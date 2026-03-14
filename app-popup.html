@@ -155,8 +155,8 @@
     flex-shrink: 0;
 }
 #maale-app-popup .popup-note {
-    font-size: 11px;
-    color: #aaa;
+    font-size: 12px;
+    color: #666;
     margin-top: 16px;
     font-weight: 500;
 }
@@ -194,9 +194,7 @@
 </div>
 <img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" style="display:none" onload="
     if(sessionStorage.getItem('maale_popup_closed'))return;
-    if(window.navigator.standalone||window.matchMedia('(display-mode:standalone)').matches)return;
-    var ua=navigator.userAgent||'';
-    if(/wv|WebView/i.test(ua)&&/android|iphone|ipad/i.test(ua))return;
+    if(!document.getElementById('MainFooter')){return;}
     var ov=document.getElementById('maale-app-overlay');
     var pp=document.getElementById('maale-app-popup');
     var cl=document.getElementById('maale-app-close');
