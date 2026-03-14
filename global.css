@@ -3451,8 +3451,8 @@ html body #MultiVendorBottomNav:not(:has(.v-btn--active)) .v-badge:first-of-type
 }
 /* 2. Position ongoingOrders above the navbar */
 #MultiVendorBottomNav #ongoingOrders {
-    position: absolute !important;
-    bottom: calc(100% + 8px) !important;
+    position: fixed !important;
+    bottom: 105px !important;
     left: 0 !important;
     right: 0 !important;
     margin: 0 auto !important;
