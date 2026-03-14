@@ -3438,36 +3438,30 @@ html body #MultiVendorBottomNav:not(:has(.v-btn--active)) .v-badge:first-of-type
 
 
 /* =========================================
-   Part 25: Order Status Crystal Fix (V9 - Anchored to Navbar)
-   Based on actual DOM: navbar#MultiVendorBottomNav > .v-bottom-navigation__content > #ongoingOrders
+   Part 25: Order Status Crystal Fix (V10 - Absolute to Fixed Navbar)
+   DOM: navbar#MultiVendorBottomNav(fixed) > .v-bottom-navigation__content(68px) > #ongoingOrders
+   The navbar is height:68px fixed. ongoingOrders must escape above it.
+   The capsule (buttons row) is already position:fixed from Part 1.
    ========================================= */
-/* 1. Make the navbar itself the positioning anchor */
-#MultiVendorBottomNav {
-    overflow: visible !important;
-    contain: none !important;
-}
-/* 2. Make content wrapper also allow overflow but keep its layout */
+/* 1. Allow overflow from the fixed navbar */
+#MultiVendorBottomNav,
 #MultiVendorBottomNav .v-bottom-navigation__content {
     overflow: visible !important;
     contain: none !important;
-    position: relative !important;
 }
-/* 3. Position ongoingOrders ABOVE the entire navbar using negative top margin */
+/* 2. Position ongoingOrders above the navbar */
 #MultiVendorBottomNav #ongoingOrders {
-    position: relative !important;
-    z-index: 9999 !important;
+    position: absolute !important;
+    bottom: calc(100% + 8px) !important;
+    left: 0 !important;
+    right: 0 !important;
+    margin: 0 auto !important;
 
-    /* Pull it up above the nav buttons using negative margin */
-    margin-top: 0 !important;
-    margin-bottom: 8px !important;
-
-    /* Sizing */
     width: calc(100% - 32px) !important;
     max-width: 450px !important;
-    margin-left: auto !important;
-    margin-right: auto !important;
+    z-index: 9999 !important;
 
-    /* Liquid Glass styling */
+    /* Liquid Glass */
     background: rgba(255, 255, 255, 0.85) !important;
     backdrop-filter: blur(24px) saturate(180%) !important;
     -webkit-backdrop-filter: blur(24px) saturate(180%) !important;
@@ -3475,28 +3469,31 @@ html body #MultiVendorBottomNav:not(:has(.v-btn--active)) .v-badge:first-of-type
     border: 1px solid rgba(255, 255, 255, 0.5) !important;
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08) !important;
     padding: 6px 10px !important;
+
+    /* CRITICAL: remove from normal flow so it doesn't affect navbar height */
+    height: auto !important;
 }
-/* 4. Kill inner backgrounds */
-#ongoingOrders .ongoing-order,
-#ongoingOrders .v-card,
-#ongoingOrders .swiper {
+/* 3. Kill inner backgrounds */
+#MultiVendorBottomNav #ongoingOrders .ongoing-order,
+#MultiVendorBottomNav #ongoingOrders .v-card,
+#MultiVendorBottomNav #ongoingOrders .swiper {
     background: transparent !important;
     background-color: transparent !important;
     box-shadow: none !important;
     background-image: none !important;
     overflow: visible !important;
 }
-/* 5. Kill Tailwind gradient on the wrapper */
+/* 4. Kill Tailwind gradient */
 #MultiVendorBottomNav .tw-bg-gradient-to-b {
     background: transparent !important;
     background-image: none !important;
 }
-/* 6. Hide the dots row */
-#ongoingOrders .tw-flex.tw-justify-left {
+/* 5. Hide dots row */
+#MultiVendorBottomNav #ongoingOrders .tw-flex.tw-justify-left {
     display: none !important;
 }
-/* 7. Fix inner card width */
-#ongoingOrders .ongoing-order {
+/* 6. Fix inner card width */
+#MultiVendorBottomNav #ongoingOrders .ongoing-order {
     width: 100% !important;
     margin: 0 !important;
 }
