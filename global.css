@@ -3468,8 +3468,6 @@ html body #MultiVendorBottomNav:not(:has(.v-btn--active)) .v-badge:first-of-type
     z-index: 9999 !important; /* מעל הכל */
     
     /* 3. עיצוב QLED Premium - נקי וקריסטלי */
-    background-color: transparent !important;
-    background-image: none !important;
     background: rgba(255, 255, 255, 0.75) !important;
     backdrop-filter: blur(24px) saturate(180%) !important;
     -webkit-backdrop-filter: blur(24px) saturate(180%) !important;
