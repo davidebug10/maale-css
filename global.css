@@ -3438,36 +3438,45 @@ html body #MultiVendorBottomNav:not(:has(.v-btn--active)) .v-badge:first-of-type
 
 
 /* =========================================
-   Part 25: Order Status Crystal Fix (V8 - iOS Native Fix)
-   Strict Scoping: #ongoingOrders & BottomNav Context
+   Part 25: Order Status Crystal Fix (V9 - Anchored to Navbar)
+   Based on actual DOM: navbar#MultiVendorBottomNav > .v-bottom-navigation__content > #ongoingOrders
    ========================================= */
-/* 1. פריצת כלא ה-Overflow */
-#MultiVendorBottomNav,
-#MultiVendorBottomNav .v-bottom-navigation__content {
+/* 1. Make the navbar itself the positioning anchor */
+#MultiVendorBottomNav {
     overflow: visible !important;
     contain: none !important;
 }
-/* 2. סטטוס ההזמנה - מיקום מעל הקפסולה */
+/* 2. Make content wrapper also allow overflow but keep its layout */
+#MultiVendorBottomNav .v-bottom-navigation__content {
+    overflow: visible !important;
+    contain: none !important;
+    position: relative !important;
+}
+/* 3. Position ongoingOrders ABOVE the entire navbar using negative top margin */
 #MultiVendorBottomNav #ongoingOrders {
     position: relative !important;
+    z-index: 9999 !important;
+
+    /* Pull it up above the nav buttons using negative margin */
+    margin-top: 0 !important;
     margin-bottom: 8px !important;
+
+    /* Sizing */
     width: calc(100% - 32px) !important;
     max-width: 450px !important;
     margin-left: auto !important;
     margin-right: auto !important;
-    z-index: 9999 !important;
 
-    /* עיצוב QLED Premium */
-    background: rgba(255, 255, 255, 0.75) !important;
+    /* Liquid Glass styling */
+    background: rgba(255, 255, 255, 0.85) !important;
     backdrop-filter: blur(24px) saturate(180%) !important;
     -webkit-backdrop-filter: blur(24px) saturate(180%) !important;
-    border-radius: 24px !important;
+    border-radius: 20px !important;
     border: 1px solid rgba(255, 255, 255, 0.5) !important;
-    border-top: 1.5px solid rgba(255, 255, 255, 0.95) !important;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.4) !important;
-    padding: 8px !important;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08) !important;
+    padding: 6px 10px !important;
 }
-/* 3. ביטול כל רקע פנימי */
+/* 4. Kill inner backgrounds */
 #ongoingOrders .ongoing-order,
 #ongoingOrders .v-card,
 #ongoingOrders .swiper {
@@ -3477,16 +3486,16 @@ html body #MultiVendorBottomNav:not(:has(.v-btn--active)) .v-badge:first-of-type
     background-image: none !important;
     overflow: visible !important;
 }
-/* 4. Force kill Tailwind gradient */
+/* 5. Kill Tailwind gradient on the wrapper */
 #MultiVendorBottomNav .tw-bg-gradient-to-b {
     background: transparent !important;
     background-image: none !important;
 }
-/* 5. הסתרת שורת הדוטים שיוצרת רווח מיותר */
+/* 6. Hide the dots row */
 #ongoingOrders .tw-flex.tw-justify-left {
     display: none !important;
 }
-/* 6. צמצום רוחב הכרטיס הפנימי */
+/* 7. Fix inner card width */
 #ongoingOrders .ongoing-order {
     width: 100% !important;
     margin: 0 !important;
