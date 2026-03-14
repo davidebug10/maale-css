@@ -3408,7 +3408,7 @@ div[data-v-4b9952fb].tw-top-1\/2.tw-left-1\/2 .tw-border-t-\[\#212121\] {
 /* --- 1. פתרון ה"תמונה הלבנה" (התנגשות אזור הזמנות פעילות) --- */
 /* העלמת הגרדיאנט המובנה ודחיפת אזור ההזמנות מעל הקפסולה הקבועה */
 html body #MultiVendorBottomNav #ongoingOrders {
-    margin-bottom: 10px !important; /* דוחף מעל לקפסולה שגובהה 72px */
+    margin-bottom: 0px !important; /* דוחף מעל לקפסולה שגובהה 72px */
 }
 
 /* מאחר וביטלנו את רקע הגרדיאנט, ניתן לכרטיס ההזמנה עצמו עיצוב זכוכית אלגנטי שישתלב עם ה-DNA */
@@ -3438,48 +3438,36 @@ html body #MultiVendorBottomNav:not(:has(.v-btn--active)) .v-badge:first-of-type
 
 
 /* =========================================
-   Part 25: Order Status Crystal Fix (V7 - Out of the Matrix)
+   Part 25: Order Status Crystal Fix (V8 - iOS Native Fix)
    Strict Scoping: #ongoingOrders & BottomNav Context
    ========================================= */
-
-/* 1. פריצת כלא ה-Overflow והעגינה הפנימית של Vuetify */
+/* 1. פריצת כלא ה-Overflow */
 #MultiVendorBottomNav,
 #MultiVendorBottomNav .v-bottom-navigation__content {
     overflow: visible !important;
     contain: none !important;
 }
-
-#MultiVendorBottomNav .v-bottom-navigation__content {
-    position: static !important; /* מעביר את סמכות העגינה לאלמנט האב הראשי כדי למנוע זיופי גובה */
-}
-
-/* 2. סטטוס ההזמנה (מחוץ לכלוב) */
-#ongoingOrders {
-    /* עכשיו כשהוא משוחרר, הוא מזהה את סרגל הניווט השלם, כולל Safe Area באייפון */
-    position: absolute !important;
-    bottom: calc(100% + 8px) !important; /* מרחף תמיד 12 פיקסלים מעל הקצה העליון של הבר השלם */
-    
-    /* מירכוז ומידות */
-    left: 0 !important;
-    right: 0 !important;
-    margin: 0 auto !important;
+/* 2. סטטוס ההזמנה - מיקום מעל הקפסולה */
+#MultiVendorBottomNav #ongoingOrders {
+    position: relative !important;
+    margin-bottom: 8px !important;
     width: calc(100% - 32px) !important;
     max-width: 450px !important;
-    z-index: 9999 !important; /* מעל הכל */
-    
-    /* 3. עיצוב QLED Premium - נקי וקריסטלי */
+    margin-left: auto !important;
+    margin-right: auto !important;
+    z-index: 9999 !important;
+
+    /* עיצוב QLED Premium */
     background: rgba(255, 255, 255, 0.75) !important;
     backdrop-filter: blur(24px) saturate(180%) !important;
     -webkit-backdrop-filter: blur(24px) saturate(180%) !important;
-    
-    /* פינות רכות ומסגרת תלת-ממדית מלוטשת */
-    border-radius: 24px !important; 
+    border-radius: 24px !important;
     border: 1px solid rgba(255, 255, 255, 0.5) !important;
-    border-top: 1.5px solid rgba(255, 255, 255, 0.95) !important; 
+    border-top: 1.5px solid rgba(255, 255, 255, 0.95) !important;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.4) !important;
+    padding: 8px !important;
 }
-
-/* ביטול כל רקע פנימי שחוסם את השקיפות */
+/* 3. ביטול כל רקע פנימי */
 #ongoingOrders .ongoing-order,
 #ongoingOrders .v-card,
 #ongoingOrders .swiper {
@@ -3489,41 +3477,17 @@ html body #MultiVendorBottomNav:not(:has(.v-btn--active)) .v-badge:first-of-type
     background-image: none !important;
     overflow: visible !important;
 }
-
-/* Force kill Tailwind gradient on ongoingOrders wrapper */
+/* 4. Force kill Tailwind gradient */
 #MultiVendorBottomNav .tw-bg-gradient-to-b {
     background: transparent !important;
     background-image: none !important;
 }
-
-/* =========================================================
-   DEBUG: COLOR WALLS - TEMPORARY (DELETE AFTER FIXING)
-   ========================================================= */
-/* DEBUG 1: #ongoingOrders itself - RED border */
-#ongoingOrders {
-    border: 3px solid red !important;
-}
-/* DEBUG 2: The Tailwind gradient wrapper div - BLUE border */
-#MultiVendorBottomNav .tw-bg-gradient-to-b {
-    border: 3px solid blue !important;
-}
-/* DEBUG 3: The ongoing-order card - GREEN border */
-#ongoingOrders .ongoing-order {
-    border: 3px solid lime !important;
-}
-/* DEBUG 4: The swiper container - ORANGE border */
-#ongoingOrders .swiper {
-    border: 3px solid orange !important;
-}
-/* DEBUG 5: The nav button row - PURPLE border */
-#MultiVendorBottomNav .tw-flex.tw-justify-between {
-    border: 3px solid purple !important;
-}
-/* DEBUG 6: v-bottom-navigation__content - YELLOW border */
-#MultiVendorBottomNav .v-bottom-navigation__content {
-    border: 3px solid yellow !important;
-}
-/* DEBUG 7: The dots row under swiper - PINK border */
+/* 5. הסתרת שורת הדוטים שיוצרת רווח מיותר */
 #ongoingOrders .tw-flex.tw-justify-left {
-    border: 3px solid hotpink !important;
+    display: none !important;
+}
+/* 6. צמצום רוחב הכרטיס הפנימי */
+#ongoingOrders .ongoing-order {
+    width: 100% !important;
+    margin: 0 !important;
 }
