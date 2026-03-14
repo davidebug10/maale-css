@@ -3116,6 +3116,58 @@ html body .location-search-custom-height input#search {
     display: none !important;
 }
 
+/* =========================================================
+   חלק 22ח: תיקון סופי - ריבוע לבן בתמונה + תוספות
+   ========================================================= */
+/* --- FIX 1: הריבוע הלבן מאחורי תמונת המוצר --- */
+/* ה-v-card הפנימי בתוך הקרוסלה שיוצר את הריבוע */
+html body .product-popup .v-carousel-item .v-responsive__content .v-card {
+    background: transparent !important;
+    background-color: transparent !important;
+    box-shadow: none !important;
+    border: none !important;
+    padding: 0 !important;
+    elevation: 0 !important;
+}
+html body .product-popup .v-carousel-item .v-responsive__content .v-card .v-card__loader {
+    display: none !important;
+}
+html body .product-popup .v-carousel-item .v-responsive__content .v-card .v-card__underlay {
+    display: none !important;
+}
+/* דריסת variant-elevated שמוסיף רקע לבן */
+html body .product-popup .v-carousel-item .v-card--variant-elevated {
+    background: transparent !important;
+    box-shadow: none !important;
+    --v-theme-surface: transparent !important;
+}
+/* --- FIX 2: רשימת התוספות - הסרת הבלוק הלבן + padding מוגזם --- */
+/* המעטפת הלבנה שעוטפת את כל הרשימה */
+html body .product-popup .tw-mx-3.tw-rounded-xl.tw-overflow-hidden.tw-bg-white {
+    background: transparent !important;
+    background-color: transparent !important;
+    border-radius: 0 !important;
+    overflow: visible !important;
+}
+/* ה-v-list עצמו - ניקוי רקע */
+html body .product-popup .tw-mx-3 .v-list.v-list--slim {
+    background: transparent !important;
+    background-color: transparent !important;
+}
+/* הקטנת padding אנכי של כל תוספת */
+html body .product-popup .v-list-item.PsoOWFvvHqrtk1n {
+    padding: 12px 16px !important;
+    min-height: auto !important;
+}
+/* ה-checkbox - מרכוז אנכי */
+html body .product-popup .v-list-item.PsoOWFvvHqrtk1n .tw-top-\[-6px\] {
+    top: 0px !important;
+}
+/* שם התוספת - גובה שורה מותאם */
+html body .product-popup .v-list-item.PsoOWFvvHqrtk1n .v-list-item-title {
+    line-height: 1.3 !important;
+    white-space: normal !important;
+}
 
 /* ==========================================================================
    חלק 23: עיצוב כירורגי לדף "הוספת כתובת" - Red & White Liquid Glass
