@@ -2368,29 +2368,31 @@ html body .merchant-page .product-card-horizontal .v-card-text {
 }
 
 /* =========================================================
-   חלק 18ג: תיקון כפתור הוספה נבלע באפליקציה (iOS Clip Fix)
+   חלק 18ג: תיקון כפתור הוספה נבלע ב-iOS (WebKit Clip Fix)
+   iOS מתעלם מ-overflow:visible כשיש border-radius על אותו אלמנט
+   פתרון: ביטול border-radius מ-v-card הפנימי, שמירתו רק על התמונה
    ========================================================= */
-/* מניעת חיתוך כפתור ההוספה ב-iOS - הגדלת אזור ה-v-card הפנימי */
+/* ביטול border-radius מ-v-card הפנימי כדי ש-overflow:visible יעבוד ב-iOS */
 html body .merchant-page .pro-card-h-img {
+    border-radius: 0 !important;
     overflow: visible !important;
-    -webkit-overflow-scrolling: touch !important;
+    border: none !important;
+    background: transparent !important;
+    box-shadow: none !important;
     margin-bottom: 16px !important;
 }
-/* וידוא שהכפתור לא נחתך על ידי ה-parent container */
+/* העברת border-radius לתמונה עצמה בלבד */
+html body .merchant-page .pro-card-h-img .product-image {
+    border-radius: 16px !important;
+    overflow: hidden !important;
+}
+/* וידוא שה-parent לא חותך */
 html body .merchant-page .pro-card-h {
     overflow: visible !important;
-    padding-bottom: 12px !important;
 }
-/* תיקון ה-aspect-ratio שחונק את הגובה וחותך את הכפתור */
-html body .merchant-page .pro-card-h-img[style*="aspect-ratio"] {
-    overflow: visible !important;
-    clip-path: none !important;
-    -webkit-clip-path: none !important;
-}
-/* הכפתור עצמו - וידוא שהוא מעל הכל */
-html body .merchant-page .add-product-btn {
+/* הכפתור מעל הכל */
+html body .merchant-page .pro-card-h-img .add-product-btn {
     z-index: 10 !important;
-    position: relative !important;
 }
 
 /* =========================================================
