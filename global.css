@@ -3497,3 +3497,147 @@ html body #MultiVendorBottomNav:not(:has(.v-btn--active)) .v-badge:first-of-type
     width: 100% !important;
     margin: 0 !important;
 }
+
+/* =========================================================
+   חלק 26: דף חיפוש - LIQUID GLASS SEARCH PAGE
+   Scope: #MultiVendorSearch
+   Date: 2026-03-14
+   ========================================================= */
+/* 1. רקע הדף - לבן קריסטל נקי */
+#MultiVendorSearch {
+    background: radial-gradient(circle at 50% 0%, #ffffff 0%, #f9f9f9 100%) !important;
+}
+/* 2. הדר חיפוש Sticky - Liquid Glass */
+#MultiVendorSearch .tw-sticky.tw-top-0.tw-bg-white {
+    background: rgba(255, 255, 255, 0.45) !important;
+    backdrop-filter: blur(40px) saturate(210%) !important;
+    -webkit-backdrop-filter: blur(40px) saturate(210%) !important;
+    border-bottom: 1.5px solid rgba(227, 30, 36, 0.1) !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04) !important;
+    padding: 16px !important;
+    z-index: 100 !important;
+}
+/* 3. שורת החיפוש - Crystal Capsule */
+#MultiVendorSearch .mobile-search-input .v-field {
+    background: rgba(255, 255, 255, 0.7) !important;
+    backdrop-filter: blur(20px) saturate(180%) !important;
+    -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+    border: 1.5px solid rgba(227, 30, 36, 0.12) !important;
+    border-radius: 20px !important;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.04) !important;
+    height: 54px !important;
+    transition: all 0.3s ease !important;
+}
+/* פוקוס על שדה החיפוש */
+#MultiVendorSearch .mobile-search-input .v-field--focused {
+    background: #ffffff !important;
+    border-color: #e31e24 !important;
+    box-shadow: 0 10px 30px rgba(227, 30, 36, 0.1) !important;
+}
+/* ניקוי שכבות Vuetify */
+#MultiVendorSearch .mobile-search-input .v-field__overlay,
+#MultiVendorSearch .mobile-search-input .v-field__outline {
+    display: none !important;
+}
+/* Placeholder וטקסט */
+#MultiVendorSearch .mobile-search-input input::placeholder {
+    color: rgba(0, 0, 0, 0.35) !important;
+    font-weight: 500 !important;
+}
+#MultiVendorSearch .mobile-search-input input {
+    font-weight: 700 !important;
+    color: #1a1a1a !important;
+}
+/* אייקון חיפוש - אדום QLED */
+#MultiVendorSearch .mobile-search-input svg path {
+    fill: #e31e24 !important;
+}
+/* כפתור חזור - אדום QLED */
+#MultiVendorSearch .mobile-search-input .v-icon {
+    color: #e31e24 !important;
+}
+#MultiVendorSearch .mobile-search-input .v-icon svg path {
+    fill: #e31e24 !important;
+}
+/* 4. כותרות סקציות (חיפוש אחרון / קניות לפי קטגוריות) */
+#MultiVendorSearch .recent-search-heading .tw-font-medium,
+#MultiVendorSearch .tw-uppercase {
+    color: #e31e24 !important;
+    font-weight: 800 !important;
+    font-size: 13px !important;
+    letter-spacing: 0.5px !important;
+}
+/* 5. כרטיס חיפוש אחרון - Floating Glass Tile */
+#MultiVendorSearch .recent-searches .tw-flex.tw-justify-between.tw-items-center.tw-mb-4 {
+    background: rgba(255, 255, 255, 0.6) !important;
+    backdrop-filter: blur(15px) !important;
+    -webkit-backdrop-filter: blur(15px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.5) !important;
+    border-radius: 18px !important;
+    padding: 12px 14px !important;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.03) !important;
+    transition: all 0.3s ease !important;
+}
+#MultiVendorSearch .recent-searches .tw-flex.tw-justify-between.tw-items-center.tw-mb-4:active {
+    transform: scale(0.98) !important;
+    background: rgba(255, 255, 255, 0.9) !important;
+}
+/* שם החנות בחיפוש אחרון */
+#MultiVendorSearch .recent-searches h4 {
+    color: #1a1a1a !important;
+    font-weight: 800 !important;
+    font-size: 14px !important;
+}
+/* כתובת בחיפוש אחרון */
+#MultiVendorSearch .recent-searches p {
+    color: #888 !important;
+    font-weight: 500 !important;
+}
+/* כפתור X (מחיקה) - אדום */
+#MultiVendorSearch .recent-searches .v-icon {
+    color: #e31e24 !important;
+    opacity: 0.5 !important;
+    transition: opacity 0.2s ease !important;
+}
+#MultiVendorSearch .recent-searches .v-icon:hover {
+    opacity: 1 !important;
+}
+/* תמונת החנות - עיגול פינות */
+#MultiVendorSearch .recent-searches .tw-rounded-\[10px\] {
+    border-radius: 14px !important;
+    overflow: hidden !important;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06) !important;
+}
+/* 6. קטגוריות - Crystal Grid Cards */
+#MultiVendorSearch .category-img {
+    background: rgba(255, 255, 255, 0.6) !important;
+    backdrop-filter: blur(15px) !important;
+    -webkit-backdrop-filter: blur(15px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.5) !important;
+    border-radius: 20px !important;
+    padding: 12px !important;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.04) !important;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+    aspect-ratio: 1 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+#MultiVendorSearch .category-img:active {
+    transform: scale(0.92) !important;
+    border-color: rgba(227, 30, 36, 0.3) !important;
+    box-shadow: 0 8px 25px rgba(227, 30, 36, 0.1) !important;
+}
+/* שם הקטגוריה */
+#MultiVendorSearch .tw-grid .tw-text-xs.tw-text-center {
+    color: #1a1a1a !important;
+    font-weight: 700 !important;
+    font-size: 12px !important;
+    margin-top: 8px !important;
+}
+/* 7. ניקוי שכבות מערכת */
+#MultiVendorSearch .v-field__loader,
+#MultiVendorSearch .v-btn__overlay,
+#MultiVendorSearch .v-btn__underlay {
+    display: none !important;
+}
