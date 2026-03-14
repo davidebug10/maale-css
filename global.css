@@ -3495,3 +3495,35 @@ html body #MultiVendorBottomNav:not(:has(.v-btn--active)) .v-badge:first-of-type
     background: transparent !important;
     background-image: none !important;
 }
+
+/* =========================================================
+   DEBUG: COLOR WALLS - TEMPORARY (DELETE AFTER FIXING)
+   ========================================================= */
+/* DEBUG 1: #ongoingOrders itself - RED border */
+#ongoingOrders {
+    border: 3px solid red !important;
+}
+/* DEBUG 2: The Tailwind gradient wrapper div - BLUE border */
+#MultiVendorBottomNav .tw-bg-gradient-to-b {
+    border: 3px solid blue !important;
+}
+/* DEBUG 3: The ongoing-order card - GREEN border */
+#ongoingOrders .ongoing-order {
+    border: 3px solid lime !important;
+}
+/* DEBUG 4: The swiper container - ORANGE border */
+#ongoingOrders .swiper {
+    border: 3px solid orange !important;
+}
+/* DEBUG 5: The nav button row - PURPLE border */
+#MultiVendorBottomNav .tw-flex.tw-justify-between {
+    border: 3px solid purple !important;
+}
+/* DEBUG 6: v-bottom-navigation__content - YELLOW border */
+#MultiVendorBottomNav .v-bottom-navigation__content {
+    border: 3px solid yellow !important;
+}
+/* DEBUG 7: The dots row under swiper - PINK border */
+#ongoingOrders .tw-flex.tw-justify-left {
+    border: 3px solid hotpink !important;
+}
