@@ -2368,6 +2368,32 @@ html body .merchant-page .product-card-horizontal .v-card-text {
 }
 
 /* =========================================================
+   חלק 18ג: תיקון כפתור הוספה נבלע באפליקציה (iOS Clip Fix)
+   ========================================================= */
+/* מניעת חיתוך כפתור ההוספה ב-iOS - הגדלת אזור ה-v-card הפנימי */
+html body .merchant-page .pro-card-h-img {
+    overflow: visible !important;
+    -webkit-overflow-scrolling: touch !important;
+    margin-bottom: 16px !important;
+}
+/* וידוא שהכפתור לא נחתך על ידי ה-parent container */
+html body .merchant-page .pro-card-h {
+    overflow: visible !important;
+    padding-bottom: 12px !important;
+}
+/* תיקון ה-aspect-ratio שחונק את הגובה וחותך את הכפתור */
+html body .merchant-page .pro-card-h-img[style*="aspect-ratio"] {
+    overflow: visible !important;
+    clip-path: none !important;
+    -webkit-clip-path: none !important;
+}
+/* הכפתור עצמו - וידוא שהוא מעל הכל */
+html body .merchant-page .add-product-btn {
+    z-index: 10 !important;
+    position: relative !important;
+}
+
+/* =========================================================
       FIX PART 19/20: GLOBAL LIQUID GLASS FOR VERTICAL CARDS
 =========================================================
 */
