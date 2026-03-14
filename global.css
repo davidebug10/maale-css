@@ -3763,3 +3763,177 @@ html body #MultiVendorBottomNav:not(:has(.v-btn--active)) .v-badge:first-of-type
 .v-bottom-sheet__content:has(.location-search-custom-height) a.v-btn .v-btn__underlay {
     display: none !important;
 }
+
+/* =========================================================
+   חלק 28: דף הוספת/עריכת כתובת - LIQUID GLASS OVERHAUL
+   Scope: #locationConfirm, #addAddressForm, [data-v-d055d74b]
+   Date: 2026-03-14
+   ========================================================= */
+/* 1. כפתור "שמור כתובת" - שחור → אדום QLED */
+[data-v-d055d74b] button.tw-bg-black,
+[data-v-d055d74b] button[class*="tw-bg-black"],
+#addAddressForm ~ div button.v-btn {
+    background: linear-gradient(135deg, #e31e24 0%, #b3161b 100%) !important;
+    color: #ffffff !important;
+    border-radius: 18px !important;
+    height: 58px !important;
+    font-size: 17px !important;
+    font-weight: 900 !important;
+    box-shadow: 0 10px 30px rgba(227, 30, 36, 0.3) !important;
+    border: none !important;
+    text-transform: none !important;
+}
+[data-v-d055d74b] button.tw-bg-black:active,
+#addAddressForm ~ div button.v-btn:active {
+    transform: scale(0.97) !important;
+}
+/* 2. פוטר כפתור שמירה - Liquid Glass */
+[data-v-d055d74b].tw-absolute.tw-bottom-0.tw-bg-white {
+    background: rgba(255, 255, 255, 0.75) !important;
+    backdrop-filter: blur(30px) saturate(200%) !important;
+    -webkit-backdrop-filter: blur(30px) saturate(200%) !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.5) !important;
+    box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.06) !important;
+}
+/* 3. תרגום "SAVE ADDRESS AS" → "שמור כתובת כ:" */
+#AddressSelectType label[style*="font-family"] {
+    font-size: 0 !important;
+}
+#AddressSelectType label[style*="font-family"]::before {
+    content: "שמור כתובת כ:" !important;
+    font-size: 13px !important;
+    font-weight: 800 !important;
+    color: #e31e24 !important;
+    text-transform: none !important;
+    visibility: visible !important;
+}
+/* 4. שדות טופס - קפסולות Liquid Glass */
+#addAddressForm .v-field--variant-underlined,
+#locationConfirm .v-field--variant-underlined {
+    background: rgba(245, 245, 245, 0.6) !important;
+    border-radius: 16px !important;
+    padding: 12px 16px !important;
+    border: 1px solid transparent !important;
+    transition: all 0.3s ease !important;
+    margin-bottom: 8px !important;
+}
+#addAddressForm .v-field--focused.v-field--variant-underlined,
+#locationConfirm .v-field--focused.v-field--variant-underlined {
+    background: #ffffff !important;
+    border: 1px solid rgba(227, 30, 36, 0.3) !important;
+    box-shadow: 0 4px 15px rgba(227, 30, 36, 0.08) !important;
+}
+/* הסתרת קו תחתון של Vuetify */
+#addAddressForm .v-field__outline,
+#locationConfirm .v-field__outline {
+    display: none !important;
+}
+/* 5. צ'יפים (בית/משרד/אחרים) - אדום מותג */
+#AddressSelectType .v-chip.text-primary {
+    border-color: #e31e24 !important;
+    background-color: rgba(227, 30, 36, 0.05) !important;
+    color: #e31e24 !important;
+}
+#AddressSelectType .v-chip {
+    background: #ffffff !important;
+    border: 1.5px solid #e0e0e0 !important;
+    border-radius: 12px !important;
+    font-weight: 600 !important;
+    transition: all 0.2s ease !important;
+    margin-left: 8px !important;
+}
+#AddressSelectType .v-chip__overlay,
+#AddressSelectType .v-chip__underlay {
+    display: none !important;
+}
+/* 6. שדה טלפון - ריווח ותיקון */
+#addAddressForm #AddressInputContactPhoneNumber .v-field {
+    direction: ltr !important;
+    display: flex !important;
+    align-items: center !important;
+}
+#addAddressForm #AddressInputContactPhoneNumber input[type="tel"] {
+    direction: ltr !important;
+    text-align: left !important;
+    padding-left: 12px !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.5px !important;
+}
+#addAddressForm .tw-bg-\[\#ccc\] {
+    background-color: rgba(227, 30, 36, 0.3) !important;
+    height: 20px !important;
+}
+/* 7. בועת "הזז את הסיכה" - אדום מותג */
+#locationConfirm .tw-bg-\[\#212121\].tw-rounded-lg {
+    background: rgba(227, 30, 36, 0.9) !important;
+    backdrop-filter: blur(10px) !important;
+    -webkit-backdrop-filter: blur(10px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    border-radius: 12px !important;
+    box-shadow: 0 6px 20px rgba(227, 30, 36, 0.25) !important;
+}
+#locationConfirm .tw-border-t-\[\#212121\] {
+    border-top-color: rgba(227, 30, 36, 0.9) !important;
+}
+/* 8. כפתור "אתר אותי" */
+#locationConfirm #CurrentLocationButton {
+    background: rgba(255, 255, 255, 0.9) !important;
+    backdrop-filter: blur(15px) !important;
+    -webkit-backdrop-filter: blur(15px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.6) !important;
+    color: #e31e24 !important;
+    border-radius: 50px !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1) !important;
+}
+#locationConfirm #CurrentLocationButton .v-icon {
+    color: #e31e24 !important;
+}
+/* 9. הדר "עריכת פרטי כתובת / הוסף כתובת חדשה" */
+.tw-h-\[56px\].tw-bg-white {
+    background: rgba(255, 255, 255, 0.5) !important;
+    backdrop-filter: blur(35px) saturate(200%) !important;
+    -webkit-backdrop-filter: blur(35px) saturate(200%) !important;
+    border-bottom: 1.5px solid rgba(227, 30, 36, 0.1) !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04) !important;
+}
+/* כפתור חזור באדום */
+.tw-h-\[56px\] img[alt="Back"] {
+    filter: brightness(0) saturate(100%) invert(18%) sepia(88%) saturate(5427%) hue-rotate(352deg) brightness(91%) contrast(92%) !important;
+}
+/* 10. רקע הטופס - Liquid Glass */
+#locationConfirm {
+    background: transparent !important;
+}
+.tw-flex-shrink-0.tw-z-10.tw-bg-white {
+    background: rgba(255, 255, 255, 0.5) !important;
+    backdrop-filter: blur(30px) saturate(180%) !important;
+    -webkit-backdrop-filter: blur(30px) saturate(180%) !important;
+}
+/* 11. אזור פרטי הכתובת (שם רחוב + עיר) */
+#locationConfirm .tw-px-4.tw-pt-3.tw-pb-3 {
+    background: rgba(255, 255, 255, 0.5) !important;
+    backdrop-filter: blur(15px) !important;
+    -webkit-backdrop-filter: blur(15px) !important;
+    border-radius: 20px !important;
+    margin: 10px 16px !important;
+    border: 1px solid rgba(0, 0, 0, 0.04) !important;
+}
+/* אייקון מיקום ליד שם הרחוב - אדום */
+#locationConfirm h2 img {
+    filter: brightness(0) saturate(100%) invert(18%) sepia(88%) saturate(5427%) hue-rotate(352deg) brightness(91%) contrast(92%) !important;
+}
+/* 12. פס "עיגול" למעלה (drag handle) */
+#locationConfirm .tw-bg-\[\#e5e5e5\] {
+    background: rgba(227, 30, 36, 0.2) !important;
+    width: 50px !important;
+    border-radius: 20px !important;
+}
+/* 13. ניקוי שכבות מערכת */
+#addAddressForm .v-field__overlay,
+#addAddressForm .v-btn__overlay,
+#addAddressForm .v-btn__underlay,
+#locationConfirm .v-btn__overlay,
+#locationConfirm .v-btn__underlay,
+#locationConfirm .v-card__underlay {
+    display: none !important;
+}
