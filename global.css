@@ -2898,6 +2898,8 @@ html body .location-search-custom-height input#search {
     border: 1px solid rgba(255, 255, 255, 0.4) !important;
     border-radius: 18px !important;
     margin: 0 14px 12px 14px !important;
+    padding-top: 10px !important;
+    padding-bottom: 10px !important;
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.03) !important;
 }
 
@@ -3060,7 +3062,7 @@ html body .location-search-custom-height input#search {
 
 /* 1. המכולה הראשית של הסליידר - ניקוי גובה קשיח */
 .product-popup .product-image-slider {
-    height: 380px !important; /* גובה מאוזן יותר למובייל */
+    height: auto !important;
     background: transparent !important;
     margin-bottom: 10px !important;
 }
@@ -3068,28 +3070,25 @@ html body .location-search-custom-height input#search {
 /* 2. ניקוי כרטיס ה-v-card הפנימי שיוצר את המסגרת הלבנה */
 .product-popup .v-carousel-item .v-card {
     background: transparent !important;
+    background-color: transparent !important;
+    --v-theme-surface: transparent !important;
     border: none !important;
     box-shadow: none !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
-    padding: 10px !important;
+    padding: 0 !important;
+    aspect-ratio: unset !important;
 }
 
 /* 3. עיצוב התמונה עצמה - THE FLOATING CRYSTAL */
 .product-popup .v-carousel-item .v-img.image {
-    border-radius: 28px !important; /* פינות מעוגלות יוקרתיות */
-    border: 1px solid rgba(227, 30, 36, 0.15) !important; /* מסגרת אדומה דקיקה */
-    
-    /* אפקט עומק של זכוכית */
-    box-shadow: 
-        0 15px 35px rgba(0, 0, 0, 0.1),
-        0 5px 15px rgba(227, 30, 36, 0.05) !important;
-    
-    /* וידוא שהתמונה תופסת את כל השטח שהקצבנו לה */
-    width: 92% !important;
-    max-width: 350px !important;
-    margin: 0 auto !important;
+    border-radius: 20px !important;
+    border: none !important;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08) !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
     overflow: hidden !important;
 }
 
