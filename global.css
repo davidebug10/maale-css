@@ -3409,7 +3409,7 @@ div[data-v-4b9952fb].tw-top-1\/2.tw-left-1\/2 .tw-border-t-\[\#212121\] {
 /* העלמת הגרדיאנט המובנה ודחיפת אזור ההזמנות מעל הקפסולה הקבועה */
 html body #MultiVendorBottomNav #ongoingOrders {
     background: transparent !important;
-    margin-bottom: 85px !important; /* דוחף מעל לקפסולה שגובהה 72px */
+    margin-bottom: 0px !important; /* דוחף מעל לקפסולה שגובהה 72px */
 }
 
 /* מאחר וביטלנו את רקע הגרדיאנט, ניתן לכרטיס ההזמנה עצמו עיצוב זכוכית אלגנטי שישתלב עם ה-DNA */
@@ -3458,7 +3458,7 @@ html body #MultiVendorBottomNav:not(:has(.v-btn--active)) .v-badge:first-of-type
 #ongoingOrders {
     /* עכשיו כשהוא משוחרר, הוא מזהה את סרגל הניווט השלם, כולל Safe Area באייפון */
     position: absolute !important;
-    bottom: calc(100% + 12px) !important; /* מרחף תמיד 12 פיקסלים מעל הקצה העליון של הבר השלם */
+    bottom: calc(100% + 8px) !important; /* מרחף תמיד 12 פיקסלים מעל הקצה העליון של הבר השלם */
     
     /* מירכוז ומידות */
     left: 0 !important;
