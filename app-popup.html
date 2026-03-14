@@ -1,0 +1,222 @@
+<!-- =========================================================
+   מעלה המשלוחים - App Download Popup V2 (Liquid Glass Crystal)
+   Custom Code for Hyperzod - paste ALL of this into Custom Code block
+   ========================================================= -->
+<style>
+#maale-app-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.35);
+    backdrop-filter: blur(12px) saturate(180%);
+    -webkit-backdrop-filter: blur(12px) saturate(180%);
+    z-index: 99998;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+}
+#maale-app-overlay.show {
+    opacity: 1;
+}
+#maale-app-popup {
+    display: none;
+    position: fixed;
+    z-index: 99999;
+
+    /* CENTER on screen */
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.85);
+    opacity: 0;
+
+    width: 88%;
+    max-width: 380px;
+
+    /* CRYSTAL Liquid Glass - maximum transparency */
+    background: rgba(255, 255, 255, 0.55);
+    backdrop-filter: blur(50px) saturate(250%) contrast(110%);
+    -webkit-backdrop-filter: blur(50px) saturate(250%) contrast(110%);
+    border: 1.5px solid rgba(255, 255, 255, 0.7);
+    border-radius: 32px;
+    box-shadow:
+        0 25px 60px rgba(0, 0, 0, 0.15),
+        0 8px 20px rgba(0, 0, 0, 0.08),
+        inset 0 1px 3px rgba(255, 255, 255, 0.9),
+        inset 0 -1px 2px rgba(255, 255, 255, 0.3);
+
+    padding: 32px 24px 24px 24px;
+    direction: rtl;
+    text-align: center;
+
+    transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+#maale-app-popup.show {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+}
+#maale-app-close {
+    position: absolute;
+    top: 14px;
+    left: 14px;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    background: rgba(255, 255, 255, 0.5);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    color: #999;
+    font-size: 20px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    line-height: 1;
+    padding: 0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+#maale-app-close:active {
+    transform: scale(0.85);
+    background: rgba(227, 30, 36, 0.15);
+    color: #e31e24;
+}
+#maale-app-popup .popup-emoji {
+    font-size: 48px;
+    margin-bottom: 14px;
+    display: block;
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1));
+}
+#maale-app-popup .popup-title {
+    font-size: 21px;
+    font-weight: 900;
+    color: #1a1a1a;
+    margin: 0 0 8px 0;
+    line-height: 1.35;
+}
+#maale-app-popup .popup-title span {
+    color: #e31e24;
+    text-shadow: 0 0 20px rgba(227, 30, 36, 0.15);
+}
+#maale-app-popup .popup-desc {
+    font-size: 14px;
+    font-weight: 500;
+    color: #777;
+    margin: 0 0 22px 0;
+    line-height: 1.5;
+}
+#maale-app-popup .popup-buttons {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
+#maale-app-popup .popup-btn {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 14px 16px;
+    border-radius: 16px;
+    text-decoration: none;
+    font-weight: 800;
+    font-size: 13px;
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+}
+#maale-app-popup .popup-btn.ios-btn {
+    background: linear-gradient(135deg, #e31e24 0%, #b3161b 100%);
+    color: #ffffff;
+    box-shadow: 0 8px 24px rgba(227, 30, 36, 0.35);
+}
+#maale-app-popup .popup-btn.ios-btn:active {
+    transform: scale(0.95);
+    box-shadow: 0 4px 12px rgba(227, 30, 36, 0.2);
+}
+#maale-app-popup .popup-btn.android-btn {
+    background: rgba(255, 255, 255, 0.5);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    color: #e31e24;
+    border: 1.5px solid rgba(227, 30, 36, 0.2);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+}
+#maale-app-popup .popup-btn.android-btn:active {
+    transform: scale(0.95);
+    background: rgba(227, 30, 36, 0.08);
+}
+#maale-app-popup .popup-btn svg {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+}
+#maale-app-popup .popup-note {
+    font-size: 11px;
+    color: #aaa;
+    margin-top: 16px;
+    font-weight: 500;
+}
+</style>
+<div id="maale-app-overlay"></div>
+<div id="maale-app-popup">
+    <button id="maale-app-close">&times;</button>
+
+    <span class="popup-emoji">📱</span>
+
+    <h3 class="popup-title">
+        הורידו את האפליקציה וקבלו
+        <span>10% הנחה</span>
+        על ההזמנה הראשונה!
+    </h3>
+
+    <p class="popup-desc">
+        חוויית הזמנה מהירה ונוחה יותר ישירות מהנייד
+    </p>
+
+    <div class="popup-buttons">
+        <a href="https://apps.apple.com/us/app/%D7%9E%D7%A2%D7%9C%D7%94-%D7%94%D7%9E%D7%A9%D7%9C%D7%95%D7%97%D7%99%D7%9D/id6757471366"
+           target="_blank" class="popup-btn ios-btn">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5C17.88 20.74 17 21.95 15.66 21.97C14.32 22 13.89 21.18 12.37 21.18C10.84 21.18 10.37 21.95 9.1 22C7.79 22.05 6.8 20.68 5.96 19.47C4.25 16.56 2.93 11.3 4.7 7.72C5.57 5.94 7.36 4.86 9.28 4.84C10.56 4.81 11.78 5.7 12.57 5.7C13.36 5.7 14.85 4.62 16.4 4.8C17.07 4.83 18.89 5.08 20.06 6.77C19.95 6.84 17.62 8.22 17.65 11.06C17.68 14.42 20.56 15.52 20.6 15.53C20.57 15.61 20.14 17.04 19.12 18.5L18.71 19.5ZM13 3.5C13.73 2.67 14.94 2.04 15.94 2C16.07 3.17 15.6 4.35 14.9 5.19C14.21 6.04 13.07 6.7 11.95 6.61C11.8 5.46 12.36 4.26 13 3.5Z"/></svg>
+            App Store
+        </a>
+        <a href="https://play.google.com/store/apps/details?id=com.customer.maalehamishlohim&hl=he"
+           target="_blank" class="popup-btn android-btn">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3,20.5V3.5C3,2.91 3.34,2.39 3.84,2.15L13.69,12L3.84,21.85C3.34,21.61 3,21.09 3,20.5M16.81,15.12L6.05,21.34L14.54,12.85L16.81,15.12M20.16,10.81C20.5,11.08 20.75,11.5 20.75,12C20.75,12.5 20.53,12.9 20.18,13.18L17.89,14.5L15.39,12L17.89,9.5L20.16,10.81M6.05,2.66L16.81,8.88L14.54,11.15L6.05,2.66Z"/></svg>
+            Google Play
+        </a>
+    </div>
+
+    <p class="popup-note">⚡ ההנחה תופעל אוטומטית בהזמנה ראשונה מהאפליקציה</p>
+</div>
+<img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" style="display:none" onload="
+    if(sessionStorage.getItem('maale_popup_closed'))return;
+    if(window.navigator.standalone||window.matchMedia('(display-mode:standalone)').matches)return;
+    var ua=navigator.userAgent||'';
+    if(/wv|WebView/i.test(ua)&&/android|iphone|ipad/i.test(ua))return;
+    var ov=document.getElementById('maale-app-overlay');
+    var pp=document.getElementById('maale-app-popup');
+    var cl=document.getElementById('maale-app-close');
+    if(!ov||!pp||!cl)return;
+    setTimeout(function(){
+        ov.style.display='block';
+        pp.style.display='block';
+        setTimeout(function(){
+            ov.classList.add('show');
+            pp.classList.add('show');
+        },50);
+    },3000);
+    cl.addEventListener('click',function(){
+        ov.classList.remove('show');
+        pp.classList.remove('show');
+        setTimeout(function(){
+            ov.style.display='none';
+            pp.style.display='none';
+        },500);
+        sessionStorage.setItem('maale_popup_closed','true');
+    });
+    ov.addEventListener('click',function(){cl.click();});
+">
