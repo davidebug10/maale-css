@@ -3408,7 +3408,6 @@ div[data-v-4b9952fb].tw-top-1\/2.tw-left-1\/2 .tw-border-t-\[\#212121\] {
 /* --- 1. פתרון ה"תמונה הלבנה" (התנגשות אזור הזמנות פעילות) --- */
 /* העלמת הגרדיאנט המובנה ודחיפת אזור ההזמנות מעל הקפסולה הקבועה */
 html body #MultiVendorBottomNav #ongoingOrders {
-    background: transparent !important;
     margin-bottom: 10px !important; /* דוחף מעל לקפסולה שגובהה 72px */
 }
 
@@ -3483,7 +3482,6 @@ html body #MultiVendorBottomNav:not(:has(.v-btn--active)) .v-badge:first-of-type
 }
 
 /* ביטול כל רקע פנימי שחוסם את השקיפות */
-#ongoingOrders,
 #ongoingOrders .ongoing-order,
 #ongoingOrders .v-card,
 #ongoingOrders .swiper {
