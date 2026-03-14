@@ -3409,7 +3409,7 @@ div[data-v-4b9952fb].tw-top-1\/2.tw-left-1\/2 .tw-border-t-\[\#212121\] {
 /* העלמת הגרדיאנט המובנה ודחיפת אזור ההזמנות מעל הקפסולה הקבועה */
 html body #MultiVendorBottomNav #ongoingOrders {
     background: transparent !important;
-    margin-bottom: 0px !important; /* דוחף מעל לקפסולה שגובהה 72px */
+    margin-bottom: 10px !important; /* דוחף מעל לקפסולה שגובהה 72px */
 }
 
 /* מאחר וביטלנו את רקע הגרדיאנט, ניתן לכרטיס ההזמנה עצמו עיצוב זכוכית אלגנטי שישתלב עם ה-DNA */
@@ -3470,7 +3470,8 @@ html body #MultiVendorBottomNav:not(:has(.v-btn--active)) .v-badge:first-of-type
     
     /* 3. עיצוב QLED Premium - נקי וקריסטלי */
     background-color: transparent !important;
-    background-image: linear-gradient(135deg, rgba(255, 255, 255, 0.85) 0%, rgba(255, 255, 255, 0.40) 100%) !important; 
+    background-image: none !important;
+    background: rgba(255, 255, 255, 0.75) !important;
     backdrop-filter: blur(24px) saturate(180%) !important;
     -webkit-backdrop-filter: blur(24px) saturate(180%) !important;
     
@@ -3482,6 +3483,7 @@ html body #MultiVendorBottomNav:not(:has(.v-btn--active)) .v-badge:first-of-type
 }
 
 /* ביטול כל רקע פנימי שחוסם את השקיפות */
+#ongoingOrders,
 #ongoingOrders .ongoing-order,
 #ongoingOrders .v-card,
 #ongoingOrders .swiper {
@@ -3490,4 +3492,10 @@ html body #MultiVendorBottomNav:not(:has(.v-btn--active)) .v-badge:first-of-type
     box-shadow: none !important;
     background-image: none !important;
     overflow: visible !important;
+}
+
+/* Force kill Tailwind gradient on ongoingOrders wrapper */
+#MultiVendorBottomNav .tw-bg-gradient-to-b {
+    background: transparent !important;
+    background-image: none !important;
 }
