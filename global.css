@@ -4482,41 +4482,58 @@ html body .v-overlay__content.v-bottom-sheet__content:has(.v-card.tw-pt-0.tw-bor
 }
 
 /* =========================================================
-   חלק 29: דף הוספת/עריכת כתובת - SCOPE CHIRURGI חדש
-   תאריך: 2026-04-27
-   Scope: [data-v-d89a1ff7] (הסקופ הנוכחי לאחר עדכוני Hyperzod)
-   הסיבה ליצירת חלק חדש: חלקים 16, 17, 23, 23B, 28 משתמשים
-   ב-Vue scopes ישנים (data-v-bd9430d0, data-v-4b9952fb,
-   data-v-d055d74b) שלא קיימים יותר ב-DOM הנוכחי.
-   הם נשארים בקובץ ליתר ביטחון אך לא חלים בפועל.
+   חלק 29: דף הוספת/עריכת כתובת - LIQUID GLASS V2
+   תאריך: 2026-04-27 (גרסה מתוקנת)
+   Scope: .v-bottom-sheet__content:has(#addAddressForm)
+   הסקופ הזה ייחודי לחלוטין לפופאפ הזה (1 התאמה בלבד באתר)
 
    חלק זה מטפל ב:
    1. רקע מגניב במקום אפור משעמם
    2. כפתור "שמור כתובת" - אדום מותגי + מרכוז
+   3. ביטול הפס האפור המציק בין שדה החיפוש לטופס
    ========================================================= */
 
-/* 1. הרקע הראשי של הדף - גרדיאנט לבן עדין במקום אפור */
-[data-v-d89a1ff7]#locationConfirm,
-[data-v-d89a1ff7].v-card[id="locationConfirm"] {
+/* 1. הכרטיס הראשי של הפופאפ - רקע גרדיאנט עדין במקום לבן אטום */
+.v-bottom-sheet__content:has(#addAddressForm) > .v-card {
     background: linear-gradient(180deg, #ffffff 0%, #fefafa 50%, #fff5f5 100%) !important;
     background-color: transparent !important;
 }
 
-/* 2. ביטול הרקע האפור של מכולת הטופס */
-[data-v-d89a1ff7].tw-px-4.tw-pt-3.tw-pb-3 {
-    background: transparent !important;
+/* 2. ביטול שכבת underlay של הכרטיס */
+.v-bottom-sheet__content:has(#addAddressForm) > .v-card > .v-card__underlay,
+.v-bottom-sheet__content:has(#addAddressForm) > .v-card > .v-card__loader {
+    display: none !important;
 }
 
-/* 3. הפס האפור הדק שמופיע בראש (border) - הסתרה */
-[data-v-d89a1ff7].tw-flex.tw-flex-col.tw-items-center.tw-justify-center {
+/* 3. אזור התוכן הפנימי (v-card-text) - הפיכה לשקוף */
+.v-bottom-sheet__content:has(#addAddressForm) .v-card-text {
     background: transparent !important;
+    background-color: transparent !important;
+}
+
+/* 4. ביטול רקע אפור של מכולת הטופס + כל המכולות הפנימיות */
+.v-bottom-sheet__content:has(#addAddressForm) .tw-px-4.tw-pt-3.tw-pb-3,
+.v-bottom-sheet__content:has(#addAddressForm) .tw-flex.tw-flex-col.tw-items-center.tw-justify-center,
+.v-bottom-sheet__content:has(#addAddressForm) #locationConfirm {
+    background: transparent !important;
+    background-color: transparent !important;
     border: none !important;
     box-shadow: none !important;
 }
 
-/* 4. פוטר כפתור השמירה - Liquid Glass במקום לבן אטום */
-[data-v-d89a1ff7].tw-absolute.tw-bottom-0.tw-w-full.tw-bg-white {
+/* 5. הפס האפור מתחת לשדה החיפוש - הסתרה אגרסיבית */
+.v-bottom-sheet__content:has(#addAddressForm) .tw-bg-white,
+.v-bottom-sheet__content:has(#addAddressForm) .tw-bg-\[\#f7f7f7\],
+.v-bottom-sheet__content:has(#addAddressForm) .tw-bg-\[\#f5f5f5\],
+.v-bottom-sheet__content:has(#addAddressForm) .tw-bg-gray-100,
+.v-bottom-sheet__content:has(#addAddressForm) .tw-bg-gray-50 {
+    background-color: transparent !important;
+}
+
+/* 6. פוטר כפתור השמירה - Liquid Glass במקום לבן אטום */
+.v-bottom-sheet__content:has(#addAddressForm) .tw-absolute.tw-bottom-0 {
     background: rgba(255, 255, 255, 0.85) !important;
+    background-color: rgba(255, 255, 255, 0.85) !important;
     backdrop-filter: blur(30px) saturate(200%) !important;
     -webkit-backdrop-filter: blur(30px) saturate(200%) !important;
     border-top: 1px solid rgba(255, 255, 255, 0.6) !important;
@@ -4525,12 +4542,15 @@ html body .v-overlay__content.v-bottom-sheet__content:has(.v-card.tw-pt-0.tw-bor
     display: flex !important;
     justify-content: center !important;
     align-items: center !important;
+    left: 0 !important;
+    right: 0 !important;
+    margin: 0 auto !important;
+    width: 100% !important;
 }
 
-/* 5. כפתור "שמור כתובת" - אדום מותגי + מרכוז */
-[data-v-d89a1ff7].tw-absolute.tw-bottom-0 button.v-btn,
-[data-v-d89a1ff7].tw-absolute.tw-bottom-0 button[type="button"],
-[data-v-d89a1ff7].tw-absolute.tw-bottom-0 .v-btn--size-x-large {
+/* 7. כפתור "שמור כתובת" - אדום מותגי + מרכוז + רוחב מלא */
+.v-bottom-sheet__content:has(#addAddressForm) .tw-absolute.tw-bottom-0 button.v-btn,
+.v-bottom-sheet__content:has(#addAddressForm) .tw-absolute.tw-bottom-0 .v-btn {
     background: linear-gradient(135deg, #e31e24 0%, #b3161b 100%) !important;
     background-color: #e31e24 !important;
     color: #ffffff !important;
@@ -4548,23 +4568,23 @@ html body .v-overlay__content.v-bottom-sheet__content:has(.v-card.tw-pt-0.tw-bor
     align-items: center !important;
 }
 
-/* 6. טקסט הכפתור */
-[data-v-d89a1ff7].tw-absolute.tw-bottom-0 button .v-btn__content,
-[data-v-d89a1ff7].tw-absolute.tw-bottom-0 button span {
+/* 8. טקסט הכפתור - לבן ובולט */
+.v-bottom-sheet__content:has(#addAddressForm) .tw-absolute.tw-bottom-0 button .v-btn__content,
+.v-bottom-sheet__content:has(#addAddressForm) .tw-absolute.tw-bottom-0 button span {
     color: #ffffff !important;
     font-size: 18px !important;
     font-weight: 900 !important;
     letter-spacing: 0.5px !important;
 }
 
-/* 7. אפקט לחיצה */
-[data-v-d89a1ff7].tw-absolute.tw-bottom-0 button.v-btn:active {
+/* 9. אפקט לחיצה טקטילי */
+.v-bottom-sheet__content:has(#addAddressForm) .tw-absolute.tw-bottom-0 button.v-btn:active {
     transform: scale(0.97) !important;
     box-shadow: 0 4px 15px rgba(227, 30, 36, 0.2) !important;
 }
 
-/* 8. ניקוי שכבות overlay של Vuetify */
-[data-v-d89a1ff7].tw-absolute.tw-bottom-0 button .v-btn__overlay,
-[data-v-d89a1ff7].tw-absolute.tw-bottom-0 button .v-btn__underlay {
+/* 10. ניקוי שכבות overlay של Vuetify בכפתור */
+.v-bottom-sheet__content:has(#addAddressForm) .tw-absolute.tw-bottom-0 button .v-btn__overlay,
+.v-bottom-sheet__content:has(#addAddressForm) .tw-absolute.tw-bottom-0 button .v-btn__underlay {
     display: none !important;
 }
