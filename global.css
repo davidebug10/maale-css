@@ -4290,3 +4290,191 @@ html body .mh-contact-wrapper .mh-card-whatsapp .mh-icon-whatsapp {
     color: transparent !important;
     text-indent: -9999px !important;
 }
+
+/* =========================================================
+   חלק 30: עגלה רב-ספקית (Multi-Vendor Cart Modal) - LIQUID GLASS
+   תאריך: 27.04.2026
+   Scope: .v-overlay__content.v-bottom-sheet__content:has(.v-card.tw-pt-0.tw-border-none)
+   הערה: סלקטור ייחודי כדי לא לזלוג למודאלים אחרים של Vuetify
+   ========================================================= */
+
+/* 1. המכולה החיצונית - מרכוז ורוחב מובייל */
+html body .v-overlay__content.v-bottom-sheet__content:has(.v-card.tw-pt-0.tw-border-none .tw-w-full.tw-p-4.tw-rounded-lg.tw-border) {
+    left: 0 !important;
+    right: 0 !important;
+    margin: 0 auto !important;
+    max-width: 500px !important;
+}
+
+/* 2. הכרטיס הראשי - Liquid Glass עליון */
+html body .v-overlay__content.v-bottom-sheet__content:has(.v-card.tw-pt-0.tw-border-none .tw-w-full.tw-p-4.tw-rounded-lg.tw-border) > .v-card {
+    background: rgba(255, 255, 255, 0.85) !important;
+    backdrop-filter: blur(45px) saturate(210%) !important;
+    -webkit-backdrop-filter: blur(45px) saturate(210%) !important;
+    border-radius: 32px 32px 0 0 !important;
+    border: none !important;
+    border-top: 1.5px solid rgba(255, 255, 255, 0.7) !important;
+    box-shadow: 0 -20px 60px rgba(0, 0, 0, 0.12) !important;
+    overflow: hidden !important;
+}
+
+/* 3. ניקוי שכבות underlay של ה-card */
+html body .v-overlay__content.v-bottom-sheet__content:has(.v-card.tw-pt-0.tw-border-none .tw-w-full.tw-p-4.tw-rounded-lg.tw-border) > .v-card > .v-card__underlay,
+html body .v-overlay__content.v-bottom-sheet__content:has(.v-card.tw-pt-0.tw-border-none .tw-w-full.tw-p-4.tw-rounded-lg.tw-border) > .v-card > .v-card__loader {
+    display: none !important;
+}
+
+/* 4. כותרת "עגלה" */
+html body .v-overlay__content.v-bottom-sheet__content:has(.v-card.tw-pt-0.tw-border-none .tw-w-full.tw-p-4.tw-rounded-lg.tw-border) .v-card-title {
+    font-size: 19px !important;
+    font-weight: 900 !important;
+    color: #e31e24 !important;
+    padding: 20px 16px !important;
+    letter-spacing: -0.3px !important;
+}
+
+/* 5. כפתור X - אדום מותג בעיגול עדין */
+html body .v-overlay__content.v-bottom-sheet__content:has(.v-card.tw-pt-0.tw-border-none .tw-w-full.tw-p-4.tw-rounded-lg.tw-border) .v-card-title button.v-btn--icon {
+    background: rgba(255, 255, 255, 0.9) !important;
+    border: 1px solid rgba(227, 30, 36, 0.15) !important;
+    border-radius: 50% !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06) !important;
+    width: 36px !important;
+    height: 36px !important;
+    transition: all 0.2s ease !important;
+}
+
+html body .v-overlay__content.v-bottom-sheet__content:has(.v-card.tw-pt-0.tw-border-none .tw-w-full.tw-p-4.tw-rounded-lg.tw-border) .v-card-title button.v-btn--icon:active {
+    transform: translateY(-50%) scale(0.9) !important;
+    background: rgba(227, 30, 36, 0.08) !important;
+}
+
+/* צביעת ה-X באדום */
+html body .v-overlay__content.v-bottom-sheet__content:has(.v-card.tw-pt-0.tw-border-none .tw-w-full.tw-p-4.tw-rounded-lg.tw-border) .v-card-title button.v-btn--icon svg path {
+    fill: #e31e24 !important;
+}
+
+/* 6. הסתרת קו ההפרדה */
+html body .v-overlay__content.v-bottom-sheet__content:has(.v-card.tw-pt-0.tw-border-none .tw-w-full.tw-p-4.tw-rounded-lg.tw-border) > .v-card > hr.v-divider {
+    display: none !important;
+}
+
+/* 7. רקע האזור הפנימי */
+html body .v-overlay__content.v-bottom-sheet__content:has(.v-card.tw-pt-0.tw-border-none .tw-w-full.tw-p-4.tw-rounded-lg.tw-border) .v-card-text {
+    background: transparent !important;
+}
+
+/* 8. כרטיס חנות בודדת - Liquid Glass Tile */
+html body .v-overlay__content.v-bottom-sheet__content:has(.v-card.tw-pt-0.tw-border-none .tw-w-full.tw-p-4.tw-rounded-lg.tw-border) .tw-w-full.tw-p-4.tw-rounded-lg.tw-border.tw-bg-white {
+    background: rgba(255, 255, 255, 0.7) !important;
+    backdrop-filter: blur(30px) saturate(180%) !important;
+    -webkit-backdrop-filter: blur(30px) saturate(180%) !important;
+    border: 1px solid rgba(227, 30, 36, 0.12) !important;
+    border-radius: 22px !important;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.05) !important;
+    padding: 18px !important;
+    margin-bottom: 14px !important;
+    transition: all 0.3s ease !important;
+}
+
+html body .v-overlay__content.v-bottom-sheet__content:has(.v-card.tw-pt-0.tw-border-none .tw-w-full.tw-p-4.tw-rounded-lg.tw-border) .tw-w-full.tw-p-4.tw-rounded-lg.tw-border.tw-bg-white:active {
+    transform: scale(0.99) !important;
+    background: rgba(255, 255, 255, 0.95) !important;
+}
+
+/* 9. תמונת החנות - פינות מעוגלות יותר */
+html body .v-overlay__content.v-bottom-sheet__content:has(.v-card.tw-pt-0.tw-border-none .tw-w-full.tw-p-4.tw-rounded-lg.tw-border) .v-img.tw-rounded-lg {
+    border-radius: 14px !important;
+    overflow: hidden !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
+}
+
+/* 10. שם החנות */
+html body .v-overlay__content.v-bottom-sheet__content:has(.v-card.tw-pt-0.tw-border-none .tw-w-full.tw-p-4.tw-rounded-lg.tw-border) .tw-w-full.tw-p-4.tw-rounded-lg.tw-border.tw-bg-white h2 {
+    color: #1a1a1a !important;
+    font-weight: 900 !important;
+    font-size: 16px !important;
+    margin-bottom: 4px !important;
+}
+
+/* 11. פרטי הכמות והמחיר */
+html body .v-overlay__content.v-bottom-sheet__content:has(.v-card.tw-pt-0.tw-border-none .tw-w-full.tw-p-4.tw-rounded-lg.tw-border) .tw-w-full.tw-p-4.tw-rounded-lg.tw-border.tw-bg-white .tw-text-gray-500 {
+    color: #e31e24 !important;
+    font-weight: 700 !important;
+    font-size: 13px !important;
+    opacity: 0.85 !important;
+}
+
+/* 12. כפתור 3 נקודות (תפריט) - עיגול עדין */
+html body .v-overlay__content.v-bottom-sheet__content:has(.v-card.tw-pt-0.tw-border-none .tw-w-full.tw-p-4.tw-rounded-lg.tw-border) .tw-w-full.tw-p-4.tw-rounded-lg.tw-border.tw-bg-white button.v-btn--icon {
+    background: rgba(0, 0, 0, 0.04) !important;
+    border-radius: 50% !important;
+    width: 36px !important;
+    height: 36px !important;
+    transition: all 0.2s ease !important;
+}
+
+html body .v-overlay__content.v-bottom-sheet__content:has(.v-card.tw-pt-0.tw-border-none .tw-w-full.tw-p-4.tw-rounded-lg.tw-border) .tw-w-full.tw-p-4.tw-rounded-lg.tw-border.tw-bg-white button.v-btn--icon:active {
+    background: rgba(227, 30, 36, 0.1) !important;
+    transform: scale(0.9) !important;
+}
+
+html body .v-overlay__content.v-bottom-sheet__content:has(.v-card.tw-pt-0.tw-border-none .tw-w-full.tw-p-4.tw-rounded-lg.tw-border) .tw-w-full.tw-p-4.tw-rounded-lg.tw-border.tw-bg-white button.v-btn--icon svg path {
+    fill: #e31e24 !important;
+}
+
+/* 13. כפתור "צפה בחנות" - זכוכית משנית */
+html body .v-overlay__content.v-bottom-sheet__content:has(.v-card.tw-pt-0.tw-border-none .tw-w-full.tw-p-4.tw-rounded-lg.tw-border) button.v-btn[style*="background-color: rgb(243, 243, 244)"] {
+    background: rgba(255, 255, 255, 0.7) !important;
+    background-color: rgba(255, 255, 255, 0.7) !important;
+    backdrop-filter: blur(15px) !important;
+    -webkit-backdrop-filter: blur(15px) !important;
+    border: 1.5px solid rgba(227, 30, 36, 0.25) !important;
+    color: #e31e24 !important;
+    border-radius: 14px !important;
+    font-weight: 800 !important;
+    font-size: 14px !important;
+    height: 48px !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04) !important;
+    transition: all 0.3s ease !important;
+}
+
+html body .v-overlay__content.v-bottom-sheet__content:has(.v-card.tw-pt-0.tw-border-none .tw-w-full.tw-p-4.tw-rounded-lg.tw-border) button.v-btn[style*="background-color: rgb(243, 243, 244)"] .v-btn__content {
+    color: #e31e24 !important;
+    font-weight: 800 !important;
+}
+
+html body .v-overlay__content.v-bottom-sheet__content:has(.v-card.tw-pt-0.tw-border-none .tw-w-full.tw-p-4.tw-rounded-lg.tw-border) button.v-btn[style*="background-color: rgb(243, 243, 244)"]:active {
+    transform: scale(0.97) !important;
+    background: rgba(227, 30, 36, 0.05) !important;
+}
+
+/* 14. כפתור "המשך לתשלום" - אדום QLED מלא */
+html body .v-overlay__content.v-bottom-sheet__content:has(.v-card.tw-pt-0.tw-border-none .tw-w-full.tw-p-4.tw-rounded-lg.tw-border) button.v-btn[style*="background-color: rgb(0, 0, 0)"] {
+    background: linear-gradient(135deg, #e31e24 0%, #b3161b 100%) !important;
+    background-color: #e31e24 !important;
+    color: #ffffff !important;
+    border-radius: 14px !important;
+    font-weight: 900 !important;
+    font-size: 14px !important;
+    height: 48px !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    box-shadow: 0 8px 20px rgba(227, 30, 36, 0.3) !important;
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+}
+
+html body .v-overlay__content.v-bottom-sheet__content:has(.v-card.tw-pt-0.tw-border-none .tw-w-full.tw-p-4.tw-rounded-lg.tw-border) button.v-btn[style*="background-color: rgb(0, 0, 0)"] .v-btn__content {
+    color: #ffffff !important;
+    font-weight: 900 !important;
+}
+
+html body .v-overlay__content.v-bottom-sheet__content:has(.v-card.tw-pt-0.tw-border-none .tw-w-full.tw-p-4.tw-rounded-lg.tw-border) button.v-btn[style*="background-color: rgb(0, 0, 0)"]:active {
+    transform: scale(0.97) !important;
+    box-shadow: 0 4px 12px rgba(227, 30, 36, 0.4) !important;
+}
+
+/* 15. ניקוי overlays של Vuetify בכפתורים */
+html body .v-overlay__content.v-bottom-sheet__content:has(.v-card.tw-pt-0.tw-border-none .tw-w-full.tw-p-4.tw-rounded-lg.tw-border) button.v-btn .v-btn__overlay,
+html body .v-overlay__content.v-bottom-sheet__content:has(.v-card.tw-pt-0.tw-border-none .tw-w-full.tw-p-4.tw-rounded-lg.tw-border) button.v-btn .v-btn__underlay {
+    display: none !important;
+}
