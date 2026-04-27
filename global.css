@@ -1418,11 +1418,13 @@ html body #sl-inner-instruction-slider .v-card__underlay {
 
 /* =========================================================
    חלק 10: הגנת התנגשות ניווט - צ'ק-אאוט בלבד
-   מטרה: העלמת סרגל הניווט למניעת "לחיצות רפאים" על הכפתור הצף
+   מטרה: העלמת סרגל הניווט רק בצ'קאאוט (ולא בעגלה!)
+   עדכון 27.04.2026: שינוי הסלקטור מ-#checkout ל-.place-order
+   הסיבה: גם דף עגלה משתמש ב-#checkout, רק לצ'קאאוט יש .place-order
    ========================================================= */
 
-/* 1. הסתרה מוחלטת של הניווט רק בדף הצ'ק-אאוט */
-html:has(#checkout) #MultiVendorBottomNav {
+/* 1. הסתרה מוחלטת של הניווט רק בדף הצ'ק-אאוט (זה שמכיל את כפתור "ביצוע הזמנה" הצף) */
+html:has(.place-order) #MultiVendorBottomNav {
     display: none !important;
     pointer-events: none !important;
     visibility: hidden !important;
@@ -1432,18 +1434,17 @@ html:has(#checkout) #MultiVendorBottomNav {
 
 /* 2. וידוא שאלמנט ה-Place Order (חלק 8ט) תמיד מעל הכל */
 .place-order {
-    z-index: 99999 !important; /* העדפה מקסימלית */
+    z-index: 99999 !important;
     pointer-events: auto !important;
 }
 
 /* 3. תיקון מרווח התחתית של דף הצ'ק-אאוט */
-/* מוודא שהתוכן לא נחתך מאחורי האי הצף של ביצוע ההזמנה */
 #checkout {
     padding-bottom: 150px !important;
 }
 
 /* 4. מניעת קפיצה של הסרגל המקורי ב-iOS */
-html:has(#checkout) .v-bottom-navigation {
+html:has(.place-order) .v-bottom-navigation {
     transform: translateY(100%) !important;
 }
 
