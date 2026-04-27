@@ -14,28 +14,42 @@
      Custom Global Scripts - מעלה המשלוחים
      ============================================================ -->
 
-<!-- ✅ סקריפט #1: בחירת ישראל אוטומטית בטופס הוספת כתובת -->
+<!-- ✅ סקריפט #1: בחירת ישראל אוטומטית בטופס הוספת כתובת (גרסה משודרגת 2026-04-27) -->
 <script>
 (function () {
   const COUNTRY = 'Israel';
+  let isProcessing = false;
+
   function selectIsrael() {
     const input = document.querySelector('#country');
     if (!input) return;
     if (input.value && input.value.toLowerCase() === COUNTRY.toLowerCase()) {
       return;
     }
+    if (isProcessing) return;
+    isProcessing = true;
+
     const field = input.closest('.v-field');
-    if (!field) return;
+    if (!field) {
+      isProcessing = false;
+      return;
+    }
     const arrow = field.querySelector('.v-autocomplete__menu-icon');
-    if (!arrow) return;
+    if (!arrow) {
+      isProcessing = false;
+      return;
+    }
+
     arrow.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }));
     arrow.dispatchEvent(new MouseEvent('mouseup', { bubbles: true }));
     arrow.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+
     setTimeout(() => {
       input.focus();
       input.value = COUNTRY;
       input.dispatchEvent(new InputEvent('input', { bubbles: true }));
     }, 80);
+
     const interval = setInterval(() => {
       const items = document.querySelectorAll(
         '.v-overlay-container .v-list-item'
@@ -47,18 +61,30 @@
         ) {
           item.click();
           clearInterval(interval);
+          isProcessing = false;
           return;
         }
       }
     }, 150);
-    setTimeout(() => clearInterval(interval), 4000);
+
+    setTimeout(() => {
+      clearInterval(interval);
+      isProcessing = false;
+    }, 4000);
   }
+
   document.addEventListener('focusin', (e) => {
     if (e.target && e.target.id === 'country') {
       setTimeout(selectIsrael, 50);
     }
   });
-  new MutationObserver(selectIsrael).observe(document.body, {
+
+  new MutationObserver(() => {
+    const input = document.querySelector('#country');
+    if (input && (!input.value || input.value.toLowerCase() !== COUNTRY.toLowerCase())) {
+      setTimeout(selectIsrael, 100);
+    }
+  }).observe(document.body, {
     childList: true,
     subtree: true
   });
