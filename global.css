@@ -1708,10 +1708,12 @@ a[href^="tel:"] svg path {
 /* =========================================================
    חלק 12 המאוחד: תפריט אפשרויות כתובת - התיקון הסופי
    מטרה: עיצוב Liquid Glass עם הגנת Scoping למניעת זליגה למוצרים
+   עדכון 2026-04-27: הוחלף הסקופ מ-:has(.tw-cursor-pointer) ל-:has(.v-card-title span.tw-leading-[16px])
+   הסיבה: הסקופ הישן דלף למודאלים אחרים (דף "בחירת מיקום", מודאל ההתחברות באנדרואיד)
    ========================================================= */
 
 /* 1. מכולה חיצונית ומרכוז - מופעל רק כשיש אפשרויות בחירה (has cursor-pointer) */
-.v-overlay__content.v-bottom-sheet__content:has(.tw-cursor-pointer) {
+.v-overlay__content.v-bottom-sheet__content:has(.v-card-title span.tw-leading-\[16px\]) {
     left: 0 !important;
     right: 0 !important;
     margin: 0 auto !important;
@@ -1723,7 +1725,7 @@ a[href^="tel:"] svg path {
 }
 
 /* 2. כרטיס הזכוכית הראשי - הגנה מפני דפים אטומים */
-.v-overlay__content.v-bottom-sheet__content:has(.tw-cursor-pointer) .v-card {
+.v-overlay__content.v-bottom-sheet__content:has(.v-card-title span.tw-leading-\[16px\]) .v-card {
     background: rgba(255, 255, 255, 0.8) !important;
     backdrop-filter: blur(45px) saturate(210%) !important;
     -webkit-backdrop-filter: blur(45px) saturate(210%) !important;
@@ -1737,7 +1739,7 @@ a[href^="tel:"] svg path {
 /* --- 3. ניקוי כותרת וחיסול ה"דיבוק" (Header Nuke) --- */
 
 /* איפוס הכותרת רק בחלונית הכתובות */
-.v-overlay__content.v-bottom-sheet__content:has(.tw-cursor-pointer) .v-card-title {
+.v-overlay__content.v-bottom-sheet__content:has(.v-card-title span.tw-leading-\[16px\]) .v-card-title {
     display: flex !important;
     justify-content: center !important;
     align-items: center !important;
@@ -1747,15 +1749,15 @@ a[href^="tel:"] svg path {
 }
 
 /* העלמת הטקסט המקורי "Address options" - רק כאן! */
-.v-overlay__content.v-bottom-sheet__content:has(.tw-cursor-pointer) .v-card-title span,
-.v-overlay__content.v-bottom-sheet__content:has(.tw-cursor-pointer) .v-card-title .tw-text-base {
+.v-overlay__content.v-bottom-sheet__content:has(.v-card-title span.tw-leading-\[16px\]) .v-card-title span,
+.v-overlay__content.v-bottom-sheet__content:has(.v-card-title span.tw-leading-\[16px\]) .v-card-title .tw-text-base {
     font-size: 0 !important;
     color: transparent !important;
     visibility: hidden !important;
 }
 
 /* הזרקת הכותרת העברית - מוגן מפני זליגה לדף המוצר */
-.v-overlay__content.v-bottom-sheet__content:has(.tw-cursor-pointer) .v-card-title::after {
+.v-overlay__content.v-bottom-sheet__content:has(.v-card-title span.tw-leading-\[16px\]) .v-card-title::after {
     content: "אפשרויות כתובת" !important;
     position: absolute !important;
     left: 50% !important;
@@ -1771,7 +1773,7 @@ a[href^="tel:"] svg path {
 
 /* --- 4. טיפול בכפתור ה-X והתוכן --- */
 
-.v-overlay__content.v-bottom-sheet__content:has(.tw-cursor-pointer) .v-card-title button.v-btn--icon {
+.v-overlay__content.v-bottom-sheet__content:has(.v-card-title span.tw-leading-\[16px\]) .v-card-title button.v-btn--icon {
     position: absolute !important;
     left: 12px !important;
     z-index: 5 !important;
@@ -1784,21 +1786,21 @@ a[href^="tel:"] svg path {
 }
 
 /* צביעת ה-X באדום QLED */
-.v-overlay__content.v-bottom-sheet__content:has(.tw-cursor-pointer) .v-btn--icon .v-img__img {
+.v-overlay__content.v-bottom-sheet__content:has(.v-card-title span.tw-leading-\[16px\]) .v-btn--icon .v-img__img {
     filter: brightness(0) saturate(100%) invert(18%) sepia(88%) saturate(5427%) hue-rotate(352deg) brightness(91%) contrast(92%) !important;
 }
 
 /* --- 5. שורות הפעולה (עריכה ומחיקה) --- */
 
 /* מחיקת האנגלית והזרקת עברית */
-.v-overlay__content.v-bottom-sheet__content:has(.tw-cursor-pointer) .tw-cursor-pointer span.tw-font-medium {
+.v-overlay__content.v-bottom-sheet__content:has(.v-card-title span.tw-leading-\[16px\]) .tw-cursor-pointer span.tw-font-medium {
     font-size: 0 !important;
     color: transparent !important;
     display: block !important;
     position: relative !important;
 }
 
-.v-overlay__content.v-bottom-sheet__content:has(.tw-cursor-pointer) .tw-cursor-pointer:first-of-type span.tw-font-medium::before {
+.v-overlay__content.v-bottom-sheet__content:has(.v-card-title span.tw-leading-\[16px\]) .tw-cursor-pointer:first-of-type span.tw-font-medium::before {
     content: "עריכת פרטי כתובת" !important;
     font-size: 15px !important;
     color: #1A1A1A !important;
@@ -1806,7 +1808,7 @@ a[href^="tel:"] svg path {
     font-weight: 700 !important;
 }
 
-.v-overlay__content.v-bottom-sheet__content:has(.tw-cursor-pointer) .tw-cursor-pointer:last-of-type span.tw-font-medium::before {
+.v-overlay__content.v-bottom-sheet__content:has(.v-card-title span.tw-leading-\[16px\]) .tw-cursor-pointer:last-of-type span.tw-font-medium::before {
     content: "מחיקת כתובת מהרשימה" !important;
     font-size: 15px !important;
     color: #e31e24 !important;
@@ -1815,7 +1817,7 @@ a[href^="tel:"] svg path {
 }
 
 /* עיצוב המכולה הפנימית של השורות */
-.v-overlay__content.v-bottom-sheet__content:has(.tw-cursor-pointer) .tw-border.tw-border-\[\#00000014\] {
+.v-overlay__content.v-bottom-sheet__content:has(.v-card-title span.tw-leading-\[16px\]) .tw-border.tw-border-\[\#00000014\] {
     background: rgba(255, 255, 255, 0.4) !important;
     border-radius: 24px !important;
     border: 1px solid rgba(0, 0, 0, 0.05) !important;
@@ -1823,7 +1825,7 @@ a[href^="tel:"] svg path {
     padding: 4px 0 !important;
 }
 
-.v-overlay__content.v-bottom-sheet__content:has(.tw-cursor-pointer) .tw-cursor-pointer {
+.v-overlay__content.v-bottom-sheet__content:has(.v-card-title span.tw-leading-\[16px\]) .tw-cursor-pointer {
     height: 56px !important;
     padding: 0 16px !important;
     display: flex !important;
@@ -1831,16 +1833,16 @@ a[href^="tel:"] svg path {
 }
 
 /* אייקוני פעולה באדום */
-.v-overlay__content.v-bottom-sheet__content:has(.tw-cursor-pointer) .v-icon, 
-.v-overlay__content.v-bottom-sheet__content:has(.tw-cursor-pointer) .tw-w-5.tw-h-5 {
+.v-overlay__content.v-bottom-sheet__content:has(.v-card-title span.tw-leading-\[16px\]) .v-icon, 
+.v-overlay__content.v-bottom-sheet__content:has(.v-card-title span.tw-leading-\[16px\]) .tw-w-5.tw-h-5 {
     color: #e31e24 !important;
     opacity: 0.8 !important;
 }
 
 /* ניקוי שאריות */
-.v-overlay__content.v-bottom-sheet__content:has(.tw-cursor-pointer) hr.v-divider,
-.v-overlay__content.v-bottom-sheet__content:has(.tw-cursor-pointer) .v-btn__overlay,
-.v-overlay__content.v-bottom-sheet__content:has(.tw-cursor-pointer) .v-btn__underlay {
+.v-overlay__content.v-bottom-sheet__content:has(.v-card-title span.tw-leading-\[16px\]) hr.v-divider,
+.v-overlay__content.v-bottom-sheet__content:has(.v-card-title span.tw-leading-\[16px\]) .v-btn__overlay,
+.v-overlay__content.v-bottom-sheet__content:has(.v-card-title span.tw-leading-\[16px\]) .v-btn__underlay {
     display: none !important;
 }
 
