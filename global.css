@@ -4588,3 +4588,143 @@ html body .v-overlay__content.v-bottom-sheet__content:has(.v-card.tw-pt-0.tw-bor
 .v-bottom-sheet__content:has(#addAddressForm) .tw-absolute.tw-bottom-0 button .v-btn__underlay {
     display: none !important;
 }
+
+/* =========================================================
+   חלק 29.1: שיפורי טופס כתובת - כפתורים, טלפון, מדינה
+   תאריך: 2026-04-27
+   Scope: .v-bottom-sheet__content:has(#addAddressForm)
+
+   טיפול ב:
+   1. כפתורי "בית/משרד/אחרים" - הוצאה מ-slider לפריסת flex רגילה
+   2. עיצוב פרימיום לכפתורים האלה
+   3. הסתרת שדה "מדינה" לחלוטין (JS ממלא Israel אוטומטית)
+   4. תיקון דגל ישראל בשדה הטלפון
+   ========================================================= */
+
+/* === 1. הסתרת שדה "מדינה" לחלוטין === */
+.v-bottom-sheet__content:has(#addAddressForm) #AddressInputAddressCountry,
+.v-bottom-sheet__content:has(#addAddressForm) .v-input:has(#country),
+.v-bottom-sheet__content:has(#addAddressForm) #country-label,
+.v-bottom-sheet__content:has(#addAddressForm) #country-messages {
+    display: none !important;
+    visibility: hidden !important;
+    height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+}
+
+/* === 2. כפתורי "בית/משרד/אחרים" - שחרור מה-slider === */
+
+/* המכולה החיצונית של ה-slider - הסרת ה-overflow שגורם לחיתוך */
+.v-bottom-sheet__content:has(#addAddressForm) #AddressSelectType .v-slide-group,
+.v-bottom-sheet__content:has(#addAddressForm) #AddressSelectType .v-slide-group__container {
+    overflow: visible !important;
+    contain: none !important;
+}
+
+/* התוכן של ה-slider - הפיכה ל-flex רגיל עם wrap */
+.v-bottom-sheet__content:has(#addAddressForm) #AddressSelectType .v-slide-group__content {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    justify-content: center !important;
+    gap: 10px !important;
+    transform: none !important;
+    width: 100% !important;
+    padding: 8px 16px !important;
+}
+
+/* הסתרת חיצי הניווט של ה-slider (אם יש) */
+.v-bottom-sheet__content:has(#addAddressForm) #AddressSelectType .v-slide-group__prev,
+.v-bottom-sheet__content:has(#addAddressForm) #AddressSelectType .v-slide-group__next {
+    display: none !important;
+}
+
+/* === 3. עיצוב הכפתורים עצמם (chips) === */
+.v-bottom-sheet__content:has(#addAddressForm) #AddressSelectType .v-chip {
+    background: rgba(255, 255, 255, 0.85) !important;
+    backdrop-filter: blur(10px) !important;
+    -webkit-backdrop-filter: blur(10px) !important;
+    border: 1.5px solid rgba(227, 30, 36, 0.2) !important;
+    border-radius: 14px !important;
+    padding: 8px 16px !important;
+    height: 42px !important;
+    margin: 0 !important;
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04) !important;
+    cursor: pointer !important;
+    opacity: 1 !important;
+}
+
+/* טקסט הכפתור */
+.v-bottom-sheet__content:has(#addAddressForm) #AddressSelectType .v-chip span.tw-font-semibold {
+    color: #1a1a1a !important;
+    font-weight: 800 !important;
+    font-size: 14px !important;
+}
+
+/* אייקון הכפתור */
+.v-bottom-sheet__content:has(#addAddressForm) #AddressSelectType .v-chip .v-img__img {
+    filter: brightness(0) saturate(100%) invert(18%) sepia(88%) saturate(5427%) hue-rotate(352deg) brightness(91%) contrast(92%) !important;
+    opacity: 0.7 !important;
+}
+
+/* כפתור פעיל - אדום מותגי */
+.v-bottom-sheet__content:has(#addAddressForm) #AddressSelectType .v-chip.text-primary,
+.v-bottom-sheet__content:has(#addAddressForm) #AddressSelectType .v-chip[aria-selected="true"] {
+    background: linear-gradient(135deg, rgba(227, 30, 36, 0.08) 0%, rgba(227, 30, 36, 0.03) 100%) !important;
+    border-color: #e31e24 !important;
+    box-shadow: 0 6px 18px rgba(227, 30, 36, 0.15) !important;
+    transform: translateY(-2px) !important;
+}
+
+.v-bottom-sheet__content:has(#addAddressForm) #AddressSelectType .v-chip.text-primary span,
+.v-bottom-sheet__content:has(#addAddressForm) #AddressSelectType .v-chip[aria-selected="true"] span {
+    color: #e31e24 !important;
+}
+
+.v-bottom-sheet__content:has(#addAddressForm) #AddressSelectType .v-chip.text-primary .v-img__img,
+.v-bottom-sheet__content:has(#addAddressForm) #AddressSelectType .v-chip[aria-selected="true"] .v-img__img {
+    opacity: 1 !important;
+}
+
+/* אפקט לחיצה */
+.v-bottom-sheet__content:has(#addAddressForm) #AddressSelectType .v-chip:active {
+    transform: scale(0.95) !important;
+}
+
+/* ניקוי שכבות overlay */
+.v-bottom-sheet__content:has(#addAddressForm) #AddressSelectType .v-chip__overlay,
+.v-bottom-sheet__content:has(#addAddressForm) #AddressSelectType .v-chip__underlay {
+    display: none !important;
+}
+
+/* ביטול ה-disabled וה-opacity-50 שמאפסים את הכפתור הראשון */
+.v-bottom-sheet__content:has(#addAddressForm) #AddressSelectType .v-chip.v-chip--disabled,
+.v-bottom-sheet__content:has(#addAddressForm) #AddressSelectType .v-chip.tw-opacity-50 {
+    opacity: 1 !important;
+    pointer-events: auto !important;
+    cursor: pointer !important;
+}
+
+/* === 4. תיקון דגל ישראל בשדה הטלפון === */
+
+/* הגדלה ויישור של הדגל */
+.v-bottom-sheet__content:has(#addAddressForm) #AddressInputContactPhoneNumber .v-img,
+.v-bottom-sheet__content:has(#addAddressForm) #AddressInputContactPhoneNumber img[alt*="flag"],
+.v-bottom-sheet__content:has(#addAddressForm) #AddressInputContactPhoneNumber img[src*="flag"] {
+    width: 28px !important;
+    height: 20px !important;
+    min-width: 28px !important;
+    border-radius: 4px !important;
+    object-fit: cover !important;
+    transform: none !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* תיקון מכולת הדגל */
+.v-bottom-sheet__content:has(#addAddressForm) #AddressInputContactPhoneNumber .v-field__prepend-inner {
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+}
