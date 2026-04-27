@@ -3686,11 +3686,11 @@ html body #MultiVendorBottomNav:not(:has(.v-btn--active)) .v-badge:first-of-type
 /* =========================================================
    חלק 27: פופאפ בחירת כתובת למשלוח - LIQUID GLASS
    Scope: v-bottom-sheet that contains "בחירת כתובת למשלוח"
-   Selector: .v-bottom-sheet__content:has(.location-search-custom-height)
-   Date: 2026-03-14
+   Selector: .v-bottom-sheet__content:has(.location-search-custom-height.dashed-border)
+   Date: 2026-03-14 | Updated: 2026-04-27 (narrowed scope to prevent leak into "בחירת מיקום" modal)
    ========================================================= */
 /* 1. The Glass Card */
-.v-bottom-sheet__content:has(.location-search-custom-height) .v-card {
+.v-bottom-sheet__content:has(.location-search-custom-height.dashed-border) .v-card {
     background: rgba(255, 255, 255, 0.8) !important;
     backdrop-filter: blur(50px) saturate(220%) !important;
     -webkit-backdrop-filter: blur(50px) saturate(220%) !important;
@@ -3702,21 +3702,21 @@ html body #MultiVendorBottomNav:not(:has(.v-btn--active)) .v-badge:first-of-type
     overflow: visible !important;
 }
 /* 2. Kill v-card layers */
-.v-bottom-sheet__content:has(.location-search-custom-height) .v-card__underlay,
-.v-bottom-sheet__content:has(.location-search-custom-height) .v-card__loader,
-.v-bottom-sheet__content:has(.location-search-custom-height) .v-card .v-card__underlay,
-.v-bottom-sheet__content:has(.location-search-custom-height) .v-field__overlay {
+.v-bottom-sheet__content:has(.location-search-custom-height.dashed-border) .v-card__underlay,
+.v-bottom-sheet__content:has(.location-search-custom-height.dashed-border) .v-card__loader,
+.v-bottom-sheet__content:has(.location-search-custom-height.dashed-border) .v-card .v-card__underlay,
+.v-bottom-sheet__content:has(.location-search-custom-height.dashed-border) .v-field__overlay {
     display: none !important;
 }
 /* 3. Title - fix broken text + QLED styling */
-.v-bottom-sheet__content:has(.location-search-custom-height) .v-card-title {
+.v-bottom-sheet__content:has(.location-search-custom-height.dashed-border) .v-card-title {
     padding: 0 0 16px 0 !important;
     border-bottom: none !important;
     display: flex !important;
     justify-content: center !important;
     align-items: center !important;
 }
-.v-bottom-sheet__content:has(.location-search-custom-height) .v-card-title div:first-child {
+.v-bottom-sheet__content:has(.location-search-custom-height.dashed-border) .v-card-title div:first-child {
     font-size: 19px !important;
     font-weight: 900 !important;
     color: #1a1a1a !important;
@@ -3726,11 +3726,11 @@ html body #MultiVendorBottomNav:not(:has(.v-btn--active)) .v-badge:first-of-type
     white-space: normal !important;
 }
 /* 4. Hide the divider line */
-.v-bottom-sheet__content:has(.location-search-custom-height) hr.v-divider {
+.v-bottom-sheet__content:has(.location-search-custom-height.dashed-border) hr.v-divider {
     display: none !important;
 }
 /* 5. Search field - Crystal Capsule */
-.v-bottom-sheet__content:has(.location-search-custom-height) .location-search-custom-height .v-field {
+.v-bottom-sheet__content:has(.location-search-custom-height.dashed-border) .location-search-custom-height .v-field {
     background: rgba(255, 255, 255, 0.7) !important;
     backdrop-filter: blur(20px) !important;
     -webkit-backdrop-filter: blur(20px) !important;
@@ -3740,49 +3740,49 @@ html body #MultiVendorBottomNav:not(:has(.v-btn--active)) .v-badge:first-of-type
     height: 56px !important;
     transition: all 0.3s ease !important;
 }
-.v-bottom-sheet__content:has(.location-search-custom-height) .location-search-custom-height .v-field--focused {
+.v-bottom-sheet__content:has(.location-search-custom-height.dashed-border) .location-search-custom-height .v-field--focused {
     background: #ffffff !important;
     border-color: #e31e24 !important;
     box-shadow: 0 10px 30px rgba(227, 30, 36, 0.1) !important;
 }
 /* Search field cleanup */
-.v-bottom-sheet__content:has(.location-search-custom-height) .v-field__outline,
-.v-bottom-sheet__content:has(.location-search-custom-height) .l-search .v-card__underlay {
+.v-bottom-sheet__content:has(.location-search-custom-height.dashed-border) .v-field__outline,
+.v-bottom-sheet__content:has(.location-search-custom-height.dashed-border) .l-search .v-card__underlay {
     display: none !important;
 }
 /* Search field background card */
-.v-bottom-sheet__content:has(.location-search-custom-height) .l-search {
+.v-bottom-sheet__content:has(.location-search-custom-height.dashed-border) .l-search {
     background: transparent !important;
     box-shadow: none !important;
 }
 /* Search icon - QLED red */
-.v-bottom-sheet__content:has(.location-search-custom-height) .search-icon-mobile {
+.v-bottom-sheet__content:has(.location-search-custom-height.dashed-border) .search-icon-mobile {
     filter: brightness(0) saturate(100%) invert(18%) sepia(88%) saturate(5427%) hue-rotate(352deg) brightness(91%) contrast(92%) !important;
     opacity: 0.7 !important;
 }
 /* Back arrow icon - QLED red */
-.v-bottom-sheet__content:has(.location-search-custom-height) .v-icon {
+.v-bottom-sheet__content:has(.location-search-custom-height.dashed-border) .v-icon {
     color: #e31e24 !important;
 }
 /* Placeholder text */
-.v-bottom-sheet__content:has(.location-search-custom-height) input::placeholder {
+.v-bottom-sheet__content:has(.location-search-custom-height.dashed-border) input::placeholder {
     color: rgba(0, 0, 0, 0.35) !important;
     font-weight: 500 !important;
 }
 /* Input text */
-.v-bottom-sheet__content:has(.location-search-custom-height) input {
+.v-bottom-sheet__content:has(.location-search-custom-height.dashed-border) input {
     font-weight: 700 !important;
     color: #1a1a1a !important;
 }
 /* 6. The "-או-" separator text */
-.v-bottom-sheet__content:has(.location-search-custom-height) p.tw-text-center.tw-my-4 {
+.v-bottom-sheet__content:has(.location-search-custom-height.dashed-border) p.tw-text-center.tw-my-4 {
     color: #bbb !important;
     font-weight: 600 !important;
     font-size: 13px !important;
     margin: 20px 0 !important;
 }
 /* 7. "סמן על המפה" button - Crystal QLED */
-.v-bottom-sheet__content:has(.location-search-custom-height) a.v-btn {
+.v-bottom-sheet__content:has(.location-search-custom-height.dashed-border) a.v-btn {
     background: linear-gradient(135deg, #e31e24 0%, #b3161b 100%) !important;
     color: #ffffff !important;
     border-radius: 18px !important;
@@ -3795,13 +3795,13 @@ html body #MultiVendorBottomNav:not(:has(.v-btn--active)) .v-badge:first-of-type
     border: 1px solid rgba(255, 255, 255, 0.2) !important;
     transition: all 0.3s ease !important;
 }
-.v-bottom-sheet__content:has(.location-search-custom-height) a.v-btn:active {
+.v-bottom-sheet__content:has(.location-search-custom-height.dashed-border) a.v-btn:active {
     transform: scale(0.97) !important;
     box-shadow: 0 4px 15px rgba(227, 30, 36, 0.2) !important;
 }
 /* Kill button overlays */
-.v-bottom-sheet__content:has(.location-search-custom-height) a.v-btn .v-btn__overlay,
-.v-bottom-sheet__content:has(.location-search-custom-height) a.v-btn .v-btn__underlay {
+.v-bottom-sheet__content:has(.location-search-custom-height.dashed-border) a.v-btn .v-btn__overlay,
+.v-bottom-sheet__content:has(.location-search-custom-height.dashed-border) a.v-btn .v-btn__underlay {
     display: none !important;
 }
 
