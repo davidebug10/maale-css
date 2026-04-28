@@ -4728,3 +4728,22 @@ html body .v-overlay__content.v-bottom-sheet__content:has(.v-card.tw-pt-0.tw-bor
     align-items: center !important;
     gap: 8px !important;
 }
+
+/* =========================================================
+   חלק 31: תיקון תוצאות חיפוש כתובת - HEIGHT FIX
+   תאריך: 2026-04-28
+   Scope: #mobileLocationSearch .search-results
+
+   הבעיה: הייפרזוד מציבים top:153.5px; bottom:0px; כ-inline style
+   על אלמנט תוצאות החיפוש, אבל בלי height מפורש האלמנט מתכווץ
+   ל-16px בלבד ומסתיר את התוצאות.
+
+   הפתרון: כפיית height:auto + min-height כדי לאפשר לאלמנט להשתרע
+   מהמיקום ה-top שלו עד תחתית המסך כפי שהמערכת מתכוונת.
+   ========================================================= */
+
+html body #mobileLocationSearch .search-results {
+    height: auto !important;
+    min-height: calc(100vh - 200px) !important;
+    max-height: calc(100vh - 153.5px) !important;
+}
