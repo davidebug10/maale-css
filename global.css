@@ -4731,19 +4731,23 @@ html body .v-overlay__content.v-bottom-sheet__content:has(.v-card.tw-pt-0.tw-bor
 
 /* =========================================================
    חלק 31: תיקון תוצאות חיפוש כתובת - HEIGHT FIX
-   תאריך: 2026-04-28
-   Scope: #mobileLocationSearch .search-results
+   תאריך: 2026-04-28 | עודכן: 2026-04-28 (הרחבת סקופ)
+   Scope: .search-results (גלובלי)
 
-   הבעיה: הייפרזוד מציבים top:153.5px; bottom:0px; כ-inline style
+   הבעיה: הייפרזוד מציבים top:Xpx; bottom:0px; כ-inline style
    על אלמנט תוצאות החיפוש, אבל בלי height מפורש האלמנט מתכווץ
    ל-16px בלבד ומסתיר את התוצאות.
 
-   הפתרון: כפיית height:auto + min-height כדי לאפשר לאלמנט להשתרע
-   מהמיקום ה-top שלו עד תחתית המסך כפי שהמערכת מתכוונת.
+   הופיע בשני מסכים: "בחירת מיקום" (#mobileLocationSearch)
+   ו-"הוספת כתובת חדשה" (אין מכולה עם ID).
+
+   הפתרון: כפיית גובה אוטומטי על כל מופע של .search-results.
+   הסקופ בטוח כי .search-results הוא class ייחודי לפופאפ
+   תוצאות החיפוש בלבד (1 התאמה במסך).
    ========================================================= */
 
-html body #mobileLocationSearch .search-results {
+html body .search-results {
     height: auto !important;
-    min-height: calc(100vh - 200px) !important;
-    max-height: calc(100vh - 153.5px) !important;
+    min-height: calc(100vh - 250px) !important;
+    max-height: calc(100vh - 100px) !important;
 }
