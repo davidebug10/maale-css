@@ -3744,7 +3744,6 @@ html body #MultiVendorBottomNav:not(:has(.v-btn--active)) .v-badge:first-of-type
     border: 1.5px solid rgba(227, 30, 36, 0.12) !important;
     border-radius: 20px !important;
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.05) !important;
-    height: 56px !important;
     transition: all 0.3s ease !important;
 }
 .v-bottom-sheet__content:has(.location-search-custom-height.dashed-border) .location-search-custom-height .v-field--focused {
