@@ -4732,3 +4732,50 @@ html body .v-overlay__content.v-bottom-sheet__content:has(.v-card.tw-pt-0.tw-bor
     align-items: center !important;
     gap: 8px !important;
 }
+
+/* ============================================================ */
+/* === Fix: Search Results Container Collapse + Layout Polish === */
+/* === Date: 2026-04-29 === */
+/* ============================================================ */
+/* בעיה: מסך "בחירת מיקום" - תוצאות החיפוש קרסו לגובה 16px במקום
+   להתפרס מ-top:147px עד תחתית המסך. הילדים גלשו אל מחוץ לאב.
+   הסיבה לא אותרה ישירות (אין כלל שלנו שמשפיע על height של .search-results),
+   אבל הפתרון: להכריח flex-column על האב כדי שהוא יתפוס את כל הגובה הזמין.
+
+   בנוסף: צמצום רווחים בין הקופסאות הפנימיות, והסתרת "כתובות שמורות"
+   בזמן שיש תוצאות חיפוש פעילות (כדי לא להעמיס מידע מיותר).
+*/
+
+/* --- חלק 1: תיקון הקריסה --- */
+html body .search-results.tw-bg-white.tw-fixed.tw-inset-x-0 {
+  display: flex !important;
+  flex-direction: column !important;
+  min-height: calc(100vh - 147px) !important;
+}
+
+html body .search-results.tw-bg-white.tw-fixed.tw-inset-x-0 > div {
+  flex-shrink: 0 !important;
+}
+
+html body .search-results.tw-bg-white.tw-fixed.tw-inset-x-0 .v-card.results-list {
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
+}
+
+/* --- חלק 2: צמצום רווחים בין הקופסאות הפנימיות --- */
+html body .search-results.tw-bg-white.tw-fixed.tw-inset-x-0 > div.tw-px-4 {
+  margin-top: 8px !important;
+  margin-bottom: 8px !important;
+}
+
+/* --- חלק 3: הסתרת "כתובות שמורות" בזמן חיפוש פעיל --- */
+/* הבלוק הזה משתמש ב-:has() כדי לזהות אם יש תוצאות חיפוש פעילות
+   (קיומו של תוצאה אחת לפחות בתוך .results-list עם .tw-cursor-pointer).
+   רק אז - מסתירים את הכותרת "כתובות שמורות" וכרטיסי הכתובות שמתחתיה.
+   ברגע שהמשתמש מוחק את החיפוש - התוצאות נעלמות, ה-:has() לא תופס,
+   ו"כתובות שמורות" חוזרת אוטומטית. */
+html body .search-results.tw-bg-white.tw-fixed.tw-inset-x-0:has(.results-list .tw-cursor-pointer) > div.tw-px-4.tw-mb-4.tw-mt-4 {
+  display: none !important;
+}
+
+/* === End: Search Results Fix | 2026-04-29 === */
