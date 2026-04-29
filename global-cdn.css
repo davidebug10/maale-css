@@ -1,0 +1,4885 @@
+/* ============================================================
+   global-cdn.css - מעלה המשלוחים
+   Loaded via jsDelivr CDN into Hyperzod's Custom CSS field.
+   Source URL: https://cdn.jsdelivr.net/gh/davidebug10/maale-css@main/global-cdn.css
+
+   This file is a CDN-served sibling of global.css.
+   Edit this file directly - changes go live within 1-5 minutes via CDN.
+   For instant updates: https://www.jsdelivr.com/tools/purge
+
+   The original global.css is retained in the repo as a historical backup.
+   ============================================================ */
+
+/* ============================================================
+   מעלה המשלוחים - CORE LOGIC & TRANSLATIONS (NO COLORS)
+   ============================================================ */
+
+/* --- 1. תרגומים ועברות ממשק (חלק 8, 11) --- */
+
+/* תרגום כותרת חיפוש מיקום */
+html body #mobileLocationSearch .tw-sticky .tw-truncate { font-size: 0 !important; }
+html body #mobileLocationSearch .tw-sticky .tw-truncate::before { 
+    content: "בחירת מיקום" !important; font-size: 16px !important; visibility: visible !important; 
+}
+/* תרגום: השתמש במיקום נוכחי */
+html body #mobileLocationSearch .locate-me span.tw-font-medium { font-size: 0 !important; }
+html body #mobileLocationSearch .locate-me span.tw-font-medium::before { 
+    content: "השתמש במיקום נוכחי" !important; font-size: 15px !important; visibility: visible !important;
+}
+
+/* תרגום: הוסף כתובת חדשה */
+html body #mobileLocationSearch button span.tw-font-medium:not(.leading-none) { font-size: 0 !important; }
+html body #mobileLocationSearch button span.tw-font-medium:not(.leading-none)::before { 
+    content: "הוסף כתובת חדשה" !important; font-size: 14px !important; visibility: visible !important;
+}
+
+/* תרגום באדג' "פעיל" */
+html body #mobileLocationSearch .tw-bg-\[\#DBF3E4\] { font-size: 0 !important; }
+html body #mobileLocationSearch .tw-bg-\[\#DBF3E4\]::before { 
+    content: "פעיל" !important; font-size: 10px !important; visibility: visible !important; font-weight: 800 !important; 
+}
+
+/* תרגום: שמור כתובת כ... */
+html body #AddressSelectType label.tw-text-sm { font-size: 0 !important; }
+html body #AddressSelectType label.tw-text-sm::before {
+    content: "שמור כתובת כ..." !important; font-size: 15px !important; visibility: visible !important;
+}
+
+/* --- 2. תיקוני מבנה ובאגים (חלק 1, 4, 25) --- */
+
+/* ביטול המרווח הלבן המציק בתחתית האתר */
+html body .tw-mb-\[55px\] { margin-bottom: 0 !important; }
+
+/* מניעת חיתוך טקסט בסרגל התחתון */
+html body .footer-btn-text {
+    white-space: normal !important;
+    line-height: 1.1 !important;
+    -webkit-line-clamp: unset !important;
+    line-clamp: unset !important;
+    text-align: center !important;
+}
+
+/* תיקון "חירבוש" ה-ID הגלוי בכתובת (iOS Fix) */
+html body #AddressCard input[id^="input-"],
+html body #AddressCard .v-field__input input {
+    opacity: 0 !important;
+    height: 0 !important;
+    position: absolute !important;
+    pointer-events: none !important;
+}
+
+/* הגבלת רוחב טקסט כתובת למניעת קריסת אייקונים */
+html body #AddressCard .v-select__selection {
+    max-width: 75vw !important;
+    overflow: hidden !important;
+}
+
+/* --- 3. לוגיקת מירכוז סרגל ניווט צף (חלק 12ג) --- */
+html body #MultiVendorBottomNav .v-bottom-navigation__content > div.tw-flex {
+    position: fixed !important;
+    bottom: 20px !important;
+    left: 0 !important; 
+    right: 0 !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    width: 92% !important;
+    max-width: 420px !important;
+    display: flex !important;
+    justify-content: space-around !important;
+    align-items: center !important;
+}
+
+/* --- 4. ניקוי לוגי (העלמת שכבות כפולות) - מוגן מודאל --- */
+html body :not(.product-popup) .v-btn__overlay, 
+html body :not(.product-popup) .v-btn__underlay, 
+html body :not(.product-popup) .v-card__underlay,
+html body :not(.product-popup) .v-field__overlay,
+html body :not(.product-popup) .v-ripple__container {
+    display: none !important;
+}
+
+/* --- 5. לוגיקת ניקוי אייקונים (mix-blend-mode) - חשוב לאייקוני תשלום --- */
+html body #payment-card .method-icon img.v-img__img {
+    mix-blend-mode: multiply !important; /* גורם לרקע לבן של תמונה להפוך לשקוף על רקע בהיר */
+    object-fit: contain !important;
+}
+
+
+/* ============================================================
+   מערכת עיצוב - מעלה המשלוחים (RED & WHITE LIQUID GLASS V2)
+   ============================================================ */
+
+/* --- 1. תיקונים גלובליים והגדרות בסיס --- */
+
+/* ביטול המרווח הלבן המציק בתחתית האתר */
+html body .tw-mb-\[55px\] { margin-bottom: 0 !important; }
+
+/* מניעת חיתוך טקסטים בסרגל התחתון */
+html body .footer-btn-text {
+    white-space: normal !important;
+    line-height: 1.1 !important;
+    -webkit-line-clamp: unset !important;
+    line-clamp: unset !important;
+    text-align: center !important;
+}
+
+/* ניקוי אלמנטים מיותרים - מוגן מודאל */
+html body :not(.product-popup) .v-btn__overlay, 
+html body :not(.product-popup) .v-btn__underlay, 
+html body :not(.product-popup) .v-card__underlay,
+html body :not(.product-popup) .v-field__overlay,
+html body :not(.product-popup) .v-ripple__container {
+    display: none !important;
+}
+
+/* =========================================================
+   חלק 1: סרגל ניווט תחתון - LIQUID GLASS V4 (FIXED)
+   מטרה: כפיית מצב פעיל על "בית", מירכוז ושקיפות iOS
+   ========================================================= */
+
+/* 1. המכולה החיצונית - נטרול מוחלט של רקעי מערכת */
+html body #MultiVendorBottomNav,
+html body .v-bottom-navigation {
+    background: transparent !important;
+    box-shadow: none !important;
+    border: none !important;
+    left: 0 !important;
+    right: 0 !important;
+    width: 100vw !important;
+    display: flex !important;
+    justify-content: center !important;
+    pointer-events: none !important;
+    z-index: 9999 !important;
+}
+
+/* 2. הקפסולה המרכזית - THE LIQUID CHASSIS */
+html body #MultiVendorBottomNav .v-bottom-navigation__content > div.tw-flex {
+    position: fixed !important;
+    bottom: 25px !important;
+    left: 0 !important;
+    right: 0 !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    
+    width: 92% !important;
+    max-width: 420px !important;
+    height: 72px !important;
+    pointer-events: auto !important;
+
+    /* עיצוב זכוכית נוזלית - שקיפות גבוהה מאוד (0.35) */
+    background: rgba(255, 255, 255, 0.35) !important;
+    backdrop-filter: blur(45px) saturate(250%) contrast(110%) !important;
+    -webkit-backdrop-filter: blur(45px) saturate(250%) contrast(110%) !important;
+    
+    border: 1px solid rgba(255, 255, 255, 0.6) !important;
+    border-radius: 40px !important;
+    
+    box-shadow: 
+        0 20px 40px rgba(0, 0, 0, 0.1),
+        inset 0 1px 3px rgba(255, 255, 255, 0.8) !important;
+
+    display: flex !important;
+    justify-content: space-around !important;
+    align-items: center !important;
+    padding: 0 10px !important;
+}
+
+/* 3. עיצוב כפתורים - מצב רגיל (לא פעיל) */
+html body #MultiVendorBottomNav .footer-btn-text {
+    color: rgba(0, 0, 0, 0.4) !important;
+    font-weight: 600 !important;
+    font-size: 10px !important;
+    margin-top: 4px !important;
+    transition: all 0.3s ease !important;
+}
+
+html body #MultiVendorBottomNav .footer-btn object,
+html body #MultiVendorBottomNav .footer-btn img {
+    filter: brightness(0) opacity(0.35) !important;
+    transition: all 0.3s ease !important;
+}
+
+/* 4. לוגיקת Active - כפייה על כפתור הבית (הימני ביותר ב-RTL) */
+
+/* הגדרת הסטייל הפעיל (QLED RED) */
+html body #MultiVendorBottomNav .v-btn--active .footer-btn-text,
+html body #MultiVendorHome #MultiVendorBottomNav .footer-btn:last-child .footer-btn-text,
+html body #MultiVendorHome #MultiVendorBottomNav .footer-btn:first-child .footer-btn-text {
+    color: #e31e24 !important;
+    font-weight: 800 !important;
+    opacity: 1 !important;
+}
+
+html body #MultiVendorBottomNav .v-btn--active object,
+html body #MultiVendorBottomNav .v-btn--active img,
+html body #MultiVendorHome #MultiVendorBottomNav .footer-btn:last-child img,
+html body #MultiVendorHome #MultiVendorBottomNav .footer-btn:last-child object,
+html body #MultiVendorHome #MultiVendorBottomNav .footer-btn:first-child img,
+html body #MultiVendorHome #MultiVendorBottomNav .footer-btn:first-child object {
+    filter: invert(18%) sepia(88%) saturate(6144%) hue-rotate(354deg) brightness(91%) contrast(100%) drop-shadow(0 2px 8px rgba(227, 30, 36, 0.4)) !important;
+    opacity: 1 !important;
+    transform: scale(1.1) translateY(-2px) !important;
+}
+
+/* 5. באדג' (עגלה) */
+html body #MultiVendorBottomNav .v-badge__badge {
+    background-color: #e31e24 !important;
+    color: white !important;
+    border: 2px solid #ffffff !important;
+    box-shadow: 0 2px 10px rgba(227, 30, 36, 0.3) !important;
+}
+
+/* =========================================================
+   חלק 2+3: איחוד הדר וחיפוש - CRYSTAL UNIFIED SYSTEM V2
+   מטרה: שקיפות מלאה, ביטול קו הפרדה, שורת חיפוש משודרגת
+   ========================================================= */
+/* 1. טיהור רקעים אטומים */
+html body #MultiVendorHeader,
+html body .Header--134917,
+html body .bg-header_bg,
+html body .tw-bg-white.position-sticky,
+html body div[data-v-5c0877f3].bg-header_bg {
+    background: transparent !important;
+    background-color: transparent !important;
+    box-shadow: none !important;
+    border: none !important;
+}
+/* 2. שכבת הזכוכית המאוחדת */
+html body #MultiVendorHeader {
+    background: rgba(255, 255, 255, 0.45) !important;
+    backdrop-filter: blur(45px) saturate(220%) contrast(105%) !important;
+    -webkit-backdrop-filter: blur(45px) saturate(220%) contrast(105%) !important;
+    border-bottom: none !important;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.06) !important;
+    z-index: 10000 !important;
+    padding-bottom: 12px !important;
+}
+/* 3. v-toolbar cleanup */
+html body #MultiVendorHeader #AppBar {
+    background: transparent !important;
+    box-shadow: none !important;
+    border: none !important;
+}
+html body #MultiVendorHeader .v-toolbar__content {
+    background: transparent !important;
+}
+/* 4. אזור מיקום (בית + כתובת) */
+html body #CurrentLocationBtn {
+    display: flex !important;
+    align-items: center !important;
+}
+html body #CurrentLocationBtn span.text,
+html body .text-nav_icon_color {
+    color: #1a1a1a !important;
+    font-weight: 900 !important;
+    font-size: 16px !important;
+}
+html body #CurrentLocationBtn svg path {
+    fill: #e31e24 !important;
+}
+/* כתובת מתחת לשם */
+html body #MultiVendorHeader .text-nav_icon_color.tw-text-\[11px\] {
+    color: #666 !important;
+    font-weight: 600 !important;
+    opacity: 1 !important;
+}
+/* חץ dropdown */
+html body #CurrentLocationBtn svg:last-child path {
+    stroke: #e31e24 !important;
+}
+/* 5. כפתור פילטר - אדום QLED */
+html body #FilterBtn svg path {
+    fill: #e31e24 !important;
+}
+/* 6. שורת החיפוש - Crystal Capsule Premium */
+html body .bg-header_bg .tw-border-\[1\.6px\] {
+    background: rgba(255, 255, 255, 0.65) !important;
+    backdrop-filter: blur(15px) saturate(180%) !important;
+    -webkit-backdrop-filter: blur(15px) saturate(180%) !important;
+    border: 1.5px solid rgba(227, 30, 36, 0.1) !important;
+    border-radius: 18px !important;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.04),
+                inset 0 1px 2px rgba(255, 255, 255, 0.8) !important;
+    height: 52px !important;
+    transition: all 0.3s ease !important;
+    margin: 0 4px !important;
+}
+/* 7. טקסט חיפוש */
+html body .bg-header_bg .tw-text-\[\#67696D\],
+html body .bg-header_bg .tw-text-sm {
+    color: rgba(0, 0, 0, 0.4) !important;
+    font-weight: 500 !important;
+    opacity: 1 !important;
+}
+/* 8. אייקון זכוכית מגדלת */
+html body .bg-header_bg svg path {
+    fill: #e31e24 !important;
+    filter: none !important;
+}
+/* 9. אפקט פוקוס */
+html body .bg-header_bg .tw-border-\[1\.6px\]:focus-within {
+    background: rgba(255, 255, 255, 0.95) !important;
+    border-color: #e31e24 !important;
+    box-shadow: 0 8px 30px rgba(227, 30, 36, 0.12),
+                inset 0 1px 2px rgba(255, 255, 255, 0.9) !important;
+}
+/* 10. הסרת קו הפרדה בין מיקום לחיפוש */
+html body #MultiVendorHeader hr,
+html body #MultiVendorHeader .v-divider,
+html body #MultiVendorHeader [class*="border-b"],
+html body .bg-header_bg .tw-border-b {
+    border: none !important;
+    display: none !important;
+}
+/* 11. ניקוי שכבות Vuetify */
+html body #MultiVendorHeader .v-btn__overlay,
+html body #MultiVendorHeader .v-btn__underlay,
+html body #MultiVendorHeader .v-toolbar__content::after,
+html body #MultiVendorHeader .v-toolbar__content::before {
+    display: none !important;
+}
+
+/* =========================================================
+   חלק 4: כפתורי קריסטל גלובליים (RED & WHITE LIQUID)
+   מטרה: הפיכת כל כפתורי ה-Add והפעולה לקפסולות זכוכית
+   ========================================================= */
+
+/* 1. הגדרת בסיס הכפתור הגלובלי (Add Buttons) */
+html body .v-btn.add-btn,
+html body .v-btn.bg-white.text-button_normal,
+html body button.add-btn {
+    /* עיצוב זכוכית לבנה */
+    background: rgba(255, 255, 255, 0.6) !important;
+    backdrop-filter: blur(15px) saturate(150%) !important;
+    -webkit-backdrop-filter: blur(15px) saturate(150%) !important;
+    
+    /* מסגרת אדום QLED דקה וחדה */
+    border: 1.2px solid #e31e24 !important;
+    border-radius: 10px !important; /* פינות מעוגלות iOS Style */
+    
+    /* טקסט אדום מודגש */
+    color: #e31e24 !important;
+    font-weight: 800 !important;
+    font-size: 13px !important;
+    letter-spacing: 0.3px !important;
+    
+    /* ניקוי צלליות מערכת ישנות */
+    box-shadow: 0 4px 12px rgba(227, 30, 36, 0.08) !important;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    
+    /* מניעת חיתוך טקסט */
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+/* 2. ביטול שכבות הצבע האטומות של Tailwind/Hyperzod */
+html body .v-btn.add-btn.tw-border-grey-500 {
+    border-color: #e31e24 !important;
+}
+
+/* 3. אפקט ריחוף ולחיצה (Tactile Response) */
+html body .v-btn.add-btn:hover {
+    background: rgba(255, 255, 255, 0.9) !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 6px 15px rgba(227, 30, 36, 0.15) !important;
+}
+
+html body .v-btn.add-btn:active {
+    transform: scale(0.94) !important; /* תחושת לחיצה פיזית */
+    background: #e31e24 !important; /* היפוך צבעים בלחיצה */
+    color: #ffffff !important;
+}
+
+/* 4. טיפול באייקון ה "+" בתוך הכפתור */
+html body .v-btn.add-btn .tw-ms-1 {
+    font-size: 16px !important;
+    line-height: 0 !important;
+    margin-bottom: 2px !important;
+}
+
+/* 5. ניקוי שכבות ה-Overlay של Vuetify שיוצרות "עננות" על הכפתור */
+html body .v-btn.add-btn .v-btn__overlay,
+html body .v-btn.add-btn .v-btn__underlay {
+    display: none !important;
+}
+
+/* =========================================================
+   חלק 5: דף העגלה - CRYSTAL BASKET OVERHAUL
+   מטרה: טיהור הרקע האפור, יצירת כרטיסי זכוכית וכפתורי QLED
+   ========================================================= */
+
+/* 1. טיהור הרקע הכללי - מעבר מלבן/אפור משעמם ללבן קריסטל */
+html body #app-router-view .tw-bg-\[#f7f7f7\],
+html body #checkout.tw-relative {
+    background-color: #ffffff !important;
+    background: radial-gradient(circle at top, #ffffff 0%, #fcfcfc 100%) !important;
+}
+
+/* 2. הדר העגלה (Sticky Header) - Liquid Glass */
+html body #checkout .position-fixed.tw-top-0 {
+    background: rgba(255, 255, 255, 0.5) !important;
+    backdrop-filter: blur(30px) saturate(200%) !important;
+    -webkit-backdrop-filter: blur(30px) saturate(200%) !important;
+    border-bottom: 1.5px solid rgba(227, 30, 36, 0.1) !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03) !important;
+}
+
+/* כפתור חזור (Back) - אדום QLED */
+html body #checkout .back-btn svg path {
+    fill: #e31e24 !important;
+    stroke: #e31e24 !important;
+}
+
+/* 3. כרטיס החנות (Merchant Card) - Floating Glass Tile */
+html body #checkout .tw-bg-white.tw-border {
+    background: rgba(255, 255, 255, 0.7) !important;
+    backdrop-filter: blur(20px) !important;
+    -webkit-backdrop-filter: blur(20px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.8) !important; /* Rim light effect */
+    border-radius: 24px !important;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.05), 
+                0 5px 15px rgba(0, 0, 0, 0.02) !important;
+    padding: 20px !important;
+    margin-bottom: 20px !important;
+}
+
+/* טקסטים בכרטיס */
+html body #checkout h2.tw-text-black {
+    color: #000000 !important;
+    font-weight: 800 !important;
+    font-size: 18px !important;
+}
+
+html body #checkout .tw-text-gray-500 {
+    color: #e31e24 !important; /* הפיכת פרטי הפריטים לאדום מותג עדין */
+    font-weight: 600 !important;
+    opacity: 0.8 !important;
+}
+
+/* 4. כפתורי הפעולה בתחתית הכרטיס */
+
+/* כפתור "המשך לתשלום" - THE PRIMARY QLED BUTTON */
+html body #checkout button[style*="background-color: rgb(0, 0, 0)"] {
+    background: linear-gradient(135deg, #e31e24 0%, #b3161b 100%) !important;
+    color: #ffffff !important;
+    border-radius: 14px !important;
+    font-weight: 900 !important;
+    font-size: 15px !important;
+    text-transform: none !important;
+    box-shadow: 0 8px 20px rgba(227, 30, 36, 0.3) !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    transition: all 0.3s ease !important;
+}
+
+/* כפתור "צפה בחנות" - THE SECONDARY CRYSTAL BUTTON */
+html body #checkout button[style*="background-color: rgb(243, 243, 244)"] {
+    background: rgba(255, 255, 255, 0.5) !important;
+    backdrop-filter: blur(10px) !important;
+    color: #e31e24 !important;
+    border: 1.5px solid rgba(227, 30, 36, 0.3) !important;
+    border-radius: 14px !important;
+    font-weight: 800 !important;
+    box-shadow: none !important;
+}
+
+/* 5. כפתור שלוש הנקודות (תפריט) - אדום */
+html body #checkout .v-btn--icon i.v-icon svg {
+    fill: #e31e24 !important;
+}
+
+/* 6. הסרת אלמנטים מיותרים */
+html body #checkout .v-card__underlay,
+html body #checkout .v-btn__overlay {
+    display: none !important;
+}
+
+/* =========================================================
+   חלק 6: דף "החשבון שלי" - LIQUID GLASS EDITION
+   מטרה: הפיכת הפרופיל לממשק זכוכית יוקרתי עם נגיעות QLED
+   ========================================================= */
+
+/* 1. טיהור רקע הדף - לבן קריסטל רענן */
+html body #app-router-view .tw-min-h-svh,
+html body .v-container.tw--mt-3.tw-bg-\[#fff\] {
+    background-color: #ffffff !important;
+    background: radial-gradient(circle at 50% 0%, #ffffff 0%, #f9f9f9 100%) !important;
+}
+
+/* 2. פאנל משתמש עליון (User Header) - Liquid Glass Panel */
+html body div.position-fixed.tw-top-0.tw-bg-white {
+    background: rgba(255, 255, 255, 0.6) !important;
+    backdrop-filter: blur(30px) saturate(180%) !important;
+    -webkit-backdrop-filter: blur(30px) saturate(180%) !important;
+    border-bottom: 1.5px solid rgba(227, 30, 36, 0.15) !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04) !important;
+}
+
+/* טקסטים בפאנל העליון */
+html body .user-details h6 {
+    color: #000000 !important;
+    font-weight: 800 !important;
+}
+
+html body .user-details p {
+    color: #e31e24 !important; /* הפיכת פרטי הקשר לאדום מותג עדין */
+    font-weight: 600 !important;
+    opacity: 0.8 !important;
+}
+
+/* אייקון עריכה - אדום QLED */
+html body .user-details img[alt="edit"] {
+    filter: invert(18%) sepia(88%) saturate(6144%) hue-rotate(354deg) brightness(91%) contrast(100%) !important;
+}
+
+/* 3. שורות הניווט - קפסולות זכוכית (Navigation Items) */
+html body #ProfileSideBar .v-list-item.navigation-item {
+    background: rgba(255, 255, 255, 0.5) !important;
+    backdrop-filter: blur(15px) !important;
+    border: 1px solid rgba(0, 0, 0, 0.05) !important;
+    border-radius: 16px !important;
+    margin-bottom: 12px !important;
+    padding: 14px 16px !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.02) !important;
+}
+
+/* אפקט Hover/Active - הבלטה באדום */
+html body #ProfileSideBar .v-list-item.navigation-item:active,
+html body #ProfileSideBar .v-list-item.navigation-item:hover {
+    background: rgba(255, 255, 255, 0.9) !important;
+    border-color: rgba(227, 30, 36, 0.4) !important;
+    transform: scale(0.98) !important;
+    box-shadow: 0 8px 20px rgba(227, 30, 36, 0.08) !important;
+}
+
+/* טקסט בתוך השורות */
+html body #ProfileSideBar .v-list-item-title.nav-text {
+    color: #000000 !important;
+    font-weight: 700 !important;
+    font-size: 14px !important;
+}
+
+/* 4. הזרקת אדום QLED לאייקוני הרשימה (SVG/IMG) */
+html body #ProfileSideBar .v-list-item__prepend img,
+html body #ProfileSideBar .v-list-item__prepend svg,
+html body #ProfileSideBar .v-list-item__prepend svg path {
+    filter: invert(18%) sepia(88%) saturate(6144%) hue-rotate(354deg) brightness(91%) contrast(100%) !important;
+    fill: #e31e24 !important;
+}
+
+/* חריג: אייקון יציאה מהמערכת - אדום עמוק יותר */
+html body #ProfileSideBar .FvDmIs7p0Tcc svg path {
+    fill: #b3161b !important;
+}
+
+/* 5. ניקוי קווים מפרידים (Dividers) */
+html body #profile hr.v-divider {
+    border-color: rgba(227, 30, 36, 0.1) !important;
+    margin: 20px 0 !important;
+}
+
+/* 6. הסרת שכבות מערכת מיותרות */
+html body #ProfileSideBar .v-btn__overlay,
+html body #ProfileSideBar .v-list-item__overlay,
+html body #ProfileSideBar .v-list-item__underlay {
+    display: none !important;
+}
+
+/* =========================================================
+   חלק 7: דף "ההזמנות שלי" - CRYSTAL ORDER HISTORY
+   מטרה: הפיכת רשימת ההזמנות לממשק זכוכית נוזלית פרימיום
+   ========================================================= */
+
+/* 1. טיהור הרקע הכללי - חיסול ה-f7f7f7 האפרורי */
+html body #custom-scroll-orders,
+html body #orders .tw-bg-\[#f7f7f7\],
+html body #profile.tw-relative {
+    background-color: #ffffff !important;
+    background: radial-gradient(circle at center, #ffffff 0%, #f8f8f8 100%) !important;
+}
+
+/* 2. הדר הדף (ההזמנות שלי) - Liquid Glass Sticky */
+html body #checkout .position-fixed.tw-top-0,
+html body #app-router-view .position-fixed.tw-top-0 {
+    background: rgba(255, 255, 255, 0.6) !important;
+    backdrop-filter: blur(25px) saturate(180%) !important;
+    -webkit-backdrop-filter: blur(25px) saturate(180%) !important;
+    border-bottom: 1.5px solid rgba(227, 30, 36, 0.15) !important;
+}
+
+/* כותרת ההדר וביטול אפקט ה-Difference הבעייתי */
+html body #checkout .v-card-title.tw-mix-blend-difference,
+html body #app-router-view .v-card-title {
+    mix-blend-mode: normal !important;
+    color: #000000 !important;
+    font-weight: 800 !important;
+    text-align: center !important;
+}
+
+/* 3. כרטיס הזמנה בודד - THE GLASS TILE */
+html body div[id^="order-"] .tw-overflow-hidden {
+    background: rgba(255, 255, 255, 0.5) !important;
+    backdrop-filter: blur(20px) !important;
+    -webkit-backdrop-filter: blur(20px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.8) !important; /* Rim Light */
+    border-radius: 20px !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04) !important;
+    margin-bottom: 16px !important;
+    transition: transform 0.3s ease !important;
+}
+
+html body div[id^="order-"] .tw-overflow-hidden:active {
+    transform: scale(0.98) !important;
+}
+
+/* 4. פרטי החנות והמחיר - QLED HIGHLIGHTS */
+html body .merchant-name {
+    color: #000000 !important;
+    font-weight: 800 !important;
+    font-size: 15px !important;
+}
+
+html body .order-price span {
+    color: #e31e24 !important; /* אדום מותג למחיר */
+    font-weight: 900 !important;
+    font-size: 16px !important;
+    text-shadow: 0 0 10px rgba(227, 30, 36, 0.1) !important;
+}
+
+/* טקסטים משניים (תאריך, מספר הזמנה) */
+html body .order-id, 
+html body .order-status, 
+html body .order-type {
+    color: rgba(0, 0, 0, 0.5) !important;
+    font-weight: 600 !important;
+}
+
+/* 5. עיצוב טבלת המוצרים בתוך הכרטיס */
+html body .c-table thead th {
+    border-bottom: 1px solid rgba(227, 30, 36, 0.1) !important;
+    color: #000000 !important;
+    font-weight: 700 !important;
+}
+
+html body .c-table tbody td {
+    color: #444444 !important;
+    font-weight: 500 !important;
+}
+
+/* 6. כפתורי פעולה בתחתית הכרטיס */
+
+/* כפתור "להזמין מחדש" - THE POWER RED CAPSULE */
+html body button.track-btn.tw-bg-black {
+    background: linear-gradient(135deg, #e31e24 0%, #b3161b 100%) !important;
+    border-radius: 50px !important; /* קפסולה מלאה */
+    color: #ffffff !important;
+    font-weight: 800 !important;
+    border: none !important;
+    box-shadow: 0 6px 15px rgba(227, 30, 36, 0.3) !important;
+    height: 38px !important;
+}
+
+/* כפתור "דרג" - CRYSTAL SECONDARY */
+html body button.track-btn.tw-bg-\[#F3F3F4\] {
+    background: rgba(255, 255, 255, 0.8) !important;
+    border: 1.2px solid rgba(227, 30, 36, 0.3) !important;
+    border-radius: 50px !important;
+    color: #e31e24 !important;
+    font-weight: 700 !important;
+}
+
+/* 7. ניקוי לוגי וסינכרון אייקונים */
+html body .v-card__underlay,
+html body .v-btn__overlay {
+    display: none !important;
+}
+
+/* הפיכת חץ הניווט בכרטיס לאדום */
+html body div[id^="order-"] .order-price svg path {
+    fill: #e31e24 !important;
+}
+
+/* =========================================================
+   חלק 8א: הדר צ'ק-אאוט - LIQUID GLASS OVERRIDE
+   מטרה: כותרת אדומה על זכוכית נוזלית (פתרון ל-Mix Blend)
+   ========================================================= */
+
+/* 1. טיפול במכולה החיצונית ביותר - "ניקוב" הלבן האטום */
+html body #checkout .position-fixed.tw-top-0.tw-bg-white {
+    background: rgba(255, 255, 255, 0.35) !important; /* נוסחת הזכוכית מה-DNA */
+    backdrop-filter: blur(45px) saturate(250%) !important;
+    -webkit-backdrop-filter: blur(45px) saturate(250%) !important;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05) !important;
+    border-bottom: 1px solid rgba(227, 30, 36, 0.1) !important;
+}
+
+/* 2. ניטרול ה-v-card הפנימי כדי שלא יחזיר את הצבע הלבן */
+html body #checkout .position-fixed.tw-top-0 .v-card {
+    background: transparent !important;
+    box-shadow: none !important;
+}
+
+/* 3. פתרון ה-Mix-Blend לכותרת - הפיכה לאדום QLED */
+/* אנחנו מבטלים את ה-Difference שכופה צבעים הפוכים */
+html body #checkout .v-card-title.tw-mix-blend-difference {
+    mix-blend-mode: normal !important; 
+    color: #e31e24 !important; /* אדום מותגי */
+    font-weight: 900 !important;
+    font-size: 18px !important;
+    opacity: 1 !important;
+    
+    /* תיקון מירכוז - נטרול ה-Offset של המערכת */
+    transform: translateX(0px) !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    text-align: center !important;
+}
+
+/* 4. עיצוב כפתור ה-Back (SVG) - אדום QLED */
+html body #checkout .back-btn svg,
+html body #checkout .back-btn svg path {
+    fill: #e31e24 !important;
+    stroke: #e31e24 !important;
+    transition: transform 0.2s ease !important;
+}
+
+/* 5. ניקוי שכבות ה-Underlay של Vuetify שחוסמות את הבלור */
+html body #checkout .v-card__underlay {
+    display: none !important;
+}
+
+/* 6. הסרת פס ההתקדמות הלבן/שחור שמעל הכותרת */
+html body #checkout .v-card__loader {
+    display: none !important;
+}
+
+/* =========================================================
+   חלק 8ג: שדה הערות למטבח - SMART GLASS FEEDBACK
+   מטרה: מתן אינדיקציה ויזואלית שההערה נשמרה ללא כפתור
+   ========================================================= */
+
+/* 1. עיצוב בסיס השדה - Liquid Glass */
+html body #message .v-field {
+    background: rgba(255, 255, 255, 0.5) !important;
+    backdrop-filter: blur(10px) !important;
+    -webkit-backdrop-filter: blur(10px) !important;
+    border: 1.2px solid rgba(0, 0, 0, 0.1) !important;
+    border-radius: 12px !important;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    overflow: hidden !important;
+}
+
+/* 2. מצב "הערה נקלטה" - כשמוקלד טקסט (Placeholder נעלם) */
+html body #message .v-field:has(input:not(:placeholder-shown)) {
+    border-color: #e31e24 !important; /* גבול אדום מותג */
+    background: rgba(227, 30, 36, 0.03) !important; /* רקע אדמדם עדין מאוד */
+    box-shadow: 0 4px 12px rgba(227, 30, 36, 0.08) !important;
+}
+
+/* 3. שינוי צבע הטקסט המוקלד לאדום QLED להדגשה */
+html body #message input:not(:placeholder-shown) {
+    color: #e31e24 !important;
+    font-weight: 700 !important;
+}
+
+/* 4. הזרקת אייקון "ההערה נשמרה" (צ'ק) מצד שמאל (LTR בתוך RTL) */
+html body #message .v-field__field::after {
+    content: '\2713 \00a0  נשמר'; /* אייקון צ'ק + טקסט */
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #e31e24;
+    font-size: 10px;
+    font-weight: 900;
+    opacity: 0;
+    transition: all 0.3s ease !important;
+    pointer-events: none !important;
+}
+
+/* הצגת האייקון רק כשיש טקסט בשדה */
+html body #message .v-field:has(input:not(:placeholder-shown)) .v-field__field::after {
+    opacity: 1 !important;
+}
+
+/* 5. פינוי מקום לאייקון כדי שהטקסט לא יעלה עליו */
+html body #message .v-field__input {
+    padding-left: 60px !important; /* מרווח עבור ה-נשמר */
+}
+
+/* 6. אפקט פעימה (Pulse) קטן ברגע שמתחילים להקליד */
+@keyframes noteCaptured {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.02); border-color: #e31e24; }
+    100% { transform: scale(1); }
+}
+
+html body #message .v-field:has(input:not(:placeholder-shown)) {
+    animation: noteCaptured 0.4s ease-out;
+}
+
+
+/* =========================================================
+   חלק 8ד: הוראות לשליח - תיקון חיתוך (No-Clip Fix)
+   מטרה: מניעת חיתוך הקצוות ושמירה על העיצוב הקיים
+   ========================================================= */
+
+/* 1. טיפול במכולה של הסליידר - הוספת "מרחב נשימה" */
+html body #slinstruction-slider,
+html body .slinstruction-slider,
+html body #sl-inner-instruction-slider {
+    overflow: visible !important; /* קריטי: מאפשר לאלמנטים לצאת מהגבולות בלי להיחתך */
+    padding-top: 15px !important; /* מרחב לאפקט ה-Scale למעלה */
+    padding-bottom: 15px !important; /* מרחב לאפקט ה-Scale למטה */
+    display: flex !important;
+    align-items: center !important;
+}
+
+/* 2. וידוא גובה מינימלי למכולה הפנימית כדי שלא תקרוס */
+html body #sl-inner-instruction-slider {
+    min-height: 140px !important; 
+    gap: 15px !important; /* ריווח יוקרתי בין הכפתורים */
+}
+
+/* 3. הקפסולה עצמה - שמירה על הגודל שמונע חיתוך טקסט */
+html body #sl-inner-instruction-slider .tw-relative.tw-flex-col {
+    width: 105px !important; 
+    height: 105px !important;
+    background: rgba(255, 255, 255, 0.45) !important;
+    backdrop-filter: blur(45px) saturate(250%) !important;
+    -webkit-backdrop-filter: blur(45px) saturate(250%) !important;
+    border-radius: 22px !important;
+    border: 1px solid rgba(0, 0, 0, 0.08) !important;
+    
+    /* מניעת חיתוך פנימי של הצל הלבן */
+    overflow: visible !important; 
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+}
+
+/* 4. מצב "נבחר" (Toggle) - ללא חיתוך */
+html body #sl-inner-instruction-slider .tw-relative.tw-border-black,
+html body #sl-inner-instruction-slider .tw-relative[style*="border-color"] {
+    border: 2px solid #e31e24 !important;
+    background: rgba(227, 30, 36, 0.08) !important;
+    transform: translateY(-5px) scale(1.06) !important; /* אפקט קפיצה נקי */
+    box-shadow: 0 10px 25px rgba(227, 30, 36, 0.2) !important;
+}
+
+/* 5. תיקון הטקסט - שלא ייחתך בתוך הקופסה */
+html body #sl-inner-instruction-slider p.tw-m-0 {
+    font-size: 11px !important;
+    line-height: 1.2 !important;
+    font-weight: 800 !important;
+    white-space: normal !important;
+    display: block !important;
+    text-align: center !important;
+}
+
+/* 6. הסרת אלמנטים חוסמים מהמערכת */
+html body #sl-inner-instruction-slider .v-card__underlay {
+    display: none !important;
+}
+
+
+
+/* --- חלק 8ה׳: אזור הטיפ - גרסת ה-Liquid Glass המזוקקת (ללא שכפולים) --- */
+
+/* 1. מכולת האב - המעטפת המרכזית (DNA) - חסין משינויי Vue */
+#checkout div.tw-mt-1.tw-mb-3:has([data-ref="customTip"]) {
+    position: relative !important;
+    left: 0 !important;
+    right: 0 !important;
+    margin: 20px auto !important;
+    width: 95% !important;
+    max-width: 480px !important;
+    padding: 20px !important;
+    background: rgba(255, 255, 255, 0.75) !important;
+    backdrop-filter: blur(45px) saturate(210%) !important;
+    -webkit-backdrop-filter: blur(45px) saturate(210%) !important;
+    border-radius: 24px !important;
+    border: 1px solid rgba(255, 255, 255, 0.5) !important;
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.05) !important;
+    transition: all 0.5s ease !important;
+    overflow: visible !important;
+}
+
+/* 2. חוק הברזל: השדה הקדוש - לבן סטרילי ולחיץ */
+#checkout .v-input[data-ref="customTip"] {
+    position: relative !important;
+    z-index: 10 !important;
+}
+
+#checkout .v-input[data-ref="customTip"] .v-field {
+    background: #ffffff !important;
+    border-radius: 14px !important;
+    border: 1px solid rgba(0, 0, 0, 0.08) !important;
+    height: 48px !important;
+    box-shadow: none !important;
+}
+
+/* ביטול קו תחתון של Vuetify */
+#checkout .v-field__outline {
+    display: none !important;
+}
+
+/* 3. אלמנט ה-Prefix (₪) - המטרה לחידוש */
+#checkout .v-text-field__prefix__text {
+    font-weight: 900 !important;
+    font-size: 1.1rem !important;
+    color: #1a1a1a !important;
+    transition: all 0.4s ease !important;
+}
+
+/* 4. הכפתור - עיצוב QLED Red (לפני היעלמות) */
+#checkout .apply-btn {
+    background: #e31e24 !important;
+    color: white !important;
+    border-radius: 12px !important;
+    height: 44px !important;
+    min-width: 90px !important;
+    font-weight: 800 !important;
+    border: none !important;
+    box-shadow: 0 4px 12px rgba(227, 30, 36, 0.25) !important;
+    text-transform: none !important;
+}
+
+/* --- לוגיקת הפידבק (פוסט-לחיצה: כשהכפתור נעלם) --- */
+
+/* א. צביעת ה-₪ בירוק דופק - סלקטור ספציפי למכולת הטיפ בלבד */
+#checkout div.tw-mt-1.tw-mb-3:has([data-ref="customTip"]):not(:has(.apply-btn)) .v-text-field__prefix__text {
+    color: #01C267 !important;
+    transform: scale(1.3) !important;
+    filter: drop-shadow(0 0 5px rgba(1, 194, 103, 0.4)) !important;
+}
+
+/* ב. הזרקת "פס כוח" ירוק עליון - מופיע אך ורק מעל השדה של הטיפ */
+#checkout div.tw-mt-1.tw-mb-3:has([data-ref="customTip"]):not(:has(.apply-btn))::before {
+    content: "הטיפ עודכן בהצלחה ✓" !important;
+    position: absolute !important;
+    top: -12px !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    background: #01C267 !important;
+    color: white !important;
+    padding: 4px 16px !important;
+    border-radius: 20px !important;
+    font-size: 11px !important;
+    font-weight: 800 !important;
+    box-shadow: 0 4px 10px rgba(1, 194, 103, 0.3) !important;
+    z-index: 20 !important;
+    animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards !important;
+}
+
+/* ג. סימולציית כפתור "בוצע" (במקום הריק שנשאר) */
+#checkout div.tw-mt-1.tw-mb-3:has([data-ref="customTip"]):not(:has(.apply-btn)) .tw-flex.tw-items-end::after {
+    content: "בוצע ✓" !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background: #01C267 !important;
+    color: white !important;
+    border-radius: 12px !important;
+    height: 44px !important;
+    min-width: 90px !important;
+    font-weight: 800 !important;
+    font-size: 13px !important;
+}
+
+@keyframes popIn {
+    from { opacity: 0; transform: translate(-50%, 10px); }
+    to { opacity: 1; transform: translate(-50%, 0); }
+}
+
+/* 5. ניקוי הגריד העליון (כפתורי הטיפ המרובעים) */
+#checkout .tw-grid-cols-4 .tw-cursor-pointer {
+    border-radius: 12px !important;
+    border: 1px solid rgba(0, 0, 0, 0.05) !important;
+    background: white !important;
+    transition: all 0.2s ease !important;
+}
+
+/* --- Part 8f: עיצוב בחירת סוג הזמנה - פריסת רוחב רגילה --- */
+
+/* 1. קונטיינר חיצוני - הסרת מגבלת ה-max-width */
+[data-v-77884587].tw-mt-\[10px\].tw-border.tw-bg-white {
+    background: rgba(255, 255, 255, 0.8) !important;
+    backdrop-filter: blur(45px) saturate(210%) !important;
+    -webkit-backdrop-filter: blur(45px) saturate(210%) !important;
+    border: 1px solid rgba(0, 0, 0, 0.05) !important;
+    border-radius: 24px !important;
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.03) !important;
+    padding: 20px !important;
+    /* החזרת רוחב רגיל */
+    width: 100% !important;
+    max-width: none !important; 
+    position: relative !important;
+    margin-top: 16px !important;
+    margin-bottom: 16px !important;
+    transition: all 0.4s ease !important;
+}
+
+/* 2. כותרת הסקשן - יישור לימין ושיפור נוכחות */
+#mbOrderTypeSelect h2 {
+    color: #1a1a1a !important;
+    font-size: 15px !important;
+    font-weight: 800 !important;
+    margin-bottom: 24px !important;
+    text-align: right !important;
+    padding-right: 4px !important;
+}
+
+/* 3. פריטי הרשימה - מרווחים נשימה רחבים */
+#mbOrderTypeSelect .v-list-item {
+    background: transparent !important;
+    border-radius: 18px !important;
+    margin-bottom: 12px !important;
+    border: 1px solid rgba(0, 0, 0, 0.03) !important;
+    padding: 14px 18px !important;
+}
+
+/* מצב נבחר - הדגשה פרימיום */
+#mbOrderTypeSelect .v-list-item:has(.checked) {
+    background: white !important;
+    border: 1px solid rgba(227, 30, 36, 0.2) !important;
+    box-shadow: 0 8px 20px rgba(227, 30, 36, 0.06) !important;
+}
+
+/* 4. טקסט ואייקונים */
+#mbOrderTypeSelect .tw-text-\[13px\] {
+    font-size: 16px !important;
+    font-weight: 600 !important;
+    color: #000 !important;
+}
+
+.delivery-icon, .pickup-icon {
+    width: 24px !important;
+    height: 24px !important;
+    margin-left: 12px !important;
+}
+
+/* 5. Radio Button Jewelry - ה"יהלום" האדום */
+.custom-radio {
+    width: 22px !important;
+    height: 22px !important;
+    border: 2px solid #d1d1d1 !important;
+    background: white !important;
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+}
+
+.custom-radio.checked {
+    border-color: #e31e24 !important;
+    background: #e31e24 !important;
+    box-shadow: 0 0 0 5px rgba(227, 30, 36, 0.12) !important;
+}
+
+.custom-radio.checked::after {
+    content: '' !important;
+    width: 9px !important;
+    height: 9px !important;
+    background: white !important;
+    border-radius: 50% !important;
+}
+
+/* ניקוי שאריות של Vuetify */
+.v-list-item__overlay, .v-list-item__underlay {
+    display: none !important;
+}
+
+/* --- Part 8z: עיצוב פרטי חשבון ופירוט מחירים --- */
+
+/* 1. כרטיס הטריגר (השורה שמובילה לפירוט) */
+[data-v-77884587].tw-mt-\[10px\].tw-border.tw--mb-0.tw-bg-white {
+    background: rgba(255, 255, 255, 0.75) !important;
+    backdrop-filter: blur(45px) saturate(210%) !important;
+    -webkit-backdrop-filter: blur(45px) saturate(210%) !important;
+    border: 1px solid rgba(0, 0, 0, 0.05) !important;
+    border-radius: 24px !important;
+    padding: 18px !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03) !important;
+    transition: all 0.3s ease !important;
+}
+
+/* כותרת קטנה מעל הטבלה */
+#summary span.tw-text-black.tw-uppercase {
+    font-size: 11px !important;
+    letter-spacing: 0.5px !important;
+    color: #888 !important; /* צבע ניטרלי לכותרת משנית */
+    font-weight: 700 !important;
+    margin-bottom: 8px !important;
+    display: block !important;
+}
+
+/* עיצוב שורת המחיר בטריגר */
+#summary .summary-card td {
+    padding-top: 8px !important;
+    vertical-align: middle !important;
+}
+
+#summary svg path {
+    fill: #e31e24 !important; /* צבע מותג לאייקון הקבלה */
+}
+
+/* 2. עיצוב ה-Bottom Sheet (החלונית שנפתחת) */
+.v-overlay__content.v-bottom-sheet__content {
+    background: transparent !important;
+}
+
+.v-bottom-sheet__content .v-card {
+    background: rgba(255, 255, 255, 0.9) !important;
+    backdrop-filter: blur(50px) saturate(210%) !important;
+    -webkit-backdrop-filter: blur(50px) saturate(210%) !important;
+    border-radius: 32px 32px 0 0 !important; /* עיגול פרימיום בחלק העליון */
+    border-top: 1px solid rgba(255, 255, 255, 0.4) !important;
+    box-shadow: 0 -15px 50px rgba(0, 0, 0, 0.1) !important;
+    padding: 24px 20px !important;
+}
+
+/* כותרת החלונית */
+.v-bottom-sheet__content .v-card-title {
+    padding: 0 0 20px 0 !important;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.04) !important;
+    margin-bottom: 20px !important;
+}
+
+.v-bottom-sheet__content .v-card-title span {
+    font-size: 17px !important;
+    font-weight: 800 !important;
+    color: #000 !important;
+}
+
+/* האייקון בכותרת החלונית */
+.v-bottom-sheet__content .v-card-title svg path {
+    fill: #e31e24 !important;
+}
+
+/* כפתור הסגירה (X) */
+.v-bottom-sheet__content .v-btn--icon {
+    background: rgba(0, 0, 0, 0.04) !important;
+    border-radius: 50% !important;
+    transition: transform 0.2s ease !important;
+}
+
+.v-bottom-sheet__content .v-btn--icon:active {
+    transform: scale(0.9) !important;
+}
+
+/* 3. טבלת הפירוט בתוך החלונית */
+.v-bottom-sheet__content table.summary-card {
+    border-collapse: separate !important;
+    border-spacing: 0 12px !important; /* מרווח בין השורות */
+}
+
+.v-bottom-sheet__content table.summary-card td {
+    font-size: 15px !important;
+    color: #444 !important;
+    font-weight: 500 !important;
+}
+
+/* שורת ה"סה"כ לתשלום" הסופית */
+.v-bottom-sheet__content .tw-border-t {
+    border-top: 2px solid #f0f0f0 !important;
+    padding-top: 20px !important;
+}
+
+.v-bottom-sheet__content .tw-border-t td {
+    font-size: 19px !important;
+    font-weight: 900 !important;
+    color: #e31e24 !important; /* המחיר הסופי באדום מותג */
+}
+
+/* יישור טקסט בטבלה */
+.text-end, .tw-text-end {
+    text-align: left !important; /* תיקון RTL במידה ויש בעיה במובייל */
+}
+
+[dir="rtl"] .text-end, [dir="rtl"] .tw-text-end {
+    text-align: left !important;
+}
+
+
+/* --- Part 8h: עיצוב אמצעי תשלום - Liquid Glass דומיננטי --- */
+
+/* 1. הקונטיינר הראשי של כרטיס התשלום */
+#payment-card {
+    background: rgba(255, 255, 255, 0.72) !important;
+    backdrop-filter: blur(45px) saturate(210%) !important;
+    -webkit-backdrop-filter: blur(45px) saturate(210%) !important;
+    border: 1px solid rgba(227, 30, 36, 0.08) !important;
+    border-radius: 28px !important; /* פינות מעוגלות יותר למראה פרימיום */
+    box-shadow: 0 15px 45px rgba(0, 0, 0, 0.04) !important;
+    padding: 24px 12px !important;
+    margin-top: 20px !important;
+    position: relative !important;
+    overflow: hidden !important;
+}
+
+/* 2. כותרת אמצעי תשלום */
+#payment-card h3.heading {
+    margin-right: 12px !important;
+    margin-bottom: 24px !important;
+    padding-top: 0 !important;
+}
+
+#payment-card h3.heading span {
+    font-size: 16px !important;
+    font-weight: 900 !important;
+    color: #1a1a1a !important;
+    letter-spacing: -0.2px !important;
+    text-transform: none !important;
+}
+
+/* 3. עיצוב שורות התשלום (מזומן / אשראי) */
+.payment-method {
+    background: transparent !important;
+    border: none !important;
+    margin-bottom: 8px !important;
+    transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1) !important;
+    border-radius: 20px !important;
+}
+
+/* קו הפרדה עדין בין אמצעי התשלום */
+.payment-method .tw-border-b-\[0\.5px\] {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.04) !important;
+    margin: 0 12px !important;
+}
+
+/* 4. מצב בחור (Active State) - זכוכית לבנה בוהקת */
+.payment-method:has(input:checked) {
+    background: #ffffff !important;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.05) !important;
+    transform: translateY(-2px) !important;
+    border: 1px solid rgba(227, 30, 36, 0.1) !important;
+}
+
+/* 5. טקסטים בתוך אמצעי התשלום */
+.payment-method .name.tw-text-\[13px\] {
+    font-size: 15px !important;
+    font-weight: 700 !important;
+    color: #111 !important;
+}
+
+.payment-method .name.tw-text-xs {
+    font-size: 12px !important;
+    color: #666 !important;
+    margin-top: 4px !important;
+}
+
+/* 6. אייקונים של אמצעי תשלום */
+.method-icon {
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.05)) !important;
+    transition: transform 0.3s ease !important;
+}
+
+.payment-method:has(input:checked) .method-icon {
+    transform: scale(1.1) !important;
+}
+
+/* 7. עיצוב כפתור הרדיו (The Selection Jewel) */
+.custom-v-radio .v-selection-control__input i {
+    color: #e0e0e0 !important; /* צבע ברירת מחדל אפור בהיר */
+    font-size: 24px !important;
+}
+
+/* כשהרדיו נבחר - הופך לסימן אישור אדום דומיננטי */
+.payment-method:has(input:checked) .v-selection-control__input i {
+    color: #e31e24 !important;
+}
+
+/* החלפת האייקון של ה-Radio במידת האפשר לעיגול מלא */
+.payment-method:has(input:checked) .v-selection-control__input i svg path {
+    d: path("M12,2C6.48,2 2,6.48 2,12C2,17.52 6.48,22 12,22C17.52,22 22,17.52 22,12C22,6.48 17.52,2 12,2ZM10,17L5,12L6.41,10.59L10,14.17L17.59,6.58L19,8L10,17Z") !important;
+}
+
+/* ניקוי שכבות מיותרות של Hyperzod */
+.v-card__overlay, .v-card__underlay, .v-btn__overlay {
+    display: none !important;
+}
+
+/* התאמת ריפודים פנימיים */
+.payment-method label {
+    padding: 16px 20px !important;
+    cursor: pointer !important;
+}
+
+/* --- Part 8i: עיצוב פוטר וסרגל ביצוע הזמנה צף - קריסטל פרימיום --- */
+
+/* 1. הפוטר הראשי (Main Footer) */
+#MainFooter {
+    background: rgba(255, 255, 255, 0.05) !important; /* שקיפות קריסטלית גבוהה */
+    backdrop-filter: blur(40px) saturate(180%) !important;
+    -webkit-backdrop-filter: blur(40px) saturate(180%) !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
+    color: #000 !important;
+    margin-bottom: 160px !important; /* מרווח עבור הסרגל הצף */
+}
+
+#MainFooter .text-footer_nav_color, 
+#MainFooter .copyright, 
+#MainFooter a {
+    color: #1a1a1a !important;
+    font-weight: 500 !important;
+}
+
+#MainFooter svg {
+    fill: #1a1a1a !important;
+    opacity: 0.7 !important;
+}
+
+/* 2. סרגל ביצוע ההזמנה הצף (The Floating Island) */
+.place-order {
+    position: fixed !important;
+    bottom: 30px !important; /* ציפה מעל התחתית */
+    left: 0 !important;
+    right: 0 !important;
+    margin: auto !important;
+    width: 94% !important;
+    max-width: 480px !important;
+    background: rgba(255, 255, 255, 0.65) !important; /* אפקט זכוכית רטובה */
+    backdrop-filter: blur(45px) saturate(210%) !important;
+    -webkit-backdrop-filter: blur(45px) saturate(210%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.5) !important;
+    border-radius: 32px !important;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.12) !important;
+    z-index: 999 !important;
+    padding: 12px 16px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 8px !important;
+}
+
+/* 3. כרטיס הכתובת בתוך הסרגל הצף */
+#AddressCard {
+    background: transparent !important;
+    border: none !important;
+    padding: 0 !important;
+    margin-bottom: 4px !important;
+}
+
+#AddressCard .tw-flex.tw-items-center.tw-gap-3 {
+    border-top: none !important;
+    background: rgba(0, 0, 0, 0.03) !important; /* הדגשה קלה לכתובת */
+    border-radius: 20px !important;
+    padding: 8px 12px !important;
+}
+
+#AddressCard svg path {
+    fill: #e31e24 !important; /* אייקון מיקום אדום */
+}
+
+/* ניקוי שדות הכתובת (Holy Field Rule) */
+#AddressCard .v-field {
+    background: transparent !important;
+    --v-field-padding-start: 0px !important;
+    box-shadow: none !important;
+}
+
+#AddressCard .tw-text-black {
+    font-size: 13px !important;
+    font-weight: 700 !important;
+}
+
+/* 4. שורת אמצעי תשלום וכפתור ביצוע הזמנה */
+.place-order .tw-justify-between.tw-items-center.tw-gap-5 {
+    margin-top: 4px !important;
+}
+
+/* תצוגת אמצעי תשלום נבחר */
+.payment-method-name {
+    font-size: 11px !important;
+    color: #666 !important;
+    font-weight: 600 !important;
+}
+
+/* 5. כפתור ביצוע הזמנה (The Ultimate CTA) */
+.mobile-place-order-btn {
+    background: #e31e24 !important; /* אדום מותג דומיננטי */
+    border-radius: 20px !important;
+    box-shadow: 0 8px 25px rgba(227, 30, 36, 0.3) !important;
+    height: 60px !important;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+}
+
+.mobile-place-order-btn:active {
+    transform: scale(0.96) !important;
+}
+
+.mobile-place-order-btn .tw-text-white {
+    font-weight: 800 !important;
+    letter-spacing: 0.5px !important;
+}
+
+/* עיצוב הטקסט בתוך הכפתור (סה"כ לתשלום) */
+.mobile-place-order-btn .tw-text-\[10px\] {
+    font-size: 11px !important;
+    opacity: 0.9 !important;
+}
+
+.mobile-place-order-btn .tw-text-xs.tw-text-uppercase {
+    font-size: 16px !important; /* מחיר בולט */
+    font-weight: 900 !important;
+}
+
+/* ניקוי רעשים ויזואליים של Hyperzod */
+.place-order .tw-border-t, 
+.v-card__overlay, 
+.v-btn__overlay {
+    display: none !important;
+}
+
+
+/* =========================================================
+   חלק 10: הגנת התנגשות ניווט - צ'ק-אאוט בלבד
+   מטרה: העלמת סרגל הניווט רק בצ'קאאוט (ולא בעגלה!)
+   עדכון 27.04.2026: שינוי הסלקטור מ-#checkout ל-.place-order
+   הסיבה: גם דף עגלה משתמש ב-#checkout, רק לצ'קאאוט יש .place-order
+   ========================================================= */
+
+/* 1. הסתרה מוחלטת של הניווט רק בדף הצ'ק-אאוט (זה שמכיל את כפתור "ביצוע הזמנה" הצף) */
+html:has(.place-order) #MultiVendorBottomNav {
+    display: none !important;
+    pointer-events: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    z-index: -1 !important;
+}
+
+/* 2. וידוא שאלמנט ה-Place Order (חלק 8ט) תמיד מעל הכל */
+.place-order {
+    z-index: 99999 !important;
+    pointer-events: auto !important;
+}
+
+/* 3. תיקון מרווח התחתית של דף הצ'ק-אאוט */
+#checkout {
+    padding-bottom: 150px !important;
+}
+
+/* 4. מניעת קפיצה של הסרגל המקורי ב-iOS */
+html:has(.place-order) .v-bottom-navigation {
+    transform: translateY(100%) !important;
+}
+
+
+/* =========================================================
+   חלק 11: דף אישור הזמנה ומעקב - LIQUID GLASS V5
+   מטרה: תרגום מלא, עיצוב קריסטלי וציר זמן יוקרתי
+   ========================================================= */
+
+/* 1. רקע הדף וניקוי כללי */
+#app-router-view div[data-v-ea7a4b37].tw-bg-\[#f7f7f7\] {
+    background: radial-gradient(circle at top, #ffffff 0%, #f8f8f8 100%) !important;
+}
+
+/* 2. הדר אישור הזמנה (Sticky Order Header) */
+.native-top-notch-padding {
+    background: rgba(255, 255, 255, 0.6) !important;
+    backdrop-filter: blur(40px) saturate(200%) !important;
+    -webkit-backdrop-filter: blur(40px) saturate(200%) !important;
+    border-bottom: 1px solid rgba(227, 30, 36, 0.1) !important;
+    padding-bottom: 15px !important;
+}
+
+/* תרגום כותרת "Order #" */
+.native-top-notch-padding h1 {
+    font-size: 0 !important; /* העלמת המקור */
+}
+
+.native-top-notch-padding h1::before {
+    content: "פרטי הזמנה " !important;
+    font-size: 16px !important;
+    font-weight: 900 !important;
+    color: #000 !important;
+    visibility: visible !important;
+}
+
+/* 3. כרטיס סטטוס ההזמנה (למשל: בוטלה/בוצע) */
+.tw-px-2.tw-mt-\[-25px\] .tw-bg-white {
+    background: rgba(255, 255, 255, 0.8) !important;
+    backdrop-filter: blur(30px) !important;
+    border-radius: 24px !important;
+    border: 2px solid rgba(227, 30, 36, 0.15) !important; /* מסגרת מודגשת לסטטוס */
+    box-shadow: 0 10px 30px rgba(227, 30, 36, 0.05) !important;
+}
+
+/* צביעת האייקון של הסטטוס באדום מותג */
+.tw-px-2.tw-mt-\[-25px\] svg rect[fill="#FFE2E4"] { fill: rgba(227, 30, 36, 0.1) !important; }
+.tw-px-2.tw-mt-\[-25px\] svg rect[fill="#DB5354"] { fill: #e31e24 !important; }
+
+/* 4. כרטיס פרטי החנות והמוצרים */
+.tw-px-2.tw-mt-\[7px\] .tw-bg-white {
+    background: rgba(255, 255, 255, 0.7) !important;
+    backdrop-filter: blur(45px) !important;
+    border-radius: 28px !important;
+    border: 1px solid rgba(0, 0, 0, 0.04) !important;
+    padding: 20px !important;
+}
+
+/* תרגום כותרות הטבלה */
+.c-table thead th {
+    color: #e31e24 !important;
+    font-weight: 800 !important;
+    border-bottom: 1px solid rgba(227, 30, 36, 0.1) !important;
+}
+
+/* תרגום Inclusive (מע"מ) */
+.c-table span:contains("(Inclusive)") {
+    font-size: 0 !important;
+}
+
+.c-table span:contains("(Inclusive)")::before {
+    content: "(כולל)" !important;
+    font-size: 11px !important;
+    visibility: visible !important;
+}
+
+/* 5. ציר הזמן למעקב (Timeline Tracking) */
+.track-delivery {
+    background: rgba(255, 255, 255, 0.5) !important;
+    backdrop-filter: blur(50px) saturate(220%) !important;
+    border-radius: 32px !important;
+    border: 1px solid rgba(255, 255, 255, 0.6) !important;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.03) !important;
+    margin-top: 20px !important;
+}
+
+/* עיצוב הקווים המחברים ב-Timeline */
+.v-timeline-divider__before, .v-timeline-divider__after {
+    background-color: rgba(227, 30, 36, 0.2) !important; /* קו אדום עדין */
+}
+
+/* עיצוב האייקונים בתוך ה-Timeline */
+.v-timeline-divider__inner-dot {
+    background-color: white !important;
+    border: 2px solid #e31e24 !important;
+    box-shadow: 0 0 15px rgba(227, 30, 36, 0.2) !important;
+}
+
+.v-timeline-divider__inner-dot svg path {
+    fill: #e31e24 !important;
+}
+
+/* תרגום כותרת הכתובת "home" */
+.v-timeline-item__body .tw-capitalize {
+    font-size: 0 !important;
+}
+
+.v-timeline-item__body .tw-capitalize::before {
+    content: "כתובת למשלוח" !important;
+    font-size: 14px !important;
+    font-weight: 900 !important;
+    color: #000 !important;
+    visibility: visible !important;
+}
+
+/* 6. כפתור התקשרות (Call Merchant) */
+a[href^="tel:"] svg rect {
+    fill: #01C267 !important; /* ירוק הצלחה לשיחות */
+}
+
+a[href^="tel:"] svg path {
+    fill: white !important;
+}
+
+/* 7. הדגשת המחיר הסופי */
+.grand-total td {
+    font-size: 18px !important;
+    font-weight: 900 !important;
+    color: #e31e24 !important;
+}
+
+/* ניקוי שאריות של Hyperzod */
+.v-divider {
+    border-color: rgba(0, 0, 0, 0.05) !important;
+}
+
+
+
+/* =========================================================
+   חלק 12: דף הבית ובחירת מיקום - LIQUID GLASS V7
+   מטרה: תיקון RTL, שדרוג רמת הטשטוש ועברות מלא של הממשק
+   ========================================================= */
+
+/* --- 12א: תיקון מבני ומרכוז (RTL Bug Fix) --- */
+#mobileLocationSearch .v-overlay__content {
+    left: 0 !important;
+    right: 0 !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    max-width: 500px !important; /* הגבלה למראה מובייל מהודק */
+}
+
+/* --- 12ב: תרגומים והזרקת תוכן (Localization Injection) --- */
+
+/* תרגום Placeholder בשדה החיפוש */
+#mobileLocationSearch .v-field__input::placeholder { color: transparent !important; }
+#mobileLocationSearch .v-field__input::before {
+    content: "חפש אזור, רחוב או כתובת..." !important;
+    position: absolute !important;
+    font-size: 14px !important;
+    color: rgba(0,0,0,0.4) !important;
+    pointer-events: none !important;
+    right: 45px !important; /* התאמה לאייקון החיפוש */
+}
+
+/* תרגום כותרת "Recent Searches" - תיקון הסלקטור השבור */
+#mobileLocationSearch .tw-font-inter.tw-font-semibold.tw-text-gray-900 { font-size: 0 !important; }
+#mobileLocationSearch .tw-font-inter.tw-font-semibold.tw-text-gray-900::before {
+    content: "חיפושים אחרונים" !important;
+    font-size: 16px !important;
+    visibility: visible !important;
+    font-weight: 800 !important;
+    color: #000 !important;
+}
+
+/* העלמת הכפילות באנגלית מתחת לחיפושים */
+#mobileLocationSearch h3.tw-font-inter { display: none !important; }
+
+/* תיקון תווית "Phone:" בכתובות שמורות */
+#mobileLocationSearch .tw-text-gray-500 { font-size: 0 !important; }
+#mobileLocationSearch .tw-text-gray-500::before {
+    content: "טלפון: " !important;
+    font-size: 11px !important;
+    visibility: visible !important;
+}
+
+/* --- 12ג: עיצוב "השתמש במיקום נוכחי" (The Action Island) --- */
+.locate-me {
+    background: rgba(255, 255, 255, 0.8) !important;
+    backdrop-filter: blur(10px) !important;
+    border-radius: 24px !important;
+    border: 1px solid rgba(227, 30, 36, 0.15) !important;
+    padding: 18px !important;
+    margin: 15px 0 !important;
+    box-shadow: 0 8px 25px rgba(227, 30, 36, 0.05) !important;
+    transition: all 0.3s ease !important;
+}
+
+.locate-me:active { transform: scale(0.98) !important; background: rgba(227, 30, 36, 0.03) !important; }
+
+.locate-me span.tw-font-medium { 
+    color: #e31e24 !important; 
+    font-weight: 800 !important; 
+    font-size: 15px !important;
+}
+
+/* --- 12ד: כרטיסי כתובות וחיפושים (Floating Glass Islands) --- */
+#mobileLocationSearch .tw-bg-white.tw-border, 
+#mobileLocationSearch .tw-p-4.tw-bg-white {
+    background: rgba(255, 255, 255, 0.75) !important;
+    backdrop-filter: blur(45px) saturate(210%) !important;
+    -webkit-backdrop-filter: blur(45px) saturate(210%) !important;
+    border-radius: 28px !important; /* עיגול פינות עמוק יותר */
+    border: 1px solid rgba(0, 0, 0, 0.06) !important;
+    margin-bottom: 16px !important;
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.05) !important;
+    padding: 20px !important;
+}
+
+/* באדג' ה-"מטרים/קילומטרים" וה-"פעיל" */
+.tw-bg-green-100 { 
+    background: rgba(1, 194, 103, 0.1) !important; 
+    color: #01C267 !important; 
+    font-weight: 800 !important;
+    border-radius: 12px !important;
+}
+
+/* --- 12ה: שורת החיפוש (Holy Field Implementation) --- */
+#mobileLocationSearch .v-field {
+    background: #FFFFFF !important;
+    border-radius: 20px !important;
+    border: 1px solid rgba(0, 0, 0, 0.08) !important;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.04) !important;
+    height: 56px !important;
+    display: flex !important;
+    align-items: center !important;
+}
+
+#mobileLocationSearch .v-field--focused {
+    border: 1px solid #e31e24 !important; /* דגש אדום עדין במיקוד */
+}
+
+/* --- 12ו: דף הבית (Merchant & Product Cards) --- */
+.merchant-card, .product-card-basic {
+    background: rgba(255, 255, 255, 0.75) !important;
+    backdrop-filter: blur(45px) saturate(210%) !important;
+    border-radius: 32px !important;
+    border: 1px solid rgba(255, 255, 255, 0.4) !important;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.06) !important;
+}
+
+/* כותרות דף הבית */
+.CollectionGrid--172265 h1::before {
+    content: "קולקציות נבחרות" !important;
+    color: #000 !important;
+    font-weight: 900 !important;
+    letter-spacing: -0.5px !important;
+}
+
+
+/* =========================================================
+   חלק 12 המאוחד: תפריט אפשרויות כתובת - התיקון הסופי
+   מטרה: עיצוב Liquid Glass עם הגנת Scoping למניעת זליגה למוצרים
+   עדכון 2026-04-27: הוחלף הסקופ מ-:has(.tw-cursor-pointer) ל-:has(.v-card-title span.tw-leading-[16px])
+   הסיבה: הסקופ הישן דלף למודאלים אחרים (דף "בחירת מיקום", מודאל ההתחברות באנדרואיד)
+   ========================================================= */
+
+/* 1. מכולה חיצונית ומרכוז - מופעל רק כשיש אפשרויות בחירה (has cursor-pointer) */
+.v-overlay__content.v-bottom-sheet__content:has(.v-card-title span.tw-leading-\[16px\]) {
+    left: 0 !important;
+    right: 0 !important;
+    margin: 0 auto !important;
+    max-width: 460px !important;
+    bottom: 16px !important;
+    padding: 0 12px !important;
+    display: flex !important;
+    justify-content: center !important;
+}
+
+/* 2. כרטיס הזכוכית הראשי - הגנה מפני דפים אטומים */
+.v-overlay__content.v-bottom-sheet__content:has(.v-card-title span.tw-leading-\[16px\]) .v-card {
+    background: rgba(255, 255, 255, 0.8) !important;
+    backdrop-filter: blur(45px) saturate(210%) !important;
+    -webkit-backdrop-filter: blur(45px) saturate(210%) !important;
+    border-radius: 32px !important;
+    border: 1px solid rgba(255, 255, 255, 0.6) !important;
+    box-shadow: 0 -15px 50px rgba(0, 0, 0, 0.12) !important;
+    overflow: hidden !important;
+    width: 100% !important;
+}
+
+/* --- 3. ניקוי כותרת וחיסול ה"דיבוק" (Header Nuke) --- */
+
+/* איפוס הכותרת רק בחלונית הכתובות */
+.v-overlay__content.v-bottom-sheet__content:has(.v-card-title span.tw-leading-\[16px\]) .v-card-title {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    min-height: 64px !important;
+    position: relative !important;
+    padding: 0 !important;
+}
+
+/* העלמת הטקסט המקורי "Address options" - רק כאן! */
+.v-overlay__content.v-bottom-sheet__content:has(.v-card-title span.tw-leading-\[16px\]) .v-card-title span,
+.v-overlay__content.v-bottom-sheet__content:has(.v-card-title span.tw-leading-\[16px\]) .v-card-title .tw-text-base {
+    font-size: 0 !important;
+    color: transparent !important;
+    visibility: hidden !important;
+}
+
+/* הזרקת הכותרת העברית - מוגן מפני זליגה לדף המוצר */
+.v-overlay__content.v-bottom-sheet__content:has(.v-card-title span.tw-leading-\[16px\]) .v-card-title::after {
+    content: "אפשרויות כתובת" !important;
+    position: absolute !important;
+    left: 50% !important;
+    top: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    font-size: 17px !important;
+    font-weight: 900 !important;
+    color: #1A1A1A !important;
+    visibility: visible !important;
+    width: max-content !important;
+    z-index: 1 !important;
+}
+
+/* --- 4. טיפול בכפתור ה-X והתוכן --- */
+
+.v-overlay__content.v-bottom-sheet__content:has(.v-card-title span.tw-leading-\[16px\]) .v-card-title button.v-btn--icon {
+    position: absolute !important;
+    left: 12px !important;
+    z-index: 5 !important;
+    background: rgba(255, 255, 255, 0.9) !important;
+    border: 1px solid rgba(227, 30, 36, 0.1) !important;
+    width: 36px !important;
+    height: 36px !important;
+    border-radius: 50% !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
+}
+
+/* צביעת ה-X באדום QLED */
+.v-overlay__content.v-bottom-sheet__content:has(.v-card-title span.tw-leading-\[16px\]) .v-btn--icon .v-img__img {
+    filter: brightness(0) saturate(100%) invert(18%) sepia(88%) saturate(5427%) hue-rotate(352deg) brightness(91%) contrast(92%) !important;
+}
+
+/* --- 5. שורות הפעולה (עריכה ומחיקה) --- */
+
+/* מחיקת האנגלית והזרקת עברית */
+.v-overlay__content.v-bottom-sheet__content:has(.v-card-title span.tw-leading-\[16px\]) .tw-cursor-pointer span.tw-font-medium {
+    font-size: 0 !important;
+    color: transparent !important;
+    display: block !important;
+    position: relative !important;
+}
+
+.v-overlay__content.v-bottom-sheet__content:has(.v-card-title span.tw-leading-\[16px\]) .tw-cursor-pointer:first-of-type span.tw-font-medium::before {
+    content: "עריכת פרטי כתובת" !important;
+    font-size: 15px !important;
+    color: #1A1A1A !important;
+    visibility: visible !important;
+    font-weight: 700 !important;
+}
+
+.v-overlay__content.v-bottom-sheet__content:has(.v-card-title span.tw-leading-\[16px\]) .tw-cursor-pointer:last-of-type span.tw-font-medium::before {
+    content: "מחיקת כתובת מהרשימה" !important;
+    font-size: 15px !important;
+    color: #e31e24 !important;
+    visibility: visible !important;
+    font-weight: 700 !important;
+}
+
+/* עיצוב המכולה הפנימית של השורות */
+.v-overlay__content.v-bottom-sheet__content:has(.v-card-title span.tw-leading-\[16px\]) .tw-border.tw-border-\[\#00000014\] {
+    background: rgba(255, 255, 255, 0.4) !important;
+    border-radius: 24px !important;
+    border: 1px solid rgba(0, 0, 0, 0.05) !important;
+    margin: 8px 12px !important;
+    padding: 4px 0 !important;
+}
+
+.v-overlay__content.v-bottom-sheet__content:has(.v-card-title span.tw-leading-\[16px\]) .tw-cursor-pointer {
+    height: 56px !important;
+    padding: 0 16px !important;
+    display: flex !important;
+    align-items: center !important;
+}
+
+/* אייקוני פעולה באדום */
+.v-overlay__content.v-bottom-sheet__content:has(.v-card-title span.tw-leading-\[16px\]) .v-icon, 
+.v-overlay__content.v-bottom-sheet__content:has(.v-card-title span.tw-leading-\[16px\]) .tw-w-5.tw-h-5 {
+    color: #e31e24 !important;
+    opacity: 0.8 !important;
+}
+
+/* ניקוי שאריות */
+.v-overlay__content.v-bottom-sheet__content:has(.v-card-title span.tw-leading-\[16px\]) hr.v-divider,
+.v-overlay__content.v-bottom-sheet__content:has(.v-card-title span.tw-leading-\[16px\]) .v-btn__overlay,
+.v-overlay__content.v-bottom-sheet__content:has(.v-card-title span.tw-leading-\[16px\]) .v-btn__underlay {
+    display: none !important;
+}
+
+/* =========================================================
+   חלק 12ג: עיצוב מחדש לכפתור הסגירה (The X Button)
+   מטרה: תיקון נראות ה-X, הפיכתו לאדום מותג ויצירת מראה בועה
+   ========================================================= */
+
+/* --- 1. עיצוב המעטפת (הבועה החיצונית) --- */
+.v-bottom-sheet__content .v-btn--icon.v-btn--variant-text {
+    background: rgba(255, 255, 255, 0.9) !important; /* לבן כמעט מלא לנראות שיא */
+    backdrop-filter: blur(10px) !important;
+    border: 1px solid rgba(227, 30, 36, 0.1) !important; /* מסגרת אדומה דקיקה */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
+    opacity: 1 !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    width: 36px !important;
+    height: 36px !important;
+}
+
+/* אפקט ריחוף ולחיצה */
+.v-bottom-sheet__content .v-btn--icon:active {
+    transform: scale(0.9) !important;
+    background: rgba(227, 30, 36, 0.05) !important;
+}
+
+/* --- 2. תיקון ה-X (הזרקת צבע אדום לאייקון) --- */
+
+/* כאן אנחנו משתמשים ב-Filter כדי להכריח את ה-SVG להפוך לאדום מותג */
+.v-bottom-sheet__content .v-btn--icon .v-img__img {
+    filter: brightness(0) saturate(100%) invert(18%) sepia(88%) saturate(5427%) hue-rotate(352deg) brightness(91%) contrast(92%) !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    padding: 6px !important; /* ריווח פנימי ל-X בתוך העיגול */
+}
+
+/* --- 3. ניקוי שכבות המערכת שחוסמות את ה-X --- */
+.v-bottom-sheet__content .v-btn__overlay,
+.v-bottom-sheet__content .v-btn__underlay {
+    display: none !important; /* הסרת שכבות אפורות של Vuetify */
+}
+
+/* --- 3. ניקוי שכבות המערכת שחוסמות את ה-X בלבד --- */
+.v-bottom-sheet__content .v-btn--icon .v-responsive__sizer {
+    display: none !important;
+}
+
+/* וידוא שהאייקון ממורכז אופטית */
+.v-bottom-sheet__content .v-btn__content {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+
+/* =========================================================
+   חלק 12ד: שדרוג מבני - נעילת מרכז וכלוב דינמי
+   ========================================================= */
+
+/* 1. המכולה הראשית - הפיכה ל-Center ומעבר לזכוכית */
+[data-v-3b7172a6].tw-flex.tw-items-start.tw-relative {
+    display: flex !important;
+    align-items: center !important; /* מרכוז ורטיקלי של כל השורה */
+    justify-content: space-between !important;
+    padding: 20px 14px !important;
+    min-height: 90px !important; /* גובה מינימלי למניעת קפיצות */
+    background: rgba(255, 255, 255, 0.75) !important;
+    backdrop-filter: blur(30px) saturate(180%) !important;
+    -webkit-backdrop-filter: blur(30px) saturate(180%) !important;
+    border-radius: 24px !important;
+    border: 1px solid rgba(255, 255, 255, 0.5) !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03) !important;
+    transition: all 0.3s ease !important;
+}
+
+/* 2. הרחבת "כלוב" המרחק (Col 0) - מונע מהטקסט לצאת מהמסגרת */
+[data-v-3b7172a6] .tw-w-\[36px\].tw-shrink-0 {
+    width: 85px !important; /* הרחבה כדי להכיל "קילומטרים" או "מטרים" */
+    min-width: 85px !important;
+    flex-shrink: 0 !important;
+    margin-left: 8px !important; /* מרווח מהכתובת ב-RTL */
+    transform: none !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+}
+
+/* עיצוב תג המרחק כבועה צפה */
+[data-v-3b7172a6] span.tw-text-\[9px\] {
+    background: rgba(0, 0, 0, 0.05) !important;
+    padding: 4px 8px !important;
+    border-radius: 10px !important;
+    font-size: 11px !important;
+    color: #1A1A1A !important;
+    font-weight: 700 !important;
+    margin-top: 6px !important;
+}
+
+/* 3. שחרור חניקת טקסט בכתובת (Col 1) */
+[data-v-3b7172a6] .tw-flex-1 {
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    padding-left: 10px !important;
+    overflow: visible !important;
+}
+
+[data-v-3b7172a6] p.tw-text-xs,
+[data-v-3b7172a6] .tw-line-clamp-2 {
+    white-space: normal !important;
+    display: block !important;
+    -webkit-line-clamp: unset !important;
+    line-clamp: unset !important;
+    font-size: 14px !important;
+    line-height: 1.4 !important;
+}
+
+/* 4. מרכוז כפתור 3 נקודות (Col 2) */
+[data-v-3b7172a6] .tw-shrink-0.tw-flex.tw-items-center.tw-justify-center.tw-w-\[24px\] {
+    width: 40px !important;
+    height: 40px !important;
+    background: rgba(0, 0, 0, 0.03) !important;
+    border-radius: 50% !important;
+}
+
+/* 5. איפוס הזזות RTL אגרסיביות של המערכת */
+[data-v-3b7172a6] .tw-translate-x-\[-8px\], 
+[data-v-3b7172a6] .tw-ml-\[-8px\],
+[data-v-3b7172a6] .tw-translate-x-\[14px\] {
+    transform: none !important;
+    margin: 0 !important;
+}
+
+/* 6. צבע אדום מותג לאייקון הבית/מיקום */
+[data-v-3b7172a6] img.v-img__img--contain {
+    filter: brightness(0) saturate(100%) invert(18%) sepia(88%) saturate(5427%) hue-rotate(352deg) brightness(91%) contrast(92%) !important;
+}
+
+/* =========================================================
+   חלק 12ה: מרכוז כירורגי של תג המרחק והאייקון
+   מטרה: תיקון הציפה שמאלה ונעילת אלמנטים למרכז הטור
+   ========================================================= */
+
+/* 1. הרחבת הטור הראשי ומרכוזו (The Column Anchor) */
+[data-v-3b7172a6] .tw-w-\[36px\].tw-shrink-0 {
+    width: 85px !important;      /* הרחבה לרוחב שיכול להכיל "קילומטר" */
+    min-width: 85px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;    /* מרכוז אופקי של האייקון והטקסט */
+    justify-content: center !important; /* מרכוז ורטיקלי */
+    margin-left: 12px !important;      /* מרווח בטיחות מהטקסט של הכתובת */
+    margin-right: 0 !important;
+    transform: none !important;        /* ביטול הזזות מערכת */
+}
+
+/* 2. המכולה הפנימית של האייקון והטקסט */
+[data-v-3b7172a6] .tw-flex.tw-flex-col.tw-gap-\[8px\].tw-items-center {
+    width: 100% !important;
+    gap: 4px !important; /* צמצום המרווח בין האייקון למטרים */
+}
+
+/* 3. עיצוב ומרכוז תג המרחק (The Distance Tag) */
+[data-v-3b7172a6] span.whitespace-nowrap.tw-text-\[9px\] {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    text-align: center !important;
+    width: auto !important;
+    min-width: 65px !important; /* מבטיח שגם "0 מטרים" ייראה מאוזן */
+    
+    /* עיצוב "בועה" קריסטלית */
+    background: rgba(0, 0, 0, 0.05) !important;
+    color: #1A1A1A !important;
+    padding: 3px 8px !important;
+    border-radius: 8px !important;
+    font-size: 10px !important;
+    font-weight: 800 !important;
+    line-height: 1 !important;
+}
+
+/* 4. תיקון אייקון המיקום/בית שיהיה במרכז מעל הטקסט */
+[data-v-3b7172a6] .tw-w-\[20px\].tw-h-\[20px\].tw-shrink-0 {
+    margin: 0 auto !important; /* מרכוז האייקון בתוך הטור */
+    display: block !important;
+}
+
+/* 5. ביטול דריסות RTL שגורמות לאלמנט "לברוח" שמאלה */
+[data-v-3b7172a6] .tw-translate-x-\[-8px\], 
+[data-v-3b7172a6] .tw-ml-\[-8px\] {
+    transform: none !important;
+    margin-left: 0 !important;
+}
+
+
+
+/* =========================================================
+   חלק 16א: בועת הנחיה במפה - MAP TOOLTIP
+   ========================================================= */
+
+/* 1. הפיכת בועת הטקסט השחורה לזכוכית אדומה יוקרתית */
+[data-v-bd9430d0] .tw-bg-\[\#212121\].tw-rounded-lg {
+    background: rgba(227, 30, 36, 0.85) !important; /* אדום מותג שקוף */
+    backdrop-filter: blur(12px) !important;
+    -webkit-backdrop-filter: blur(12px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    border-radius: 12px !important;
+    padding: 8px 16px !important;
+    box-shadow: 0 8px 20px rgba(227, 30, 36, 0.2) !important;
+}
+
+/* 2. שינוי צבע המשולש של הבועה לאדום */
+[data-v-bd9430d0] .tw-border-t-\[\#212121\] {
+    border-top-color: rgba(227, 30, 36, 0.85) !important;
+}
+
+/* 3. הדגשת טקסט ההנחיה */
+[data-v-bd9430d0] .tw-text-white.tw-font-medium.tw-text-\[13px\] {
+    font-weight: 800 !important;
+    letter-spacing: -0.2px !important;
+    color: #ffffff !important;
+}
+
+
+/* =========================================================
+   חלק 16ב: כרטיס פרטי כתובת - ADDRESS DETAIL BOX
+   ========================================================= */
+
+/* 1. עיצוב המכולה של פרטי הכתובת ככרטיס Liquid Glass */
+[data-v-bd9430d0] .tw-px-4.tw-pt-3.tw-pb-3 {
+    background: rgba(255, 255, 255, 0.5) !important;
+    backdrop-filter: blur(20px) !important;
+    border-radius: 24px !important;
+    border: 1px solid rgba(227, 30, 36, 0.05) !important;
+    margin: 10px 16px !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03) !important;
+}
+
+/* 2. עיצוב הכותרת (שם הרחוב) וצביעת האייקון */
+[data-v-bd9430d0] h2.tw-text-\[18px\] {
+    color: #1A1A1A !important;
+    font-weight: 900 !important;
+    font-size: 20px !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+}
+
+/* צביעת האייקון הקטן של המיקום ליד שם הרחוב לאדום */
+[data-v-bd9430d0] h2 img.tw-max-w-\[15px\] {
+    filter: brightness(0) saturate(100%) invert(18%) sepia(88%) saturate(5427%) hue-rotate(352deg) brightness(91%) contrast(92%) !important;
+}
+
+/* 3. עיצוב תת-הכותרת (העיר) */
+[data-v-bd9430d0] p.tw-text-\[14px\].tw-text-\[\#6B7280\] {
+    color: #6B7280 !important;
+    font-weight: 500 !important;
+    margin-right: 25px !important; /* יישור מתחת לטקסט של הכותרת */
+}
+
+
+/* =========================================================
+   חלק 16ג: שדות הטופס - MODERN GLASS INPUTS
+   ========================================================= */
+
+/* 1. הפיכת השדות לקפסולות זכוכית מעוגלות */
+[data-v-bd9430d0] .v-field--variant-underlined {
+    background: rgba(245, 245, 245, 0.6) !important;
+    border-radius: 16px !important;
+    padding: 12px 16px !important;
+    margin-bottom: 8px !important;
+    border: 1px solid transparent !important;
+    transition: all 0.3s ease !important;
+}
+
+/* מצב פוקוס - מסגרת אדומה עדינה */
+[data-v-bd9430d0] .v-field--focused.v-field--variant-underlined {
+    background: #ffffff !important;
+    border: 1px solid rgba(227, 30, 36, 0.3) !important;
+    box-shadow: 0 4px 15px rgba(227, 30, 36, 0.08) !important;
+}
+
+/* העלמת הקו התחתון המקורי של Vuetify */
+[data-v-bd9430d0] .v-field__outline {
+    display: none !important;
+}
+
+/* 2. תרגום כותרות קטנות (Labels) */
+/* תרגום "SAVE ADDRESS AS" */
+[data-v-bd9430d0] #AddressSelectType label {
+    font-size: 0 !important;
+}
+[data-v-bd9430d0] #AddressSelectType label::before {
+    content: "שמור כתובת כ:" !important;
+    font-size: 13px !important;
+    font-weight: 800 !important;
+    color: #e31e24 !important;
+    text-transform: none !important;
+}
+
+
+/* =========================================================
+   חלק 16ד: שדה טלפון - PHONE & COUNTRY PICKER
+   ========================================================= */
+
+/* 1. עיצוב מכולת הטלפון */
+[data-v-bd9430d0] #AddressInputContactPhoneNumber .v-field {
+    display: flex !important;
+    align-items: center !important;
+    direction: ltr !important; /* טלפון תמיד משמאל לימין */
+}
+
+/* 2. סידור הקידומת (+972) והפרדה */
+[data-v-bd9430d0] .v-field__prepend-inner .tw-flex {
+    margin-left: 0 !important;
+    padding-right: 10px !important;
+}
+
+[data-v-bd9430d0] .tw-bg-\[\#ccc\].tw-w-\[1px\] {
+    background-color: #e31e24 !important; /* קו הפרדה אדום */
+    height: 20px !important;
+}
+
+/* 3. יישור טקסט בתוך שדה הטלפון */
+[data-v-bd9430d0] input#contactPhoneNumber {
+    text-align: left !important;
+    padding-left: 8px !important;
+    font-weight: 700 !important;
+}
+
+
+/* =========================================================
+   חלק 16ה: כפתור שמירה - THE RED MASTER BUTTON
+   ========================================================= */
+
+/* 1. הפוטר הלבן - הפיכה לשקיפות קריסטלית */
+[data-v-bd9430d0] .tw-absolute.tw-bottom-0.tw-w-full.tw-bg-white {
+    background: rgba(255, 255, 255, 0.75) !important;
+    backdrop-filter: blur(25px) !important;
+    -webkit-backdrop-filter: blur(25px) !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.5) !important;
+    padding-bottom: 30px !important; /* מרווח בטיחות מלמטה */
+}
+
+/* 2. כפתור השמירה - אדום מעלה המשלוחים */
+[data-v-bd9430d0] button.v-btn--size-x-large {
+    background: linear-gradient(135deg, #e31e24 0%, #b31419 100%) !important;
+    border-radius: 18px !important;
+    height: 56px !important;
+    box-shadow: 0 10px 25px rgba(227, 30, 36, 0.3) !important;
+    transition: all 0.3s ease !important;
+}
+
+[data-v-bd9430d0] button.v-btn--size-x-large .v-btn__content {
+    font-size: 18px !important;
+    font-weight: 900 !important;
+    color: #ffffff !important;
+}
+
+[data-v-bd9430d0] button.v-btn--size-x-large:active {
+    transform: scale(0.97) !important;
+}
+
+
+/* =========================================================
+   חלק 17: תיקון שדה טלפון - THE CRYSTAL PHONE INPUT
+   מטרה: פתרון התנגשות הספרות והדגל + מראה Liquid Glass
+   ========================================================= */
+
+/* 1. הפיכת שדה ה-Input לקופסת זכוכית שלמה (במקום קו תחתון) */
+[data-v-bd9430d0] .v-field--variant-underlined {
+    background: rgba(255, 255, 255, 0.7) !important;
+    backdrop-filter: blur(25px) saturate(210%) !important;
+    -webkit-backdrop-filter: blur(25px) saturate(210%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.5) !important;
+    border-radius: 20px !important; /* פינות מעוגלות מאוד */
+    padding: 8px 16px !important;
+    display: flex !important;
+    align-items: center !important;
+    height: 56px !important;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.04) !important;
+    overflow: hidden !important;
+}
+
+/* ביטול הקו התחתון המקורי והאנימציה שלו */
+[data-v-bd9430d0] .v-field__outline,
+[data-v-bd9430d0] .v-field--variant-underlined .v-field__overlay {
+    display: none !important;
+}
+
+/* 2. סידור ה-Prepend (הדגל והקידומת +972) */
+[data-v-bd9430d0] .v-field__prepend-inner {
+    padding-top: 0 !important;
+    align-items: center !important;
+    margin-inline-start: 0 !important;
+    z-index: 10 !important;
+}
+
+/* תיקון המכולה הפנימית של הקידומת */
+[data-v-bd9430d0] .v-field__prepend-inner .tw-flex.tw-items-center {
+    margin-left: 0 !important; /* איפוס הזזה שגויה */
+    gap: 10px !important;
+    padding-left: 10px !important;
+    border-left: 1px solid rgba(227, 30, 36, 0.2) !important; /* קו הפרדה עדין באדום מותג */
+}
+
+/* 3. נעילת הקידומת +972 (מניעת התהפכות ב-RTL) */
+[data-v-bd9430d0] span.tw-mr-2.tw-text-\[14px\] {
+    direction: ltr !important;
+    display: inline-block !important;
+    font-weight: 700 !important;
+    color: #1A1A1A !important;
+    margin: 0 !important;
+}
+
+/* 4. עיצוב שדה הקלט (Input) ומניעת התנגשות */
+[data-v-bd9430d0] input#contactPhoneNumber {
+    direction: ltr !important; /* מספר טלפון נכתב תמיד משמאל לימין */
+    text-align: left !important;
+    padding-left: 15px !important; /* רווח מהקו המפריד של הקידומת */
+    font-size: 16px !important;
+    font-weight: 600 !important;
+    letter-spacing: 1px !important;
+    width: 100% !important;
+}
+
+/* 5. תיקון ה-Placeholder (תרגום להוראה) */
+[data-v-bd9430d0] input#contactPhoneNumber::placeholder {
+    direction: rtl !important;
+    text-align: right !important;
+    font-size: 14px !important;
+    opacity: 0.5 !important;
+    color: #767C8F !important;
+}
+
+/* 6. מצב פוקוס (הילה אדומה עדינה) */
+[data-v-bd9430d0] .v-field--focused.v-field--variant-underlined {
+    border-color: rgba(227, 30, 36, 0.4) !important;
+    background: #ffffff !important;
+    box-shadow: 0 10px 35px rgba(227, 30, 36, 0.1) !important;
+}
+
+
+/* =========================================================
+   חלק 17ב: עיצוב פוטר שמירה - THE CRYSTAL ANCHOR
+   מטרה: מרכוז מוחלט, דריסת הלבן הקשיח ועיצוב Liquid Glass
+   ========================================================= */
+
+/* 1. מכולת הפוטר (ה-Wrapper הלבן במקור) */
+[data-v-bd9430d0].tw-absolute.tw-bottom-0.tw-w-full.tw-bg-white {
+    /* Centering Logic - תיקון RTL/Left-shift */
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    margin: 0 auto !important;
+    width: 100% !important;
+    max-width: 500px !important; /* נעילה לרוחב המובייל למניעת ציפה */
+
+    /* Liquid Glass DNA */
+    background: rgba(255, 255, 255, 0.65) !important; /* זכוכית שקופה */
+    backdrop-filter: blur(35px) saturate(210%) !important;
+    -webkit-backdrop-filter: blur(35px) saturate(210%) !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.4) !important;
+    box-shadow: 0 -15px 40px rgba(0, 0, 0, 0.08) !important;
+    
+    /* מרווחים */
+    padding: 16px 20px 32px 20px !important;
+    z-index: 1000 !important;
+}
+
+/* 2. כפתור "שמור כתובת" (The Master Action) */
+[data-v-bd9430d0] button.v-btn--size-x-large {
+    /* זהות המותג - אדום מעלה המשלוחים */
+    background: linear-gradient(135deg, #e31e24 0%, #b31419 100%) !important;
+    color: #ffffff !important;
+    
+    /* צורה ועומק */
+    border-radius: 20px !important;
+    height: 62px !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    box-shadow: 0 10px 25px rgba(227, 30, 36, 0.3) !important;
+    
+    /* טקסט */
+    font-size: 19px !important;
+    font-weight: 900 !important;
+    letter-spacing: 0.5px !important;
+    text-transform: none !important;
+    
+    /* יישור פנימי */
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    width: 100% !important;
+}
+
+/* אפקט לחיצה (Feedback) */
+[data-v-bd9430d0] button.v-btn--size-x-large:active {
+    transform: scale(0.96) !important;
+    box-shadow: 0 4px 15px rgba(227, 30, 36, 0.4) !important;
+    transition: all 0.1s ease !important;
+}
+
+/* 3. ניקוי צללים ישנים שמתנגשים עם הזכוכית */
+div[style*="box-shadow: rgba(0, 0, 0, 0.05) 0px 0px 24px 5px;"] {
+    box-shadow: none !important;
+}
+
+/*חלק 18 א+ב */
+/* אנחנו מוודאים שהטור עצמו לא מפעיל לחץ או Padding על התמונה */
+html body .merchant-page .pro-card-h {
+    padding: 0 !important;
+    display: flex !important;
+    justify-content: flex-start !important; /* נועל את התוכן לצד החיצוני (שמאל) */
+}
+
+/* 2. ניקוי ויישור כרטיס התמונה (The Inner Card) */
+/* ביטול המרג'ינים שגרמו לציפה ונעילת רוחב למניעת כיווץ באייפון */
+html body .merchant-page .pro-card-h-img {
+    width: 128px !important;
+    height: 128px !important;
+    flex: 0 0 128px !important; /* חובה: מונע מהגריד "לחנוק" את התמונה באייפון */
+    margin: 0 !important;       /* ביטול margin-left: auto שגרם לניתק מהדופן */
+    border: none !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    overflow: visible !important; /* מאפשר לכפתורים/באדג'ים לצוף בעתיד */
+    position: relative !important;
+}
+
+/* 3. נעילת התמונה הפיזית (The Image Component) */
+html body .merchant-page .product-image {
+    width: 128px !important;
+    height: 128px !important;
+    min-width: 128px !important;
+    max-width: 128px !important;
+    /* עיגול פינות DNA - רק בצד הפנימי (ימין) כדי להישאר "דבוק" לדופן שמאל */
+    /* אם אתה רוצה עיגול מלא, שנה ל-16px */
+    border-radius: 16px !important; 
+    overflow: hidden !important;
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+}
+
+/* =========================================================
+      FIX PART 18B: SCOPED SIZER KILL (PREVENTS DOMINO)
+=========================================================
+*/
+/* ביטול ה-Sizer רק בכרטיסים רוחביים כדי למנוע קריסת תמונות בשאר האתר */
+html body .merchant-page .product-card-horizontal:not(.product-popup) .v-responsive__sizer {
+    display: none !important;
+}
+
+/* 5. וידוא שהטקסט (הטור השני) מקבל את המרווח שלו מהתמונה */
+html body .merchant-page .xs\:tw-col-span-9,
+html body .merchant-page .tw-col-span-8 {
+    padding-right: 12px !important; /* יוצר את המרווח היוקרתי בין הטקסט לתמונה */
+}
+
+/* 6. הסרת פדינג מיותר מכרטיס האב שחנק את התמונה */
+html body .merchant-page .product-card-horizontal .v-card-text {
+    padding-left: 0 !important; /* מצמיד את התמונה לדופן השמאלית של הכרטיס */
+    padding-top: 10px !important;
+    padding-bottom: 10px !important;
+}
+
+/* =========================================================
+   חלק 18ג: תיקון כפתור הוספה נבלע ב-iOS (WebKit Clip Fix v3)
+   iOS WebKit חותך overflow כשיש border-radius על כל אלמנט בשרשרת
+   פתרון: overflow:visible + padding-bottom על הכרטיס החיצוני
+   ========================================================= */
+/* 1. הכרטיס החיצוני - חייב overflow visible כי הכפתור בולט מחוצה לו */
+html body .merchant-page .product-card-horizontal {
+    overflow: visible !important;
+}
+html body .merchant-page .product-card-horizontal > .v-card__underlay {
+    border-radius: 8px !important;
+    overflow: hidden !important;
+}
+/* 2. v-card-text בתוך הכרטיס */
+html body .merchant-page .product-card-horizontal > .v-card-text {
+    overflow: visible !important;
+}
+/* 3. עמודת התמונה */
+html body .merchant-page .pro-card-h {
+    overflow: visible !important;
+}
+/* 4. ה-v-card של התמונה - ביטול border-radius מהקונטיינר */
+html body .merchant-page .pro-card-h-img {
+    overflow: visible !important;
+    border-radius: 0 !important;
+    border: none !important;
+    background: transparent !important;
+    box-shadow: none !important;
+}
+/* 5. העברת border-radius + border לתמונה עצמה בלבד */
+html body .merchant-page .pro-card-h-img .product-image {
+    border-radius: 12px !important;
+    overflow: hidden !important;
+    border: 1px solid #e0e0e0 !important;
+}
+/* 6. הכפתור מעל הכל */
+html body .merchant-page .pro-card-h-img .add-product-btn {
+    z-index: 10 !important;
+    position: relative !important;
+}
+/* 7. הוספת padding-bottom לכרטיס כדי שיהיה מקום לכפתור שבולט */
+html body .merchant-page .product-card-horizontal {
+    padding-bottom: 10px !important;
+}
+/* 8. Vuetify v-card elevated variant - ביטול clipping */
+html body .merchant-page .product-card-horizontal.v-card {
+    -webkit-mask-image: none !important;
+    mask-image: none !important;
+}
+
+/* =========================================================
+      FIX PART 19/20: GLOBAL LIQUID GLASS FOR VERTICAL CARDS
+=========================================================
+*/
+/* החלת עיצוב הזכוכית על כל סוגי הכרטיסים האנכיים באתר (כולל סליידרים) */
+html body .merchant-page .product-card-basic {
+    background: rgba(255, 255, 255, 0.7) !important;
+    backdrop-filter: blur(30px) saturate(200%) !important;
+    -webkit-backdrop-filter: blur(30px) saturate(200%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.6) !important;
+    border-radius: 24px !important;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.04) !important;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+    margin-bottom: 25px !important; /* רווח עבור הטקסט "התאמה אישית" שלא ייחתך */
+    overflow: visible !important;
+}
+
+/* ביטול שכבות מערכת */
+html body .merchant-page .ProductHighlights .v-card__underlay,
+html body .merchant-page .ProductHighlights .v-card__overlay {
+    display: none !important;
+}
+
+/* נעילת גובה לתמונה בכרטיס אנכי למניעת קריסה לאחר ביטול ה-Sizer */
+html body .merchant-page .product-card-basic .product-image {
+    height: 140px !important; 
+    width: calc(100% - 12px) !important;
+    margin: 6px auto !important;
+    border-radius: 18px !important;
+    overflow: hidden !important;
+    position: relative !important;
+    background: #f8f9fa !important;
+}
+
+/* נטרול ה-Sizer של Vuetify */
+html body .merchant-page .ProductHighlights:not(.product-popup) .v-responsive__sizer {
+    display: none !important;
+}
+
+/* עיצוב שם המוצר והמחיר */
+html body .merchant-page .ProductHighlights .product-name {
+    color: #1A1A1A !important;
+    font-weight: 800 !important;
+    font-size: 14px !important;
+    text-align: center !important;
+}
+
+html body .merchant-page .ProductHighlights .product-price {
+    color: #e31e24 !important;
+    font-weight: 900 !important;
+    font-size: 15px !important;
+    text-align: center !important;
+    width: 100% !important;
+}
+
+/* עיצוב הכפתור בתוך ה-Highlights */
+html body .merchant-page .ProductHighlights button.add-btn {
+    background: #ffffff !important;
+    border: 1.5px solid #e31e24 !important;
+    color: #e31e24 !important;
+    border-radius: 12px !important;
+    font-weight: 800 !important;
+    height: 32px !important;
+    min-width: 75px !important;
+    box-shadow: 0 4px 10px rgba(227, 30, 36, 0.15) !important;
+}
+
+/* מירכוז אלמנט ה-footer של הכרטיס */
+html body .merchant-page .ProductHighlights .card-footer {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 8px !important;
+    padding-bottom: 12px !important;
+}
+
+/* טיפול בטקסט "התאמה אישית" */
+html body .merchant-page .ProductHighlights .tw-text-gray-400 {
+    color: rgba(0, 0, 0, 0.3) !important;
+    font-weight: 600 !important;
+    bottom: -18px !important;
+}
+
+
+/* =============================================================================
+   PART 20: THE ULTIMATE SLIDER CARD REBORN (VERTICAL CARDS GLOBAL FIX)
+   ============================================================================= */
+
+/* 1. מכולת הכרטיס - Liquid Glass DNA */
+html body .merchant-page .product-card-slider {
+    background: rgba(255, 255, 255, 0.7) !important;
+    backdrop-filter: blur(40px) saturate(210%) !important;
+    -webkit-backdrop-filter: blur(40px) saturate(210%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.5) !important;
+    border-radius: 22px !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05) !important;
+    min-height: 280px !important; /* מבטיח שהכרטיס לא יקרוס פנימה */
+    display: flex !important;
+    flex-direction: column !important;
+    overflow: visible !important;
+    transition: transform 0.3s ease !important;
+}
+
+/* 2. ניקוי שכבות וצללים של Vuetify */
+html body .merchant-page .product-card-slider .v-card__underlay,
+html body .merchant-page .product-card-slider .v-card__overlay {
+    display: none !important;
+}
+
+
+/* 1. כפיית גובה לתמונה - פתרון סופי להיעלמות */
+html body .merchant-page .product-card-slider .product-image {
+    height: 120px !important; /* גובה קבוע באייפון ובדפדפן */
+    width: calc(100% - 12px) !important;
+    margin: 6px auto !important;
+    border-radius: 16px !important;
+    overflow: hidden !important;
+    position: relative !important;
+    background: #f9f9f9 !important;
+    flex-shrink: 0 !important;
+}
+
+/* 2. וידוא פריסת התמונה בתוך הכלוב */
+html body .merchant-page .product-card-slider .v-img__img {
+    height: 100% !important;
+    object-fit: cover !important;
+    position: absolute !important;
+    top: 0 !important;
+}
+
+/* 3. שחרור ה-Sizer רק לכרטיסי סליידר כדי לאפשר גובה קבוע */
+html body .merchant-page .product-card-slider:not(.product-popup) .v-responsive__sizer {
+    display: none !important;
+}
+
+
+/* 1. מכולת הטקסט - סידור ורטיקלי */
+html body .merchant-page .product-card-slider .v-card-text {
+    padding: 8px 10px 15px 10px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+    flex-grow: 1 !important;
+}
+
+/* 2. שם המוצר */
+html body .merchant-page .product-card-slider .product-name {
+    color: #000000 !important;
+    font-weight: 800 !important;
+    font-size: 13px !important;
+    line-height: 1.2 !important;
+    text-align: center !important;
+    margin-bottom: 5px !important;
+}
+
+/* 3. המחיר - אדום QLED */
+html body .merchant-page .product-card-slider .product-price {
+    color: #e31e24 !important;
+    font-weight: 900 !important;
+    font-size: 15px !important;
+    text-align: center !important;
+    margin-bottom: 8px !important;
+}
+
+/* 4. כפתור ההוספה הקריסטלי */
+html body .merchant-page .product-card-slider button.add-btn {
+    background: #ffffff !important;
+    border: 1.5px solid #e31e24 !important;
+    color: #e31e24 !important;
+    border-radius: 10px !important;
+    font-weight: 800 !important;
+    height: 32px !important;
+    min-width: 80px !important;
+    margin: 0 auto !important;
+    box-shadow: 0 4px 10px rgba(227, 30, 36, 0.1) !important;
+}
+
+/* 5. טקסט "התאמה אישית" */
+html body .merchant-page .product-card-slider .tw-text-gray-400 {
+    font-size: 10px !important;
+    font-weight: 700 !important;
+    color: rgba(0, 0, 0, 0.3) !important;
+    position: absolute !important;
+    bottom: -18px !important;
+    width: 100% !important;
+    left: 0 !important;
+    text-align: center !important;
+}
+
+
+/* =========================================================
+   חלק 21א: הדר הוספת כתובת - טיפול שורש קריסטלי
+   מטרה: מעבר מלבן אטום לזכוכית, תרגום ועיצוב כפתור חזור
+   ========================================================= */
+
+/* 1. מכולת ההדר הראשית - הפיכה ל-Liquid Glass */
+html body .tw-flex.tw-h-\[56px\].tw-bg-white.tw-shadow-\[0px_1px_2px_0px_rgba\(28\2c 32\2c 40\2c 0\.05\)\] {
+    background: rgba(255, 255, 255, 0.45) !important; /* שקיפות מותאמת להדר */
+    backdrop-filter: blur(40px) saturate(210%) !important;
+    -webkit-backdrop-filter: blur(40px) saturate(210%) !important;
+    border-bottom: 1.5px solid rgba(227, 30, 36, 0.15) !important; /* קו הפרדה אדום דק */
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04) !important;
+    padding-inline-start: 12px !important;
+}
+
+/* 2. תרגום ועיצוב הכותרת (Add new address -> הוספת כתובת חדשה) */
+html body .tw-h-\[56px\] span.tw-text-\[16px\].tw-font-medium {
+    font-size: 0 !important; /* העלמת המקור */
+}
+
+html body .tw-h-\[56px\] span.tw-text-\[16px\].tw-font-medium::before {
+    content: "הוספת כתובת חדשה" !important;
+    font-size: 17px !important;
+    font-weight: 900 !important;
+    color: #1a1a1a !important;
+    visibility: visible !important;
+    letter-spacing: -0.3px !important;
+}
+
+/* 3. עיצוב כפתור החזור (Back Button) */
+/* צביעת ה-SVG המובנה לאדום QLED באמצעות Filter */
+html body .tw-h-\[56px\] .tw-w-8.tw-h-8 img[alt="Back"] {
+    filter: brightness(0) saturate(100%) invert(18%) sepia(88%) saturate(5427%) hue-rotate(352deg) brightness(91%) contrast(92%) !important;
+    transform: scale(0.9) !important;
+    transition: transform 0.2s ease !important;
+}
+
+html body .tw-h-\[56px\] .tw-w-8.tw-h-8:active img {
+    transform: scale(0.75) !important; /* אפקט לחיצה tactile */
+}
+
+/* 4. מרכוז אופטי של התוכן בתוך ההדר */
+html body .tw-h-\[56px\].tw-flex-shrink-0 {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    gap: 12px !important;
+}
+
+/* 5. ניקוי צלליות Tailwind מקוריות */
+html body .tw-shadow-\[0px_1px_2px_0px_rgba\(28\2c 32\2c 40\2c 0\.05\)\] {
+    box-shadow: none !important;
+}
+
+/* =========================================================
+   חלק 21ב: שדה חיפוש כתובת - טיפול שורש קריסטלי
+   מטרה: תרגום לוקאלי, עיצוב קפסולת זכוכית ואייקון QLED
+   ========================================================= */
+
+/* 1. המכולה החיצונית - יצירת מרחב נשימה */
+html body .tw-px-4.tw-pt-4.tw-pb-\[10px\] {
+    background: transparent !important;
+    padding-bottom: 20px !important;
+}
+
+/* 2. הקפסולה המרכזית (The Search Chassis) */
+html body .location-search-custom-height .v-field {
+    background: rgba(255, 255, 255, 0.7) !important; /* זכוכית לבנה קריסטלית */
+    backdrop-filter: blur(30px) saturate(210%) !important;
+    -webkit-backdrop-filter: blur(30px) saturate(210%) !important;
+    
+    border: 1.5px solid rgba(227, 30, 36, 0.1) !important; /* מסגרת אדומה "רפאים" */
+    border-radius: 24px !important; /* צורת קפסולה מודרנית */
+    
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.04) !important;
+    height: 58px !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+/* אפקט פוקוס - כשהמשתמש מתחיל להקליד */
+html body .location-search-custom-height .v-field--focused {
+    background: #ffffff !important;
+    border-color: #e31e24 !important; /* הדגשת אדום מותג */
+    box-shadow: 0 15px 40px rgba(227, 30, 36, 0.1) !important;
+}
+
+/* 3. הזרקת תרגום Placeholder (Search for area... -> חפש אזור...) */
+html body .location-search-custom-height input#search::placeholder {
+    color: transparent !important; /* העלמת האנגלית */
+}
+
+html body .location-search-custom-height .v-field__field::before {
+    content: "חפש אזור, רחוב או כתובת..." !important;
+    position: absolute !important;
+    right: 16px !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    font-size: 15px !important;
+    font-weight: 500 !important;
+    color: rgba(0, 0, 0, 0.4) !important;
+    pointer-events: none !important;
+    visibility: visible !important;
+}
+
+/* העלמת התרגום בזמן הקלדה */
+html body .location-search-custom-height .v-field--has-subsettings .v-field__field::before,
+html body .location-search-custom-height .v-field--dirty .v-field__field::before {
+    display: none !important;
+}
+
+/* 4. עיצוב אייקון החיפוש (זכוכית מגדלת) - צביעה לאדום QLED */
+html body .location-search-custom-height .search-icon-mobile {
+    filter: brightness(0) saturate(100%) invert(18%) sepia(88%) saturate(5427%) hue-rotate(352deg) brightness(91%) contrast(92%) !important;
+    width: 22px !important;
+    height: 22px !important;
+    margin-left: 8px !important;
+    opacity: 0.8 !important;
+}
+
+/* 5. ניקוי שכבות המערכת של Vuetify (החוק הלוגי) */
+html body .location-search-custom-height .v-field__overlay,
+html body .location-search-custom-height .v-field__outline,
+html body .location-search-custom-height .v-card__underlay {
+    display: none !important;
+}
+
+/* 6. תיקון הטקסט המוזן - יישור לימין (RTL) */
+html body .location-search-custom-height input#search {
+    text-align: right !important;
+    padding-right: 16px !important;
+    font-weight: 700 !important;
+    color: #1a1a1a !important;
+}
+
+/* =========================================================
+   חלק 22א: שלד דף מוצר ותמונה - LIQUID GLASS DNA
+   מטרה: הפיכת המודאל לזכוכית, שחזור התמונה ועיצוב הדר
+   ========================================================= */
+
+/* 1. המכולה הראשית של ה-Popup - מעטפת זכוכית נוזלית */
+.v-overlay__content.v-bottom-sheet__content:has(.product-popup) .product-popup {
+    background: rgba(255, 255, 255, 0.7) !important;
+    backdrop-filter: blur(45px) saturate(210%) !important;
+    -webkit-backdrop-filter: blur(45px) saturate(210%) !important;
+    border-radius: 32px 32px 0 0 !important; /* עיגול פרימיום עליון */
+    border: 1px solid rgba(255, 255, 255, 0.5) !important;
+    box-shadow: 0 -15px 50px rgba(0, 0, 0, 0.1) !important;
+    overflow: hidden !important;
+}
+
+/* 2. הדר המודאל (Sticky Header) - שקיפות וניקוי */
+.product-popup .v-card-title {
+    background: transparent !important; /* ביטול ה-tw-bg-white */
+    border-bottom: 1.5px solid rgba(227, 30, 36, 0.1) !important;
+    min-height: 70px !important;
+}
+
+/* שם המוצר בהדר */
+.product-popup .v-card-title .tw-text-black {
+    font-weight: 900 !important;
+    font-size: 18px !important;
+    color: #1a1a1a !important;
+}
+
+/* כפתור החזור - אדום QLED */
+.product-popup .back-btn {
+    background: rgba(255, 255, 255, 0.8) !important;
+    border: 1px solid rgba(227, 30, 36, 0.15) !important;
+    border-radius: 12px !important;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05) !important;
+}
+
+.product-popup .back-btn svg path {
+    fill: #e31e24 !important; /* חץ אדום מותג */
+}
+
+}
+
+/* =========================================================
+   חלק 22ב: זהות המוצר ואריחי קריסטל (תוספות)
+   מטרה: עיצוב שם המוצר והפיכת התוספות לכפתורי זכוכית נוזלית
+   ========================================================= */
+
+/* 1. זהות המוצר (שם, קטגוריה ומחיר) */
+.product-popup #productInfo {
+    text-align: right !important;
+    padding: 20px 16px !important;
+}
+
+/* קטגוריית המוצר */
+.product-popup .product-category-name {
+    color: #e31e24 !important; /* אדום מותג עדין */
+    font-size: 13px !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    margin-bottom: 4px !important;
+    opacity: 0.8 !important;
+}
+
+/* שם המוצר הראשי */
+.product-popup .product-name {
+    font-size: 24px !important;
+    font-weight: 900 !important;
+    color: #000000 !important;
+    line-height: 1.2 !important;
+    margin-bottom: 8px !important;
+}
+
+/* המחיר - בולט ויוקרתי */
+.product-popup .product-price {
+    color: #e31e24 !important;
+    font-size: 22px !important;
+    font-weight: 900 !important;
+    margin-top: 10px !important;
+    display: block !important;
+}
+
+/* תיאור המוצר */
+.product-popup .product-description {
+    color: #666666 !important;
+    font-size: 14px !important;
+    line-height: 1.5 !important;
+    font-weight: 500 !important;
+    margin-top: 8px !important;
+}
+
+/* 2. כותרות קבוצות התוספות (למשל: "בחר תוספת") */
+.product-popup .addon-heading {
+    padding: 24px 16px 12px 16px !important;
+}
+
+.product-popup .addon-heading h2 {
+    font-size: 17px !important;
+    font-weight: 800 !important;
+    color: #1a1a1a !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+}
+
+/* תג ה-"נדרש" (Required) */
+.product-popup .addon-heading .tw-text-xs {
+    background: rgba(227, 30, 36, 0.1) !important;
+    color: #e31e24 !important;
+    padding: 2px 8px !important;
+    border-radius: 6px !important;
+    font-weight: 800 !important;
+    font-size: 10px !important;
+}
+
+/* 3. יצירת ה-Crystal Tiles (הפיכת השורות לאריחי זכוכית) */
+.product-popup .v-list-item.PsoOWFvvHqrtk1n {
+    background: rgba(255, 255, 255, 0.5) !important; /* זכוכית בסיס */
+    backdrop-filter: blur(10px) !important;
+    border: 1px solid rgba(0, 0, 0, 0.05) !important;
+    border-radius: 16px !important;
+    margin: 0 12px 10px 12px !important;
+    padding: 14px 16px !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02) !important;
+}
+
+/* ביטול קווי ההפרדה הישנים של המערכת */
+.product-popup .tw-border-b-\[\.5px\],
+.product-popup .v-list-item--variant-text {
+    border-bottom: none !important;
+}
+
+/* מצב בחור (Active Tile) */
+.product-popup .v-list-item:has(input:checked) {
+    background: #ffffff !important;
+    border-color: rgba(227, 30, 36, 0.3) !important;
+    box-shadow: 0 8px 20px rgba(227, 30, 36, 0.08) !important;
+    transform: translateY(-2px) !important;
+}
+
+/* 4. עיצוב ה-Radio/Checkbox (The Jewel) */
+.product-popup .v-selection-control__input i {
+    color: #d1d1d1 !important;
+    transition: all 0.3s ease !important;
+}
+
+.product-popup .v-list-item:has(input:checked) .v-selection-control__input i {
+    color: #e31e24 !important; /* הפיכת הסימן לאדום מותג */
+}
+
+/* 5. טיפול בתוספות במבנה סליידר (אם קיימות) */
+.product-popup .simple-slider .v-card {
+    background: rgba(255, 255, 255, 0.6) !important;
+    backdrop-filter: blur(15px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.5) !important;
+    border-radius: 20px !important;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.04) !important;
+    padding: 10px !important;
+}
+
+.product-popup .simple-slider .v-img {
+    border-radius: 14px !important;
+    margin-bottom: 10px !important;
+}
+
+/* 6. ניקוי רקע הטופס האפור (#F6F6F6) שחונק את הזכוכית */
+.product-popup #ProductPopupForm,
+.product-popup .tw-bg-\[\#F6F6F6\] {
+    background: transparent !important;
+}
+
+
+/* =========================================================
+   חלק 22ג+ד: גוף הטופס, אריחי קריסטל וכפתור הרחבה
+   סטטוס: איחוד כוחות סופי - דריסה אגרסיבית לפי HTML LIVE
+   ========================================================= */
+
+/* 1. ניקוי שורש המודאל - השמדת ה-White Wall מהיסוד */
+.product-popup[data-v-4e145e4c],
+.product-popup .v-card-text[data-v-4e145e4c],
+.product-popup #ProductPopupForm,
+.product-popup div[data-v-4e145e4c].tw-bg-\[\#F6F6F6\] {
+    background: transparent !important;
+    background-color: transparent !important;
+    --v-theme-surface: transparent !important;
+    box-shadow: none !important;
+}
+
+/* 2. קילוף הלבן האטום של מעטפת הרשימה (The Main Culprit) */
+/* זהו האלמנט שיוצר את הריבוע הלבן סביב התוספות ב-HTML שלך */
+.product-popup .tw-bg-white:has(.v-list),
+.product-popup .tw-mx-3.tw-rounded-xl.tw-bg-white {
+    background: transparent !important;
+    background-color: transparent !important;
+    box-shadow: none !important;
+}
+
+/* 3. עיצוב אריחי התוספות (Crystal Tiles) - זכוכית נוזלית */
+.product-popup .v-list-item.PsoOWFvvHqrtk1n {
+    background: rgba(255, 255, 255, 0.65) !important;
+    backdrop-filter: blur(20px) saturate(180%) !important;
+    -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.4) !important;
+    border-radius: 18px !important;
+    margin: 0 14px 12px 14px !important;
+    padding-top: 10px !important;
+    padding-bottom: 10px !important;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.03) !important;
+}
+
+/* אפקט בחירה (Active Tile) */
+.product-popup .v-list-item.PsoOWFvvHqrtk1n:has(input:checked) {
+    background: #ffffff !important;
+    border-color: #e31e24 !important;
+    box-shadow: 0 10px 25px rgba(227, 30, 36, 0.1) !important;
+}
+
+/* 4. לוגיקת Selection Force (האונס) - שחרור חסימת ה-10 */
+.product-popup .v-selection-control--disabled,
+.product-popup .v-list-item--disabled,
+.product-popup .v-selection-control--disabled * {
+    pointer-events: auto !important;
+    cursor: pointer !important;
+    opacity: 1 !important;
+}
+
+/* צביעת ה-V וה-Checkbox באדום QLED */
+.product-popup .v-selection-control__input i,
+.product-popup .v-list-item:has(input:checked) .v-selection-control__input i {
+    color: #e31e24 !important;
+}
+
+/* 5. עיצוב כפתור "להראות יותר" - THE LIQUID GLASS CAPSULE */
+.product-popup button.text-primary.tw-ms-3 {
+    /* מירכוז DNA */
+    display: flex !important;
+    position: relative !important;
+    margin: 30px auto !important; 
+    left: 0 !important;
+    right: 0 !important;
+    
+    width: fit-content !important;
+    min-width: 175px !important;
+    height: 44px !important;
+    z-index: 10 !important;
+
+    /* עיצוב זכוכית */
+    background: rgba(255, 255, 255, 0.8) !important;
+    backdrop-filter: blur(25px) !important;
+    -webkit-backdrop-filter: blur(25px) !important;
+    
+    /* מסגרת אדומה וטקסט */
+    border: 1.2px solid #e31e24 !important;
+    border-radius: 50px !important;
+    color: #e31e24 !important;
+    box-shadow: 0 8px 25px rgba(227, 30, 36, 0.15) !important;
+}
+
+.product-popup button.text-primary.tw-ms-3 .v-btn__content {
+    font-weight: 800 !important;
+    font-size: 15px !important;
+}
+
+/* 6. ניקוי סופי של שכבות ה-Underlay */
+.product-popup .v-card__underlay,
+.product-popup .v-list-item__underlay,
+.product-popup .v-field__overlay {
+    display: none !important;
+    opacity: 0 !important;
+}
+
+/* =========================================================
+   חלק 22ה: עיצוב פנים הפוטר (הוספה לסל ומונה)
+   סטטוס: עיצוב אלמנטים פנימיים בלבד - שמירה על שקיפות קיימת
+   ========================================================= */
+
+/* 1. עיצוב כפתור ההוספה (The Master QLED Button) */
+.product-popup [data-v-4e145e4c] button.add-btn.bg-button_normal {
+    /* זהות המותג - אדום QLED */
+    background: linear-gradient(135deg, #e31e24 0%, #b31419 100%) !important;
+    color: #ffffff !important;
+    
+    /* צורה ועומק */
+    border-radius: 16px !important;
+    height: 58px !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    box-shadow: 0 10px 25px rgba(227, 30, 36, 0.35) !important;
+    
+    /* טקסט */
+    font-size: 18px !important;
+    font-weight: 900 !important;
+    letter-spacing: 0.5px !important;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+}
+
+/* אפקט לחיצה טקטילי */
+.product-popup button.add-btn:active {
+    transform: scale(0.96) !important;
+    box-shadow: 0 4px 12px rgba(227, 30, 36, 0.2) !important;
+}
+
+/* 2. עיצוב המונה (The Quantity Stepper) - קריסטל שקוף */
+.product-popup [data-v-4e145e4c] .tw-flex-none.tw-border {
+    /* הפיכה מזכוכית אטומה לקריסטל שקוף */
+    background: rgba(255, 255, 255, 0.4) !important;
+    backdrop-filter: blur(10px) !important;
+    -webkit-backdrop-filter: blur(10px) !important;
+    
+    border: 1px solid rgba(0, 0, 0, 0.08) !important;
+    border-radius: 16px !important;
+    height: 58px !important;
+    width: 130px !important;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.02) !important;
+}
+
+/* 3. כפתורי הפלוס והמינוס - אדום QLED */
+.product-popup .decrement-btn, 
+.product-popup .increment-btn {
+    color: #e31e24 !important;
+    font-weight: 900 !important;
+    font-size: 26px !important;
+    background: transparent !important;
+}
+
+/* 4. עיצוב המספר במרכז המונה */
+.product-popup input#quantity {
+    color: #000000 !important;
+    font-weight: 900 !important;
+    font-size: 19px !important;
+    background: transparent !important;
+}
+
+/* 5. ניקוי סופי של שכבות "רפאים" בתוך המונה */
+.product-popup #add_to_cart_hide_from_mobile_app .v-field__overlay,
+.product-popup #add_to_cart_hide_from_mobile_app .v-field__outline {
+    display: none !important;
+}
+
+
+/* =========================================================
+   חלק ו22: שחזור תמונת מוצר במודאל - THE FINAL FIX
+   ========================================================= */
+
+/* וידוא שהסייזר של התמונה חי וקיים במודאל */
+.product-popup .v-responsive__sizer {
+    display: block !important;
+    padding-bottom: 70% !important; /* קובע את גובה התמונה */
+}
+
+/* הכרחת התמונה להיות גלויה */
+.product-popup .v-img__img {
+    opacity: 1 !important;
+    visibility: visible !important;
+    object-fit: cover !important;
+}
+
+/* ביטול חניקת גובה של Vuetify Window */
+.product-popup .v-window, 
+.product-popup .v-window-item {
+    height: auto !important;
+}
+
+/* =========================================================
+   חלק 22ז: עיצוב קרוסלת תמונה - THE LIQUID SLIDER
+   מטרה: ניקוי ה"מסגרת המגעילה" והפיכת התמונה לפרמיום
+   ========================================================= */
+
+/* 1. המכולה הראשית של הסליידר - ניקוי גובה קשיח */
+.product-popup .product-image-slider {
+    height: auto !important;
+    background: transparent !important;
+    margin-bottom: 10px !important;
+}
+
+/* 2. ניקוי כרטיס ה-v-card הפנימי שיוצר את המסגרת הלבנה */
+.product-popup .v-carousel-item .v-card {
+    background: transparent !important;
+    background-color: transparent !important;
+    --v-theme-surface: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 0 !important;
+    aspect-ratio: unset !important;
+}
+
+/* 3. עיצוב התמונה עצמה - THE FLOATING CRYSTAL */
+.product-popup .v-carousel-item .v-img.image {
+    border-radius: 20px !important;
+    border: none !important;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08) !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    overflow: hidden !important;
+}
+
+/* 4. תיקון ה-Sizer של התמונה בתוך הקרוסלה */
+.product-popup .v-carousel-item .v-img.image .v-responsive__sizer {
+    padding-bottom: 100% !important; /* תמונה מרובעת מושלמת בתוך המכולה */
+}
+
+/* 5. עיצוב כפתורי הניווט (Arrows) והדוטס (Dots) אם קיימים */
+.product-popup .v-carousel__controls {
+    background: rgba(255, 255, 255, 0.2) !important;
+    backdrop-filter: blur(5px) !important;
+    border-radius: 20px !important;
+    height: 40px !important;
+    bottom: 20px !important;
+}
+
+.product-popup .v-carousel__controls .v-btn--active {
+    color: #e31e24 !important; /* דוט פעיל באדום מותג */
+}
+
+/* 6. הסרת שכבת ה-Underlay של ה-v-card הפנימי שחוסמת שקיפות */
+.product-popup .v-carousel-item .v-card__underlay {
+    display: none !important;
+}
+
+/* =========================================================
+   חלק 22ח: תיקון סופי - ריבוע לבן בתמונה + תוספות
+   ========================================================= */
+/* --- FIX 1: הריבוע הלבן מאחורי תמונת המוצר --- */
+/* ה-v-card הפנימי בתוך הקרוסלה שיוצר את הריבוע */
+html body .product-popup .v-carousel-item .v-responsive__content .v-card {
+    background: transparent !important;
+    background-color: transparent !important;
+    box-shadow: none !important;
+    border: none !important;
+    padding: 0 !important;
+    elevation: 0 !important;
+}
+html body .product-popup .v-carousel-item .v-responsive__content .v-card .v-card__loader {
+    display: none !important;
+}
+html body .product-popup .v-carousel-item .v-responsive__content .v-card .v-card__underlay {
+    display: none !important;
+}
+/* דריסת variant-elevated שמוסיף רקע לבן */
+html body .product-popup .v-carousel-item .v-card--variant-elevated {
+    background: transparent !important;
+    box-shadow: none !important;
+    --v-theme-surface: transparent !important;
+}
+/* --- FIX 2: רשימת התוספות - הסרת הבלוק הלבן + padding מוגזם --- */
+/* המעטפת הלבנה שעוטפת את כל הרשימה */
+html body .product-popup .tw-mx-3.tw-rounded-xl.tw-overflow-hidden.tw-bg-white {
+    background: transparent !important;
+    background-color: transparent !important;
+    border-radius: 0 !important;
+    overflow: visible !important;
+}
+/* ה-v-list עצמו - ניקוי רקע */
+html body .product-popup .tw-mx-3 .v-list.v-list--slim {
+    background: transparent !important;
+    background-color: transparent !important;
+}
+/* הקטנת padding אנכי של כל תוספת */
+html body .product-popup .v-list-item.PsoOWFvvHqrtk1n {
+    padding: 12px 16px !important;
+    min-height: auto !important;
+}
+/* ה-checkbox - מרכוז אנכי */
+html body .product-popup .v-list-item.PsoOWFvvHqrtk1n .tw-top-\[-6px\] {
+    top: 0px !important;
+}
+/* שם התוספת - גובה שורה מותאם */
+html body .product-popup .v-list-item.PsoOWFvvHqrtk1n .v-list-item-title {
+    line-height: 1.3 !important;
+    white-space: normal !important;
+}
+
+/* ==========================================================================
+   חלק 23: עיצוב כירורגי לדף "הוספת כתובת" - Red & White Liquid Glass
+   SCOPE: [data-v-4b9952fb] (Vue Scoped Component)
+   ========================================================================== */
+
+/* --- 1. מחיקת עיצוב ה-Material משדות הקלט (Inputs) והחלת קפסולות נקיות --- */
+[data-v-4b9952fb] .v-field {
+    background-color: #f7f7f7 !important;
+    border-radius: 12px !important;
+    box-shadow: none !important;
+    border: 1px solid transparent !important;
+    transition: all 0.3s ease !important;
+}
+
+/* העלמת הקווים התחתונים המובנים של Vuetify */
+[data-v-4b9952fb] .v-field__outline,
+[data-v-4b9952fb] .v-field__outline::before,
+[data-v-4b9952fb] .v-field__outline::after {
+    display: none !important;
+}
+
+/* מסגרת אדומה קלה כשהשדה פעיל/בפוקוס */
+[data-v-4b9952fb] .v-field--focused,
+[data-v-4b9952fb] .v-field--active {
+    background-color: #ffffff !important;
+    border-color: #e31e24 !important;
+    box-shadow: 0 0 0 3px rgba(227, 30, 36, 0.1) !important;
+}
+
+/* --- 2. תיקון הרסני לשדה הטלפון (שבירת ה-RTL המובנה) --- */
+/* אנחנו מכריחים את כל המכולה של הטלפון לפעול משמאל לימין */
+[data-v-4b9952fb] #AddressInputContactPhoneNumber,
+[data-v-4b9952fb] #AddressInputContactPhoneNumber .v-field,
+[data-v-4b9952fb] #AddressInputContactPhoneNumber .v-input__control {
+    direction: ltr !important;
+}
+
+/* יישור הטקסט של המספר עצמו לשמאל */
+[data-v-4b9952fb] #AddressInputContactPhoneNumber input[type="tel"] {
+    direction: ltr !important;
+    text-align: left !important;
+    padding-left: 12px !important;
+}
+
+/* --- 3. כפתורי "Save address as" (בית/משרד/אחרים - Chips) --- */
+/* עיצוב בסיסי לכל הצ'יפים */
+[data-v-4b9952fb] #AddressSelectType .v-chip {
+    background-color: #ffffff !important;
+    border: 1px solid #e0e0e0 !important;
+    color: #555555 !important;
+    border-radius: 12px !important;
+    font-weight: 500 !important;
+    transition: all 0.2s ease !important;
+}
+
+/* עיצוב אדום מותגי לצ'יפ הפעיל (לפי המחלקה text-primary שהמערכת מזריקה) */
+[data-v-4b9952fb] #AddressSelectType .v-chip.text-primary {
+    border-color: #e31e24 !important;
+    background-color: rgba(227, 30, 36, 0.05) !important;
+    color: #e31e24 !important;
+}
+
+/* צביעת האייקון בצ'יפ הפעיל */
+[data-v-4b9952fb] #AddressSelectType .v-chip.text-primary svg path {
+    fill: #e31e24 !important;
+}
+
+/* --- 4. אזור כפתור השמירה התחתון (Liquid Glass Wrapper) --- */
+/* הופך את המכולה שעוטפת את הכפתור בתחתית לזכוכית מטושטשת כדי לא להסתיר את התוכן בגלילה */
+div[data-v-4b9952fb].tw-absolute.tw-bottom-0 {
+    background: rgba(255, 255, 255, 0.85) !important;
+    backdrop-filter: blur(20px) !important;
+    -webkit-backdrop-filter: blur(20px) !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.5) !important;
+    padding-bottom: 24px !important;
+}
+
+/* שדרוג כפתור "שמור כתובת" - צבע מותג ומרכוז */
+div[data-v-4b9952fb].tw-absolute.tw-bottom-0 button {
+    background: linear-gradient(135deg, #e31e24 0%, #b3161b 100%) !important;
+    color: #ffffff !important;
+    border-radius: 30px !important;
+    height: 56px !important;
+    font-size: 1.1rem !important;
+    font-weight: 800 !important;
+    letter-spacing: 0 !important;
+    box-shadow: 0 8px 25px rgba(227, 30, 36, 0.3) !important;
+    border: none !important;
+    margin: 0 auto !important; /* מרכוז מוחלט ביחס למכולה שלו */
+    max-width: 460px !important; 
+}
+
+/* --- 5. עידון כפתור "אתר אותי" במפה --- */
+[data-v-4b9952fb] #CurrentLocationButton {
+    color: #e31e24 !important;
+    border-radius: 30px !important;
+}
+
+[data-v-4b9952fb] #CurrentLocationButton .v-icon {
+    color: #e31e24 !important;
+}
+
+/* =========================================
+   PART 23B: Map Elements & Address Button Fix
+   Scope: [data-v-4b9952fb] / #CurrentLocationButton
+   ========================================= */
+
+/* 1. כפתור "שמור כתובת" (הקונטיינר והכפתור עצמו) */
+div[data-v-4b9952fb].tw-bottom-0.tw-bg-white {
+    /* אפקט זכוכית יוקרתי לקונטיינר התחתון */
+    background: rgba(255, 255, 255, 0.85) !important;
+    backdrop-filter: blur(24px) !important;
+    -webkit-backdrop-filter: blur(24px) !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.5) !important;
+    
+    /* תיקון מרכוז מוחלט */
+    left: 0 !important;
+    right: 0 !important;
+    margin: 0 auto !important;
+    box-shadow: 0 -4px 30px rgba(0, 0, 0, 0.05) !important;
+}
+
+div[data-v-4b9952fb].tw-bottom-0.tw-bg-white button.v-btn {
+    /* עיצוב כפתור המותג */
+    background: #e31e24 !important; /* אדום מעלה המשלוחים */
+    color: #ffffff !important;
+    border-radius: 12px !important;
+    margin: 0 auto !important;
+    display: flex !important;
+    justify-content: center !important;
+    box-shadow: 0 8px 24px rgba(227, 30, 36, 0.3) !important; /* הילת צל אדומה */
+}
+
+/* 2. כפתור "אתר אותי" */
+button#CurrentLocationButton {
+    /* תיקון מרכוז וביטול סטייה שמאלה */
+    position: absolute !important;
+    left: 0 !important;
+    right: 0 !important;
+    margin: 0 auto !important;
+    width: max-content !important;
+    transform: translateY(-5px) !important; /* ביטול תזוזת X, שמירה על Y */
+    
+    /* עיצוב זכוכית ואדום */
+    background: rgba(255, 255, 255, 0.9) !important;
+    backdrop-filter: blur(20px) !important;
+    -webkit-backdrop-filter: blur(20px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.6) !important;
+    color: #e31e24 !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1) !important;
+    border-radius: 50px !important; /* צורת גלולה */
+}
+
+/* צביעת האייקון בתוך כפתור אתר אותי */
+button#CurrentLocationButton i.v-icon,
+button#CurrentLocationButton svg {
+    color: #e31e24 !important;
+    fill: #e31e24 !important;
+}
+
+/* 3. טולטיפ "הזז את הסיכה" */
+div[data-v-4b9952fb].tw-top-1\/2.tw-left-1\/2 {
+    /* תיקון מרכוז */
+    left: 0 !important;
+    right: 0 !important;
+    margin: 0 auto !important;
+    width: max-content !important;
+    transform: translateY(-100%) !important; /* ביטול תזוזת X */
+}
+
+/* הבועה עצמה */
+div[data-v-4b9952fb].tw-top-1\/2.tw-left-1\/2 .tw-bg-\[\#212121\] {
+    background: #e31e24 !important; /* צבע המותג במקום אפור כהה */
+    color: #ffffff !important;
+    box-shadow: 0 4px 12px rgba(227, 30, 36, 0.3) !important;
+    border-radius: 8px !important;
+}
+
+/* המשולש (חץ) שיוצא מהבועה למטה */
+div[data-v-4b9952fb].tw-top-1\/2.tw-left-1\/2 .tw-border-t-\[\#212121\] {
+    border-top-color: #e31e24 !important;
+}
+
+/* =========================================================
+   חלק 24: תיקוני סרגל ניווט תחתון (התנגשויות ומצב התחלתי)
+   ========================================================= */
+
+/* --- 1. פתרון ה"תמונה הלבנה" (התנגשות אזור הזמנות פעילות) --- */
+/* העלמת הגרדיאנט המובנה ודחיפת אזור ההזמנות מעל הקפסולה הקבועה */
+html body #MultiVendorBottomNav #ongoingOrders {
+    margin-bottom: 0px !important; /* דוחף מעל לקפסולה שגובהה 72px */
+}
+
+/* מאחר וביטלנו את רקע הגרדיאנט, ניתן לכרטיס ההזמנה עצמו עיצוב זכוכית אלגנטי שישתלב עם ה-DNA */
+html body #MultiVendorBottomNav #ongoingOrders .ongoing-order {
+    background: rgba(255, 255, 255, 0.8) !important;
+    backdrop-filter: blur(20px) !important;
+    -webkit-backdrop-filter: blur(20px) !important;
+    border: 1px solid rgba(227, 30, 36, 0.1) !important;
+    border-radius: 16px !important;
+    padding: 6px 10px !important;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05) !important;
+}
+
+/* --- 2. פתרון "בית לא בחור" (כפיית Active State התחלתי) --- */
+/* לוגיקה: אם לסרגל הניווט אין אף כפתור פעיל, הפעל את עיצוב ה-QLED Red על הכפתור הראשון (בית) */
+html body #MultiVendorBottomNav:not(:has(.v-btn--active)) .v-badge:first-of-type .footer-btn-text {
+    color: #e31e24 !important;
+    font-weight: 800 !important;
+    opacity: 1 !important;
+}
+
+html body #MultiVendorBottomNav:not(:has(.v-btn--active)) .v-badge:first-of-type img {
+    filter: invert(18%) sepia(88%) saturate(6144%) hue-rotate(354deg) brightness(91%) contrast(100%) drop-shadow(0 2px 8px rgba(227, 30, 36, 0.4)) !important;
+    opacity: 1 !important;
+    transform: scale(1.1) translateY(-2px) !important;
+}
+
+
+/* =========================================
+   Part 25: Order Status Crystal Fix (V10 - Absolute to Fixed Navbar)
+   DOM: navbar#MultiVendorBottomNav(fixed) > .v-bottom-navigation__content(68px) > #ongoingOrders
+   The navbar is height:68px fixed. ongoingOrders must escape above it.
+   The capsule (buttons row) is already position:fixed from Part 1.
+   ========================================= */
+/* 1. Allow overflow from the fixed navbar */
+#MultiVendorBottomNav,
+#MultiVendorBottomNav .v-bottom-navigation__content {
+    overflow: visible !important;
+    contain: none !important;
+}
+/* 2. Position ongoingOrders above the navbar */
+#MultiVendorBottomNav #ongoingOrders {
+    position: fixed !important;
+    bottom: 105px !important;
+    left: 0 !important;
+    right: 0 !important;
+    margin: 0 auto !important;
+
+    width: calc(100% - 32px) !important;
+    max-width: 450px !important;
+    z-index: 9999 !important;
+
+    /* Liquid Glass */
+    background: rgba(255, 255, 255, 0.85) !important;
+    backdrop-filter: blur(24px) saturate(180%) !important;
+    -webkit-backdrop-filter: blur(24px) saturate(180%) !important;
+    border-radius: 20px !important;
+    border: 1px solid rgba(255, 255, 255, 0.5) !important;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08) !important;
+    padding: 6px 10px !important;
+
+    /* CRITICAL: remove from normal flow so it doesn't affect navbar height */
+    height: auto !important;
+}
+/* 3. Kill inner backgrounds */
+#MultiVendorBottomNav #ongoingOrders .ongoing-order,
+#MultiVendorBottomNav #ongoingOrders .v-card,
+#MultiVendorBottomNav #ongoingOrders .swiper {
+    background: transparent !important;
+    background-color: transparent !important;
+    box-shadow: none !important;
+    background-image: none !important;
+    overflow: visible !important;
+}
+/* 4. Kill Tailwind gradient */
+#MultiVendorBottomNav .tw-bg-gradient-to-b {
+    background: transparent !important;
+    background-image: none !important;
+}
+/* 5. Hide dots row */
+#MultiVendorBottomNav #ongoingOrders .tw-flex.tw-justify-left {
+    display: none !important;
+}
+/* 6. Fix inner card width */
+#MultiVendorBottomNav #ongoingOrders .ongoing-order {
+    width: 100% !important;
+    margin: 0 !important;
+}
+
+/* =========================================================
+   חלק 26: דף חיפוש - LIQUID GLASS SEARCH PAGE
+   Scope: #MultiVendorSearch
+   Date: 2026-03-14
+   ========================================================= */
+/* 1. רקע הדף - לבן קריסטל נקי */
+#MultiVendorSearch {
+    background: radial-gradient(circle at 50% 0%, #ffffff 0%, #f9f9f9 100%) !important;
+}
+/* 2. הדר חיפוש Sticky - Liquid Glass */
+#MultiVendorSearch .tw-sticky.tw-top-0.tw-bg-white {
+    background: rgba(255, 255, 255, 0.45) !important;
+    backdrop-filter: blur(40px) saturate(210%) !important;
+    -webkit-backdrop-filter: blur(40px) saturate(210%) !important;
+    border-bottom: 1.5px solid rgba(227, 30, 36, 0.1) !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04) !important;
+    padding: 16px !important;
+    z-index: 100 !important;
+}
+/* 3. שורת החיפוש - Crystal Capsule */
+#MultiVendorSearch .mobile-search-input .v-field {
+    background: rgba(255, 255, 255, 0.7) !important;
+    backdrop-filter: blur(20px) saturate(180%) !important;
+    -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+    border: 1.5px solid rgba(227, 30, 36, 0.12) !important;
+    border-radius: 20px !important;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.04) !important;
+    height: 54px !important;
+    transition: all 0.3s ease !important;
+}
+/* פוקוס על שדה החיפוש */
+#MultiVendorSearch .mobile-search-input .v-field--focused {
+    background: #ffffff !important;
+    border-color: #e31e24 !important;
+    box-shadow: 0 10px 30px rgba(227, 30, 36, 0.1) !important;
+}
+/* ניקוי שכבות Vuetify */
+#MultiVendorSearch .mobile-search-input .v-field__overlay,
+#MultiVendorSearch .mobile-search-input .v-field__outline {
+    display: none !important;
+}
+/* Placeholder וטקסט */
+#MultiVendorSearch .mobile-search-input input::placeholder {
+    color: rgba(0, 0, 0, 0.35) !important;
+    font-weight: 500 !important;
+}
+#MultiVendorSearch .mobile-search-input input {
+    font-weight: 700 !important;
+    color: #1a1a1a !important;
+}
+/* אייקון חיפוש - אדום QLED */
+#MultiVendorSearch .mobile-search-input svg path {
+    fill: #e31e24 !important;
+}
+/* כפתור חזור - אדום QLED */
+#MultiVendorSearch .mobile-search-input .v-icon {
+    color: #e31e24 !important;
+}
+#MultiVendorSearch .mobile-search-input .v-icon svg path {
+    fill: #e31e24 !important;
+}
+/* 4. כותרות סקציות (חיפוש אחרון / קניות לפי קטגוריות) */
+#MultiVendorSearch .recent-search-heading .tw-font-medium,
+#MultiVendorSearch .tw-uppercase {
+    color: #e31e24 !important;
+    font-weight: 800 !important;
+    font-size: 13px !important;
+    letter-spacing: 0.5px !important;
+}
+/* 5. כרטיס חיפוש אחרון - Floating Glass Tile */
+#MultiVendorSearch .recent-searches .tw-flex.tw-justify-between.tw-items-center.tw-mb-4 {
+    background: rgba(255, 255, 255, 0.6) !important;
+    backdrop-filter: blur(15px) !important;
+    -webkit-backdrop-filter: blur(15px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.5) !important;
+    border-radius: 18px !important;
+    padding: 12px 14px !important;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.03) !important;
+    transition: all 0.3s ease !important;
+}
+#MultiVendorSearch .recent-searches .tw-flex.tw-justify-between.tw-items-center.tw-mb-4:active {
+    transform: scale(0.98) !important;
+    background: rgba(255, 255, 255, 0.9) !important;
+}
+/* שם החנות בחיפוש אחרון */
+#MultiVendorSearch .recent-searches h4 {
+    color: #1a1a1a !important;
+    font-weight: 800 !important;
+    font-size: 14px !important;
+}
+/* כתובת בחיפוש אחרון */
+#MultiVendorSearch .recent-searches p {
+    color: #888 !important;
+    font-weight: 500 !important;
+}
+/* כפתור X (מחיקה) - אדום */
+#MultiVendorSearch .recent-searches .v-icon {
+    color: #e31e24 !important;
+    opacity: 0.5 !important;
+    transition: opacity 0.2s ease !important;
+}
+#MultiVendorSearch .recent-searches .v-icon:hover {
+    opacity: 1 !important;
+}
+/* תמונת החנות - עיגול פינות */
+#MultiVendorSearch .recent-searches .tw-rounded-\[10px\] {
+    border-radius: 14px !important;
+    overflow: hidden !important;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06) !important;
+}
+/* 6. קטגוריות - Crystal Grid Cards */
+#MultiVendorSearch .category-img {
+    background: rgba(255, 255, 255, 0.6) !important;
+    backdrop-filter: blur(15px) !important;
+    -webkit-backdrop-filter: blur(15px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.5) !important;
+    border-radius: 20px !important;
+    padding: 12px !important;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.04) !important;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+    aspect-ratio: 1 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+#MultiVendorSearch .category-img:active {
+    transform: scale(0.92) !important;
+    border-color: rgba(227, 30, 36, 0.3) !important;
+    box-shadow: 0 8px 25px rgba(227, 30, 36, 0.1) !important;
+}
+/* שם הקטגוריה */
+#MultiVendorSearch .tw-grid .tw-text-xs.tw-text-center {
+    color: #1a1a1a !important;
+    font-weight: 700 !important;
+    font-size: 12px !important;
+    margin-top: 8px !important;
+}
+/* 7. ניקוי שכבות מערכת */
+#MultiVendorSearch .v-field__loader,
+#MultiVendorSearch .v-btn__overlay,
+#MultiVendorSearch .v-btn__underlay {
+    display: none !important;
+}
+
+/* =========================================================
+   חלק 27: פופאפ בחירת כתובת למשלוח - LIQUID GLASS
+   Scope: v-bottom-sheet that contains "בחירת כתובת למשלוח"
+   Selector: .v-bottom-sheet__content:has(.location-search-custom-height.dashed-border)
+   Date: 2026-03-14 | Updated: 2026-04-27 (narrowed scope to prevent leak into "בחירת מיקום" modal)
+   ========================================================= */
+/* 1. The Glass Card */
+.v-bottom-sheet__content:has(.location-search-custom-height.dashed-border) .v-card {
+    background: rgba(255, 255, 255, 0.8) !important;
+    backdrop-filter: blur(50px) saturate(220%) !important;
+    -webkit-backdrop-filter: blur(50px) saturate(220%) !important;
+    border-radius: 32px 32px 0 0 !important;
+    border: none !important;
+    border-top: 1.5px solid rgba(255, 255, 255, 0.7) !important;
+    box-shadow: 0 -20px 60px rgba(0, 0, 0, 0.12) !important;
+    padding: 24px 20px 32px 20px !important;
+    overflow: visible !important;
+}
+/* 2. Kill v-card layers */
+.v-bottom-sheet__content:has(.location-search-custom-height.dashed-border) .v-card__underlay,
+.v-bottom-sheet__content:has(.location-search-custom-height.dashed-border) .v-card__loader,
+.v-bottom-sheet__content:has(.location-search-custom-height.dashed-border) .v-card .v-card__underlay,
+.v-bottom-sheet__content:has(.location-search-custom-height.dashed-border) .v-field__overlay {
+    display: none !important;
+}
+/* 3. Title - fix broken text + QLED styling */
+.v-bottom-sheet__content:has(.location-search-custom-height.dashed-border) .v-card-title {
+    padding: 0 0 16px 0 !important;
+    border-bottom: none !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+}
+.v-bottom-sheet__content:has(.location-search-custom-height.dashed-border) .v-card-title div:first-child {
+    font-size: 19px !important;
+    font-weight: 900 !important;
+    color: #1a1a1a !important;
+    letter-spacing: -0.3px !important;
+    text-align: center !important;
+    word-spacing: normal !important;
+    white-space: normal !important;
+}
+/* 4. Hide the divider line */
+.v-bottom-sheet__content:has(.location-search-custom-height.dashed-border) hr.v-divider {
+    display: none !important;
+}
+/* 5. Search field - Crystal Capsule */
+.v-bottom-sheet__content:has(.location-search-custom-height.dashed-border) .location-search-custom-height .v-field {
+    background: rgba(255, 255, 255, 0.7) !important;
+    backdrop-filter: blur(20px) !important;
+    -webkit-backdrop-filter: blur(20px) !important;
+    border: 1.5px solid rgba(227, 30, 36, 0.12) !important;
+    border-radius: 20px !important;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.05) !important;
+    height: 56px !important;
+    transition: all 0.3s ease !important;
+}
+.v-bottom-sheet__content:has(.location-search-custom-height.dashed-border) .location-search-custom-height .v-field--focused {
+    background: #ffffff !important;
+    border-color: #e31e24 !important;
+    box-shadow: 0 10px 30px rgba(227, 30, 36, 0.1) !important;
+}
+/* Search field cleanup */
+.v-bottom-sheet__content:has(.location-search-custom-height.dashed-border) .v-field__outline,
+.v-bottom-sheet__content:has(.location-search-custom-height.dashed-border) .l-search .v-card__underlay {
+    display: none !important;
+}
+/* Search field background card */
+.v-bottom-sheet__content:has(.location-search-custom-height.dashed-border) .l-search {
+    background: transparent !important;
+    box-shadow: none !important;
+}
+/* Search icon - QLED red */
+.v-bottom-sheet__content:has(.location-search-custom-height.dashed-border) .search-icon-mobile {
+    filter: brightness(0) saturate(100%) invert(18%) sepia(88%) saturate(5427%) hue-rotate(352deg) brightness(91%) contrast(92%) !important;
+    opacity: 0.7 !important;
+}
+/* Back arrow icon - QLED red */
+.v-bottom-sheet__content:has(.location-search-custom-height.dashed-border) .v-icon {
+    color: #e31e24 !important;
+}
+/* Placeholder text */
+.v-bottom-sheet__content:has(.location-search-custom-height.dashed-border) input::placeholder {
+    color: rgba(0, 0, 0, 0.35) !important;
+    font-weight: 500 !important;
+}
+/* Input text */
+.v-bottom-sheet__content:has(.location-search-custom-height.dashed-border) input {
+    font-weight: 700 !important;
+    color: #1a1a1a !important;
+}
+/* 6. The "-או-" separator text */
+.v-bottom-sheet__content:has(.location-search-custom-height.dashed-border) p.tw-text-center.tw-my-4 {
+    color: #bbb !important;
+    font-weight: 600 !important;
+    font-size: 13px !important;
+    margin: 20px 0 !important;
+}
+/* 7. "סמן על המפה" button - Crystal QLED */
+.v-bottom-sheet__content:has(.location-search-custom-height.dashed-border) a.v-btn {
+    background: linear-gradient(135deg, #e31e24 0%, #b3161b 100%) !important;
+    color: #ffffff !important;
+    border-radius: 18px !important;
+    height: 58px !important;
+    font-size: 17px !important;
+    font-weight: 900 !important;
+    letter-spacing: 0.3px !important;
+    text-transform: none !important;
+    box-shadow: 0 10px 30px rgba(227, 30, 36, 0.3) !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    transition: all 0.3s ease !important;
+}
+.v-bottom-sheet__content:has(.location-search-custom-height.dashed-border) a.v-btn:active {
+    transform: scale(0.97) !important;
+    box-shadow: 0 4px 15px rgba(227, 30, 36, 0.2) !important;
+}
+/* Kill button overlays */
+.v-bottom-sheet__content:has(.location-search-custom-height.dashed-border) a.v-btn .v-btn__overlay,
+.v-bottom-sheet__content:has(.location-search-custom-height.dashed-border) a.v-btn .v-btn__underlay {
+    display: none !important;
+}
+
+/* =========================================================
+   חלק 28: דף הוספת/עריכת כתובת - LIQUID GLASS OVERHAUL
+   Scope: #locationConfirm, #addAddressForm, [data-v-d055d74b]
+   Date: 2026-03-14
+   ========================================================= */
+/* 1. כפתור "שמור כתובת" - שחור → אדום QLED */
+[data-v-d055d74b] button.tw-bg-black,
+[data-v-d055d74b] button[class*="tw-bg-black"],
+#addAddressForm ~ div button.v-btn {
+    background: linear-gradient(135deg, #e31e24 0%, #b3161b 100%) !important;
+    color: #ffffff !important;
+    border-radius: 18px !important;
+    height: 58px !important;
+    font-size: 17px !important;
+    font-weight: 900 !important;
+    box-shadow: 0 10px 30px rgba(227, 30, 36, 0.3) !important;
+    border: none !important;
+    text-transform: none !important;
+}
+[data-v-d055d74b] button.tw-bg-black:active,
+#addAddressForm ~ div button.v-btn:active {
+    transform: scale(0.97) !important;
+}
+/* 2. פוטר כפתור שמירה - Liquid Glass */
+[data-v-d055d74b].tw-absolute.tw-bottom-0.tw-bg-white {
+    background: rgba(255, 255, 255, 0.75) !important;
+    backdrop-filter: blur(30px) saturate(200%) !important;
+    -webkit-backdrop-filter: blur(30px) saturate(200%) !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.5) !important;
+    box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.06) !important;
+}
+/* 3. תרגום "SAVE ADDRESS AS" → "שמור כתובת כ:" */
+#AddressSelectType label[style*="font-family"] {
+    font-size: 0 !important;
+}
+#AddressSelectType label[style*="font-family"]::before {
+    content: "שמור כתובת כ:" !important;
+    font-size: 13px !important;
+    font-weight: 800 !important;
+    color: #e31e24 !important;
+    text-transform: none !important;
+    visibility: visible !important;
+}
+/* 4. שדות טופס - קפסולות Liquid Glass */
+#addAddressForm .v-field--variant-underlined,
+#locationConfirm .v-field--variant-underlined {
+    background: rgba(245, 245, 245, 0.6) !important;
+    border-radius: 16px !important;
+    padding: 12px 16px !important;
+    border: 1px solid transparent !important;
+    transition: all 0.3s ease !important;
+    margin-bottom: 8px !important;
+}
+#addAddressForm .v-field--focused.v-field--variant-underlined,
+#locationConfirm .v-field--focused.v-field--variant-underlined {
+    background: #ffffff !important;
+    border: 1px solid rgba(227, 30, 36, 0.3) !important;
+    box-shadow: 0 4px 15px rgba(227, 30, 36, 0.08) !important;
+}
+/* הסתרת קו תחתון של Vuetify */
+#addAddressForm .v-field__outline,
+#locationConfirm .v-field__outline {
+    display: none !important;
+}
+/* 5. צ'יפים (בית/משרד/אחרים) - אדום מותג */
+#AddressSelectType .v-chip.text-primary {
+    border-color: #e31e24 !important;
+    background-color: rgba(227, 30, 36, 0.05) !important;
+    color: #e31e24 !important;
+}
+#AddressSelectType .v-chip {
+    background: #ffffff !important;
+    border: 1.5px solid #e0e0e0 !important;
+    border-radius: 12px !important;
+    font-weight: 600 !important;
+    transition: all 0.2s ease !important;
+    margin-left: 8px !important;
+}
+#AddressSelectType .v-chip__overlay,
+#AddressSelectType .v-chip__underlay {
+    display: none !important;
+}
+/* 6. שדה טלפון - ריווח ותיקון */
+#addAddressForm #AddressInputContactPhoneNumber .v-field {
+    direction: ltr !important;
+    display: flex !important;
+    align-items: center !important;
+}
+#addAddressForm #AddressInputContactPhoneNumber input[type="tel"] {
+    direction: ltr !important;
+    text-align: left !important;
+    padding-left: 12px !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.5px !important;
+}
+#addAddressForm .tw-bg-\[\#ccc\] {
+    background-color: rgba(227, 30, 36, 0.3) !important;
+    height: 20px !important;
+}
+/* 7. בועת "הזז את הסיכה" - אדום מותג */
+#locationConfirm .tw-bg-\[\#212121\].tw-rounded-lg {
+    background: rgba(227, 30, 36, 0.9) !important;
+    backdrop-filter: blur(10px) !important;
+    -webkit-backdrop-filter: blur(10px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    border-radius: 12px !important;
+    box-shadow: 0 6px 20px rgba(227, 30, 36, 0.25) !important;
+}
+#locationConfirm .tw-border-t-\[\#212121\] {
+    border-top-color: rgba(227, 30, 36, 0.9) !important;
+}
+/* 8. כפתור "אתר אותי" */
+#locationConfirm #CurrentLocationButton {
+    background: rgba(255, 255, 255, 0.9) !important;
+    backdrop-filter: blur(15px) !important;
+    -webkit-backdrop-filter: blur(15px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.6) !important;
+    color: #e31e24 !important;
+    border-radius: 50px !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1) !important;
+}
+#locationConfirm #CurrentLocationButton .v-icon {
+    color: #e31e24 !important;
+}
+/* 9. הדר "עריכת פרטי כתובת / הוסף כתובת חדשה" */
+.tw-h-\[56px\].tw-bg-white {
+    background: rgba(255, 255, 255, 0.5) !important;
+    backdrop-filter: blur(35px) saturate(200%) !important;
+    -webkit-backdrop-filter: blur(35px) saturate(200%) !important;
+    border-bottom: 1.5px solid rgba(227, 30, 36, 0.1) !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04) !important;
+}
+/* כפתור חזור באדום */
+.tw-h-\[56px\] img[alt="Back"] {
+    filter: brightness(0) saturate(100%) invert(18%) sepia(88%) saturate(5427%) hue-rotate(352deg) brightness(91%) contrast(92%) !important;
+}
+/* 10. רקע הטופס - Liquid Glass */
+#locationConfirm {
+    background: transparent !important;
+}
+.tw-flex-shrink-0.tw-z-10.tw-bg-white {
+    background: rgba(255, 255, 255, 0.5) !important;
+    backdrop-filter: blur(30px) saturate(180%) !important;
+    -webkit-backdrop-filter: blur(30px) saturate(180%) !important;
+}
+/* 11. אזור פרטי הכתובת (שם רחוב + עיר) */
+#locationConfirm .tw-px-4.tw-pt-3.tw-pb-3 {
+    background: rgba(255, 255, 255, 0.5) !important;
+    backdrop-filter: blur(15px) !important;
+    -webkit-backdrop-filter: blur(15px) !important;
+    border-radius: 20px !important;
+    margin: 10px 16px !important;
+    border: 1px solid rgba(0, 0, 0, 0.04) !important;
+}
+/* אייקון מיקום ליד שם הרחוב - אדום */
+#locationConfirm h2 img {
+    filter: brightness(0) saturate(100%) invert(18%) sepia(88%) saturate(5427%) hue-rotate(352deg) brightness(91%) contrast(92%) !important;
+}
+/* 12. פס "עיגול" למעלה (drag handle) */
+#locationConfirm .tw-bg-\[\#e5e5e5\] {
+    background: rgba(227, 30, 36, 0.2) !important;
+    width: 50px !important;
+    border-radius: 20px !important;
+}
+/* 13. ניקוי שכבות מערכת */
+#addAddressForm .v-field__overlay,
+#addAddressForm .v-btn__overlay,
+#addAddressForm .v-btn__underlay,
+#locationConfirm .v-btn__overlay,
+#locationConfirm .v-btn__underlay,
+#locationConfirm .v-card__underlay {
+    display: none !important;
+}
+
+/* =========================================================
+   חלק 26: דף "צור קשר" - LIQUID GLASS PREMIUM
+   תאריך: 26.04.2026 | Scope: .mh-contact-wrapper
+   ========================================================= */
+
+/* 1. מכולת הדף הראשית */
+html body .mh-contact-wrapper {
+    direction: rtl !important;
+    font-family: 'Heebo', 'Inter', -apple-system, sans-serif !important;
+    padding: 20px 14px 50px 14px !important;
+    background: linear-gradient(180deg, #fff5f5 0%, #ffffff 50%, #fff5f5 100%) !important;
+    border-radius: 24px !important;
+    position: relative !important;
+    overflow: hidden !important;
+    max-width: 600px !important;
+    margin: 0 auto !important;
+}
+
+/* 2. כדורי אור אדומים מטושטשים ברקע */
+html body .mh-contact-wrapper::before {
+    content: '' !important;
+    position: absolute !important;
+    top: -80px !important;
+    right: -60px !important;
+    width: 240px !important;
+    height: 240px !important;
+    background: radial-gradient(circle, rgba(227, 30, 36, 0.18) 0%, transparent 70%) !important;
+    border-radius: 50% !important;
+    filter: blur(40px) !important;
+    z-index: 0 !important;
+    pointer-events: none !important;
+}
+
+html body .mh-contact-wrapper::after {
+    content: '' !important;
+    position: absolute !important;
+    bottom: 80px !important;
+    left: -80px !important;
+    width: 280px !important;
+    height: 280px !important;
+    background: radial-gradient(circle, rgba(227, 30, 36, 0.12) 0%, transparent 70%) !important;
+    border-radius: 50% !important;
+    filter: blur(50px) !important;
+    z-index: 0 !important;
+    pointer-events: none !important;
+}
+
+html body .mh-contact-wrapper > * {
+    position: relative !important;
+    z-index: 1 !important;
+}
+
+/* 3. כרטיס Hero עליון */
+html body .mh-contact-hero {
+    text-align: center !important;
+    padding: 32px 22px !important;
+    background: rgba(255, 255, 255, 0.7) !important;
+    backdrop-filter: blur(40px) saturate(200%) !important;
+    -webkit-backdrop-filter: blur(40px) saturate(200%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.8) !important;
+    border-radius: 28px !important;
+    box-shadow: 0 15px 40px rgba(227, 30, 36, 0.08) !important;
+    margin-bottom: 24px !important;
+}
+
+html body .mh-contact-icon {
+    width: 70px !important;
+    height: 70px !important;
+    margin: 0 auto 16px auto !important;
+    background: linear-gradient(135deg, #e31e24 0%, #b3161b 100%) !important;
+    border-radius: 20px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 36px !important;
+    box-shadow: 0 10px 25px rgba(227, 30, 36, 0.4) !important;
+    animation: mh-pulse 2.5s ease-in-out infinite !important;
+}
+
+@keyframes mh-pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.06); }
+}
+
+html body .mh-contact-hero h1 {
+    font-size: 26px !important;
+    font-weight: 900 !important;
+    color: #1a1a1a !important;
+    margin: 0 0 10px 0 !important;
+    letter-spacing: -0.5px !important;
+    line-height: 1.2 !important;
+}
+
+html body .mh-contact-hero p {
+    font-size: 14px !important;
+    line-height: 1.6 !important;
+    color: #555 !important;
+    margin: 0 !important;
+    font-weight: 500 !important;
+}
+
+/* 4. כותרת הפרדה */
+html body .mh-contact-divider {
+    text-align: center !important;
+    font-size: 16px !important;
+    font-weight: 800 !important;
+    color: #1a1a1a !important;
+    margin: 28px 0 18px 0 !important;
+    position: relative !important;
+}
+
+html body .mh-contact-divider::before,
+html body .mh-contact-divider::after {
+    content: '—' !important;
+    color: rgba(227, 30, 36, 0.4) !important;
+    margin: 0 12px !important;
+    font-weight: 400 !important;
+}
+
+/* 5. כרטיסי פעולה (וואטסאפ/מייל/טלפון) */
+html body .mh-contact-card {
+    display: flex !important;
+    align-items: center !important;
+    gap: 14px !important;
+    padding: 18px !important;
+    background: rgba(255, 255, 255, 0.85) !important;
+    backdrop-filter: blur(25px) saturate(180%) !important;
+    -webkit-backdrop-filter: blur(25px) saturate(180%) !important;
+    border: 1px solid rgba(227, 30, 36, 0.15) !important;
+    border-radius: 22px !important;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.05) !important;
+    text-decoration: none !important;
+    color: inherit !important;
+    margin-bottom: 12px !important;
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+    position: relative !important;
+    overflow: hidden !important;
+}
+
+html body .mh-contact-card:active {
+    transform: scale(0.97) !important;
+    background: rgba(255, 255, 255, 1) !important;
+    border-color: rgba(227, 30, 36, 0.35) !important;
+    box-shadow: 0 12px 30px rgba(227, 30, 36, 0.12) !important;
+}
+
+/* 6. אייקון בכרטיס */
+html body .mh-contact-card .mh-card-icon {
+    flex-shrink: 0 !important;
+    width: 50px !important;
+    height: 50px !important;
+    border-radius: 14px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 26px !important;
+    color: #ffffff !important;
+}
+
+/* צבעים שונים לכל כרטיס */
+html body .mh-card-whatsapp .mh-card-icon {
+    background: linear-gradient(135deg, #25D366 0%, #128C7E 100%) !important;
+    box-shadow: 0 6px 15px rgba(37, 211, 102, 0.35) !important;
+}
+
+html body .mh-card-email .mh-card-icon {
+    background: linear-gradient(135deg, #e31e24 0%, #b3161b 100%) !important;
+    box-shadow: 0 6px 15px rgba(227, 30, 36, 0.35) !important;
+}
+
+html body .mh-card-phone .mh-card-icon {
+    background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%) !important;
+    box-shadow: 0 6px 15px rgba(59, 130, 246, 0.35) !important;
+}
+
+/* 7. טקסט בכרטיס */
+html body .mh-contact-card .mh-card-text {
+    flex: 1 !important;
+    min-width: 0 !important;
+}
+
+html body .mh-contact-card .mh-card-label {
+    font-size: 11px !important;
+    font-weight: 700 !important;
+    color: #e31e24 !important;
+    margin-bottom: 4px !important;
+    letter-spacing: 0.3px !important;
+}
+
+html body .mh-contact-card .mh-card-value {
+    font-size: 16px !important;
+    font-weight: 800 !important;
+    color: #1a1a1a !important;
+    line-height: 1.3 !important;
+}
+
+html body .mh-contact-card .mh-email-value {
+    font-size: 13px !important;
+    direction: ltr !important;
+    text-align: right !important;
+    word-break: break-all !important;
+}
+
+/* 8. חץ */
+html body .mh-contact-card .mh-card-arrow {
+    flex-shrink: 0 !important;
+    font-size: 24px !important;
+    color: #e31e24 !important;
+    font-weight: 900 !important;
+    line-height: 1 !important;
+}
+
+/* 9. כרטיס שעות פעילות */
+html body .mh-hours-card {
+    background: rgba(255, 255, 255, 0.7) !important;
+    backdrop-filter: blur(35px) saturate(180%) !important;
+    -webkit-backdrop-filter: blur(35px) saturate(180%) !important;
+    border: 1px solid rgba(227, 30, 36, 0.15) !important;
+    border-radius: 24px !important;
+    padding: 22px !important;
+    margin-top: 24px !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05) !important;
+}
+
+html body .mh-hours-header {
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+    margin-bottom: 16px !important;
+    padding-bottom: 14px !important;
+    border-bottom: 1px solid rgba(227, 30, 36, 0.12) !important;
+}
+
+html body .mh-hours-icon {
+    width: 38px !important;
+    height: 38px !important;
+    border-radius: 12px !important;
+    background: rgba(227, 30, 36, 0.12) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 20px !important;
+    flex-shrink: 0 !important;
+}
+
+html body .mh-hours-title {
+    font-size: 15px !important;
+    font-weight: 900 !important;
+    color: #1a1a1a !important;
+}
+
+html body .mh-hour-row {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    padding: 12px 14px !important;
+    background: rgba(255, 245, 245, 0.6) !important;
+    border: 1px solid rgba(227, 30, 36, 0.08) !important;
+    border-radius: 14px !important;
+    margin-bottom: 8px !important;
+}
+
+html body .mh-hour-row:last-child {
+    margin-bottom: 0 !important;
+}
+
+html body .mh-hour-day {
+    font-size: 13px !important;
+    font-weight: 700 !important;
+    color: #444 !important;
+}
+
+html body .mh-hour-time {
+    font-size: 14px !important;
+    font-weight: 800 !important;
+    color: #e31e24 !important;
+    direction: ltr !important;
+}
+
+/* 10. הודעת סיום */
+html body .mh-footer-msg {
+    text-align: center !important;
+    margin-top: 24px !important;
+    padding: 18px !important;
+    background: linear-gradient(135deg, rgba(227, 30, 36, 0.08) 0%, rgba(227, 30, 36, 0.03) 100%) !important;
+    border: 1px dashed rgba(227, 30, 36, 0.3) !important;
+    border-radius: 18px !important;
+    font-size: 14px !important;
+    font-weight: 700 !important;
+    color: #1a1a1a !important;
+}
+
+
+/* =========================================================
+   חלק 26.1: סמליל וואטסאפ רשמי - FIXED
+   תאריך: 27.04.2026
+   ========================================================= */
+
+/* כפיית הרקע הירוק + הסמליל הלבן יחד - גוברת על כל הקודם */
+html body .mh-contact-wrapper a.mh-card-whatsapp .mh-card-icon.mh-icon-whatsapp,
+html body .mh-contact-wrapper .mh-card-whatsapp .mh-icon-whatsapp {
+    background-color: transparent !important;
+    background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23ffffff'%3E%3Cpath d='M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z'/%3E%3C/svg%3E"), linear-gradient(135deg, #25D366 0%, #128C7E 100%) !important;
+    background-repeat: no-repeat, no-repeat !important;
+    background-position: center center, center center !important;
+    background-size: 30px 30px, 100% 100% !important;
+    box-shadow: 0 6px 15px rgba(37, 211, 102, 0.35) !important;
+    font-size: 0 !important;
+    color: transparent !important;
+    text-indent: -9999px !important;
+}
+
+/* =========================================================
+   חלק 30: עגלה רב-ספקית (Multi-Vendor Cart Modal) - LIQUID GLASS
+   תאריך: 27.04.2026
+   Scope: .v-overlay__content.v-bottom-sheet__content:has(.v-card.tw-pt-0.tw-border-none)
+   הערה: סלקטור ייחודי כדי לא לזלוג למודאלים אחרים של Vuetify
+   ========================================================= */
+
+/* 1. המכולה החיצונית - מרכוז ורוחב מובייל */
+html body .v-overlay__content.v-bottom-sheet__content:has(.v-card.tw-pt-0.tw-border-none .tw-w-full.tw-p-4.tw-rounded-lg.tw-border) {
+    left: 0 !important;
+    right: 0 !important;
+    margin: 0 auto !important;
+    max-width: 500px !important;
+}
+
+/* 2. הכרטיס הראשי - Liquid Glass עליון */
+html body .v-overlay__content.v-bottom-sheet__content:has(.v-card.tw-pt-0.tw-border-none .tw-w-full.tw-p-4.tw-rounded-lg.tw-border) > .v-card {
+    background: rgba(255, 255, 255, 0.85) !important;
+    backdrop-filter: blur(45px) saturate(210%) !important;
+    -webkit-backdrop-filter: blur(45px) saturate(210%) !important;
+    border-radius: 32px 32px 0 0 !important;
+    border: none !important;
+    border-top: 1.5px solid rgba(255, 255, 255, 0.7) !important;
+    box-shadow: 0 -20px 60px rgba(0, 0, 0, 0.12) !important;
+    overflow: hidden !important;
+}
+
+/* 3. ניקוי שכבות underlay של ה-card */
+html body .v-overlay__content.v-bottom-sheet__content:has(.v-card.tw-pt-0.tw-border-none .tw-w-full.tw-p-4.tw-rounded-lg.tw-border) > .v-card > .v-card__underlay,
+html body .v-overlay__content.v-bottom-sheet__content:has(.v-card.tw-pt-0.tw-border-none .tw-w-full.tw-p-4.tw-rounded-lg.tw-border) > .v-card > .v-card__loader {
+    display: none !important;
+}
+
+/* 4. כותרת "עגלה" */
+html body .v-overlay__content.v-bottom-sheet__content:has(.v-card.tw-pt-0.tw-border-none .tw-w-full.tw-p-4.tw-rounded-lg.tw-border) .v-card-title {
+    font-size: 19px !important;
+    font-weight: 900 !important;
+    color: #e31e24 !important;
+    padding: 20px 16px !important;
+    letter-spacing: -0.3px !important;
+}
+
+/* 5. כפתור X - אדום מותג בעיגול עדין */
+html body .v-overlay__content.v-bottom-sheet__content:has(.v-card.tw-pt-0.tw-border-none .tw-w-full.tw-p-4.tw-rounded-lg.tw-border) .v-card-title button.v-btn--icon {
+    background: rgba(255, 255, 255, 0.9) !important;
+    border: 1px solid rgba(227, 30, 36, 0.15) !important;
+    border-radius: 50% !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06) !important;
+    width: 36px !important;
+    height: 36px !important;
+    transition: all 0.2s ease !important;
+}
+
+html body .v-overlay__content.v-bottom-sheet__content:has(.v-card.tw-pt-0.tw-border-none .tw-w-full.tw-p-4.tw-rounded-lg.tw-border) .v-card-title button.v-btn--icon:active {
+    transform: translateY(-50%) scale(0.9) !important;
+    background: rgba(227, 30, 36, 0.08) !important;
+}
+
+/* צביעת ה-X באדום */
+html body .v-overlay__content.v-bottom-sheet__content:has(.v-card.tw-pt-0.tw-border-none .tw-w-full.tw-p-4.tw-rounded-lg.tw-border) .v-card-title button.v-btn--icon svg path {
+    fill: #e31e24 !important;
+}
+
+/* 6. הסתרת קו ההפרדה */
+html body .v-overlay__content.v-bottom-sheet__content:has(.v-card.tw-pt-0.tw-border-none .tw-w-full.tw-p-4.tw-rounded-lg.tw-border) > .v-card > hr.v-divider {
+    display: none !important;
+}
+
+/* 7. רקע האזור הפנימי */
+html body .v-overlay__content.v-bottom-sheet__content:has(.v-card.tw-pt-0.tw-border-none .tw-w-full.tw-p-4.tw-rounded-lg.tw-border) .v-card-text {
+    background: transparent !important;
+}
+
+/* 8. כרטיס חנות בודדת - Liquid Glass Tile */
+html body .v-overlay__content.v-bottom-sheet__content:has(.v-card.tw-pt-0.tw-border-none .tw-w-full.tw-p-4.tw-rounded-lg.tw-border) .tw-w-full.tw-p-4.tw-rounded-lg.tw-border.tw-bg-white {
+    background: rgba(255, 255, 255, 0.7) !important;
+    backdrop-filter: blur(30px) saturate(180%) !important;
+    -webkit-backdrop-filter: blur(30px) saturate(180%) !important;
+    border: 1px solid rgba(227, 30, 36, 0.12) !important;
+    border-radius: 22px !important;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.05) !important;
+    padding: 18px !important;
+    margin-bottom: 14px !important;
+    transition: all 0.3s ease !important;
+}
+
+html body .v-overlay__content.v-bottom-sheet__content:has(.v-card.tw-pt-0.tw-border-none .tw-w-full.tw-p-4.tw-rounded-lg.tw-border) .tw-w-full.tw-p-4.tw-rounded-lg.tw-border.tw-bg-white:active {
+    transform: scale(0.99) !important;
+    background: rgba(255, 255, 255, 0.95) !important;
+}
+
+/* 9. תמונת החנות - פינות מעוגלות יותר */
+html body .v-overlay__content.v-bottom-sheet__content:has(.v-card.tw-pt-0.tw-border-none .tw-w-full.tw-p-4.tw-rounded-lg.tw-border) .v-img.tw-rounded-lg {
+    border-radius: 14px !important;
+    overflow: hidden !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
+}
+
+/* 10. שם החנות */
+html body .v-overlay__content.v-bottom-sheet__content:has(.v-card.tw-pt-0.tw-border-none .tw-w-full.tw-p-4.tw-rounded-lg.tw-border) .tw-w-full.tw-p-4.tw-rounded-lg.tw-border.tw-bg-white h2 {
+    color: #1a1a1a !important;
+    font-weight: 900 !important;
+    font-size: 16px !important;
+    margin-bottom: 4px !important;
+}
+
+/* 11. פרטי הכמות והמחיר */
+html body .v-overlay__content.v-bottom-sheet__content:has(.v-card.tw-pt-0.tw-border-none .tw-w-full.tw-p-4.tw-rounded-lg.tw-border) .tw-w-full.tw-p-4.tw-rounded-lg.tw-border.tw-bg-white .tw-text-gray-500 {
+    color: #e31e24 !important;
+    font-weight: 700 !important;
+    font-size: 13px !important;
+    opacity: 0.85 !important;
+}
+
+/* 12. כפתור 3 נקודות (תפריט) - עיגול עדין */
+html body .v-overlay__content.v-bottom-sheet__content:has(.v-card.tw-pt-0.tw-border-none .tw-w-full.tw-p-4.tw-rounded-lg.tw-border) .tw-w-full.tw-p-4.tw-rounded-lg.tw-border.tw-bg-white button.v-btn--icon {
+    background: rgba(0, 0, 0, 0.04) !important;
+    border-radius: 50% !important;
+    width: 36px !important;
+    height: 36px !important;
+    transition: all 0.2s ease !important;
+}
+
+html body .v-overlay__content.v-bottom-sheet__content:has(.v-card.tw-pt-0.tw-border-none .tw-w-full.tw-p-4.tw-rounded-lg.tw-border) .tw-w-full.tw-p-4.tw-rounded-lg.tw-border.tw-bg-white button.v-btn--icon:active {
+    background: rgba(227, 30, 36, 0.1) !important;
+    transform: scale(0.9) !important;
+}
+
+html body .v-overlay__content.v-bottom-sheet__content:has(.v-card.tw-pt-0.tw-border-none .tw-w-full.tw-p-4.tw-rounded-lg.tw-border) .tw-w-full.tw-p-4.tw-rounded-lg.tw-border.tw-bg-white button.v-btn--icon svg path {
+    fill: #e31e24 !important;
+}
+
+/* 13. כפתור "צפה בחנות" - זכוכית משנית */
+html body .v-overlay__content.v-bottom-sheet__content:has(.v-card.tw-pt-0.tw-border-none .tw-w-full.tw-p-4.tw-rounded-lg.tw-border) button.v-btn[style*="background-color: rgb(243, 243, 244)"] {
+    background: rgba(255, 255, 255, 0.7) !important;
+    background-color: rgba(255, 255, 255, 0.7) !important;
+    backdrop-filter: blur(15px) !important;
+    -webkit-backdrop-filter: blur(15px) !important;
+    border: 1.5px solid rgba(227, 30, 36, 0.25) !important;
+    color: #e31e24 !important;
+    border-radius: 14px !important;
+    font-weight: 800 !important;
+    font-size: 14px !important;
+    height: 48px !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04) !important;
+    transition: all 0.3s ease !important;
+}
+
+html body .v-overlay__content.v-bottom-sheet__content:has(.v-card.tw-pt-0.tw-border-none .tw-w-full.tw-p-4.tw-rounded-lg.tw-border) button.v-btn[style*="background-color: rgb(243, 243, 244)"] .v-btn__content {
+    color: #e31e24 !important;
+    font-weight: 800 !important;
+}
+
+html body .v-overlay__content.v-bottom-sheet__content:has(.v-card.tw-pt-0.tw-border-none .tw-w-full.tw-p-4.tw-rounded-lg.tw-border) button.v-btn[style*="background-color: rgb(243, 243, 244)"]:active {
+    transform: scale(0.97) !important;
+    background: rgba(227, 30, 36, 0.05) !important;
+}
+
+/* 14. כפתור "המשך לתשלום" - אדום QLED מלא */
+html body .v-overlay__content.v-bottom-sheet__content:has(.v-card.tw-pt-0.tw-border-none .tw-w-full.tw-p-4.tw-rounded-lg.tw-border) button.v-btn[style*="background-color: rgb(0, 0, 0)"] {
+    background: linear-gradient(135deg, #e31e24 0%, #b3161b 100%) !important;
+    background-color: #e31e24 !important;
+    color: #ffffff !important;
+    border-radius: 14px !important;
+    font-weight: 900 !important;
+    font-size: 14px !important;
+    height: 48px !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    box-shadow: 0 8px 20px rgba(227, 30, 36, 0.3) !important;
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+}
+
+html body .v-overlay__content.v-bottom-sheet__content:has(.v-card.tw-pt-0.tw-border-none .tw-w-full.tw-p-4.tw-rounded-lg.tw-border) button.v-btn[style*="background-color: rgb(0, 0, 0)"] .v-btn__content {
+    color: #ffffff !important;
+    font-weight: 900 !important;
+}
+
+html body .v-overlay__content.v-bottom-sheet__content:has(.v-card.tw-pt-0.tw-border-none .tw-w-full.tw-p-4.tw-rounded-lg.tw-border) button.v-btn[style*="background-color: rgb(0, 0, 0)"]:active {
+    transform: scale(0.97) !important;
+    box-shadow: 0 4px 12px rgba(227, 30, 36, 0.4) !important;
+}
+
+/* 15. ניקוי overlays של Vuetify בכפתורים */
+html body .v-overlay__content.v-bottom-sheet__content:has(.v-card.tw-pt-0.tw-border-none .tw-w-full.tw-p-4.tw-rounded-lg.tw-border) button.v-btn .v-btn__overlay,
+html body .v-overlay__content.v-bottom-sheet__content:has(.v-card.tw-pt-0.tw-border-none .tw-w-full.tw-p-4.tw-rounded-lg.tw-border) button.v-btn .v-btn__underlay {
+    display: none !important;
+}
+
+/* =========================================================
+   חלק 29: דף הוספת/עריכת כתובת - LIQUID GLASS V2
+   תאריך: 2026-04-27 (גרסה מתוקנת)
+   Scope: .v-bottom-sheet__content:has(#addAddressForm)
+   הסקופ הזה ייחודי לחלוטין לפופאפ הזה (1 התאמה בלבד באתר)
+
+   חלק זה מטפל ב:
+   1. רקע מגניב במקום אפור משעמם
+   2. כפתור "שמור כתובת" - אדום מותגי + מרכוז
+   3. ביטול הפס האפור המציק בין שדה החיפוש לטופס
+   ========================================================= */
+
+/* 1. הכרטיס הראשי של הפופאפ - רקע גרדיאנט עדין במקום לבן אטום */
+.v-bottom-sheet__content:has(#addAddressForm) > .v-card {
+    background: linear-gradient(180deg, #ffffff 0%, #fefafa 50%, #fff5f5 100%) !important;
+    background-color: transparent !important;
+}
+
+/* 2. ביטול שכבת underlay של הכרטיס */
+.v-bottom-sheet__content:has(#addAddressForm) > .v-card > .v-card__underlay,
+.v-bottom-sheet__content:has(#addAddressForm) > .v-card > .v-card__loader {
+    display: none !important;
+}
+
+/* 3. אזור התוכן הפנימי (v-card-text) - הפיכה לשקוף */
+.v-bottom-sheet__content:has(#addAddressForm) .v-card-text {
+    background: transparent !important;
+    background-color: transparent !important;
+}
+
+/* 4. ביטול רקע אפור של מכולת הטופס + כל המכולות הפנימיות */
+.v-bottom-sheet__content:has(#addAddressForm) .tw-px-4.tw-pt-3.tw-pb-3,
+.v-bottom-sheet__content:has(#addAddressForm) .tw-flex.tw-flex-col.tw-items-center.tw-justify-center,
+.v-bottom-sheet__content:has(#addAddressForm) #locationConfirm {
+    background: transparent !important;
+    background-color: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+
+/* 5. הפס האפור מתחת לשדה החיפוש - הסתרה אגרסיבית */
+.v-bottom-sheet__content:has(#addAddressForm) .tw-bg-white,
+.v-bottom-sheet__content:has(#addAddressForm) .tw-bg-\[\#f7f7f7\],
+.v-bottom-sheet__content:has(#addAddressForm) .tw-bg-\[\#f5f5f5\],
+.v-bottom-sheet__content:has(#addAddressForm) .tw-bg-gray-100,
+.v-bottom-sheet__content:has(#addAddressForm) .tw-bg-gray-50 {
+    background-color: transparent !important;
+}
+
+/* 6. פוטר כפתור השמירה - Liquid Glass במקום לבן אטום */
+.v-bottom-sheet__content:has(#addAddressForm) .tw-absolute.tw-bottom-0 {
+    background: rgba(255, 255, 255, 0.85) !important;
+    background-color: rgba(255, 255, 255, 0.85) !important;
+    backdrop-filter: blur(30px) saturate(200%) !important;
+    -webkit-backdrop-filter: blur(30px) saturate(200%) !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.6) !important;
+    box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.06) !important;
+    padding: 16px 20px 24px 20px !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    left: 0 !important;
+    right: 0 !important;
+    margin: 0 auto !important;
+    width: 100% !important;
+}
+
+/* 7. כפתור "שמור כתובת" - אדום מותגי + מרכוז + רוחב מלא */
+.v-bottom-sheet__content:has(#addAddressForm) .tw-absolute.tw-bottom-0 button.v-btn,
+.v-bottom-sheet__content:has(#addAddressForm) .tw-absolute.tw-bottom-0 .v-btn {
+    background: linear-gradient(135deg, #e31e24 0%, #b3161b 100%) !important;
+    background-color: #e31e24 !important;
+    color: #ffffff !important;
+    border-radius: 18px !important;
+    height: 58px !important;
+    width: 100% !important;
+    max-width: 460px !important;
+    margin: 0 auto !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    box-shadow: 0 10px 30px rgba(227, 30, 36, 0.3) !important;
+    text-transform: none !important;
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+}
+
+/* 8. טקסט הכפתור - לבן ובולט */
+.v-bottom-sheet__content:has(#addAddressForm) .tw-absolute.tw-bottom-0 button .v-btn__content,
+.v-bottom-sheet__content:has(#addAddressForm) .tw-absolute.tw-bottom-0 button span {
+    color: #ffffff !important;
+    font-size: 18px !important;
+    font-weight: 900 !important;
+    letter-spacing: 0.5px !important;
+}
+
+/* 9. אפקט לחיצה טקטילי */
+.v-bottom-sheet__content:has(#addAddressForm) .tw-absolute.tw-bottom-0 button.v-btn:active {
+    transform: scale(0.97) !important;
+    box-shadow: 0 4px 15px rgba(227, 30, 36, 0.2) !important;
+}
+
+/* 10. ניקוי שכבות overlay של Vuetify בכפתור */
+.v-bottom-sheet__content:has(#addAddressForm) .tw-absolute.tw-bottom-0 button .v-btn__overlay,
+.v-bottom-sheet__content:has(#addAddressForm) .tw-absolute.tw-bottom-0 button .v-btn__underlay {
+    display: none !important;
+}
+
+/* =========================================================
+   חלק 29.1: שיפורי טופס כתובת - כפתורים, טלפון, מדינה
+   תאריך: 2026-04-27
+   Scope: .v-bottom-sheet__content:has(#addAddressForm)
+
+   טיפול ב:
+   1. כפתורי "בית/משרד/אחרים" - הוצאה מ-slider לפריסת flex רגילה
+   2. עיצוב פרימיום לכפתורים האלה
+   3. הסתרת שדה "מדינה" לחלוטין (JS ממלא Israel אוטומטית)
+   4. תיקון דגל ישראל בשדה הטלפון
+   ========================================================= */
+
+/* === 1. הסתרת שדה "מדינה" לחלוטין === */
+.v-bottom-sheet__content:has(#addAddressForm) #AddressInputAddressCountry,
+.v-bottom-sheet__content:has(#addAddressForm) .v-input:has(#country),
+.v-bottom-sheet__content:has(#addAddressForm) #country-label,
+.v-bottom-sheet__content:has(#addAddressForm) #country-messages {
+    display: none !important;
+    visibility: hidden !important;
+    height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+}
+
+/* === 2. כפתורי "בית/משרד/אחרים" - שחרור מה-slider === */
+
+/* המכולה החיצונית של ה-slider - הסרת ה-overflow שגורם לחיתוך */
+.v-bottom-sheet__content:has(#addAddressForm) #AddressSelectType .v-slide-group,
+.v-bottom-sheet__content:has(#addAddressForm) #AddressSelectType .v-slide-group__container {
+    overflow: visible !important;
+    contain: none !important;
+}
+
+/* התוכן של ה-slider - הפיכה ל-flex רגיל עם wrap */
+.v-bottom-sheet__content:has(#addAddressForm) #AddressSelectType .v-slide-group__content {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    justify-content: center !important;
+    gap: 10px !important;
+    transform: none !important;
+    width: 100% !important;
+    padding: 8px 16px !important;
+}
+
+/* הסתרת חיצי הניווט של ה-slider (אם יש) */
+.v-bottom-sheet__content:has(#addAddressForm) #AddressSelectType .v-slide-group__prev,
+.v-bottom-sheet__content:has(#addAddressForm) #AddressSelectType .v-slide-group__next {
+    display: none !important;
+}
+
+/* === 3. עיצוב הכפתורים עצמם (chips) === */
+.v-bottom-sheet__content:has(#addAddressForm) #AddressSelectType .v-chip {
+    background: rgba(255, 255, 255, 0.85) !important;
+    backdrop-filter: blur(10px) !important;
+    -webkit-backdrop-filter: blur(10px) !important;
+    border: 1.5px solid rgba(227, 30, 36, 0.2) !important;
+    border-radius: 14px !important;
+    padding: 8px 16px !important;
+    height: 42px !important;
+    margin: 0 !important;
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04) !important;
+    cursor: pointer !important;
+    opacity: 1 !important;
+}
+
+/* טקסט הכפתור */
+.v-bottom-sheet__content:has(#addAddressForm) #AddressSelectType .v-chip span.tw-font-semibold {
+    color: #1a1a1a !important;
+    font-weight: 800 !important;
+    font-size: 14px !important;
+}
+
+/* אייקון הכפתור */
+.v-bottom-sheet__content:has(#addAddressForm) #AddressSelectType .v-chip .v-img__img {
+    filter: brightness(0) saturate(100%) invert(18%) sepia(88%) saturate(5427%) hue-rotate(352deg) brightness(91%) contrast(92%) !important;
+    opacity: 0.7 !important;
+}
+
+/* כפתור פעיל - אדום מותגי */
+.v-bottom-sheet__content:has(#addAddressForm) #AddressSelectType .v-chip.text-primary,
+.v-bottom-sheet__content:has(#addAddressForm) #AddressSelectType .v-chip[aria-selected="true"] {
+    background: linear-gradient(135deg, rgba(227, 30, 36, 0.08) 0%, rgba(227, 30, 36, 0.03) 100%) !important;
+    border-color: #e31e24 !important;
+    box-shadow: 0 6px 18px rgba(227, 30, 36, 0.15) !important;
+    transform: translateY(-2px) !important;
+}
+
+.v-bottom-sheet__content:has(#addAddressForm) #AddressSelectType .v-chip.text-primary span,
+.v-bottom-sheet__content:has(#addAddressForm) #AddressSelectType .v-chip[aria-selected="true"] span {
+    color: #e31e24 !important;
+}
+
+.v-bottom-sheet__content:has(#addAddressForm) #AddressSelectType .v-chip.text-primary .v-img__img,
+.v-bottom-sheet__content:has(#addAddressForm) #AddressSelectType .v-chip[aria-selected="true"] .v-img__img {
+    opacity: 1 !important;
+}
+
+/* אפקט לחיצה */
+.v-bottom-sheet__content:has(#addAddressForm) #AddressSelectType .v-chip:active {
+    transform: scale(0.95) !important;
+}
+
+/* ניקוי שכבות overlay */
+.v-bottom-sheet__content:has(#addAddressForm) #AddressSelectType .v-chip__overlay,
+.v-bottom-sheet__content:has(#addAddressForm) #AddressSelectType .v-chip__underlay {
+    display: none !important;
+}
+
+/* ביטול ה-disabled וה-opacity-50 שמאפסים את הכפתור הראשון */
+.v-bottom-sheet__content:has(#addAddressForm) #AddressSelectType .v-chip.v-chip--disabled,
+.v-bottom-sheet__content:has(#addAddressForm) #AddressSelectType .v-chip.tw-opacity-50 {
+    opacity: 1 !important;
+    pointer-events: auto !important;
+    cursor: pointer !important;
+}
+
+/* === 4. תיקון דגל ישראל בשדה הטלפון === */
+
+/* הגדלה ויישור של הדגל */
+.v-bottom-sheet__content:has(#addAddressForm) #AddressInputContactPhoneNumber .v-img,
+.v-bottom-sheet__content:has(#addAddressForm) #AddressInputContactPhoneNumber img[alt*="flag"],
+.v-bottom-sheet__content:has(#addAddressForm) #AddressInputContactPhoneNumber img[src*="flag"] {
+    width: 28px !important;
+    height: 20px !important;
+    min-width: 28px !important;
+    border-radius: 4px !important;
+    object-fit: cover !important;
+    transform: none !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* תיקון מכולת הדגל */
+.v-bottom-sheet__content:has(#addAddressForm) #AddressInputContactPhoneNumber .v-field__prepend-inner {
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+}
+
+/* =========================================================
+   חלק 31: תיקון תוצאות חיפוש כתובת - HEIGHT FIX
+   תאריך: 2026-04-28 | עודכן: 2026-04-28 (הרחבת סקופ)
+   Scope: .search-results (גלובלי)
+
+   הבעיה: הייפרזוד מציבים top:Xpx; bottom:0px; כ-inline style
+   על אלמנט תוצאות החיפוש, אבל בלי height מפורש האלמנט מתכווץ
+   ל-16px בלבד ומסתיר את התוצאות.
+
+   הופיע בשני מסכים: "בחירת מיקום" (#mobileLocationSearch)
+   ו-"הוספת כתובת חדשה" (אין מכולה עם ID).
+
+   הפתרון: כפיית גובה אוטומטי על כל מופע של .search-results.
+   הסקופ בטוח כי .search-results הוא class ייחודי לפופאפ
+   תוצאות החיפוש בלבד (1 התאמה במסך).
+   ========================================================= */
+
+html body .search-results {
+    height: auto !important;
+    min-height: calc(100vh - 250px) !important;
+    max-height: calc(100vh - 100px) !important;
+}
+
+/* =========================================================
+   חלק 31.1: תוצאות חיפוש כתובת - שינוי מיקום ועיצוב Liquid Glass
+   תאריך: 2026-04-28
+   Scope: .search-results
+
+   הבעיה: הייפרזוד מציבים position:fixed עם top לא מדויק על
+   אלמנט תוצאות החיפוש. במסך "בחירת מיקום" זה גורם לתוצאות
+   להופיע באמצע המסך עם פער ריק מעליהן, ובמסך "הוספת כתובת"
+   זה גורם להן לחפוף עם המפה.
+
+   הפתרון: שבירת position:fixed והפיכת האלמנט לדרופדאון רגיל
+   מתחת לשדה החיפוש, עם עיצוב Liquid Glass + Red & White.
+
+   הערה: סקריפט זה דוחה את חלק 31 (height fix) שלא רלוונטי
+   יותר כי האלמנט כבר לא fixed.
+   ========================================================= */
+
+/* 1. שבירת position:fixed - הפיכה לדרופדאון רגיל מתחת לשדה */
+html body .search-results {
+    position: relative !important;
+    top: auto !important;
+    bottom: auto !important;
+    left: auto !important;
+    right: auto !important;
+    inset: auto !important;
+    width: 100% !important;
+    z-index: 100 !important;
+
+    /* גובה אוטומטי עם מקסימום של ~5 תוצאות גלויות */
+    height: auto !important;
+    max-height: 380px !important;
+    min-height: auto !important;
+    overflow-y: auto !important;
+
+    /* מרווח עליון מהשדה */
+    margin-top: 8px !important;
+
+    /* עיצוב Liquid Glass + Red & White */
+    background: rgba(255, 255, 255, 0.85) !important;
+    backdrop-filter: blur(30px) saturate(200%) !important;
+    -webkit-backdrop-filter: blur(30px) saturate(200%) !important;
+    border: 1px solid rgba(227, 30, 36, 0.12) !important;
+    border-radius: 20px !important;
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.08) !important;
+    padding: 8px !important;
+}
+
+/* 2. כותרת "Search Results" - הסתרה (לא רלוונטית בעברית) */
+html body .search-results h3 {
+    display: none !important;
+}
+
+/* 3. ביטול הכרטיס הלבן הפנימי - שיהיה שקוף על הזכוכית */
+html body .search-results .results-list {
+    background: transparent !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    height: auto !important;
+    max-height: none !important;
+}
+
+/* 4. ביטול ה-border והרקע של מכולת התוצאות הפנימית */
+html body .search-results .tw-bg-white.tw-border {
+    background: transparent !important;
+    border: none !important;
+    border-radius: 0 !important;
+}
+
+/* 5. עיצוב כל שורת תוצאה כקפסולת זכוכית */
+html body .search-results .tw-cursor-pointer {
+    background: rgba(255, 255, 255, 0.6) !important;
+    border-radius: 14px !important;
+    margin-bottom: 6px !important;
+    padding: 14px 12px !important;
+    transition: all 0.2s ease !important;
+    border: 1px solid transparent !important;
+}
+
+/* 6. אפקט hover/active - הדגשת אדום מותגי */
+html body .search-results .tw-cursor-pointer:hover,
+html body .search-results .tw-cursor-pointer:active {
+    background: rgba(227, 30, 36, 0.05) !important;
+    border-color: rgba(227, 30, 36, 0.2) !important;
+    transform: scale(0.99) !important;
+}
+
+/* 7. הסרת קווי ההפרדה הישנים בין שורות */
+html body .search-results .tw-cursor-pointer .tw-absolute.tw-bottom-0 {
+    display: none !important;
+}
+
+/* 8. צביעת אייקון המיקום באדום QLED */
+html body .search-results .v-icon svg path {
+    fill: #e31e24 !important;
+}
+
+/* 9. שם הכתובת הראשי - מודגש שחור */
+html body .search-results .tw-text-\[\#1A1A1A\] {
+    color: #1a1a1a !important;
+    font-weight: 800 !important;
+    font-size: 14px !important;
+}
+
+/* 10. תיאור משני - אפור עדין */
+html body .search-results .tw-text-\[\#767C8F\] {
+    color: #888 !important;
+    font-weight: 500 !important;
+    font-size: 12px !important;
+}
+
+/* 11. יישור הטקסט לימין (RTL) */
+html body .search-results .tw-text-left {
+    text-align: right !important;
+}
+
+/* 12. שורה אחרונה ללא margin */
+html body .search-results .tw-cursor-pointer:last-child {
+    margin-bottom: 0 !important;
+}
