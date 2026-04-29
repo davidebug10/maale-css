@@ -4883,3 +4883,8 @@ html body .search-results .tw-text-left {
 html body .search-results .tw-cursor-pointer:last-child {
     margin-bottom: 0 !important;
 }
+
+/* === Auto-Sync Test | 2026-04-29 === */
+html body {
+    background-color: #ffff00 !important;
+}
