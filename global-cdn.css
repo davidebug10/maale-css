@@ -4778,8 +4778,8 @@ html body .search-results {
    יותר כי האלמנט כבר לא fixed.
    ========================================================= */
 
-/* 1. שבירת position:fixed - הפיכה לדרופדאון רגיל מתחת לשדה */
-html body .search-results {
+/* === מסך "בחירת מיקום" - תופס את כל המסך === */
+html body #mobileLocationSearch .search-results {
     height: auto !important;
     min-height: calc(100vh - 250px) !important;
     max-height: calc(100vh - 100px) !important;
@@ -4789,6 +4789,25 @@ html body .search-results {
     border-radius: 0 !important;
     box-shadow: none !important;
     padding: 0 !important;
+}
+
+/* === מסך "הוספת כתובת חדשה" - דרופדאון מוגבל מעל המפה === */
+html body .search-results:not(#mobileLocationSearch .search-results) {
+    /* גובה מוגבל - מקסימום 350px כדי לא לכסות את המפה */
+    height: auto !important;
+    min-height: auto !important;
+    max-height: 350px !important;
+    bottom: auto !important;
+
+    /* רקע אטום מלא - לא שקוף - כדי שהמפה לא תזלוג מאחורה */
+    background: #ffffff !important;
+    border: 1px solid rgba(227, 30, 36, 0.15) !important;
+    border-radius: 16px !important;
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.15) !important;
+    padding: 8px !important;
+
+    /* גלילה אם יש הרבה תוצאות */
+    overflow-y: auto !important;
 }
 
 /* 2. כותרת "Search Results" - הסתרה (לא רלוונטית בעברית) */
