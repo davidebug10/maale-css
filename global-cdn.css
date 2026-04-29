@@ -223,7 +223,7 @@ html body #MultiVendorHome #MultiVendorBottomNav .footer-btn:first-child object 
 
 /* 5. באדג' (עגלה) */
 html body #MultiVendorBottomNav .v-badge__badge {
-    background-color: #e31e24 !important;
+    background-color: #0066ff !important;
     color: white !important;
     border: 2px solid #ffffff !important;
     box-shadow: 0 2px 10px rgba(227, 30, 36, 0.3) !important;
