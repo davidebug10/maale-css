@@ -4781,7 +4781,7 @@ html body .search-results {
 /* 1. שבירת position:fixed - הפיכה לדרופדאון רגיל מתחת לשדה */
 html body .search-results {
     height: auto !important;
-    min-height: auto !important;
+    min-height: calc(100vh - 250px) !important;
     max-height: calc(100vh - 100px) !important;
 
     background: transparent !important;
