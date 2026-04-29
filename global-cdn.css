@@ -2731,7 +2731,6 @@ html body .location-search-custom-height .v-field {
     border-radius: 24px !important; /* צורת קפסולה מודרנית */
     
     box-shadow: 0 12px 30px rgba(0, 0, 0, 0.04) !important;
-    height: 58px !important;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
 
