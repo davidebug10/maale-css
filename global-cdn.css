@@ -5023,3 +5023,118 @@ html body.mh-scrolled .home-mobile-search-input .v-field:active {
 html body.mh-scrolled .home-mobile-search-input .v-field:active img.home-mobile-search-icon {
     transform: scale(0.85) !important;
 }
+
+/* =========================================================
+   חלק 31: סרגל ניווט תחתון - APPLE LIQUID GLASS
+   תאריך: 2026-05-01
+   מטרה: עיצוב מחדש של הסרגל הצף (DOM חדש של Hyperzod)
+   - קפסולה חצי-שקופה עם blur
+   - כפתור פעיל בסגנון Apple Liquid Glass
+   - אייקון פעיל באדום QLED
+   - אנימציית Material Ripple (מנוהלת ב-custom-footer.js)
+   - ביטול הסתרה אוטומטית בגלילה (מנוהל ב-custom-footer.js)
+   ========================================================= */
+
+/* 1. ביטול ההסתרה האוטומטית של הסרגל בגלילה */
+html body navbar#MultiVendorBottomNav.floating-bottom-nav {
+  transform: translateY(0px) !important;
+  bottom: 0 !important;
+}
+
+/* 2. הסרת ה-active indicator המובנה (היה באג ב-RTL) */
+html body #MultiVendorBottomNav .floating-nav-active-indicator {
+  display: none !important;
+}
+
+/* 3. הקפסולה הראשית - חצי שקופה עם blur */
+html body #MultiVendorBottomNav .floating-nav-wrapper {
+  padding-bottom: 18px !important;
+}
+
+html body #MultiVendorBottomNav .floating-nav-pill {
+  background: rgba(255, 255, 255, 0.55) !important;
+  backdrop-filter: blur(30px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(30px) saturate(180%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.6) !important;
+  box-shadow:
+    0 10px 30px rgba(0, 0, 0, 0.08),
+    0 2px 8px rgba(0, 0, 0, 0.04),
+    inset 0 1px 1px rgba(255, 255, 255, 0.7) !important;
+  padding: 5px !important;
+  gap: 0 !important;
+  position: relative !important;
+  overflow: hidden !important;
+}
+
+/* 4. כל כפתור - בסיס, מצב לא-פעיל */
+html body #MultiVendorBottomNav .floating-frosted-btn {
+  position: relative !important;
+  background: transparent !important;
+  border: none !important;
+  border-radius: 999px !important;
+  overflow: hidden !important;
+  transition: transform 0.2s ease !important;
+  z-index: 1 !important;
+}
+
+html body #MultiVendorBottomNav .floating-frosted-btn .nav-label {
+  color: rgba(0, 0, 0, 0.45) !important;
+  font-weight: 600 !important;
+  transition: color 0.4s ease !important;
+}
+
+html body #MultiVendorBottomNav .floating-frosted-btn object {
+  opacity: 0.5 !important;
+  transition: all 0.4s ease !important;
+  filter: grayscale(100%) brightness(0.4) !important;
+}
+
+/* 5. Active State - Apple Liquid Glass Pill */
+html body #MultiVendorBottomNav .floating-tab-active {
+  background: linear-gradient(180deg,
+    rgba(255, 255, 255, 0.95) 0%,
+    rgba(255, 255, 255, 0.75) 100%) !important;
+  box-shadow:
+    0 4px 12px rgba(227, 30, 36, 0.15),
+    0 1px 3px rgba(0, 0, 0, 0.08),
+    inset 0 1px 1px rgba(255, 255, 255, 0.9),
+    inset 0 -1px 2px rgba(227, 30, 36, 0.05) !important;
+  border: 1px solid rgba(255, 255, 255, 0.8) !important;
+  transform: scale(1.02) !important;
+}
+
+html body #MultiVendorBottomNav .floating-tab-active .nav-label {
+  color: #e31e24 !important;
+  font-weight: 800 !important;
+  text-shadow: 0 0 12px rgba(227, 30, 36, 0.2) !important;
+}
+
+/* אייקון פעיל - אדום QLED */
+html body #MultiVendorBottomNav .floating-tab-active object {
+  filter: brightness(0) saturate(100%) invert(18%) sepia(88%) saturate(5427%) hue-rotate(352deg) brightness(91%) contrast(92%) !important;
+  opacity: 1 !important;
+}
+
+/* 6. אנימציית לחיצה פיזית */
+html body #MultiVendorBottomNav .floating-frosted-btn:active {
+  transform: scale(0.94) !important;
+  transition: transform 0.1s ease !important;
+}
+
+/* 7. ניקוי שכבות Vuetify */
+html body #MultiVendorBottomNav .floating-frosted-btn .v-btn__overlay,
+html body #MultiVendorBottomNav .floating-frosted-btn .v-btn__underlay {
+  display: none !important;
+}
+
+/* 8. Keyframes ל-Material Ripple (האירוע מנוהל ב-custom-footer.js) */
+@keyframes mh-ripple-burst {
+  0% {
+    transform: scale(0);
+    opacity: 0.7;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 0;
+  }
+}
