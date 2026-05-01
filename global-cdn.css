@@ -4953,3 +4953,73 @@ html body .v-bottom-sheet__content:has(#addAddressForm) .search-results.tw-bg-wh
   box-shadow: 0 2px 8px rgba(227, 30, 36, 0.3) !important;
   z-index: 10 !important;
 }
+
+/* =========================================================
+   חלק 30: עיצוב טאבים וכרטיס מסעדה בדף החיפוש
+   תאריך: 2026-05-01
+   Scope: #MultiVendorSearch
+   מטרה:
+   1. טאבים "מוצר/חנות" - גרדיאנט אדום מותגי במקום שחור
+   2. כרטיס מסעדה בתוצאות חיפוש - Liquid Glass במקום אפור #f8f8f8
+   ========================================================= */
+
+/* === 1. טאבים - Liquid Red === */
+html body #MultiVendorSearch .v-slide-group__content .v-tab {
+    border-radius: 14px !important;
+    border: 1.5px solid rgba(227, 30, 36, 0.15) !important;
+    background: rgba(255, 255, 255, 0.6) !important;
+    backdrop-filter: blur(20px) saturate(180%) !important;
+    -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+    color: #4a5568 !important;
+    font-weight: 700 !important;
+    font-size: 14px !important;
+    padding: 0 18px !important;
+    height: 38px !important;
+    min-height: 38px !important;
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04) !important;
+}
+
+html body #MultiVendorSearch .v-slide-group__content .v-tab .v-btn__content {
+    color: inherit !important;
+}
+
+/* === 2. טאב פעיל - גרדיאנט אדום מותגי === */
+html body #MultiVendorSearch .v-slide-group__content .v-tab.v-tab-item--selected,
+html body #MultiVendorSearch .v-slide-group__content .v-tab[aria-selected="true"] {
+    background: linear-gradient(135deg, #e31e24 0%, #b3161b 100%) !important;
+    border: 1.5px solid rgba(227, 30, 36, 0.4) !important;
+    color: #ffffff !important;
+    box-shadow: 0 6px 20px rgba(227, 30, 36, 0.35) !important;
+    transform: translateY(-1px) !important;
+}
+
+html body #MultiVendorSearch .v-slide-group__content .v-tab.v-tab-item--selected .v-btn__content,
+html body #MultiVendorSearch .v-slide-group__content .v-tab[aria-selected="true"] .v-btn__content {
+    color: #ffffff !important;
+    font-weight: 800 !important;
+}
+
+/* === 3. הסתרת המחוון התחתון של Vuetify === */
+html body #MultiVendorSearch .v-slide-group__content .v-tab .v-tab__slider {
+    display: none !important;
+}
+
+/* === 4. כרטיס מסעדה בתוצאות חיפוש - Liquid Glass === */
+html body #MultiVendorSearch .v-window-item .tw-bg-\[\#f8f8f8\].tw-rounded-lg {
+    background: rgba(255, 255, 255, 0.7) !important;
+    backdrop-filter: blur(40px) saturate(200%) !important;
+    -webkit-backdrop-filter: blur(40px) saturate(200%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.5) !important;
+    border-radius: 22px !important;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.05) !important;
+    padding: 14px 6px !important;
+    transition: all 0.3s ease !important;
+}
+
+/* === 5. שם המסעדה - הדגשה מותגית === */
+html body #MultiVendorSearch .v-window-item .tw-bg-\[\#f8f8f8\] .tw-font-semibold.tw-text-\[\#000\] {
+    color: #1a1a1a !important;
+    font-weight: 800 !important;
+    font-size: 16px !important;
+}
