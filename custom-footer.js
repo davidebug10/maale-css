@@ -269,91 +269,68 @@
 })();
 
 /* =========================================================
-   Bottom Nav - Anti-Vibrate (אגרסיבי - חוסם הכל)
+   Bottom Nav - Selective Anti-Vibrate
    תאריך: 2026-05-01
-   מטרה: ביטול הרטט הפיזי במכשיר בכל לחיצה על הסרגל
-   הגישה: דריסת כל ה-API-ים האפשריים שמסוגלים להפעיל רטט
-   - navigator.vibrate (web standard)
-   - window.nativeVibrateShort/Long (Hyperzod custom bridge)
-   - Capacitor.Plugins.Haptics (Capacitor framework)
-   - cordova plugin notification.vibrate
-   - webkit messageHandlers (iOS bridge)
+   מטרה: ביטול הרטט רק בלחיצה על הסרגל התחתון
+   הגישה: שמירת הפונקציות המקוריות, החלפה ל-noop ל-200ms בלחיצה,
+          ואז החזרה למקור - כך ששאר האפליקציה (עגלה, הזמנה) ימשיך לרטוט רגיל
    ========================================================= */
 (function() {
+  // פונקציה ריקה
   function noop() { return false; }
-  function asyncNoop() { return Promise.resolve(); }
 
-  // 1. Web standard
-  try {
-    if (typeof navigator !== 'undefined') {
-      navigator.vibrate = noop;
+  // המתנה ב-DOMContentLoaded כדי שהפונקציות הנייטיב יהיו זמינות
+  function init() {
+    // שמירת הפונקציות המקוריות (Hyperzod native bridges)
+    if (typeof window.nativeVibrateShort === 'function' && !window.__mhOriginalVibrateShort) {
+      window.__mhOriginalVibrateShort = window.nativeVibrateShort;
     }
-  } catch(e) {}
+    if (typeof window.nativeVibrateLong === 'function' && !window.__mhOriginalVibrateLong) {
+      window.__mhOriginalVibrateLong = window.nativeVibrateLong;
+    }
 
-  // 2. Hyperzod's custom native bridge (זוהה בדיאגנוסטיקה)
-  try {
-    window.nativeVibrateShort = noop;
-    window.nativeVibrateLong = noop;
-  } catch(e) {}
+    function suppressVibration() {
+      // דריסה זמנית
+      if (window.__mhOriginalVibrateShort) {
+        window.nativeVibrateShort = noop;
+      }
+      if (window.__mhOriginalVibrateLong) {
+        window.nativeVibrateLong = noop;
+      }
 
-  // 3. Capacitor Haptics
-  try {
-    if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.Haptics) {
-      var haptics = window.Capacitor.Plugins.Haptics;
-      var methods = ['impact', 'notification', 'vibrate', 'selectionStart', 'selectionChanged', 'selectionEnd'];
-      methods.forEach(function(m) {
-        if (typeof haptics[m] === 'function') {
-          haptics[m] = asyncNoop;
+      // החזרה למקור אחרי 200ms
+      setTimeout(function() {
+        if (window.__mhOriginalVibrateShort) {
+          window.nativeVibrateShort = window.__mhOriginalVibrateShort;
         }
-      });
-    }
-  } catch(e) {}
-
-  // 4. Cordova vibration plugin
-  try {
-    if (window.navigator && window.navigator.notification) {
-      window.navigator.notification.vibrate = noop;
-      window.navigator.notification.vibrateWithPattern = noop;
-    }
-  } catch(e) {}
-
-  // 5. iOS WebKit message handlers - חסימה דרך proxy
-  try {
-    if (window.webkit && window.webkit.messageHandlers) {
-      var handlers = window.webkit.messageHandlers;
-      Object.keys(handlers).forEach(function(name) {
-        if (name.toLowerCase().indexOf('vibr') >= 0 ||
-            name.toLowerCase().indexOf('haptic') >= 0) {
-          var original = handlers[name];
-          if (original && typeof original.postMessage === 'function') {
-            handlers[name].postMessage = noop;
-          }
+        if (window.__mhOriginalVibrateLong) {
+          window.nativeVibrateLong = window.__mhOriginalVibrateLong;
         }
-      });
+      }, 200);
     }
-  } catch(e) {}
 
-  // 6. Android interface
-  try {
-    if (window.Android) {
-      var androidKeys = Object.keys(window.Android);
-      androidKeys.forEach(function(k) {
-        if (k.toLowerCase().indexOf('vibr') >= 0 ||
-            k.toLowerCase().indexOf('haptic') >= 0) {
-          if (typeof window.Android[k] === 'function') {
-            window.Android[k] = noop;
-          }
-        }
-      });
+    function handler(e) {
+      var btn = e.target.closest('#MultiVendorBottomNav .floating-frosted-btn');
+      if (btn) {
+        suppressVibration();
+      }
     }
-  } catch(e) {}
 
-  // 7. דריסה חוזרת אחרי 1 שנייה - אם משהו טוען מאוחר
-  setTimeout(function() {
-    try { navigator.vibrate = noop; } catch(e) {}
-    try { window.nativeVibrateShort = noop; } catch(e) {}
-    try { window.nativeVibrateLong = noop; } catch(e) {}
-  }, 1000);
+    // האזנה בשלב capture - לפני ש-Vuetify יקרא ל-vibrate
+    document.addEventListener('pointerdown', handler, true);
+    document.addEventListener('touchstart', handler, { capture: true, passive: true });
+    document.addEventListener('mousedown', handler, true);
+  }
+
+  // הרצה כשה-DOM מוכן
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+
+  // ניסיון נוסף אחרי שנייה - אם הפונקציות הנייטיב עוד לא היו זמינות
+  setTimeout(init, 1000);
 })();
 
 /* =========================================================
