@@ -49,15 +49,6 @@ html body #AddressSelectType label.tw-text-sm::before {
 /* ביטול המרווח הלבן המציק בתחתית האתר */
 html body .tw-mb-\[55px\] { margin-bottom: 0 !important; }
 
-/* מניעת חיתוך טקסט בסרגל התחתון */
-html body .footer-btn-text {
-    white-space: normal !important;
-    line-height: 1.1 !important;
-    -webkit-line-clamp: unset !important;
-    line-clamp: unset !important;
-    text-align: center !important;
-}
-
 /* תיקון "חירבוש" ה-ID הגלוי בכתובת (iOS Fix) */
 html body #AddressCard input[id^="input-"],
 html body #AddressCard .v-field__input input {
@@ -97,15 +88,6 @@ html body #payment-card .method-icon img.v-img__img {
 
 /* ביטול המרווח הלבן המציק בתחתית האתר */
 html body .tw-mb-\[55px\] { margin-bottom: 0 !important; }
-
-/* מניעת חיתוך טקסטים בסרגל התחתון */
-html body .footer-btn-text {
-    white-space: normal !important;
-    line-height: 1.1 !important;
-    -webkit-line-clamp: unset !important;
-    line-clamp: unset !important;
-    text-align: center !important;
-}
 
 /* ניקוי אלמנטים מיותרים - מוגן מודאל */
 html body :not(.product-popup) .v-btn__overlay, 
@@ -1212,39 +1194,6 @@ html body #sl-inner-instruction-slider .v-card__underlay {
 .v-card__overlay, 
 .v-btn__overlay {
     display: none !important;
-}
-
-
-/* =========================================================
-   חלק 10: הגנת התנגשות ניווט - צ'ק-אאוט בלבד
-   מטרה: העלמת סרגל הניווט רק בצ'קאאוט (ולא בעגלה!)
-   עדכון 27.04.2026: שינוי הסלקטור מ-#checkout ל-.place-order
-   הסיבה: גם דף עגלה משתמש ב-#checkout, רק לצ'קאאוט יש .place-order
-   ========================================================= */
-
-/* 1. הסתרה מוחלטת של הניווט רק בדף הצ'ק-אאוט (זה שמכיל את כפתור "ביצוע הזמנה" הצף) */
-html:has(.place-order) #MultiVendorBottomNav {
-    display: none !important;
-    pointer-events: none !important;
-    visibility: hidden !important;
-    opacity: 0 !important;
-    z-index: -1 !important;
-}
-
-/* 2. וידוא שאלמנט ה-Place Order (חלק 8ט) תמיד מעל הכל */
-.place-order {
-    z-index: 99999 !important;
-    pointer-events: auto !important;
-}
-
-/* 3. תיקון מרווח התחתית של דף הצ'ק-אאוט */
-#checkout {
-    padding-bottom: 150px !important;
-}
-
-/* 4. מניעת קפיצה של הסרגל המקורי ב-iOS */
-html:has(.place-order) .v-bottom-navigation {
-    transform: translateY(100%) !important;
 }
 
 
