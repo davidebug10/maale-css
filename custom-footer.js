@@ -137,3 +137,133 @@
         }
     }).observe(document.body, { childList: true, subtree: true });
 })();
+
+/* =========================================================
+   Header Scroll State Manager
+   תאריך: 2026-05-01
+   מטרה: מוסיף/מסיר class "mh-scrolled" על body כשהמשתמש גולל
+   חשוב: הגלילה ב-Hyperzod קורית על #MultiVendorHome (Vue SPA),
+          לא על window - לכן ה-listener חייב להיות על האלמנט הזה
+   ========================================================= */
+(function() {
+    'use strict';
+
+    var SCROLL_THRESHOLD = 30;
+    var ticking = false;
+    var currentContainer = null;
+
+    function updateScrollState() {
+        if (!currentContainer) {
+            ticking = false;
+            return;
+        }
+        var scrolled = currentContainer.scrollTop > SCROLL_THRESHOLD;
+        document.body.classList.toggle('mh-scrolled', scrolled);
+        ticking = false;
+    }
+
+    function onScroll() {
+        if (!ticking) {
+            window.requestAnimationFrame(updateScrollState);
+            ticking = true;
+        }
+    }
+
+    function attachToContainer() {
+        var container = document.getElementById('MultiVendorHome');
+
+        // אם הcontainer לא השתנה - אל תעשה כלום
+        if (container === currentContainer) return;
+
+        // נתק listener ישן אם היה
+        if (currentContainer) {
+            currentContainer.removeEventListener('scroll', onScroll);
+        }
+
+        currentContainer = container;
+
+        if (container) {
+            container.addEventListener('scroll', onScroll, { passive: true });
+            updateScrollState();
+        } else {
+            // לא בדף הבית - הסר את הclass
+            document.body.classList.remove('mh-scrolled');
+        }
+    }
+
+    // בדיקה ראשונית
+    attachToContainer();
+
+    // Vue SPA - האזנה לשינויי DOM כדי לתפוס מעבר בין דפים
+    var observer = new MutationObserver(function() {
+        attachToContainer();
+    });
+
+    observer.observe(document.body, {
+        childList: true,
+        subtree: true
+    });
+})();
+
+/* =========================================================
+   SVG Gradient Defs Injector
+   תאריך: 2026-05-01
+   מטרה: מזריק SVG <defs> עם גרדיאנט "mh-grad-red-pink"
+          כדי שאייקוני ההדר (מיקום, פילטר) יקבלו fill בגרדיאנט אדום->ורוד
+   ========================================================= */
+(function() {
+    'use strict';
+
+    function injectSvgGradients() {
+        if (document.getElementById('mh-svg-grads')) return;
+
+        var svgNS = 'http://www.w3.org/2000/svg';
+        var svg = document.createElementNS(svgNS, 'svg');
+        svg.id = 'mh-svg-grads';
+        svg.setAttribute('width', '0');
+        svg.setAttribute('height', '0');
+        svg.setAttribute('aria-hidden', 'true');
+        svg.style.position = 'absolute';
+        svg.style.width = '0';
+        svg.style.height = '0';
+        svg.style.overflow = 'hidden';
+
+        var defs = document.createElementNS(svgNS, 'defs');
+
+        var gradient = document.createElementNS(svgNS, 'linearGradient');
+        gradient.setAttribute('id', 'mh-grad-red-pink');
+        gradient.setAttribute('x1', '0%');
+        gradient.setAttribute('y1', '0%');
+        gradient.setAttribute('x2', '100%');
+        gradient.setAttribute('y2', '100%');
+
+        var stop1 = document.createElementNS(svgNS, 'stop');
+        stop1.setAttribute('offset', '0%');
+        stop1.setAttribute('stop-color', '#e31e24');
+
+        var stop2 = document.createElementNS(svgNS, 'stop');
+        stop2.setAttribute('offset', '100%');
+        stop2.setAttribute('stop-color', '#e75480');
+
+        gradient.appendChild(stop1);
+        gradient.appendChild(stop2);
+        defs.appendChild(gradient);
+        svg.appendChild(defs);
+
+        if (document.body) {
+            document.body.appendChild(svg);
+        } else {
+            document.addEventListener('DOMContentLoaded', function() {
+                document.body.appendChild(svg);
+            });
+        }
+    }
+
+    // ניסיון מיידי
+    injectSvgGradients();
+
+    // נסיון נוסף אחרי load (במקרה שה-body לא היה מוכן)
+    if (document.readyState !== 'complete') {
+        window.addEventListener('load', injectSvgGradients);
+    }
+})();
