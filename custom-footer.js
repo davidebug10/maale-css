@@ -413,3 +413,88 @@
   document.addEventListener('touchstart', rippleHandler, { capture: true, passive: true });
   document.addEventListener('mousedown', rippleHandler, true);
 })();
+
+/* =========================================================
+   זמני: דיאגנוסטיקת רטט - יוסר אחרי האבחון
+   תאריך: 2026-05-01
+   מטרה: לזהות מאיפה מגיע הרטט באפליקציית מובייל
+   ========================================================= */
+(function() {
+  // ממתינים 3 שניות אחרי טעינת הדף - שכל ה-bridges של האפליקציה ייטענו
+  setTimeout(function() {
+    var report = [];
+
+    report.push('=== דיאגנוסטיקת רטט ===');
+    report.push('זמן: ' + new Date().toLocaleTimeString('he-IL'));
+    report.push('User Agent: ' + navigator.userAgent.substring(0, 60));
+    report.push('');
+    report.push('--- 1. navigator.vibrate ---');
+    report.push('קיים: ' + (typeof navigator.vibrate));
+
+    report.push('');
+    report.push('--- 2. Capacitor (Hyperzod app likely) ---');
+    if (window.Capacitor) {
+      report.push('Capacitor: כן');
+      try {
+        report.push('isNative: ' + (window.Capacitor.isNativePlatform ? window.Capacitor.isNativePlatform() : 'unknown'));
+        report.push('platform: ' + (window.Capacitor.getPlatform ? window.Capacitor.getPlatform() : 'unknown'));
+        if (window.Capacitor.Plugins) {
+          report.push('Plugins: ' + Object.keys(window.Capacitor.Plugins).join(', '));
+          if (window.Capacitor.Plugins.Haptics) {
+            report.push('Haptics נמצא! Methods: ' + Object.keys(window.Capacitor.Plugins.Haptics).join(', '));
+          }
+        }
+      } catch(e) {
+        report.push('שגיאה: ' + e.message);
+      }
+    } else {
+      report.push('Capacitor: לא');
+    }
+
+    report.push('');
+    report.push('--- 3. Cordova ---');
+    report.push('cordova: ' + (typeof window.cordova));
+    if (window.cordova && window.cordova.plugins) {
+      report.push('plugins: ' + Object.keys(window.cordova.plugins).join(', '));
+    }
+
+    report.push('');
+    report.push('--- 4. WebKit (iOS bridge) ---');
+    if (window.webkit && window.webkit.messageHandlers) {
+      report.push('messageHandlers: ' + Object.keys(window.webkit.messageHandlers).join(', '));
+    } else {
+      report.push('webkit: לא');
+    }
+
+    report.push('');
+    report.push('--- 5. Android bridge ---');
+    report.push('Android: ' + (typeof window.Android));
+    report.push('AndroidVibrate: ' + (typeof window.AndroidVibrate));
+
+    report.push('');
+    report.push('--- 6. window.* keys with "vibr" or "haptic" ---');
+    var matches = [];
+    for (var key in window) {
+      try {
+        if (key.toLowerCase().indexOf('vibr') >= 0 || key.toLowerCase().indexOf('haptic') >= 0) {
+          matches.push(key + ' (' + typeof window[key] + ')');
+        }
+      } catch(e) {}
+    }
+    report.push(matches.length ? matches.join('\n') : 'אין');
+
+    // הצגת החלונית
+    var modal = document.createElement('div');
+    modal.id = 'mh-diag-modal';
+    modal.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:white;border:3px solid #e31e24;border-radius:16px;padding:20px;max-width:90vw;max-height:80vh;overflow:auto;z-index:999999;font-family:monospace;font-size:11px;text-align:left;direction:ltr;box-shadow:0 20px 60px rgba(0,0,0,0.3);white-space:pre-wrap;line-height:1.5';
+    modal.textContent = report.join('\n');
+
+    var closeBtn = document.createElement('button');
+    closeBtn.textContent = 'X';
+    closeBtn.style.cssText = 'position:absolute;top:8px;left:8px;background:#e31e24;color:white;border:none;border-radius:8px;padding:6px 12px;font-weight:bold;font-size:12px;cursor:pointer';
+    closeBtn.onclick = function(){ modal.remove(); };
+    modal.appendChild(closeBtn);
+
+    document.body.appendChild(modal);
+  }, 3000);
+})();
