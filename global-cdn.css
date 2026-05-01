@@ -5025,14 +5025,14 @@ html body.mh-scrolled .home-mobile-search-input .v-field:active img.home-mobile-
 }
 
 /* =========================================================
-   חלק 31: סרגל ניווט תחתון - APPLE LIQUID GLASS
+   חלק 31: סרגל ניווט תחתון - APPLE LIQUID GLASS V2
    תאריך: 2026-05-01
-   מטרה: עיצוב מחדש של הסרגל הצף (DOM חדש של Hyperzod)
+   מטרה: עיצוב מחדש של הסרגל הצף עם אינדיקטור שזז (Apple Liquid Glass)
    - קפסולה חצי-שקופה עם blur
-   - כפתור פעיל בסגנון Apple Liquid Glass
+   - אינדיקטור גלולה שמחליק חלק בין טאבים (מנוהל ב-custom-footer.js)
    - אייקון פעיל באדום QLED
    - אנימציית Material Ripple (מנוהלת ב-custom-footer.js)
-   - ביטול הסתרה אוטומטית בגלילה (מנוהל ב-custom-footer.js)
+   - ביטול הסתרה אוטומטית בגלילה (כפיית transform 0)
    ========================================================= */
 
 /* 1. ביטול ההסתרה האוטומטית של הסרגל בגלילה */
@@ -5041,12 +5041,17 @@ html body navbar#MultiVendorBottomNav.floating-bottom-nav {
   bottom: 0 !important;
 }
 
-/* 2. הסרת ה-active indicator המובנה (היה באג ב-RTL) */
+/* 2. כפיית transform 0 על ה-pill הפנימי (הוא זה שזז בפועל) */
+html body #MultiVendorBottomNav .floating-nav-pill {
+  transform: translateY(0px) !important;
+}
+
+/* 3. הסרת ה-active indicator המובנה (היה באג ב-RTL) */
 html body #MultiVendorBottomNav .floating-nav-active-indicator {
   display: none !important;
 }
 
-/* 3. הקפסולה הראשית - חצי שקופה עם blur */
+/* 4. הקפסולה הראשית - חצי שקופה עם blur */
 html body #MultiVendorBottomNav .floating-nav-wrapper {
   padding-bottom: 18px !important;
 }
@@ -5066,7 +5071,7 @@ html body #MultiVendorBottomNav .floating-nav-pill {
   overflow: hidden !important;
 }
 
-/* 4. כל כפתור - בסיס, מצב לא-פעיל */
+/* 5. כל כפתור - בסיס, מצב לא-פעיל */
 html body #MultiVendorBottomNav .floating-frosted-btn {
   position: relative !important;
   background: transparent !important;
@@ -5089,45 +5094,59 @@ html body #MultiVendorBottomNav .floating-frosted-btn object {
   filter: grayscale(100%) brightness(0.4) !important;
 }
 
-/* 5. Active State - Apple Liquid Glass Pill */
-html body #MultiVendorBottomNav .floating-tab-active {
-  background: linear-gradient(180deg,
-    rgba(255, 255, 255, 0.95) 0%,
-    rgba(255, 255, 255, 0.75) 100%) !important;
-  box-shadow:
-    0 4px 12px rgba(227, 30, 36, 0.15),
-    0 1px 3px rgba(0, 0, 0, 0.08),
-    inset 0 1px 1px rgba(255, 255, 255, 0.9),
-    inset 0 -1px 2px rgba(227, 30, 36, 0.05) !important;
-  border: 1px solid rgba(255, 255, 255, 0.8) !important;
-  transform: scale(1.02) !important;
+/* 6. תוכן הכפתור צריך להיות מעל האינדיקטור */
+html body #MultiVendorBottomNav .floating-frosted-btn .v-btn__content {
+  position: relative !important;
+  z-index: 2 !important;
 }
 
+/* 7. ביטול הסטייל הישן של floating-tab-active (האינדיקטור מטפל בזה עכשיו) */
+html body #MultiVendorBottomNav .floating-tab-active {
+  background: transparent !important;
+  box-shadow: none !important;
+  border: none !important;
+  transform: none !important;
+}
+
+/* 8. טקסט ואייקון של הטאב הפעיל - אדום QLED */
 html body #MultiVendorBottomNav .floating-tab-active .nav-label {
   color: #e31e24 !important;
   font-weight: 800 !important;
   text-shadow: 0 0 12px rgba(227, 30, 36, 0.2) !important;
 }
 
-/* אייקון פעיל - אדום QLED */
 html body #MultiVendorBottomNav .floating-tab-active object {
   filter: brightness(0) saturate(100%) invert(18%) sepia(88%) saturate(5427%) hue-rotate(352deg) brightness(91%) contrast(92%) !important;
   opacity: 1 !important;
 }
 
-/* 6. אנימציית לחיצה פיזית */
-html body #MultiVendorBottomNav .floating-frosted-btn:active {
-  transform: scale(0.94) !important;
-  transition: transform 0.1s ease !important;
+/* 9. האינדיקטור הזוהר שזז בין טאבים - מוזרק על ידי custom-footer.js */
+.mh-active-pill {
+  position: absolute !important;
+  top: 5px !important;
+  bottom: 5px !important;
+  border-radius: 999px !important;
+  background: linear-gradient(180deg,
+    rgba(255, 255, 255, 0.95) 0%,
+    rgba(255, 255, 255, 0.75) 100%) !important;
+  box-shadow:
+    0 4px 12px rgba(227, 30, 36, 0.15),
+    0 1px 3px rgba(0, 0, 0, 0.08),
+    inset 0 1px 1px rgba(255, 255, 255, 0.9) !important;
+  border: 1px solid rgba(255, 255, 255, 0.8) !important;
+  transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+              width 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  pointer-events: none !important;
+  z-index: 0 !important;
 }
 
-/* 7. ניקוי שכבות Vuetify */
+/* 10. ניקוי שכבות Vuetify */
 html body #MultiVendorBottomNav .floating-frosted-btn .v-btn__overlay,
 html body #MultiVendorBottomNav .floating-frosted-btn .v-btn__underlay {
   display: none !important;
 }
 
-/* 8. Keyframes ל-Material Ripple (האירוע מנוהל ב-custom-footer.js) */
+/* 11. Keyframes ל-Material Ripple (האירוע מנוהל ב-custom-footer.js) */
 @keyframes mh-ripple-burst {
   0% {
     transform: scale(0);
