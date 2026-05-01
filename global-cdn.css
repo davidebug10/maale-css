@@ -73,21 +73,6 @@ html body #AddressCard .v-select__selection {
     overflow: hidden !important;
 }
 
-/* --- 3. לוגיקת מירכוז סרגל ניווט צף (חלק 12ג) --- */
-html body #MultiVendorBottomNav .v-bottom-navigation__content > div.tw-flex {
-    position: fixed !important;
-    bottom: 20px !important;
-    left: 0 !important; 
-    right: 0 !important;
-    margin-left: auto !important;
-    margin-right: auto !important;
-    width: 92% !important;
-    max-width: 420px !important;
-    display: flex !important;
-    justify-content: space-around !important;
-    align-items: center !important;
-}
-
 /* --- 4. ניקוי לוגי (העלמת שכבות כפולות) - מוגן מודאל --- */
 html body :not(.product-popup) .v-btn__overlay, 
 html body :not(.product-popup) .v-btn__underlay, 
@@ -132,101 +117,9 @@ html body :not(.product-popup) .v-ripple__container {
 }
 
 /* =========================================================
-   חלק 1: סרגל ניווט תחתון - LIQUID GLASS V4 (FIXED)
-   מטרה: כפיית מצב פעיל על "בית", מירכוז ושקיפות iOS
+   Bottom Navigation - הוסר 2026-05-01 לקראת עיצוב מחדש מאפס
+   הסיבה: ניקוי כולל לפני בנייה חדשה של הסרגל
    ========================================================= */
-
-/* 1. המכולה החיצונית - נטרול מוחלט של רקעי מערכת */
-html body #MultiVendorBottomNav,
-html body .v-bottom-navigation {
-    background: transparent !important;
-    box-shadow: none !important;
-    border: none !important;
-    left: 0 !important;
-    right: 0 !important;
-    width: 100vw !important;
-    display: flex !important;
-    justify-content: center !important;
-    pointer-events: none !important;
-    z-index: 9999 !important;
-}
-
-/* 2. הקפסולה המרכזית - THE LIQUID CHASSIS */
-html body #MultiVendorBottomNav .v-bottom-navigation__content > div.tw-flex {
-    position: fixed !important;
-    bottom: 25px !important;
-    left: 0 !important;
-    right: 0 !important;
-    margin-left: auto !important;
-    margin-right: auto !important;
-    
-    width: 92% !important;
-    max-width: 420px !important;
-    height: 72px !important;
-    pointer-events: auto !important;
-
-    /* עיצוב זכוכית נוזלית - שקיפות גבוהה מאוד (0.35) */
-    background: rgba(255, 255, 255, 0.35) !important;
-    backdrop-filter: blur(45px) saturate(250%) contrast(110%) !important;
-    -webkit-backdrop-filter: blur(45px) saturate(250%) contrast(110%) !important;
-    
-    border: 1px solid rgba(255, 255, 255, 0.6) !important;
-    border-radius: 40px !important;
-    
-    box-shadow: 
-        0 20px 40px rgba(0, 0, 0, 0.1),
-        inset 0 1px 3px rgba(255, 255, 255, 0.8) !important;
-
-    display: flex !important;
-    justify-content: space-around !important;
-    align-items: center !important;
-    padding: 0 10px !important;
-}
-
-/* 3. עיצוב כפתורים - מצב רגיל (לא פעיל) */
-html body #MultiVendorBottomNav .footer-btn-text {
-    color: rgba(0, 0, 0, 0.4) !important;
-    font-weight: 600 !important;
-    font-size: 10px !important;
-    margin-top: 4px !important;
-    transition: all 0.3s ease !important;
-}
-
-html body #MultiVendorBottomNav .footer-btn object,
-html body #MultiVendorBottomNav .footer-btn img {
-    filter: brightness(0) opacity(0.35) !important;
-    transition: all 0.3s ease !important;
-}
-
-/* 4. לוגיקת Active - כפייה על כפתור הבית (הימני ביותר ב-RTL) */
-
-/* הגדרת הסטייל הפעיל (QLED RED) */
-html body #MultiVendorBottomNav .v-btn--active .footer-btn-text,
-html body #MultiVendorHome #MultiVendorBottomNav .footer-btn:last-child .footer-btn-text,
-html body #MultiVendorHome #MultiVendorBottomNav .footer-btn:first-child .footer-btn-text {
-    color: #e31e24 !important;
-    font-weight: 800 !important;
-    opacity: 1 !important;
-}
-
-html body #MultiVendorBottomNav .v-btn--active object,
-html body #MultiVendorBottomNav .v-btn--active img,
-html body #MultiVendorHome #MultiVendorBottomNav .footer-btn:last-child img,
-html body #MultiVendorHome #MultiVendorBottomNav .footer-btn:last-child object,
-html body #MultiVendorHome #MultiVendorBottomNav .footer-btn:first-child img,
-html body #MultiVendorHome #MultiVendorBottomNav .footer-btn:first-child object {
-    filter: invert(18%) sepia(88%) saturate(6144%) hue-rotate(354deg) brightness(91%) contrast(100%) drop-shadow(0 2px 8px rgba(227, 30, 36, 0.4)) !important;
-    opacity: 1 !important;
-    transform: scale(1.1) translateY(-2px) !important;
-}
-
-/* 5. באדג' (עגלה) */
-html body #MultiVendorBottomNav .v-badge__badge {
-    background-color: #00ff00 !important;
-    color: white !important;
-    border: 2px solid #ffffff !important;
-    box-shadow: 0 2px 10px rgba(227, 30, 36, 0.3) !important;
-}
 
 /* =========================================================
    חלק 2+3: הדר - הוסר 2026-05-01 לקראת עיצוב מחדש מאפס
@@ -3342,103 +3235,6 @@ div[data-v-4b9952fb].tw-top-1\/2.tw-left-1\/2 .tw-bg-\[\#212121\] {
 /* המשולש (חץ) שיוצא מהבועה למטה */
 div[data-v-4b9952fb].tw-top-1\/2.tw-left-1\/2 .tw-border-t-\[\#212121\] {
     border-top-color: #e31e24 !important;
-}
-
-/* =========================================================
-   חלק 24: תיקוני סרגל ניווט תחתון (התנגשויות ומצב התחלתי)
-   ========================================================= */
-
-/* --- 1. פתרון ה"תמונה הלבנה" (התנגשות אזור הזמנות פעילות) --- */
-/* העלמת הגרדיאנט המובנה ודחיפת אזור ההזמנות מעל הקפסולה הקבועה */
-html body #MultiVendorBottomNav #ongoingOrders {
-    margin-bottom: 0px !important; /* דוחף מעל לקפסולה שגובהה 72px */
-}
-
-/* מאחר וביטלנו את רקע הגרדיאנט, ניתן לכרטיס ההזמנה עצמו עיצוב זכוכית אלגנטי שישתלב עם ה-DNA */
-html body #MultiVendorBottomNav #ongoingOrders .ongoing-order {
-    background: rgba(255, 255, 255, 0.8) !important;
-    backdrop-filter: blur(20px) !important;
-    -webkit-backdrop-filter: blur(20px) !important;
-    border: 1px solid rgba(227, 30, 36, 0.1) !important;
-    border-radius: 16px !important;
-    padding: 6px 10px !important;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05) !important;
-}
-
-/* --- 2. פתרון "בית לא בחור" (כפיית Active State התחלתי) --- */
-/* לוגיקה: אם לסרגל הניווט אין אף כפתור פעיל, הפעל את עיצוב ה-QLED Red על הכפתור הראשון (בית) */
-html body #MultiVendorBottomNav:not(:has(.v-btn--active)) .v-badge:first-of-type .footer-btn-text {
-    color: #e31e24 !important;
-    font-weight: 800 !important;
-    opacity: 1 !important;
-}
-
-html body #MultiVendorBottomNav:not(:has(.v-btn--active)) .v-badge:first-of-type img {
-    filter: invert(18%) sepia(88%) saturate(6144%) hue-rotate(354deg) brightness(91%) contrast(100%) drop-shadow(0 2px 8px rgba(227, 30, 36, 0.4)) !important;
-    opacity: 1 !important;
-    transform: scale(1.1) translateY(-2px) !important;
-}
-
-
-/* =========================================
-   Part 25: Order Status Crystal Fix (V10 - Absolute to Fixed Navbar)
-   DOM: navbar#MultiVendorBottomNav(fixed) > .v-bottom-navigation__content(68px) > #ongoingOrders
-   The navbar is height:68px fixed. ongoingOrders must escape above it.
-   The capsule (buttons row) is already position:fixed from Part 1.
-   ========================================= */
-/* 1. Allow overflow from the fixed navbar */
-#MultiVendorBottomNav,
-#MultiVendorBottomNav .v-bottom-navigation__content {
-    overflow: visible !important;
-    contain: none !important;
-}
-/* 2. Position ongoingOrders above the navbar */
-#MultiVendorBottomNav #ongoingOrders {
-    position: fixed !important;
-    bottom: 105px !important;
-    left: 0 !important;
-    right: 0 !important;
-    margin: 0 auto !important;
-
-    width: calc(100% - 32px) !important;
-    max-width: 450px !important;
-    z-index: 9999 !important;
-
-    /* Liquid Glass */
-    background: rgba(255, 255, 255, 0.85) !important;
-    backdrop-filter: blur(24px) saturate(180%) !important;
-    -webkit-backdrop-filter: blur(24px) saturate(180%) !important;
-    border-radius: 20px !important;
-    border: 1px solid rgba(255, 255, 255, 0.5) !important;
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08) !important;
-    padding: 6px 10px !important;
-
-    /* CRITICAL: remove from normal flow so it doesn't affect navbar height */
-    height: auto !important;
-}
-/* 3. Kill inner backgrounds */
-#MultiVendorBottomNav #ongoingOrders .ongoing-order,
-#MultiVendorBottomNav #ongoingOrders .v-card,
-#MultiVendorBottomNav #ongoingOrders .swiper {
-    background: transparent !important;
-    background-color: transparent !important;
-    box-shadow: none !important;
-    background-image: none !important;
-    overflow: visible !important;
-}
-/* 4. Kill Tailwind gradient */
-#MultiVendorBottomNav .tw-bg-gradient-to-b {
-    background: transparent !important;
-    background-image: none !important;
-}
-/* 5. Hide dots row */
-#MultiVendorBottomNav #ongoingOrders .tw-flex.tw-justify-left {
-    display: none !important;
-}
-/* 6. Fix inner card width */
-#MultiVendorBottomNav #ongoingOrders .ongoing-order {
-    width: 100% !important;
-    margin: 0 !important;
 }
 
 /* =========================================================
