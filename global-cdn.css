@@ -4779,3 +4779,44 @@ html body .search-results.tw-bg-white.tw-fixed.tw-inset-x-0:has(.results-list .t
 }
 
 /* === End: Search Results Fix | 2026-04-29 === */
+
+/* =========================================================
+   חלק 26: תיקוני תוצאות חיפוש כתובת - מסך "הוספת כתובת חדשה"
+   תאריך: 2026-05-01
+   מטרה: 4 תיקונים מאומתים על מסך הוספת כתובת:
+     1. החזרת רקע לבן + blur לתוצאות (היה שקוף)
+     2. תיקון line-height של כותרות (אותיות עברית נחתכו)
+     3. שיפור קריאות תיאור התוצאה
+     4. הסרת קווי הפרדה בין תוצאות
+     5. צמצום הרווח הענק בין שדה החיפוש לתוצאות
+   סקופ: רק במסך עם #addAddressForm כדי לא לפגוע במסכים אחרים
+   ========================================================= */
+
+/* 1. החזרת רקע לבן ל-search-results (חלק 12ד דורס אותו לשקוף) */
+html body .v-bottom-sheet__content:has(#addAddressForm) .search-results.tw-bg-white {
+    background-color: rgba(255, 255, 255, 0.97) !important;
+    backdrop-filter: blur(20px) saturate(150%) !important;
+    -webkit-backdrop-filter: blur(20px) saturate(150%) !important;
+}
+
+/* 2. תיקון line-height של כותרת תוצאה - מונע חיתוך אותיות עברית */
+html body .v-bottom-sheet__content:has(#addAddressForm) .search-results .v-card.results-list .tw-cursor-pointer span.tw-line-clamp-1 {
+    line-height: 1.4 !important;
+    height: auto !important;
+}
+
+/* 3. שיפור קריאות התיאור (היה אפור דהוי) */
+html body .v-bottom-sheet__content:has(#addAddressForm) .search-results .v-card.results-list .tw-cursor-pointer p.tw-line-clamp-2 {
+    color: #4a5568 !important;
+    line-height: 1.4 !important;
+}
+
+/* 4. הסתרת קווי ההפרדה הדקים בין תוצאות חיפוש */
+html body .v-bottom-sheet__content:has(#addAddressForm) .search-results .tw-cursor-pointer > div.tw-absolute.tw-bottom-0 {
+    display: none !important;
+}
+
+/* 5. צמצום הרווח בין שדה החיפוש לתוצאות (היה ~98px, יורד ל-~10px) */
+html body .v-bottom-sheet__content:has(#addAddressForm) .search-results.tw-bg-white.tw-fixed {
+    margin-top: -88px !important;
+}
