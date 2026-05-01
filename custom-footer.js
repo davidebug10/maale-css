@@ -269,53 +269,91 @@
 })();
 
 /* =========================================================
-   Bottom Nav - Anti-Hide on Scroll
+   Bottom Nav - Anti-Vibrate (disable haptic feedback)
    תאריך: 2026-05-01
-   מטרה: ביטול ההסתרה האוטומטית של ה-pill הפנימי בגלילה
-   הבעיה: Hyperzod מזיז את .floating-nav-pill ב-translateY(84px)
-   הפתרון: MutationObserver שמאפס transform על ה-pill כל פעם שמשתנה
+   מטרה: ביטול הרטט הפיזי במכשיר בכל לחיצה על הסרגל
+   הבעיה: Hyperzod מפעיל navigator.vibrate בכל לחיצה - מציק במובייל
+   הפתרון: דריסת navigator.vibrate לפונקציה ריקה
    ========================================================= */
 (function() {
-  function init() {
-    const pill = document.querySelector('#MultiVendorBottomNav .floating-nav-pill');
+  if (typeof navigator !== 'undefined' && typeof navigator.vibrate === 'function') {
+    navigator.vibrate = function() { return false; };
+  }
+})();
+
+/* =========================================================
+   Bottom Nav - Sliding Active Indicator (Apple Liquid Glass)
+   תאריך: 2026-05-01
+   מטרה: יצירת אינדיקטור גלולה שמחליק חלק בין הטאבים
+   הערה: ה-CSS של .mh-active-pill מוגדר ב-global-cdn.css
+   ========================================================= */
+(function() {
+  const navId = 'MultiVendorBottomNav';
+
+  function initIndicator() {
+    const pill = document.querySelector('#' + navId + ' .floating-nav-pill');
     if (!pill) {
-      // הסרגל עוד לא קיים בDOM - ננסה שוב בעוד שנייה
-      setTimeout(init, 1000);
+      setTimeout(initIndicator, 1000);
       return;
     }
 
-    // אם כבר יש observer - לא צריך עוד אחד
-    if (pill.dataset.mhAntiHide === 'attached') return;
-    pill.dataset.mhAntiHide = 'attached';
+    // אם כבר התחבר - לא ליצור שוב
+    if (pill.dataset.mhSliderAttached === 'yes') return;
+    pill.dataset.mhSliderAttached = 'yes';
 
-    function forcePillVisible() {
-      const cs = getComputedStyle(pill);
-      if (cs.transform && cs.transform !== 'none' && cs.transform !== 'matrix(1, 0, 0, 1, 0, 0)') {
-        pill.style.transform = 'translateY(0px)';
-      }
+    // צור את האינדיקטור
+    let indicator = pill.querySelector('.mh-active-pill');
+    if (!indicator) {
+      indicator = document.createElement('div');
+      indicator.className = 'mh-active-pill';
+      pill.insertBefore(indicator, pill.firstChild);
     }
 
-    const observer = new MutationObserver(forcePillVisible);
-    observer.observe(pill, {
-      attributes: true,
-      attributeFilter: ['style']
+    function updatePosition() {
+      const activeBtn = pill.querySelector('.floating-tab-active');
+      if (!activeBtn) {
+        indicator.style.opacity = '0';
+        return;
+      }
+
+      const btnRect = activeBtn.getBoundingClientRect();
+      const pillRect = pill.getBoundingClientRect();
+
+      // RTL: מודדים מהימין
+      const rightOffset = pillRect.right - btnRect.right;
+      const width = btnRect.width;
+
+      indicator.style.right = rightOffset + 'px';
+      indicator.style.width = width + 'px';
+      indicator.style.opacity = '1';
+    }
+
+    updatePosition();
+
+    // עדכון כשהטאב הפעיל מתחלף
+    const observer = new MutationObserver(updatePosition);
+    pill.querySelectorAll('.floating-frosted-btn').forEach(function(btn) {
+      observer.observe(btn, {
+        attributes: true,
+        attributeFilter: ['class']
+      });
     });
 
-    forcePillVisible();
+    window.addEventListener('resize', updatePosition);
   }
 
-  // SPA support - נריץ גם כשנטען וגם כשה-DOM משתנה
+  // SPA support
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init);
+    document.addEventListener('DOMContentLoaded', initIndicator);
   } else {
-    init();
+    initIndicator();
   }
 
-  // observer גלובלי שמזהה כשהסרגל מופיע מחדש (Vue SPA navigation)
-  const bodyObserver = new MutationObserver(() => {
-    const pill = document.querySelector('#MultiVendorBottomNav .floating-nav-pill');
-    if (pill && pill.dataset.mhAntiHide !== 'attached') {
-      init();
+  // Vue SPA navigation - אם הסרגל יוחלף, נחבר מחדש
+  const bodyObserver = new MutationObserver(function() {
+    const pill = document.querySelector('#' + navId + ' .floating-nav-pill');
+    if (pill && pill.dataset.mhSliderAttached !== 'yes') {
+      initIndicator();
     }
   });
   bodyObserver.observe(document.body, { childList: true, subtree: true });
@@ -371,7 +409,6 @@
     setTimeout(function() { ripple.remove(); }, 600);
   }
 
-  // האזנה בשלב capture כדי להקדים את Vuetify
   document.addEventListener('pointerdown', rippleHandler, true);
   document.addEventListener('touchstart', rippleHandler, { capture: true, passive: true });
   document.addEventListener('mousedown', rippleHandler, true);
