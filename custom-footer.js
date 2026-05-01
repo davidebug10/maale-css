@@ -267,3 +267,112 @@
         window.addEventListener('load', injectSvgGradients);
     }
 })();
+
+/* =========================================================
+   Bottom Nav - Anti-Hide on Scroll
+   תאריך: 2026-05-01
+   מטרה: ביטול ההסתרה האוטומטית של ה-pill הפנימי בגלילה
+   הבעיה: Hyperzod מזיז את .floating-nav-pill ב-translateY(84px)
+   הפתרון: MutationObserver שמאפס transform על ה-pill כל פעם שמשתנה
+   ========================================================= */
+(function() {
+  function init() {
+    const pill = document.querySelector('#MultiVendorBottomNav .floating-nav-pill');
+    if (!pill) {
+      // הסרגל עוד לא קיים בDOM - ננסה שוב בעוד שנייה
+      setTimeout(init, 1000);
+      return;
+    }
+
+    // אם כבר יש observer - לא צריך עוד אחד
+    if (pill.dataset.mhAntiHide === 'attached') return;
+    pill.dataset.mhAntiHide = 'attached';
+
+    function forcePillVisible() {
+      const cs = getComputedStyle(pill);
+      if (cs.transform && cs.transform !== 'none' && cs.transform !== 'matrix(1, 0, 0, 1, 0, 0)') {
+        pill.style.transform = 'translateY(0px)';
+      }
+    }
+
+    const observer = new MutationObserver(forcePillVisible);
+    observer.observe(pill, {
+      attributes: true,
+      attributeFilter: ['style']
+    });
+
+    forcePillVisible();
+  }
+
+  // SPA support - נריץ גם כשנטען וגם כשה-DOM משתנה
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+
+  // observer גלובלי שמזהה כשהסרגל מופיע מחדש (Vue SPA navigation)
+  const bodyObserver = new MutationObserver(() => {
+    const pill = document.querySelector('#MultiVendorBottomNav .floating-nav-pill');
+    if (pill && pill.dataset.mhAntiHide !== 'attached') {
+      init();
+    }
+  });
+  bodyObserver.observe(document.body, { childList: true, subtree: true });
+})();
+
+/* =========================================================
+   Bottom Nav - Material Ripple Animation
+   תאריך: 2026-05-01
+   מטרה: גל אדום שמתפשט מנקודת הלחיצה על כל טאב
+   הערה: ה-keyframes mh-ripple-burst מוגדרים ב-global-cdn.css
+   ========================================================= */
+(function() {
+  const navId = 'MultiVendorBottomNav';
+
+  function rippleHandler(e) {
+    const btn = e.target.closest('#' + navId + ' .floating-frosted-btn');
+    if (!btn) return;
+
+    const pill = document.querySelector('#' + navId + ' .floating-nav-pill');
+    if (!pill) return;
+
+    const btnRect = btn.getBoundingClientRect();
+    const pillRect = pill.getBoundingClientRect();
+
+    let clientX, clientY;
+    if (e.touches && e.touches[0]) {
+      clientX = e.touches[0].clientX;
+      clientY = e.touches[0].clientY;
+    } else {
+      clientX = e.clientX || (btnRect.left + btnRect.width / 2);
+      clientY = e.clientY || (btnRect.top + btnRect.height / 2);
+    }
+
+    const x = clientX - pillRect.left;
+    const y = clientY - pillRect.top;
+    const size = btnRect.width * 1.4;
+
+    const ripple = document.createElement('span');
+    ripple.style.cssText =
+      'position: absolute;' +
+      'width: ' + size + 'px;' +
+      'height: ' + size + 'px;' +
+      'left: ' + (x - size / 2) + 'px;' +
+      'top: ' + (y - size / 2) + 'px;' +
+      'border-radius: 50%;' +
+      'background: radial-gradient(circle, rgba(227,30,36,0.6) 0%, rgba(227,30,36,0.3) 40%, transparent 70%);' +
+      'pointer-events: none;' +
+      'z-index: 50;' +
+      'animation: mh-ripple-burst 0.55s cubic-bezier(0.4, 0, 0.2, 1) forwards;' +
+      'will-change: transform, opacity;';
+
+    pill.appendChild(ripple);
+    setTimeout(function() { ripple.remove(); }, 600);
+  }
+
+  // האזנה בשלב capture כדי להקדים את Vuetify
+  document.addEventListener('pointerdown', rippleHandler, true);
+  document.addEventListener('touchstart', rippleHandler, { capture: true, passive: true });
+  document.addEventListener('mousedown', rippleHandler, true);
+})();
