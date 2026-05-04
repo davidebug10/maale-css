@@ -5157,3 +5157,106 @@ html body #MultiVendorBottomNav .floating-frosted-btn .v-btn__underlay {
     opacity: 0;
   }
 }
+
+/* =========================================================
+   חלק 32: טאב סטטוס הזמנה פעילה - LIVE ORDER STRIP
+   תאריך: 2026-05-04
+   מטרה: עיצוב הטאב הצף שמופיע כשיש הזמנה פעילה (#ongoingOrders)
+   - רקע קריסטלי אדום עדין (לרמוז על מצב "חי")
+   - תמונה עם הילה אדומה מתפעמת (live pulse)
+   - נקודת LIVE אדומה מהבהבת בפינה
+   - כותרת מודגשת באדום
+   הערה: הטאב יושב מעל הסרגל התחתון בתוך .floating-nav-wrapper
+   ========================================================= */
+
+/* 1. הקפסולה הראשית - אדום קריסטלי עדין */
+html body #MultiVendorBottomNav #ongoingOrders .ongoing-orders-strip {
+  background: rgba(255, 245, 245, 0.75) !important;
+  backdrop-filter: blur(30px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(30px) saturate(180%) !important;
+  border: 1px solid rgba(227, 30, 36, 0.15) !important;
+  border-radius: 999px !important;
+  box-shadow:
+    0 8px 24px rgba(227, 30, 36, 0.08),
+    0 2px 6px rgba(0, 0, 0, 0.04),
+    inset 0 1px 1px rgba(255, 255, 255, 0.7) !important;
+  padding: 10px 14px !important;
+  overflow: hidden !important;
+}
+
+/* 2. הכרטיס הפנימי - שקוף, יורש מההורה */
+html body #MultiVendorBottomNav #ongoingOrders .ongoing-order {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  position: relative !important;
+}
+
+/* 3. תמונה עגולה - הילה אדומה מתפעמת (LIVE indicator) */
+html body #MultiVendorBottomNav #ongoingOrders .ongoing-order .[v-img.tw](http://v-img.tw)-rounded-full {
+  border: 2px solid #e31e24 !important;
+  position: relative !important;
+  animation: mh-live-pulse 2s ease-in-out infinite !important;
+}
+
+@keyframes mh-live-pulse {
+  0%, 100% {
+    box-shadow:
+      0 0 0 0 rgba(227, 30, 36, 0.5),
+      0 0 8px rgba(227, 30, 36, 0.3);
+  }
+  50% {
+    box-shadow:
+      0 0 0 6px rgba(227, 30, 36, 0),
+      0 0 12px rgba(227, 30, 36, 0.4);
+  }
+}
+
+/* 4. נקודת LIVE אדומה מהבהבת בפינת התמונה */
+html body #MultiVendorBottomNav #ongoingOrders .ongoing-order > div:first-child::after {
+  content: '' !important;
+  position: absolute !important;
+  top: -2px !important;
+  right: -2px !important;
+  width: 10px !important;
+  height: 10px !important;
+  border-radius: 50% !important;
+  background: #e31e24 !important;
+  border: 2px solid white !important;
+  box-shadow: 0 0 8px rgba(227, 30, 36, 0.6) !important;
+  animation: mh-live-blink 1.2s ease-in-out infinite !important;
+  z-index: 5 !important;
+}
+
+@keyframes mh-live-blink {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.85); }
+}
+
+/* 5. כותרת "ההזמנה שלך ממתינה" - מודגש ואדום */
+html body #MultiVendorBottomNav #ongoingOrders .ongoing-order h3 {
+  color: #b3161b !important;
+  font-weight: 800 !important;
+  font-size: 13px !important;
+  line-height: 1.3 !important;
+}
+
+/* 6. טקסט זמן ("5m ago") - אפור עדין */
+html body #MultiVendorBottomNav #ongoingOrders .ongoing-order span {
+  color: rgba(0, 0, 0, 0.5) !important;
+  font-weight: 600 !important;
+  font-size: 10px !important;
+}
+
+/* 7. חץ ניווט - אדום מותג */
+html body #MultiVendorBottomNav #ongoingOrders .ongoing-order img[alt="chevron"] {
+  filter: brightness(0) saturate(100%) invert(18%) sepia(88%) saturate(5427%) hue-rotate(352deg) brightness(91%) contrast(92%) !important;
+}
+
+/* 8. אפקט לחיצה פיזי */
+html body #MultiVendorBottomNav #ongoingOrders .ongoing-order:active {
+  transform: scale(0.97) !important;
+  transition: transform 0.1s ease !important;
+}
