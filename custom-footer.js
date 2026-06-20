@@ -465,3 +465,36 @@
   document.addEventListener('touchstart', rippleHandler, { capture: true, passive: true });
   document.addEventListener('mousedown', rippleHandler, true);
 })();
+
+
+/* === Maale: merchant hero video autoplay fix (.mhh-video) | 2026-06-20 === */
+(function () {
+  // 1) hide the iOS native center play-button overlay on our hero video only
+  var st = document.createElement('style');
+  st.textContent = '.mhh-video::-webkit-media-controls-start-playback-button{display:none !important;-webkit-appearance:none !important}.mhh-video::-webkit-media-controls{display:none !important}';
+  document.head.appendChild(st);
+
+  // 2) force autoplay (iOS needs the muted PROPERTY + play() retried when data is ready)
+  function play(v) {
+    if (!v) return;
+    v.muted = true; v.defaultMuted = true; v.playsInline = true;
+    v.setAttribute('muted', ''); v.setAttribute('playsinline', '');
+    var pr = v.play(); if (pr && pr.catch) pr.catch(function () {});
+  }
+  function setup(v) {
+    if (!v || v.dataset.mhhKick) return;
+    v.dataset.mhhKick = '1';
+    play(v);
+    ['loadedmetadata', 'loadeddata', 'canplay'].forEach(function (e) {
+      v.addEventListener(e, function () { play(v); });
+    });
+  }
+  function scan() { var v = document.querySelector('.mhh-video'); if (v) setup(v); }
+  scan();
+  new MutationObserver(scan).observe(document.documentElement, { childList: true, subtree: true });
+  ['touchstart', 'pointerdown', 'click'].forEach(function (ev) {
+    document.addEventListener(ev, function () {
+      var v = document.querySelector('.mhh-video'); if (v && v.paused) play(v);
+    }, { passive: true });
+  });
+})();
