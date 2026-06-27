@@ -5419,3 +5419,16 @@ html body .v-bottom-sheet__content:has(#Phone) #Phone #mh-terms-row{
 html body .v-bottom-sheet__content:has(#Phone) #Phone #mh-terms-link{
   color:#e31e24 !important;font-weight:800 !important;text-decoration:underline !important;
   cursor:pointer !important;white-space:nowrap !important;}
+
+/* === חלק 35 | אנימציית פעימה בכפתור התחברות אוטומטית | 2026-06-27 ===
+   מופעלת ע"י class "mh-auto-press" שמוזרק ב-custom-footer.js ברגע הלחיצה
+   האוטומטית אחרי מילוי OTP. פעימה אחת קצרה (~0.5s) ואז הספינר של Hyperzod.
+   מכוסה בשני חלונות ההתחברות: דף הבית (#WelcomePage) + חלונית bottom-sheet. */
+@keyframes mhAutoPress{
+  0%{transform:scale(1);box-shadow:0 10px 24px rgba(227,30,36,.3);}
+  40%{transform:scale(1.03);box-shadow:0 14px 34px rgba(227,30,36,.55),0 0 0 4px rgba(227,30,36,.18);}
+  100%{transform:scale(1);box-shadow:0 10px 24px rgba(227,30,36,.3);}
+}
+html body #WelcomePage form#Phone button.login-btn.mh-auto-press,
+html body .v-bottom-sheet__content:has(#Phone) #Phone button.login-btn.mh-auto-press{
+  animation:mhAutoPress .5s cubic-bezier(.34,1.56,.64,1) !important;}
