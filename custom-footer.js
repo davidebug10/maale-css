@@ -600,24 +600,23 @@
   enhanceOTP();
 })();
 
-/* === TEMP ORIGIN PROBE - REMOVE AFTER iOS SCREENSHOT === */
+/* === TEMP ORIGIN PROBE v2 - REMOVE AFTER iOS SCREENSHOT === */
 (function(){
   function showProbe(){
     if(document.getElementById('mh-origin-probe')) return;
+    var info = 'origin: ' + window.location.origin + '\n' +
+               'host: ' + window.location.hostname + '\n' +
+               'OTPCredential: ' + (('OTPCredential' in window) ? 'YES' : 'NO') + '\n' +
+               'iOS app: ' + (document.documentElement.classList.contains('mh-ios-app') ? 'YES' : 'no') + '\n' +
+               'Android app: ' + (document.documentElement.classList.contains('mh-android-app') ? 'YES' : 'no') + '\n' +
+               'BUILD: probe-v2';
     var box = document.createElement('div');
     box.id = 'mh-origin-probe';
-    box.style.cssText = 'position:fixed;top:80px;left:10px;right:10px;z-index:999999;background:#1a1a1a;color:#0f0;font-family:monospace;font-size:13px;padding:14px;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.5);direction:ltr;text-align:left;line-height:1.8;';
-    box.innerHTML =
-      '<b style="color:#fff">🔍 ORIGIN PROBE</b><br>'+
-      'hostname: <b>' + window.location.hostname + '</b><br>'+
-      'origin: <b style="color:#ff0">' + window.location.origin + '</b><br>'+
-      'OTPCredential API: <b>' + ('OTPCredential' in window ? 'YES' : 'NO') + '</b><br>'+
-      'iOS app: <b>' + (document.documentElement.classList.contains('mh-ios-app') ? 'YES' : 'no') + '</b> | '+
-      'Android app: <b>' + (document.documentElement.classList.contains('mh-android-app') ? 'YES' : 'no') + '</b>'+
-      '<br><span style="color:#888;font-size:11px">tap to close</span>';
+    box.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;z-index:2147483647;background:rgba(10,10,10,0.97);color:#0f0;font-family:monospace;font-size:18px;padding:30px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;white-space:pre-line;direction:ltr;';
+    box.textContent = info + '\n\n(tap to close)';
     box.onclick = function(){ box.remove(); };
     document.body.appendChild(box);
   }
   if(document.body){ showProbe(); } else { document.addEventListener('DOMContentLoaded', showProbe); }
-  setTimeout(showProbe, 1500);
+  var n=0, iv=setInterval(function(){ showProbe(); if(++n>12) clearInterval(iv); }, 800);
 })();
