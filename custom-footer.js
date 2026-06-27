@@ -599,24 +599,3 @@
   mo.observe(document.body, {childList:true, subtree:true});
   enhanceOTP();
 })();
-
-/* === TEMP ORIGIN PROBE v2 - REMOVE AFTER iOS SCREENSHOT === */
-(function(){
-  function showProbe(){
-    if(document.getElementById('mh-origin-probe')) return;
-    var info = 'origin: ' + window.location.origin + '\n' +
-               'host: ' + window.location.hostname + '\n' +
-               'OTPCredential: ' + (('OTPCredential' in window) ? 'YES' : 'NO') + '\n' +
-               'iOS app: ' + (document.documentElement.classList.contains('mh-ios-app') ? 'YES' : 'no') + '\n' +
-               'Android app: ' + (document.documentElement.classList.contains('mh-android-app') ? 'YES' : 'no') + '\n' +
-               'BUILD: probe-v2';
-    var box = document.createElement('div');
-    box.id = 'mh-origin-probe';
-    box.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;z-index:2147483647;background:rgba(10,10,10,0.97);color:#0f0;font-family:monospace;font-size:18px;padding:30px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;white-space:pre-line;direction:ltr;';
-    box.textContent = info + '\n\n(tap to close)';
-    box.onclick = function(){ box.remove(); };
-    document.body.appendChild(box);
-  }
-  if(document.body){ showProbe(); } else { document.addEventListener('DOMContentLoaded', showProbe); }
-  var n=0, iv=setInterval(function(){ showProbe(); if(++n>12) clearInterval(iv); }, 800);
-})();
