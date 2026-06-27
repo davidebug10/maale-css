@@ -498,3 +498,27 @@
     }, { passive: true });
   });
 })();
+
+/* =========================================================
+   Platform Detection - תיוג פלטפורמה על תגית <html>
+   תאריך: 2026-06-27
+   מטרה: מוסיף class לתגית <html> לפי סביבת ההרצה:
+         mh-android-app  = אפליקציית אנדרואיד (WebView)
+         mh-ios-app      = אפליקציית אייפון (WKWebView)
+         כך ניתן לכוון CSS לפלטפורמה אחת בלבד.
+   הערה: nativeVibrateShort אינו אמין לזיהוי (מוזרק גם בדפדפן iOS).
+   ========================================================= */
+(function() {
+  'use strict';
+  var html = document.documentElement;
+  var ua = navigator.userAgent || '';
+
+  // אפליקציית אייפון - WKWebView חושף את window.webkit.messageHandlers
+  var isIOSApp = !!(window.webkit && window.webkit.messageHandlers);
+
+  // אפליקציית אנדרואיד - ה-User Agent של WebView מכיל "wv"
+  var isAndroidApp = /wv/i.test(ua);
+
+  if (isAndroidApp) { html.classList.add('mh-android-app'); }
+  if (isIOSApp) { html.classList.add('mh-ios-app'); }
+})();
