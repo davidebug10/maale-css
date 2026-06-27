@@ -522,3 +522,62 @@
   if (isAndroidApp) { html.classList.add('mh-android-app'); }
   if (isIOSApp) { html.classList.add('mh-ios-app'); }
 })();
+
+/* =========================================================
+   Welcome Page - Terms acceptance sentence + Terms popup
+   Date: 2026-06-27
+   מזריק משפט אישור תקנון מתחת לכפתורים בדף ההתחברות,
+   ופותח את דף התקנון החי כפופאפ (iframe).
+   מסתיר את .back-btn רק בתוך ה-iframe הזה (לא דולף החוצה).
+   MutationObserver לתמיכת SPA. ה-CSS מוגדר ב-global-cdn.css.
+   ========================================================= */
+(function(){
+  function injectTerms(){
+    const form = document.getElementById('Phone');
+    if(!form || document.getElementById('mh-terms-row')) return;
+    const buttons = [...form.querySelectorAll('button')];
+    const skipBtn = buttons.find(b=>b.textContent.trim()==='דלג');
+    const anchor = skipBtn || buttons.find(b=>b.classList.contains('login-btn'));
+    if(!anchor) return;
+
+    const row = document.createElement('div');
+    row.id = 'mh-terms-row';
+    row.innerHTML = 'בלחיצה על "המשך" את/ה מאשר/ת שקראת והסכמת ל<span id="mh-terms-link">תקנון האתר</span>';
+    anchor.parentElement.appendChild(row);
+
+    row.querySelector('#mh-terms-link').addEventListener('click', function(){
+      document.getElementById('mh-terms-modal')?.remove();
+      const m = document.createElement('div');
+      m.id = 'mh-terms-modal';
+      m.innerHTML =
+        '<div id="mh-terms-box">'+
+          '<div id="mh-terms-head"><h3>תקנון השימוש</h3><button id="mh-terms-x" aria-label="close">&times;</button></div>'+
+          '<iframe id="mh-terms-frame" src="https://www.maalehamishlohim.co.il/he/page/takanon"></iframe>'+
+          '<button id="mh-terms-accept">סגור</button>'+
+        '</div>';
+      document.body.appendChild(m);
+      requestAnimationFrame(()=>m.classList.add('show'));
+
+      const frame = m.querySelector('#mh-terms-frame');
+      frame.addEventListener('load', function(){
+        try{
+          const d = frame.contentDocument || frame.contentWindow.document;
+          const s = d.createElement('style');
+          s.textContent = '.back-btn{display:none !important;}';
+          d.head.appendChild(s);
+        }catch(e){}
+      });
+
+      const close = ()=>{ m.classList.remove('show'); setTimeout(()=>m.remove(),300); };
+      m.querySelector('#mh-terms-x').onclick = close;
+      m.querySelector('#mh-terms-accept').onclick = close;
+      m.onclick = e=>{ if(e.target===m) close(); };
+    });
+  }
+
+  const mo = new MutationObserver(function(){
+    requestAnimationFrame(injectTerms);
+  });
+  mo.observe(document.body, {childList:true, subtree:true});
+  injectTerms();
+})();
