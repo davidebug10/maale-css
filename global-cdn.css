@@ -5273,3 +5273,85 @@ html body #MultiVendorBottomNav #ongoingOrders .ongoing-order:active {
 html.mh-android-app .floating-nav-pill {
     bottom: 28px !important;
 }
+
+/* =========================================================
+   חלק 33: דף התחברות/בית - WELCOME PAGE LIQUID GLASS
+   תאריך: 2026-06-27
+   Scope: #WelcomePage / form#Phone  (מזהים יציבים)
+   כפתור "המשך" = .login-btn | "דלג" = :not(.login-btn)
+   כולל גם עיצוב פופאפ התקנון (#mh-terms-*) המוזרק ע"י custom-footer.js
+   הסרטון מוזרק דרך Page Builder, לא כאן.
+   ========================================================= */
+html body #WelcomePage{background:radial-gradient(circle at 50% 0%,#fff 0%,#fff5f5 100%) !important;}
+html body #WelcomePage form#Phone{
+  background:rgba(255,255,255,.72) !important;backdrop-filter:blur(30px) saturate(200%) !important;
+  -webkit-backdrop-filter:blur(30px) saturate(200%) !important;border:1px solid rgba(255,255,255,.6) !important;
+  border-radius:28px !important;box-shadow:0 18px 45px rgba(227,30,36,.10) !important;
+  padding:28px 22px !important;margin:-34px 16px 24px 16px !important;position:relative !important;z-index:5 !important;}
+html body #WelcomePage form#Phone .tw-text-4xl{
+  color:#1a1a1a !important;font-weight:900 !important;font-size:32px !important;letter-spacing:-.8px !important;
+  line-height:1.15 !important;display:inline-block !important;position:relative !important;padding-bottom:8px !important;}
+html body #WelcomePage form#Phone .tw-text-4xl::after{
+  content:'' !important;position:absolute !important;bottom:0 !important;right:0 !important;width:52px !important;height:4px !important;
+  background:linear-gradient(90deg,#e31e24 0%,rgba(227,30,36,0) 100%) !important;border-radius:4px !important;}
+html body #WelcomePage form#Phone .tw-text-\[\#918D8D\]{
+  color:#4a5568 !important;font-size:14px !important;font-weight:500 !important;margin-top:4px !important;}
+html body #WelcomePage form#Phone .tw-mt-6.tw-text-black{
+  color:#1a1a1a !important;font-weight:800 !important;font-size:15px !important;text-align:center !important;
+  display:flex !important;align-items:center !important;justify-content:center !important;gap:14px !important;
+  margin-top:26px !important;margin-bottom:4px !important;}
+html body #WelcomePage form#Phone .tw-mt-6.tw-text-black::before,
+html body #WelcomePage form#Phone .tw-mt-6.tw-text-black::after{
+  content:'' !important;flex:1 !important;height:1px !important;
+  background:linear-gradient(90deg,rgba(227,30,36,0) 0%,rgba(227,30,36,.35) 50%,rgba(227,30,36,0) 100%) !important;}
+html body #WelcomePage form#Phone .v-field{
+  background:#fff !important;border:1.5px solid rgba(227,30,36,.18) !important;border-radius:16px !important;
+  box-shadow:0 6px 20px rgba(0,0,0,.04) !important;transition:all .3s ease !important;}
+html body #WelcomePage form#Phone .v-field--focused{
+  border-color:#e31e24 !important;box-shadow:0 8px 24px rgba(227,30,36,.12) !important;}
+html body #WelcomePage form#Phone .v-field__outline{display:none !important;}
+html body #WelcomePage form#Phone #loginEmailOrNumber{font-weight:600 !important;color:#1a1a1a !important;}
+html body #WelcomePage form#Phone button.login-btn,
+html body #WelcomePage form#Phone button.login-btn.v-btn--disabled,
+html body #WelcomePage form#Phone button.login-btn.v-btn--elevated,
+html body #WelcomePage form#Phone button.login-btn[disabled]{
+  background:linear-gradient(135deg,#e31e24 0%,#b3161b 100%) !important;background-color:#e31e24 !important;
+  border-radius:16px !important;height:54px !important;box-shadow:0 10px 24px rgba(227,30,36,.3) !important;
+  border:1px solid rgba(255,255,255,.2) !important;opacity:1 !important;
+  transition:all .3s cubic-bezier(.34,1.56,.64,1) !important;}
+html body #WelcomePage form#Phone button.login-btn .v-btn__content,
+html body #WelcomePage form#Phone button.login-btn.v-btn--elevated .v-btn__content,
+html body #WelcomePage form#Phone button.login-btn.v-btn--disabled .v-btn__content{
+  color:#fff !important;font-weight:900 !important;font-size:16px !important;opacity:1 !important;}
+html body #WelcomePage form#Phone button.login-btn:active{transform:scale(.97) !important;}
+html body #WelcomePage form#Phone button.login-btn .v-btn__overlay,
+html body #WelcomePage form#Phone button.login-btn .v-btn__underlay{opacity:0 !important;background:transparent !important;}
+html body #WelcomePage form#Phone button.v-btn--block:not(.login-btn){
+  background:rgba(255,255,255,.5) !important;backdrop-filter:blur(10px) !important;border:1px solid rgba(0,0,0,.06) !important;
+  border-radius:16px !important;box-shadow:none !important;height:48px !important;}
+html body #WelcomePage form#Phone button.v-btn--block:not(.login-btn) .v-btn__content{
+  color:#888 !important;font-weight:600 !important;}
+html body #WelcomePage form#Phone #mh-terms-row{
+  display:block !important;width:100% !important;text-align:center !important;
+  margin:16px 0 2px !important;direction:rtl !important;font-family:'Heebo',sans-serif !important;
+  font-size:12px !important;color:#4a5568 !important;line-height:1.6 !important;font-weight:500 !important;}
+html body #WelcomePage form#Phone #mh-terms-link{
+  color:#e31e24 !important;font-weight:800 !important;text-decoration:underline !important;
+  cursor:pointer !important;white-space:nowrap !important;}
+#mh-terms-modal{position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;
+  padding:20px;background:rgba(20,8,8,.55);backdrop-filter:blur(4px);opacity:0;transition:opacity .3s;direction:rtl;font-family:'Heebo',sans-serif;}
+#mh-terms-modal.show{opacity:1;}
+#mh-terms-box{width:100%;max-width:460px;height:78vh;background:rgba(255,255,255,.96);border:1px solid rgba(255,255,255,.7);
+  border-radius:24px;box-shadow:0 25px 60px rgba(0,0,0,.35);display:flex;flex-direction:column;overflow:hidden;
+  transform:scale(.94);transition:transform .3s cubic-bezier(.34,1.56,.64,1);}
+#mh-terms-modal.show #mh-terms-box{transform:scale(1);}
+#mh-terms-head{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid rgba(227,30,36,.12);}
+#mh-terms-head h3{margin:0;font-size:18px;font-weight:900;color:#1a1a1a;}
+#mh-terms-x{width:34px;height:34px;border-radius:50%;border:none;background:rgba(227,30,36,.08);color:#e31e24;
+  font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+#mh-terms-x:active{transform:scale(.9);}
+#mh-terms-frame{flex:1;border:none;width:100%;background:#fff;}
+#mh-terms-accept{margin:14px 18px 18px;padding:13px;background:linear-gradient(135deg,#e31e24,#b3161b);color:#fff;
+  border:none;border-radius:14px;font-size:15px;font-weight:900;cursor:pointer;box-shadow:0 8px 20px rgba(227,30,36,.3);
+  font-family:'Heebo',sans-serif;}
+#mh-terms-accept:active{transform:scale(.97);}
