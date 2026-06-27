@@ -552,21 +552,14 @@
       m.innerHTML =
         '<div id="mh-terms-box">'+
           '<div id="mh-terms-head"><h3>תקנון השימוש</h3><button id="mh-terms-x" aria-label="close">&times;</button></div>'+
-          '<iframe id="mh-terms-frame" src="https://www.maalehamishlohim.co.il/he/page/takanon"></iframe>'+
+          '<div id="mh-terms-frame-wrap">'+
+            '<iframe id="mh-terms-frame" src="https://www.maalehamishlohim.co.il/he/page/takanon"></iframe>'+
+            '<div id="mh-terms-cover" aria-hidden="true"></div>'+
+          '</div>'+
           '<button id="mh-terms-accept">סגור</button>'+
         '</div>';
       document.body.appendChild(m);
       requestAnimationFrame(()=>m.classList.add('show'));
-
-      const frame = m.querySelector('#mh-terms-frame');
-      frame.addEventListener('load', function(){
-        try{
-          const d = frame.contentDocument || frame.contentWindow.document;
-          const s = d.createElement('style');
-          s.textContent = '.back-btn{display:none !important;}';
-          d.head.appendChild(s);
-        }catch(e){}
-      });
 
       const close = ()=>{ m.classList.remove('show'); setTimeout(()=>m.remove(),300); };
       m.querySelector('#mh-terms-x').onclick = close;
