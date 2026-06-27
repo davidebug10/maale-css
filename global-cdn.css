@@ -5260,3 +5260,16 @@ html body #MultiVendorBottomNav #ongoingOrders .ongoing-order:active {
   transform: scale(0.97) !important;
   transition: transform 0.1s ease !important;
 }
+
+/* =========================================================
+   Android Bottom Nav - Safe Gap Fix
+   תאריך: 2026-06-27
+   מטרה: הרמת הסרגל התחתון כלפי מעלה רק באנדרואיד, כדי שלא
+         יתנגש עם סרגל הניווט המובנה של המערכת (חזור/בית/אחרון).
+   סקופ: html.mh-android-app בלבד - לא נוגע באייפון/בדפדפן.
+   הערה: לא משתמשים ב-env(safe-area-inset-bottom) כי הוא מחזיר
+         0 ברוב מכשירי אנדרואיד WebView (תיעוד רשמי של גוגל).
+   ========================================================= */
+html.mh-android-app .floating-nav-pill {
+    bottom: 28px !important;
+}
