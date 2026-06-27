@@ -466,7 +466,6 @@
   document.addEventListener('mousedown', rippleHandler, true);
 })();
 
-
 /* === Maale: merchant hero video autoplay fix (.mhh-video) | 2026-06-20 === */
 (function () {
   // 1) hide the iOS native center play-button overlay on our hero video only
@@ -669,4 +668,87 @@
   var mo = new MutationObserver(function(){ requestAnimationFrame(check); });
   mo.observe(document.body, { childList:true, subtree:true });
   check();
+})();
+
+/* =========================================================
+   ✅ סקריפט #3: קישורי עמודים משפטיים בתפריט החשבון
+   תאריך: 2026-06-27 | Scope: #ProfileSideBar .navigation-list
+   מטרה: הוספת תקנון / מדיניות פרטיות / הצהרת נגישות
+          מעל "יציאה מהמערכת". מזוהה לפי טקסט (יציב),
+          לא לפי קלאס-האש של Vue. כולל MutationObserver
+          להזרקה מחדש אחרי ניווט SPA של Vue.
+   ========================================================= */
+(function() {
+    var PAGES = [
+        { id:'mh-link-takanon',  icon:'📜', text:'תקנון האתר',      href:'/he/page/takanon' },
+        { id:'mh-link-privacy',  icon:'🔒', text:'מדיניות הפרטיות', href:'/he/page/privacy-policy' },
+        { id:'mh-link-negishut', icon:'♿', text:'הצהרת נגישות',     href:'/he/page/negishut' }
+    ];
+
+    function buildLink(p) {
+        var link = document.createElement('a');
+        link.id = p.id;
+        link.href = p.href;
+        link.className = 'v-list-item v-list-item--link rounded-lg navigation-item tw-my-4';
+        link.setAttribute('role', 'link');
+        link.style.cssText = 'display:flex;align-items:center;padding:14px 16px;text-decoration:none;color:inherit;border:1px solid rgba(227,30,36,0.2);border-radius:16px;background:rgba(255,255,255,0.5);backdrop-filter:blur(15px);-webkit-backdrop-filter:blur(15px);box-shadow:0 4px 15px rgba(227,30,36,0.08);margin-top:16px;margin-bottom:16px;transition:all 0.3s ease;position:relative;overflow:hidden;cursor:pointer;';
+        link.innerHTML =
+            '<div class="v-list-item__prepend">' +
+                '<div class="tw-me-3" style="display:flex;align-items:center;justify-content:center;font-size:22px;width:24px;height:24px;">' + p.icon + '</div>' +
+            '</div>' +
+            '<div class="v-list-item__content">' +
+                '<div class="v-list-item-title nav-text" style="font-weight:800;font-size:14px;color:#1a1a1a;">' + p.text + '</div>' +
+            '</div>' +
+            '<div style="margin-right:auto;font-size:20px;color:#e31e24;font-weight:900;">‹</div>';
+        return link;
+    }
+
+    function injectLegalLinks() {
+        var navList = document.querySelector('#ProfileSideBar .navigation-list');
+        if (!navList) return false;
+        if (document.getElementById('mh-link-takanon')) return true;
+
+        // מציאת "יציאה מהמערכת" לפי טקסט (לא לפי קלאס-האש שמשתנה)
+        var logoutItem = null;
+        var items = navList.children;
+        for (var i = 0; i < items.length; i++) {
+            if ((items[i].textContent || '').indexOf('יציאה מהמערכת') !== -1) {
+                logoutItem = items[i];
+                break;
+            }
+        }
+
+        PAGES.forEach(function(p) {
+            if (document.getElementById(p.id)) return;
+            var link = buildLink(p);
+            if (logoutItem) {
+                navList.insertBefore(link, logoutItem);
+            } else {
+                navList.appendChild(link);
+            }
+        });
+        return true;
+    }
+
+    function tryInject() {
+        if (injectLegalLinks()) return;
+        var attempts = 0;
+        var iv = setInterval(function() {
+            attempts++;
+            if (injectLegalLinks() || attempts > 60) clearInterval(iv);
+        }, 250);
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', tryInject);
+    } else {
+        tryInject();
+    }
+
+    new MutationObserver(function() {
+        if (document.querySelector('#ProfileSideBar .navigation-list') &&
+            !document.getElementById('mh-link-takanon')) {
+            injectLegalLinks();
+        }
+    }).observe(document.body, { childList: true, subtree: true });
 })();
