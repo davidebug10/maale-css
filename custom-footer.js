@@ -601,55 +601,69 @@
 })();
 
 /* =========================================================
-   Login OTP - Web OTP API auto-fill (browser only)
-   Date: 2026-06-27
-   מאזין ל-SMS עם קוד וממלא את #loginOTP אוטומטית.
-   עובד בדפדפנים תומכים (בעיקר Chrome אנדרואיד) כשה-SMS
-   מסתיים בשורה "@www.maalehamishlohim.co.il #קוד".
+   Login OTP - Smart auto-fill detector + auto-submit
+   Date: 2026-06-27  (מחליף את גרסת Web OTP הקודמת)
+   מזהה מילוי אוטומטי של #loginOTP בכל סביבה:
+   - iOS: נגיעה על ההצעה מעל המקלדת (QuickType)
+   - Android-דפדפן: Web OTP API ממלא תכנותית
+   - הדבקה / כל מילוי "בקפיצה"
+   מבדיל ממילוי ידני (ספרה-ספרה) כדי לא לשלוח קוד חלקי.
+   לוחץ "התחברות" אוטומטית אחרי 0.8 שנייה. בלי תנאי אורך.
    ========================================================= */
 (function(){
-  if(!('OTPCredential' in window)) return;
+  var prevLen = 0, attachedNode = null, submitScheduled = false, webOtpStarted = false;
 
-  var listening = false;
+  function autoSubmit(form){
+    if(submitScheduled) return;
+    submitScheduled = true;
+    var btn = form ? Array.prototype.slice.call(form.querySelectorAll('button')).filter(function(b){ return b.classList.contains('login-btn'); })[0] : null;
+    setTimeout(function(){
+      if(btn && !btn.disabled && !btn.classList.contains('v-btn--disabled')){
+        btn.classList.add('mh-auto-press');
+        btn.click();
+        setTimeout(function(){ btn.classList.remove('mh-auto-press'); }, 600);
+      }
+      setTimeout(function(){ submitScheduled = false; }, 2500);
+    }, 800);
+  }
 
-  function startListening(otp){
-    if(listening) return;
-    listening = true;
+  function onInput(e){
+    var otp = e.target;
+    var len = (otp.value || '').length, delta = len - prevLen;
+    prevLen = len;
+    if(delta >= 2){ autoSubmit(otp.closest('form')); }
+  }
 
+  function startWebOtp(otp){
+    if(webOtpStarted || !('OTPCredential' in window)) return;
+    webOtpStarted = true;
     var ac = new AbortController();
     var form = otp.closest('form');
-    if(form){
-      form.addEventListener('submit', function(){ ac.abort(); }, { once:true });
-    }
-
-    navigator.credentials.get({
-      otp: { transport: ['sms'] },
-      signal: ac.signal
-    }).then(function(otpCred){
-      if(otpCred && otpCred.code){
-        otp.value = otpCred.code;
-        otp.dispatchEvent(new Event('input', { bubbles:true }));
-        otp.dispatchEvent(new Event('change', { bubbles:true }));
-
-        var btn = form ? Array.prototype.slice.call(form.querySelectorAll('button')).filter(function(b){ return b.classList.contains('login-btn'); })[0] : null;
-        if(btn){
-          setTimeout(function(){
-            if(!btn.disabled && !btn.classList.contains('v-btn--disabled')){
-              btn.click();
-            }
-          }, 800);
+    if(form){ form.addEventListener('submit', function(){ try{ ac.abort(); }catch(_){} }, { once:true }); }
+    navigator.credentials.get({ otp:{ transport:['sms'] }, signal: ac.signal })
+      .then(function(c){
+        if(c && c.code){
+          otp.value = c.code;
+          otp.dispatchEvent(new Event('input', { bubbles:true }));
+          otp.dispatchEvent(new Event('change', { bubbles:true }));
         }
-      }
-      listening = false;
-    }).catch(function(){
-      listening = false;
-    });
+        webOtpStarted = false;
+      })
+      .catch(function(){ webOtpStarted = false; });
   }
 
   function check(){
     var otp = document.getElementById('loginOTP');
-    if(otp && !listening) startListening(otp);
-    if(!otp && listening) listening = false;
+    if(otp){
+      if(attachedNode !== otp){
+        attachedNode = otp;
+        prevLen = (otp.value || '').length;
+        otp.addEventListener('input', onInput);
+      }
+      startWebOtp(otp);
+    } else {
+      attachedNode = null; prevLen = 0; webOtpStarted = false; submitScheduled = false;
+    }
   }
 
   var mo = new MutationObserver(function(){ requestAnimationFrame(check); });
