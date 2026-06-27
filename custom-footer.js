@@ -599,3 +599,51 @@
   mo.observe(document.body, {childList:true, subtree:true});
   enhanceOTP();
 })();
+
+/* =========================================================
+   Login OTP - Web OTP API auto-fill (browser only)
+   Date: 2026-06-27
+   מאזין ל-SMS עם קוד וממלא את #loginOTP אוטומטית.
+   עובד בדפדפנים תומכים (בעיקר Chrome אנדרואיד) כשה-SMS
+   מסתיים בשורה "@www.maalehamishlohim.co.il #קוד".
+   ========================================================= */
+(function(){
+  if(!('OTPCredential' in window)) return;
+
+  var listening = false;
+
+  function startListening(otp){
+    if(listening) return;
+    listening = true;
+
+    var ac = new AbortController();
+    var form = otp.closest('form');
+    if(form){
+      form.addEventListener('submit', function(){ ac.abort(); }, { once:true });
+    }
+
+    navigator.credentials.get({
+      otp: { transport: ['sms'] },
+      signal: ac.signal
+    }).then(function(otpCred){
+      if(otpCred && otpCred.code){
+        otp.value = otpCred.code;
+        otp.dispatchEvent(new Event('input', { bubbles:true }));
+        otp.dispatchEvent(new Event('change', { bubbles:true }));
+      }
+      listening = false;
+    }).catch(function(){
+      listening = false;
+    });
+  }
+
+  function check(){
+    var otp = document.getElementById('loginOTP');
+    if(otp && !listening) startListening(otp);
+    if(!otp && listening) listening = false;
+  }
+
+  var mo = new MutationObserver(function(){ requestAnimationFrame(check); });
+  mo.observe(document.body, { childList:true, subtree:true });
+  check();
+})();
