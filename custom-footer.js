@@ -630,6 +630,15 @@
         otp.value = otpCred.code;
         otp.dispatchEvent(new Event('input', { bubbles:true }));
         otp.dispatchEvent(new Event('change', { bubbles:true }));
+
+        var btn = form ? Array.prototype.slice.call(form.querySelectorAll('button')).filter(function(b){ return b.classList.contains('login-btn'); })[0] : null;
+        if(btn){
+          setTimeout(function(){
+            if(!btn.disabled && !btn.classList.contains('v-btn--disabled')){
+              btn.click();
+            }
+          }, 800);
+        }
       }
       listening = false;
     }).catch(function(){
