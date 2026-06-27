@@ -574,3 +574,27 @@
   mo.observe(document.body, {childList:true, subtree:true});
   injectTerms();
 })();
+
+
+/* =========================================================
+   Login OTP - Numeric keyboard + iOS autofill attributes
+   Date: 2026-06-27
+   מוסיף לשדה #loginOTP את התכונות:
+   - inputmode="numeric"  -> מקלדת ספרות בלבד (iOS + Android)
+   - autocomplete="one-time-code" -> הצעת מילוי אוטומטי באייפון
+   - pattern="[0-9]*" -> חיזוק ל-iOS ישנים (הטופס novalidate, בטוח)
+   MutationObserver כי שדה ה-OTP נוצר דינמית אחרי "המשך".
+   ========================================================= */
+(function(){
+  function enhanceOTP(){
+    const otp = document.getElementById('loginOTP');
+    if(!otp) return;
+    if(otp.getAttribute('inputmode') === 'numeric') return;
+    otp.setAttribute('inputmode','numeric');
+    otp.setAttribute('autocomplete','one-time-code');
+    otp.setAttribute('pattern','[0-9]*');
+  }
+  const mo = new MutationObserver(function(){ requestAnimationFrame(enhanceOTP); });
+  mo.observe(document.body, {childList:true, subtree:true});
+  enhanceOTP();
+})();
