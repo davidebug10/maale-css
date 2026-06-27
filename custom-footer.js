@@ -590,6 +590,7 @@
     const otp = document.getElementById('loginOTP');
     if(!otp) return;
     if(otp.getAttribute('inputmode') === 'numeric') return;
+    otp.setAttribute('type','tel');
     otp.setAttribute('inputmode','numeric');
     otp.setAttribute('autocomplete','one-time-code');
     otp.setAttribute('pattern','[0-9]*');
