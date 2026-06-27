@@ -699,7 +699,7 @@
             '<div class="v-list-item__content">' +
                 '<div class="v-list-item-title nav-text" style="font-weight:800;font-size:14px;color:#1a1a1a;">' + p.text + '</div>' +
             '</div>' +
-            '<div style="margin-right:auto;font-size:20px;color:#e31e24;font-weight:900;">‹</div>';
+            '<div style="margin-right:auto;font-size:22px;color:#c4c4c4;font-weight:400;">‹</div>';
         return link;
     }
 
