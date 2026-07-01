@@ -752,3 +752,71 @@
         }
     }).observe(document.body, { childList: true, subtree: true });
 })();
+
+/* =========================================================
+   עברות ותיקוני טקסט לדף "ההזמנות שלי" | 2026-07-01
+   - החזרת טקסט מלא לכפתור "להזמין מחדש" (הפלטפורמה מקצרת ל"מחד...")
+   - המרת שעה מפורמט 12ש עברי ל-24 שעות (order-status)
+   - תרגום "Delivery" ל-"משלוח לבית" (order-type)
+   - תרגום "Rating:" ל-"הדירוג שלי:" (span.review)
+   ========================================================= */
+(function () {
+    'use strict';
+
+    var REORDER_FULL = 'להזמין מחדש';
+
+    function to24(text) {
+        return text.replace(
+            /(\d{1,2}):(\d{2})[\s‎‏⁦-⁩]*(אחר הצהריים|אחה["״']?צ|צהריים|בוקר|ערב|לילה)/g,
+            function (m, h, mm, p) {
+                h = parseInt(h, 10);
+                var isPM = /ערב|צהריים|אחה|אחר/.test(p);
+                if (isPM) { if (h < 12) { h += 12; } }
+                else { if (h === 12) { h = 0; } }
+                return (h < 10 ? '0' : '') + h + ':' + mm;
+            }
+        );
+    }
+
+    function applyFixes() {
+        document.querySelectorAll('button.track-btn.tw-bg-black').forEach(function (btn) {
+            var label = btn.querySelector('.tw-truncate') ||
+                        btn.querySelector('.v-btn__content > span:last-of-type');
+            if (label && label.textContent.trim() !== REORDER_FULL) {
+                label.textContent = REORDER_FULL;
+            }
+        });
+        document.querySelectorAll('.order-status').forEach(function (el) {
+            var t = el.textContent, n = to24(t);
+            if (n !== t) { el.textContent = n; }
+        });
+        document.querySelectorAll('.order-type').forEach(function (el) {
+            if (/Delivery/i.test(el.textContent)) {
+                el.textContent = el.textContent.replace(/Delivery/gi, 'משלוח לבית');
+            }
+        });
+        document.querySelectorAll('span.review').forEach(function (el) {
+            el.childNodes.forEach(function (node) {
+                if (node.nodeType === 3 && /Rating\s*:/i.test(node.textContent)) {
+                    node.textContent = node.textContent.replace(/Rating\s*:/i, 'הדירוג שלי:');
+                }
+            });
+        });
+    }
+
+    function init() {
+        applyFixes();
+        var raf;
+        var obs = new MutationObserver(function () {
+            cancelAnimationFrame(raf);
+            raf = requestAnimationFrame(applyFixes);
+        });
+        obs.observe(document.body, { childList: true, subtree: true });
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+    } else {
+        init();
+    }
+})();
