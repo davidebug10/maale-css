@@ -5490,3 +5490,59 @@ html body #merchants_by_category .hide-scrollbar .v-btn {
 html body #merchants_by_category .hide-scrollbar .tw-bg-\[#212121\] {
     background: #e31e24 !important;
 }
+
+/* =========================================================
+   חלק 37: דף "ההזמנות שלי" - כפתורי פעולה + כרטיס דירוג | 2026-07-01
+   השלמה לחלק 7. הפלטפורמה שינתה class של כפתור "דרג", לכן תופסים
+   אותו כ-track-btn שאינו האדום (עמיד לשינויי class עתידיים).
+   ========================================================= */
+
+/* כפתור "להזמין מחדש" - קפסולה אדומה שמתאימה לרוחב הטקסט (בלי חיתוך) */
+html body button.track-btn.tw-bg-black {
+    max-width: none !important;
+    width: fit-content !important;
+    min-width: 0 !important;
+    flex: 0 0 auto !important;
+    padding: 0 20px !important;
+    height: 42px !important;
+    border-radius: 50px !important;
+    overflow: visible !important;
+    background: linear-gradient(135deg, #e31e24 0%, #b3161b 100%) !important;
+    box-shadow: 0 6px 16px rgba(227, 30, 36, 0.32) !important;
+}
+html body button.track-btn.tw-bg-black .v-btn__content {
+    overflow: visible !important;
+    max-width: none !important;
+}
+html body button.track-btn.tw-bg-black .tw-truncate {
+    overflow: visible !important;
+    text-overflow: clip !important;
+    max-width: none !important;
+}
+
+/* כפתור "דרג" - כל track-btn שאינו האדום */
+html body button.track-btn:not(.tw-bg-black) {
+    background: #ffffff !important;
+    border: 1.5px solid rgba(227, 30, 36, 0.4) !important;
+    border-radius: 50px !important;
+    color: #e31e24 !important;
+    font-weight: 700 !important;
+    height: 42px !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05) !important;
+}
+
+/* קפסולת "הדירוג שלי" (span.review) - זכוכית אדומה עדינה */
+html body span.review {
+    background: linear-gradient(135deg, rgba(227, 30, 36, 0.08) 0%, rgba(255, 245, 245, 0.9) 100%) !important;
+    border: 1px solid rgba(227, 30, 36, 0.2) !important;
+    border-radius: 50px !important;
+    padding: 6px 16px !important;
+    color: #b3161b !important;
+    font-weight: 800 !important;
+    font-size: 13px !important;
+    box-shadow: 0 4px 12px rgba(227, 30, 36, 0.08) !important;
+    direction: rtl !important;
+}
+html body span.review img {
+    filter: drop-shadow(0 0 3px rgba(255, 193, 7, 0.5)) !important;
+}
