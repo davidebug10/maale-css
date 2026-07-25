@@ -820,3 +820,88 @@
         init();
     }
 })();
+
+/* =========================================================
+   אישור גיל 18+ בהוספה לעגלה (אלכוהול / סיגריות) | 2026-07-25
+   - תופס לחיצה על button.add-btn בשלב ה-capture (לפני Vue)
+   - מזהה קטגוריה: .product-category-name בפופאפ מוצר,
+     או h3.category-name בתוך .special-listing-inner ברשימה
+   - חוסם רק אם שם הקטגוריה הוא בדיוק "אלכוהול" או "סיגריות"
+   - אחרי אישור: נשמר ב-sessionStorage ומופעל click חוזר על הכפתור
+   ========================================================= */
+(function () {
+    'use strict';
+
+    if (window.__mhAgeGateInit) { return; }
+    window.__mhAgeGateInit = true;
+
+    var RESTRICTED = ['אלכוהול', 'סיגריות'];
+    var KEY = 'mhAgeOK';
+    var STYLE_ID = 'mh-age-style';
+    var GATE_ID = 'mh-age-gate';
+
+    function injectStyle() {
+        if (document.getElementById(STYLE_ID)) { return; }
+        var st = document.createElement('style');
+        st.id = STYLE_ID;
+        st.textContent = '#mh-age-gate{position:fixed;inset:0;z-index:2147483000;display:flex;align-items:center;justify-content:center;padding:24px;background:rgba(0,0,0,.5);direction:rtl;opacity:0;transition:opacity .28s ease}#mh-age-gate.on{opacity:1}#mh-age-gate .card{width:100%;max-width:390px;background:#fff;border-radius:28px;box-shadow:0 25px 60px rgba(0,0,0,.3);padding:30px 22px 22px;text-align:center;font-family:"Heebo","Inter",-apple-system,sans-serif;transform:scale(.9);transition:transform .32s cubic-bezier(.34,1.56,.64,1)}#mh-age-gate.on .card{transform:scale(1)}#mh-age-gate .badge{width:62px;height:62px;margin:0 auto 16px;border-radius:50%;background:linear-gradient(135deg,#e31e24,#b3161b);color:#fff;font-weight:900;font-size:19px;display:flex;align-items:center;justify-content:center;box-shadow:0 10px 24px rgba(227,30,36,.35)}#mh-age-gate h2{font-size:20px;font-weight:900;color:#1a1a1a;margin:0 0 10px;line-height:1.4}#mh-age-gate p{font-size:14.5px;font-weight:500;color:#4a5568;line-height:1.6;margin:0 0 22px}#mh-age-gate .ok{display:block;width:100%;height:52px;border:none;border-radius:16px;background:linear-gradient(135deg,#e31e24,#b3161b);color:#fff;font-family:inherit;font-size:16px;font-weight:900;cursor:pointer;box-shadow:0 8px 20px rgba(227,30,36,.3);transition:transform .2s ease}#mh-age-gate .ok:active{transform:scale(.97)}#mh-age-gate .no{display:block;margin:14px auto 0;background:none;border:none;font-family:inherit;font-size:14px;font-weight:700;color:#4a5568;cursor:pointer;text-decoration:underline}';
+        document.head.appendChild(st);
+    }
+
+    function categoryOf(target) {
+        var popup = target.closest('.product-popup');
+        if (popup) {
+            var c = popup.querySelector('.product-category-name');
+            return c ? c.textContent.trim() : null;
+        }
+        var section = target.closest('.special-listing-inner');
+        if (section) {
+            var h = section.querySelector('h3.category-name');
+            return h ? h.textContent.trim() : null;
+        }
+        return null;
+    }
+
+    function showGate(btn) {
+        if (document.getElementById(GATE_ID)) { return; }
+        injectStyle();
+        var ov = document.createElement('div');
+        ov.id = GATE_ID;
+        ov.innerHTML = '<div class="card"><div class="badge">18+</div>' +
+            '<h2>מוצר לגילאי 18 ומעלה</h2>' +
+            '<p>בלחיצה על ״אני מאשר/ת״ הנך מצהיר/ה כי מלאו לך 18 שנים, וכי ברשותך תעודה מזהה להציג לשליח בעת מסירת ההזמנה.</p>' +
+            '<button type="button" class="ok">אני מאשר/ת שאני מעל גיל 18</button>' +
+            '<button type="button" class="no">ביטול</button></div>';
+        document.body.appendChild(ov);
+        requestAnimationFrame(function () { ov.classList.add('on'); });
+
+        ov.querySelector('.ok').addEventListener('click', function () {
+            try { sessionStorage.setItem(KEY, '1'); } catch (err) {}
+            ov.classList.remove('on');
+            setTimeout(function () {
+                ov.remove();
+                if (document.contains(btn)) { btn.click(); }
+            }, 260);
+        });
+
+        ov.querySelector('.no').addEventListener('click', function () {
+            ov.classList.remove('on');
+            setTimeout(function () { ov.remove(); }, 260);
+        });
+    }
+
+    document.addEventListener('click', function (e) {
+        var approved = false;
+        try { approved = sessionStorage.getItem(KEY) === '1'; } catch (err) {}
+        if (approved) { return; }
+        if (!e.target || !e.target.closest) { return; }
+        var btn = e.target.closest('button.add-btn');
+        if (!btn) { return; }
+        var cat = categoryOf(e.target);
+        if (!cat || RESTRICTED.indexOf(cat) === -1) { return; }
+        e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
+        showGate(btn);
+    }, true);
+})();
