@@ -905,3 +905,653 @@
         showGate(btn);
     }, true);
 })();
+
+/* ============================================================================
+   MH Pizza Quarters — Production v1.0  (הרצה בקונסולה בלבד, לא לקומיט)
+   ----------------------------------------------------------------------------
+   שינויים מ-v0.5:
+     [FIX] הפתיחה האוטומטית לא עבדה. סיבת שורש: השוויתי לטקסט "הראה עוד",
+           אבל הכפתור בפלטפורמה כתוב "להראות יותר". ההנחה הגיעה מקריאת
+           צילום מסך ולא ממדידה. עכשיו ההתאמה מבוססת ביטוי רגולרי גמיש,
+           מנקה תווי כיווניות נסתרים, ומוצאת גם כשהטקסט יושב ב-span פנימי.
+     [CHG] תנאי העצירה מבוסס חתימת מצב (תיבות + כפתורים) במקום ספירת
+           תיבות בלבד — כך קבוצה שנפתחת בלי להוסיף תיבות לא עוצרת אותנו
+           לפני שהגענו לקבוצות הבאות.
+
+   שינויים מ-v0.4:
+     [FIX] רשימות מקופלות. HyperZod מכניס ל-DOM רק חלק מהאופציות ומסתיר את
+           השאר מאחורי "הראה עוד" (נמדד: 16 תיבות לפני, 26 אחרי). הכרטיס
+           הציג רבעים חסרים. פתרון: פתיחה אוטומטית לפני הרינדור, עם תקרה
+           של 10 לחיצות ועצירה מיידית כשהמספר מפסיק לעלות.
+     [FIX] מגן קבוצת החובה האזין לכל הוספה לעגלה בפלטפורמה כולה. עכשיו
+           פעיל אך ורק בפופאפ שבו קיימים הכרטיסים שלנו — כלומר רק אצל
+           מסעדן שהגדיר את קונבנציית הרבעים.
+
+   שינויים מ-v0.3:
+     [FIX] תמונות תוספות לא הופיעו בכרטיסים.
+           סיבה: MutationObserver אינו צובר אירועים בזמן שהוא מנותק, וב-v0.2
+           ניתקנו אותו בזמן הסריקה כדי למנוע לולאה. Vuetify מכניס את תגיות
+           <img> בדיוק בחלון הזה, וההודעה אבדה — אז שום דבר לא העיר את
+           הסקריפט לצייר אותן.
+           פתרון: סריקות מעקב מתוזמנות (settle) ב-0.35/0.9/2/3.5 שניות אחרי
+           כל סריקה ואחרי כל שינוי בחירה. מוגבל וצפוי בכוונה.
+     [CHG] שיטת הסתרה בטוחה יותר לטעינה עצלה: השורה שומרת על מידותיה
+           האמיתיות אבל יוצאת מהזרימה עם z-index שלילי.
+
+   ארכיטקטורה (ללא שינוי):
+     הכרטיס הוא בובה. לא זוכר ולא מחשב — קורא את מצב הצ'קבוקסים המקוריים
+     ומצייר את עצמו. כל לחיצה מתורגמת ל-click() על ה-input המקורי,
+     ו-HyperZod מחשב מחיר, עגלה ובון.
+
+   קונבנציית שמות (החוזה עם המסעדן):
+     "בצל ( על הכל )" / "בצל (רבע 1)".."בצל (רבע 4)" / "בצל ( על חצי )"
+     4 רבעים נבחרים -> מסומנת "על הכל" בלבד, כדי שהבון יישאר שורה אחת.
+     תמונה מספיק להעלות פעם אחת, על וריאנט כלשהו של התוספת.
+
+   מפת הרבעים (כפי שהלקוח רואה, RTL):
+     1 = ימין למעלה   2 = שמאל למעלה   3 = שמאל למטה   4 = ימין למטה
+
+   Dependencies: אין. וניל JS.
+   הפעלה מאפס: פתח פופאפ מוצר -> הדבק את כל הקובץ בקונסולה.
+   בדיקה: __mhq.stats()   |   ביטול: __mhq.destroy()
+   ============================================================================ */
+(function () {
+  'use strict';
+
+  if (window.__mhq && window.__mhq.destroy) {
+    try { window.__mhq.destroy(); } catch (e) { }
+  }
+
+  var BUSY = false, RAF = null, OBSERVER = null, LAST_LOG = '';
+  var SETTLE = [];                       /* טיימרים של סריקות מעקב */
+  var SETTLE_MS = [350, 900, 2000, 3500];
+  var EXPAND_N = 0;                      /* [v0.5] כמה פעמים נלחץ "הראה עוד" */
+  var MAX_EXPAND = 10;                   /* תקרה קשיחה נגד לולאה */
+  var LAST_POPUP = null;                 /* לזיהוי מעבר בין מוצרים */
+  var PENDING_EXPAND = false;
+
+  /* סריקות מעקב — תופסות שינויים שקרו בזמן שה-Observer היה מנותק */
+  function settle() {
+    SETTLE.forEach(clearTimeout);
+    SETTLE = SETTLE_MS.map(function (ms) { return setTimeout(scan, ms); });
+  }
+
+  /* ==========================================================================
+     1. פענוח שמות
+     ========================================================================== */
+  function splitLabel(txt) {
+    var m = String(txt).replace(/\s+/g, ' ').trim().match(/^(.+?)\s*[\(\[]\s*(.+?)\s*[\)\]]\s*$/);
+    return m ? { name: m[1].trim(), inner: m[2].trim() } : null;
+  }
+
+  function parseVariant(s) {
+    var t = String(s).replace(/["'״׳]/g, '').replace(/\s+/g, ' ').trim();
+    if (/^(על\s*)?(הכל|כל\s*הפיצה|שלם|שלמה|מלא)$/.test(t)) return { kind: 'whole' };
+    if (/^(על\s*)?(חצי|חצי\s*פיצה)$/.test(t)) return { kind: 'half' };
+    var m = t.match(/^(?:על\s*)?רבע\s*([1-4])$/);
+    if (m) return { kind: 'quarter', idx: parseInt(m[1], 10) };
+    return null;
+  }
+
+  /* ==========================================================================
+     2. סריקת DOM -> מודל נתונים
+     ========================================================================== */
+  function collect(popup) {
+    var map = new Map();
+    var inputs = popup.querySelectorAll('input[type="checkbox"]');
+
+    for (var i = 0; i < inputs.length; i++) {
+      var input = inputs[i];
+      var row = input.closest('.v-list-item');
+      if (!row || row.closest('.mhq-card')) continue;
+
+      var content = row.querySelector('.v-list-item__content') || row;
+      var titleEl = content.querySelector('.v-list-item-title');
+      if (!titleEl) continue;
+
+      var label = titleEl.innerText.replace(/\s+/g, ' ').trim();
+      var parts = splitLabel(label);
+      if (!parts) continue;
+      var variant = parseVariant(parts.inner);
+      if (!variant) continue;
+
+      /* מחיר = טקסט השורה פחות התווית. הסדר קריטי: בתווית יש ספרה ("רבע 1") */
+      var allTxt = content.innerText.replace(/\s+/g, ' ').trim();
+      var rest = allTxt.indexOf(label) === 0 ? allTxt.slice(label.length) : allTxt;
+      var pm = rest.match(/\d+(?:[.,]\d+)?/);
+      var price = pm ? parseFloat(pm[0].replace(',', '.')) : 0;
+
+      var t = map.get(parts.name);
+      if (!t) {
+        t = { whole: null, half: null, q: {}, rows: [], img: null, anchor: row, all: [] };
+        map.set(parts.name, t);
+      }
+
+      var slot = { input: input, price: price };
+      if (variant.kind === 'whole') t.whole = slot;
+      else if (variant.kind === 'half') t.half = slot;
+      else t.q[variant.idx] = slot;
+
+      t.rows.push(row);
+      t.all.push(input);
+      /* התמונה נאספת מכל וריאנט — מספיק שהמסעדן העלה אותה על אחד מהם */
+      if (!t.img) {
+        var im = row.querySelector('img');
+        if (im && (im.currentSrc || im.getAttribute('src'))) t.img = im.currentSrc || im.src;
+      }
+    }
+
+    map.forEach(function (t, name) {
+      var n = (t.whole ? 1 : 0) + (t.half ? 1 : 0) + Object.keys(t.q).length;
+      if (n < 2) map.delete(name);
+      else t.hasQ = Object.keys(t.q).length > 0;
+    });
+
+    return map;
+  }
+
+  function findHeroImg(popup) {
+    var best = null, bestArea = 0;
+    popup.querySelectorAll('img').forEach(function (im) {
+      if (im.closest('.mhq-card') || im.closest('.mhq-preview')) return;
+      if (im.closest('.v-list-item')) return;
+      var a = im.offsetWidth * im.offsetHeight;
+      if (a > bestArea) { bestArea = a; best = im; }
+    });
+    return bestArea > 4000 && best ? (best.currentSrc || best.src) : null;
+  }
+
+  /* ==========================================================================
+     3. תרגום בחירה -> צ'קבוקסים
+     ========================================================================== */
+  function computePlan(t, sel) {
+    var n = sel.size, checks = new Map();
+    t.all.forEach(function (el) { checks.set(el, false); });
+
+    if (n === 0) return { ok: true, checks: checks, price: 0 };
+
+    if (n === 4 && t.whole) {                       /* בון נקי: שורה אחת */
+      checks.set(t.whole.input, true);
+      return { ok: true, checks: checks, price: t.whole.price };
+    }
+
+    if (t.hasQ) {
+      var price = 0, missing = [];
+      sel.forEach(function (i) {
+        if (t.q[i]) { checks.set(t.q[i].input, true); price += t.q[i].price; }
+        else missing.push(i);
+      });
+      if (missing.length) return { ok: false, reason: 'רבע ' + missing.join(', ') + ' לא הוגדר בתפריט' };
+      return { ok: true, checks: checks, price: price };
+    }
+
+    if (n === 2 && t.half) { checks.set(t.half.input, true); return { ok: true, checks: checks, price: t.half.price }; }
+    if (n === 4 && t.half && !t.whole) { checks.set(t.half.input, true); return { ok: true, checks: checks, price: t.half.price }; }
+    return { ok: false, reason: 'התוספת הזו זמינה בחצי או בפיצה שלמה בלבד' };
+  }
+
+  function readSel(t) {
+    var s = new Set();
+    if (t.whole && t.whole.input.checked) { s.add(1); s.add(2); s.add(3); s.add(4); }
+    if (t.half && t.half.input.checked) { s.add(1); s.add(2); }
+    for (var i = 1; i <= 4; i++) if (t.q[i] && t.q[i].input.checked) s.add(i);
+    return s;
+  }
+
+  function applyPlan(plan) {
+    BUSY = true;
+    plan.checks.forEach(function (want, el) {
+      if (el.checked !== want) el.click();   /* click ולא checked=true — אחרת Vue לא קולט */
+    });
+    setTimeout(function () { BUSY = false; scan(); }, 80);
+  }
+
+  /* ==========================================================================
+     4. גיאומטריה
+     ========================================================================== */
+  var QPATH = {
+    1: 'M50,50 L50,4 A46,46 0 0,1 96,50 Z',
+    2: 'M50,50 L4,50 A46,46 0 0,1 50,4 Z',
+    3: 'M50,50 L50,96 A46,46 0 0,1 4,50 Z',
+    4: 'M50,50 L96,50 A46,46 0 0,1 50,96 Z'
+  };
+  var QNUM = { 1: [71, 36], 2: [29, 36], 3: [29, 70], 4: [71, 70] };
+
+  function circleSvg(big) {
+    var s = '<svg class="mhq-circle" viewBox="0 0 100 100">';
+    for (var i = 1; i <= 4; i++) {
+      s += '<path class="mhq-q" data-q="' + i + '" d="' + QPATH[i] + '"></path>';
+      if (big) s += '<text class="mhq-num" x="' + QNUM[i][0] + '" y="' + QNUM[i][1] + '">' + i + '</text>';
+    }
+    return s + '</svg>';
+  }
+
+  /* ==========================================================================
+     5. תצוגת הפיצה החיה
+     ========================================================================== */
+  function buildPreview() {
+    var p = document.createElement('div');
+    p.className = 'mhq-preview';
+    var veil = '<svg class="mhq-veil" viewBox="0 0 100 100">';
+    for (var i = 1; i <= 4; i++) {
+      veil += '<path class="mhq-vq" data-q="' + i + '" d="' + QPATH[i] + '"></path>';
+      veil += '<text class="mhq-vnum" x="' + QNUM[i][0] + '" y="' + QNUM[i][1] + '">' + i + '</text>';
+    }
+    veil += '</svg>';
+    p.innerHTML =
+      '<div class="mhq-pizza"><img class="mhq-pizza-img" alt="">' + veil +
+      '<div class="mhq-chips" data-q="1"></div><div class="mhq-chips" data-q="2"></div>' +
+      '<div class="mhq-chips" data-q="3"></div><div class="mhq-chips" data-q="4"></div></div>' +
+      '<div class="mhq-cap">בחרו תוספת ואז את הרבעים שעליהם היא תופיע</div>';
+    return p;
+  }
+
+  function paintPreview(prev, map, heroSrc) {
+    var img = prev.querySelector('.mhq-pizza-img');
+    if (heroSrc && img.getAttribute('src') !== heroSrc) img.src = heroSrc;
+    prev.classList.toggle('mhq-noimg', !heroSrc);
+
+    var perQ = { 1: [], 2: [], 3: [], 4: [] }, any = false;
+    map.forEach(function (t, name) {
+      readSel(t).forEach(function (i) { perQ[i].push({ name: name, img: t.img }); any = true; });
+    });
+
+    prev.classList.toggle('mhq-lit', any);
+    prev.querySelectorAll('.mhq-vq').forEach(function (p) {
+      p.classList.toggle('mhq-on', perQ[p.getAttribute('data-q')].length > 0);
+    });
+
+    /* בונים צ'יפים מחדש רק כשההרכב באמת השתנה — אחרת האנימציה תרוץ בלולאה.
+       החתימה כוללת גם את התמונה, כדי שצ'יפ יתעדכן כשתמונה נטענת מאוחר. */
+    prev.querySelectorAll('.mhq-chips').forEach(function (box) {
+      var list = perQ[box.getAttribute('data-q')];
+      var sig = list.map(function (x) { return x.name + ':' + (x.img || '-'); }).join('|');
+      if (box.dataset.sig === sig) return;
+      box.dataset.sig = sig;
+      box.innerHTML = list.slice(0, 3).map(function (x) {
+        return x.img
+          ? '<img class="mhq-chip" src="' + x.img + '" alt="' + x.name + '">'
+          : '<span class="mhq-chip mhq-chip-txt">' + x.name.charAt(0) + '</span>';
+      }).join('') + (list.length > 3 ? '<span class="mhq-chip mhq-chip-txt">+' + (list.length - 3) + '</span>' : '');
+    });
+  }
+
+  /* ==========================================================================
+     6. כרטיס תוספת
+     ========================================================================== */
+  function buildCard(name) {
+    var card = document.createElement('div');
+    card.className = 'mhq-card';
+    card.setAttribute('data-mhq', name);
+    card.innerHTML =
+      '<button type="button" class="mhq-tile">' +
+      '<span class="mhq-thumbwrap"><span class="mhq-thumb mhq-thumb-txt">' + name.charAt(0) + '</span>' +
+      '<span class="mhq-mini">' + circleSvg(false) + '</span></span>' +
+      '<span class="mhq-name">' + name + '</span>' +
+      '<span class="mhq-price"></span>' +
+      '</button>' +
+      '<div class="mhq-panel">' + circleSvg(true) +
+      '<div class="mhq-side"><div class="mhq-hint">אילו רבעים?</div>' +
+      '<div class="mhq-actions">' +
+      '<button type="button" class="mhq-btn" data-act="all">כל הפיצה</button>' +
+      '<button type="button" class="mhq-btn mhq-ghost" data-act="clear">הסרה</button>' +
+      '</div><div class="mhq-msg"></div></div></div>';
+
+    card.querySelector('.mhq-tile').addEventListener('click', function () {
+      var open = card.classList.contains('mhq-open');
+      var root = card.closest('.product-popup') || document;
+      root.querySelectorAll('.mhq-card.mhq-open').forEach(function (c) { c.classList.remove('mhq-open'); });
+      if (!open) card.classList.add('mhq-open');
+    });
+
+    card.querySelectorAll('.mhq-panel .mhq-q').forEach(function (p) {
+      p.addEventListener('click', function (e) {
+        e.stopPropagation();
+        var t = card.__t; if (!t) return;
+        var i = parseInt(p.getAttribute('data-q'), 10);
+        var cur = readSel(t);
+        cur.has(i) ? cur.delete(i) : cur.add(i);
+        var pl = computePlan(t, cur);
+        if (!pl.ok) { flash(card, pl.reason); return; }
+        applyPlan(pl); settle();
+      });
+    });
+
+    card.querySelectorAll('.mhq-btn').forEach(function (b) {
+      b.addEventListener('click', function (e) {
+        e.stopPropagation();
+        var t = card.__t; if (!t) return;
+        var pl = computePlan(t, b.getAttribute('data-act') === 'all' ? new Set([1, 2, 3, 4]) : new Set());
+        if (!pl.ok) { flash(card, pl.reason); return; }
+        applyPlan(pl); settle();
+      });
+    });
+
+    return card;
+  }
+
+  function paint(card, t) {
+    var sel = readSel(t), plan = computePlan(t, sel);
+
+    card.querySelectorAll('.mhq-q').forEach(function (p) {
+      p.classList.toggle('mhq-on', sel.has(parseInt(p.getAttribute('data-q'), 10)));
+    });
+
+    var txt = sel.size ? '₪' + (plan.ok ? plan.price : 0) : (t.whole ? '₪' + t.whole.price : '');
+    var pe = card.querySelector('.mhq-price');
+    if (pe.textContent !== txt) pe.textContent = txt;
+
+    card.classList.toggle('mhq-active', sel.size > 0);
+
+    /* החלפת אות בתמונה — גם אם התמונה נטענה הרבה אחרי הסריקה הראשונה */
+    var th = card.querySelector('.mhq-thumb');
+    if (t.img && th.tagName !== 'IMG') {
+      var img = document.createElement('img');
+      img.className = 'mhq-thumb';
+      img.src = t.img;
+      img.alt = '';
+      th.replaceWith(img);
+    }
+  }
+
+  function flash(card, msg) {
+    var el = card.querySelector('.mhq-msg');
+    el.textContent = msg;
+    el.classList.add('mhq-show');
+    clearTimeout(el._t);
+    el._t = setTimeout(function () { el.classList.remove('mhq-show'); }, 2800);
+  }
+
+  /* ==========================================================================
+     7. מגן קבוצת חובה
+     ========================================================================== */
+  function requiredGroups(popup) {
+    var out = [];
+    popup.querySelectorAll('span,small,b,strong,em,div,p').forEach(function (n) {
+      if (n.children.length) return;
+      if ((n.textContent || '').trim() !== 'נדרש') return;
+      var c = n;
+      for (var k = 0; k < 8 && c.parentElement; k++) {
+        c = c.parentElement;
+        var boxes = c.querySelectorAll('input[type="checkbox"],input[type="radio"]');
+        if (boxes.length) { out.push({ el: c, inputs: [].slice.call(boxes) }); return; }
+      }
+    });
+    return out;
+  }
+
+  function warnGroup(g) {
+    var a = g.el.querySelector(':scope > .mhq-alert');
+    if (!a) {
+      a = document.createElement('div');
+      a.className = 'mhq-alert';
+      g.el.insertBefore(a, g.el.firstChild);
+    }
+    a.textContent = 'בחרו לפחות אפשרות אחת כדי להמשיך';
+    a.classList.add('mhq-show');
+    try { a.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch (e) { }
+    clearTimeout(a._t);
+    a._t = setTimeout(function () { a.classList.remove('mhq-show'); }, 4000);
+  }
+
+  function onAddClick(e) {
+    var popup = document.querySelector('.product-popup');
+    if (!popup || !e.target || !e.target.closest) return;
+    /* [v0.5] המגן פעיל אך ורק בפופאפ שבו הכרטיסים שלנו קיימים.
+       בלי זה היינו מאזינים לכל הוספה לעגלה בכל הפלטפורמה — ומסעדן
+       אחר עם מבנה שונה היה עלול להיחסם בגלל זיהוי שגוי אצלנו. */
+    if (!popup.querySelector('.mhq-card')) return;
+    var btn = e.target.closest('.add-btn');
+    if (!btn || !popup.contains(btn)) return;
+    var bad = requiredGroups(popup).filter(function (g) {
+      return !g.inputs.some(function (i) { return i.checked; });
+    });
+    if (!bad.length) return;
+    e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation();
+    warnGroup(bad[0]);
+  }
+
+  /* ==========================================================================
+     7ב. פתיחת רשימות מקופלות  [v0.5]
+     --------------------------------------------------------------------------
+     HyperZod מכניס ל-DOM רק חלק מהאופציות ומסתיר את השאר מאחורי "הראה עוד".
+     נמדד בפועל: 16 תיבות סימון לפני הלחיצה, 26 אחריה. בלי פתיחה אוטומטית
+     הכרטיס יציג רבעים חסרים והלקוח לא יוכל לבחור אותם.
+
+     שלוש הגנות מפני לולאה:
+       1. פועל רק בפופאפ שבו נמצאה תבנית "(רבע N)" — כלומר פיצרייה בלבד.
+       2. תקרה קשיחה של 10 לחיצות למוצר.
+       3. אם מספר התיבות לא עלה אחרי לחיצה — עוצרים מיד.
+     ========================================================================== */
+  /* נמדד בפועל בפלטפורמה: "להראות יותר" (codes: 1500,1492,...,32,...).
+     ההשוואה גמישה בכוונה — ניסוח שונה אצל מסעדן אחר ייתפס גם הוא.
+     "פחות" לא נתפס, כדי שלא נקפל בחזרה את מה שפתחנו. */
+  var SHOW_MORE_RX = /^(להראות|להציג|הראה|הראו|הצג|הצגת)\s+(יותר|עוד)$|^(show|view|see)\s+more$/i;
+
+  function isShowMore(el) {
+    /* ניקוי תווי כיווניות נסתרים של עברית לפני ההשוואה */
+    var t = (el.innerText || el.textContent || '')
+      .replace(/[\u200e\u200f\u202a-\u202e\u2066-\u2069]/g, '')
+      .replace(/\s+/g, ' ').trim();
+    return SHOW_MORE_RX.test(t);
+  }
+
+  var SHOW_LESS_RX = /^(להראות|להציג|הראה|הראו|הצג)\s+פחות$|^(show|view)\s+less$/i;
+  function isShowLess(el) {
+    var t = (el.innerText || el.textContent || '')
+      .replace(/[\u200e\u200f\u202a-\u202e\u2066-\u2069]/g, '')
+      .replace(/\s+/g, ' ').trim();
+    return SHOW_LESS_RX.test(t);
+  }
+
+  function findShowMore(popup) {
+    var out = null;
+    popup.querySelectorAll('button,[role="button"],a,.v-btn').forEach(function (b) {
+      if (out || b.closest('.mhq-card')) return;
+      if (isShowMore(b)) out = b;
+    });
+    /* מוצא גם כשהטקסט יושב ב-span פנימי בלי כפתור עוטף מזוהה */
+    if (!out) {
+      popup.querySelectorAll('span,div').forEach(function (s) {
+        if (out || s.children.length || s.closest('.mhq-card')) return;
+        if (isShowMore(s)) out = s.closest('button,[role="button"],a,.v-btn') || s;
+      });
+    }
+    return out;
+  }
+
+  /* חתימת מצב: אם היא לא משתנה אחרי לחיצה — אין יותר מה לפתוח */
+  function expandSig(popup) {
+    var boxes = popup.querySelectorAll('input[type="checkbox"]').length;
+    var btns = 0;
+    popup.querySelectorAll('button,[role="button"],a,.v-btn').forEach(function (b) {
+      if (isShowMore(b)) btns++;
+    });
+    return boxes + '|' + btns;
+  }
+
+  function tryExpand(popup, hasPattern) {
+    if (!hasPattern || EXPAND_N >= MAX_EXPAND) return false;
+    var btn = findShowMore(popup);
+    if (!btn) return false;
+
+    /* חתימה ולא ספירת תיבות בלבד: קבוצה שנפתחת בלי להוסיף תיבות
+       (למשל רשימת שתייה) עדיין נחשבת התקדמות, ולכן נמשיך לקבוצה הבאה */
+    var before = expandSig(popup);
+    EXPAND_N++;
+    BUSY = true;                       /* חוסם סריקות בזמן שה-DOM משתנה */
+    btn.click();
+
+    setTimeout(function () {
+      BUSY = false;
+      var p2 = document.querySelector('.product-popup');
+      if (!p2) return;
+      var after = expandSig(p2);
+      if (after === before) {
+        EXPAND_N = MAX_EXPAND;         /* שום דבר לא זז — עוצרים */
+        console.log('%c[mhq] אין יותר מה לפתוח', 'color:#e31e24');
+      } else {
+        console.log('%c[mhq] נפתחה רשימה: ' + before + ' -> ' + after +
+          ' (תיבות|כפתורים)', 'color:#e31e24');
+      }
+      scan();
+    }, 280);
+
+    return true;
+  }
+
+  /* ==========================================================================
+     8. סריקה ראשית
+     ========================================================================== */
+  function scan() {
+    try { scanInner(); }
+    catch (err) { console.error('[mhq] שגיאה בסריקה — הממשק נשאר כפי שהוא:', err); }
+  }
+
+  function scanInner() {
+    if (BUSY) return;
+    var popup = document.querySelector('.product-popup');
+    if (!popup) return;
+
+    /* מוצר חדש = מאפסים את מונה הפתיחות */
+    if (popup !== LAST_POPUP) { LAST_POPUP = popup; EXPAND_N = 0; }
+
+    if (OBSERVER) OBSERVER.disconnect();   /* מונע לולאה. חסרון: אירועים בחלון הזה אובדים */
+
+    try {
+      var map = collect(popup), seen = {}, firstGrid = null;
+
+      map.forEach(function (t, name) {
+        seen[name] = true;
+        t.rows.forEach(function (r) {
+          if (!r.classList.contains('mhq-hidden')) r.classList.add('mhq-hidden');
+        });
+
+        var parent = t.anchor.parentNode;
+        var grid = parent.querySelector(':scope > [data-mhq-grid]');
+        if (!grid) {
+          grid = document.createElement('div');
+          grid.className = 'mhq-grid';
+          grid.setAttribute('data-mhq-grid', '1');
+          parent.insertBefore(grid, t.anchor);
+        }
+        if (!firstGrid) firstGrid = grid;
+
+        var card = popup.querySelector('.mhq-card[data-mhq="' + CSS.escape(name) + '"]');
+        if (!card) card = buildCard(name);
+        if (card.parentNode !== grid) grid.appendChild(card);
+        card.__t = t;
+        paint(card, t);
+      });
+
+      var prev = popup.querySelector('.mhq-preview');
+      if (firstGrid) {
+        if (!prev) prev = buildPreview();
+        if (prev.nextElementSibling !== firstGrid) firstGrid.parentNode.insertBefore(prev, firstGrid);
+        paintPreview(prev, map, findHeroImg(popup));
+      } else if (prev) { prev.remove(); }
+
+      popup.querySelectorAll('.mhq-card').forEach(function (c) {
+        if (!seen[c.getAttribute('data-mhq')]) c.remove();
+      });
+      popup.querySelectorAll('[data-mhq-grid]').forEach(function (g) {
+        if (!g.children.length) g.remove();
+      });
+
+      var line = Array.from(map.keys()).join(', ');
+      if (line !== LAST_LOG) {
+        LAST_LOG = line;
+        console.log('%c[mhq] תוספות שזוהו: ' + (line || '(אין)'), 'color:#e31e24;font-weight:bold');
+      }
+
+      /* [v0.7] הרשת שלנו מחליפה את הרשימה, ולכן "להראות יותר" מיותר.
+         נמדד: לחיצה עליו לא מוחקת את הכרטיסים, אז זה קוסמטי בלבד. */
+      if (map.size > 0) {
+        popup.querySelectorAll('button,[role="button"],a,.v-btn').forEach(function (b) {
+          if (b.closest('.mhq-card')) return;
+          if (isShowMore(b) || isShowLess(b)) b.classList.add('mhq-hidden');
+        });
+      }
+
+      /* [v0.5] אם זו פיצרייה ויש עוד אופציות מקופלות — לפתוח ולסרוק שוב */
+      PENDING_EXPAND = map.size > 0;
+    } finally {
+      if (OBSERVER) OBSERVER.observe(document.body, { childList: true, subtree: true });
+    }
+
+    /* מחוץ ל-try: הפתיחה משנה DOM ולכן חייבת לרוץ אחרי שהחיישן חובר מחדש */
+    if (PENDING_EXPAND) tryExpand(popup, true);
+  }
+
+  /* ==========================================================================
+     9. CSS
+     ========================================================================== */
+  /* ה-CSS חי ב-global-cdn.css (חפש: "Pizza Quarters").
+     כאן רק נבדק שהוא באמת נטען — אם לא, הסקריפט לא מרנדר כלום
+     ומשאיר את רשימת הצ'קבוקסים המקורית עובדת. עדיף ממשק ישן
+     מאשר ממשק שבור. */
+  function cssLoaded() {
+    var probe = document.createElement('div');
+    probe.className = 'mhq-css-probe';
+    probe.style.cssText = 'position:absolute;visibility:hidden';
+    var host = document.querySelector('.product-popup') || document.body;
+    host.appendChild(probe);
+    var ok = getComputedStyle(probe).getPropertyValue('--mhq') .trim() === 'on';
+    probe.remove();
+    return ok;
+  }
+
+  /* ==========================================================================
+     10. הפעלה
+     ========================================================================== */
+  /* שער כניסה: בלי ה-CSS אין ממשק. יוצאים בשקט ומשאירים את המקור. */
+  if (!cssLoaded()) {
+    console.warn('[mhq] ה-CSS לא נטען מ-global-cdn.css — הממשק לא הופעל');
+    return;
+  }
+  document.addEventListener('click', onAddClick, true);
+
+  OBSERVER = new MutationObserver(function () {
+    if (BUSY) return;
+    cancelAnimationFrame(RAF);
+    RAF = requestAnimationFrame(scan);
+  });
+
+  scan();
+  settle();   /* תופס תמונות שנטענות אחרי הסריקה הראשונה */
+
+  window.__mhq = {
+    scan: scan,
+    settle: settle,
+    stats: function () {
+      var p = document.querySelector('.product-popup');
+      if (!p) return 'אין פופאפ';
+      var cards = [].slice.call(p.querySelectorAll('.mhq-card'));
+      return {
+        cards: cards.length,
+        withImage: cards.filter(function (c) { return c.querySelector('img.mhq-thumb'); }).length,
+        grids: p.querySelectorAll('[data-mhq-grid]').length,
+        hiddenRows: p.querySelectorAll('.mhq-hidden').length,
+        expansions: EXPAND_N,
+        requiredGroups: requiredGroups(p).length,
+        heroImg: !!findHeroImg(p),
+        checked: [].slice.call(p.querySelectorAll('input[type=checkbox]'))
+          .filter(function (i) { return i.checked; })
+          .map(function (i) { return i.closest('.v-list-item').innerText.replace(/\s+/g, ' ').trim(); })
+      };
+    },
+    destroy: function () {
+      SETTLE.forEach(clearTimeout); SETTLE = [];
+      EXPAND_N = 0; LAST_POPUP = null; PENDING_EXPAND = false;
+      if (OBSERVER) OBSERVER.disconnect();
+      document.removeEventListener('click', onAddClick, true);
+      document.querySelectorAll('.mhq-card,.mhq-preview,[data-mhq-grid],.mhq-alert').forEach(function (c) { c.remove(); });
+      document.querySelectorAll('.mhq-hidden').forEach(function (r) { r.classList.remove('mhq-hidden'); });
+      delete window.__mhq;
+      console.log('[mhq] בוטל, הרשימה המקורית חזרה');
+    }
+  };
+
+  console.log('%c[mhq] Pizza Quarters פעיל. בדיקה: __mhq.stats()  |  ביטול: __mhq.destroy()',
+    'color:#e31e24;font-weight:bold');
+})();
