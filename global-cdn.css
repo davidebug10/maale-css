@@ -5546,3 +5546,369 @@ html body span.review {
 html body span.review img {
     filter: drop-shadow(0 0 3px rgba(255, 193, 7, 0.5)) !important;
 }
+
+/* =========================================================
+   בורר רבעי פיצה — Pizza Quarters  |  2026-08-28
+   ---------------------------------------------------------
+   מחליף את רשימת הצ'קבוקסים של תוספות הפיצה בממשק רבעים.
+   הלוגיקה יושבת ב-custom-footer.js (חיפוש: "Pizza Quarters").
+
+   Scope: כל הכללים תחת .product-popup ובתחילית mh-q (mhq-).
+   הכללים לא נוגעים בשום רכיב Vuetify משותף, ולכן אין סיכון
+   דליפה למודאלים אחרים.
+
+   מופעל רק כאשר המסעדן הגדיר אופציות בתבנית "שם (רבע N)".
+   אצל כל שאר המסעדנים הכללים האלה לא מוצאים אלמנטים כלל.
+   ========================================================= */
+
+/* חיישן נוכחות: הסקריפט ב-custom-footer.js בודק את המשתנה הזה.
+   אם הקובץ הזה לא נטען — הסקריפט לא מרנדר כלום ומשאיר את
+   רשימת התוספות המקורית עובדת. אל תמחק את הכלל הזה. */
+.mhq-css-probe {
+  --mhq: on;
+}
+
+.product-popup .mhq-hidden {
+  position:absolute!important;
+  opacity:0!important;
+  pointer-events:none!important;
+  z-index:-1!important;
+  width:auto!important;
+  height:auto!important;
+  overflow:visible!important;
+}
+.product-popup .mhq-preview {
+  direction:rtl;
+  font-family:"Heebo","Inter",-apple-system,sans-serif;
+  padding:6px 14px 14px;
+  text-align:center;
+  position:relative;
+  z-index:1;
+}
+.product-popup .mhq-pizza {
+  position:relative;
+  width:190px;
+  height:190px;
+  margin:0 auto;
+  border-radius:50%;
+  overflow:hidden;
+  box-shadow:0 12px 30px rgba(0,0,0,.14);
+}
+.product-popup .mhq-preview.mhq-noimg .mhq-pizza {
+  background:radial-gradient(circle at 42% 38%,#f7d9a0,#e8b366 62%,#c98a3c);
+}
+.product-popup .mhq-pizza-img {
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  display:block;
+}
+.product-popup .mhq-veil {
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+}
+.product-popup .mhq-vq {
+  fill:rgba(20,12,10,.42);
+  stroke:rgba(255,255,255,.75);
+  stroke-width:.8;
+  transition:fill .3s ease;
+}
+.product-popup .mhq-vq.mhq-on {
+  fill:transparent;
+}
+.product-popup .mhq-preview:not(.mhq-lit) .mhq-vq {
+  fill:transparent;
+}
+.product-popup .mhq-vnum {
+  fill:rgba(255,255,255,.9);
+  font-size:7px;
+  font-weight:800;
+  text-anchor:middle;
+  font-family:inherit;
+  pointer-events:none;
+  paint-order:stroke;
+  stroke:rgba(0,0,0,.35);
+  stroke-width:1.6;
+}
+.product-popup .mhq-chips {
+  position:absolute;
+  transform:translate(-50%,-50%);
+  display:flex;
+  gap:3px;
+  pointer-events:none;
+}
+.product-popup .mhq-chips[data-q="1"] {
+  left:70.4%;
+  top:29.6%;
+}
+.product-popup .mhq-chips[data-q="2"] {
+  left:29.6%;
+  top:29.6%;
+}
+.product-popup .mhq-chips[data-q="3"] {
+  left:29.6%;
+  top:70.4%;
+}
+.product-popup .mhq-chips[data-q="4"] {
+  left:70.4%;
+  top:70.4%;
+}
+.product-popup .mhq-chip {
+  width:27px;
+  height:27px;
+  border-radius:50%;
+  border:2px solid #fff;
+  object-fit:cover;
+  box-shadow:0 3px 10px rgba(0,0,0,.4);
+  background:#fff;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:12px;
+  font-weight:900;
+  color:#e31e24;
+  flex:none;
+  animation:mhq-pop .34s cubic-bezier(.34,1.56,.64,1);
+}
+.product-popup .mhq-cap {
+  font-size:12.5px;
+  font-weight:600;
+  color:#4a5568;
+  margin-top:12px;
+  line-height:1.5;
+}
+@keyframes mhq-pop {
+  from { transform:scale(0); opacity:0; }
+  to   { transform:scale(1); opacity:1; }
+}
+.product-popup .mhq-grid {
+  direction:rtl;
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:8px;
+  padding:4px 12px 12px;
+  font-family:"Heebo","Inter",-apple-system,sans-serif;
+  position:relative;
+  z-index:1;
+}
+.product-popup .mhq-card {
+  border-radius:18px;
+  background:rgba(255,255,255,.72);
+  -webkit-backdrop-filter:blur(28px) saturate(180%);
+  backdrop-filter:blur(28px) saturate(180%);
+  border:1px solid rgba(255,255,255,.6);
+  box-shadow:0 5px 16px rgba(0,0,0,.06);
+  overflow:hidden;
+  transition:border-color .25s ease,box-shadow .25s ease;
+}
+.product-popup .mhq-card.mhq-active {
+  border-color:rgba(227,30,36,.4);
+  box-shadow:0 6px 20px rgba(227,30,36,.16);
+}
+.product-popup .mhq-card.mhq-open {
+  grid-column:1/-1;
+  background:rgba(255,255,255,.85);
+}
+.product-popup .mhq-tile {
+  all:unset;
+  box-sizing:border-box;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:5px;
+  width:100%;
+  padding:11px 6px;
+  cursor:pointer;
+  text-align:center;
+  transition:transform .18s ease;
+}
+.product-popup .mhq-tile:active {
+  transform:scale(.95);
+}
+.product-popup .mhq-tile:focus-visible {
+  outline:2px solid #e31e24;
+  outline-offset:2px;
+}
+.product-popup .mhq-thumbwrap {
+  position:relative;
+  display:block;
+}
+.product-popup .mhq-thumb {
+  width:52px;
+  height:52px;
+  border-radius:15px;
+  object-fit:cover;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:#f2f2f2;
+  font-size:19px;
+  font-weight:900;
+  color:#b9b9b9;
+}
+.product-popup .mhq-mini {
+  position:absolute;
+  bottom:-3px;
+  left:-4px;
+  width:19px;
+  height:19px;
+  border-radius:50%;
+  background:#fff;
+  box-shadow:0 1px 5px rgba(0,0,0,.22);
+  opacity:0;
+  transition:opacity .25s ease;
+  padding:1px;
+  box-sizing:border-box;
+}
+.product-popup .mhq-card.mhq-active .mhq-mini {
+  opacity:1;
+}
+.product-popup .mhq-name {
+  font-size:12.5px;
+  font-weight:800;
+  color:#1a1a1a;
+  line-height:1.35;
+  display:-webkit-box;
+  -webkit-line-clamp:2;
+  -webkit-box-orient:vertical;
+  overflow:hidden;
+}
+.product-popup .mhq-price {
+  font-size:12px;
+  font-weight:700;
+  color:#767c8f;
+  line-height:1.4;
+}
+.product-popup .mhq-card.mhq-active .mhq-price {
+  color:#e31e24;
+}
+.product-popup .mhq-panel {
+  display:none;
+  align-items:center;
+  gap:16px;
+  padding:2px 16px 16px;
+  border-top:1px solid rgba(0,0,0,.06);
+  margin-top:2px;
+}
+.product-popup .mhq-card.mhq-open .mhq-panel {
+  display:flex;
+  animation:mhq-slide .3s ease;
+}
+@keyframes mhq-slide {
+  from { opacity:0; transform:translateY(-6px); }
+  to   { opacity:1; transform:none; }
+}
+.product-popup .mhq-panel .mhq-circle {
+  width:126px;
+  height:126px;
+  flex:none;
+  margin-top:14px;
+}
+.product-popup .mhq-side {
+  flex:1;
+  min-width:0;
+  text-align:right;
+  margin-top:14px;
+}
+.product-popup .mhq-q {
+  fill:#e8e8e8;
+  stroke:#fff;
+  stroke-width:2.5;
+  cursor:pointer;
+  transition:fill .22s ease;
+}
+.product-popup .mhq-q.mhq-on {
+  fill:#e31e24;
+}
+.product-popup .mhq-mini .mhq-q {
+  cursor:default;
+  stroke-width:6;
+  fill:#dcdcdc;
+}
+.product-popup .mhq-num {
+  fill:#9a9a9a;
+  font-size:13px;
+  font-weight:800;
+  text-anchor:middle;
+  pointer-events:none;
+  font-family:inherit;
+}
+.product-popup .mhq-q.mhq-on+.mhq-num {
+  fill:#fff;
+}
+.product-popup .mhq-hint {
+  font-size:13px;
+  font-weight:700;
+  color:#1a1a1a;
+  margin-bottom:10px;
+}
+.product-popup .mhq-actions {
+  display:flex;
+  flex-wrap:wrap;
+  gap:7px;
+}
+.product-popup .mhq-btn {
+  font-family:inherit;
+  font-size:12.5px;
+  font-weight:800;
+  padding:9px 14px;
+  border-radius:13px;
+  border:none;
+  cursor:pointer;
+  color:#fff;
+  background:linear-gradient(135deg,#e31e24,#b3161b);
+  transition:transform .18s ease;
+}
+.product-popup .mhq-btn:active {
+  transform:scale(.95);
+}
+.product-popup .mhq-ghost {
+  background:none;
+  color:#4a5568;
+  border:1px solid rgba(0,0,0,.14);
+}
+.product-popup .mhq-msg {
+  font-size:12px;
+  font-weight:700;
+  color:#b3161b;
+  line-height:1.5;
+  max-height:0;
+  opacity:0;
+  overflow:hidden;
+  transition:all .25s ease;
+}
+.product-popup .mhq-msg.mhq-show {
+  max-height:48px;
+  opacity:1;
+  margin-top:9px;
+}
+.product-popup .mhq-alert {
+  direction:rtl;
+  font-family:"Heebo",sans-serif;
+  font-size:13px;
+  font-weight:800;
+  color:#fff;
+  background:linear-gradient(135deg,#e31e24,#b3161b);
+  border-radius:14px;
+  max-height:0;
+  opacity:0;
+  overflow:hidden;
+  padding:0 14px;
+  transition:all .28s cubic-bezier(.34,1.56,.64,1);
+}
+.product-popup .mhq-alert.mhq-show {
+  max-height:60px;
+  opacity:1;
+  padding:12px 14px;
+  margin:8px 12px;
+}
+@media (prefers-reduced-motion:reduce) {
+  .product-popup .mhq-chip,
+  .product-popup .mhq-card.mhq-open .mhq-panel { animation:none; }
+  .product-popup .mhq-tile,
+  .product-popup .mhq-btn,
+  .product-popup .mhq-q,
+  .product-popup .mhq-vq { transition:none; }
+}
