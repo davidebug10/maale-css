@@ -907,14 +907,24 @@
 })();
 
 /* ============================================================================
-   MH Pizza Quarters — Production v1.1
+   MH Pizza Quarters — Production v1.2
    ----------------------------------------------------------------------------
+   שינויים מ-v1.1:
+     [NEW] בורר הצירוף הקצר ביותר. הבון אצל המסעדן היה ארוך ומבלבל — שורה
+           נפרדת לכל רבע. עכשיו הסקריפט בוחר את קבוצת האפשרויות שמכסה
+           בדיוק את בחירת הלקוח עם הכי מעט שורות. 7 שורות -> 5 בהזמנה
+           אמיתית שנמדדה.
+     [NEW] שמות מיקום מילוליים: (חצי ימין) (חצי שמאל) (רבע שמאל עליון)...
+           מודל מחשבה אחד לאורך כל הבון, בלי מפת רבעים שהטבח צריך לזכור.
+     [CHG] מודל נתונים אחיד: כל אפשרות = קבוצת רבעים. במקום whole/half/
+           quarter נפרדים. זה מה שמאפשר את הבורר.
+     [OK]  תאימות לאחור מלאה — "רבע 1", "על הכל", "על חצי" ממשיכים לעבוד,
+           כך שאפשר לעדכן שמות בתפריט בהדרגה בלי לשבור כלום באמצע.
+
    שינויים מ-v1.0:
-     [FIX] באתר החי הכרטיסים לא הופיעו אף פעם. סיבת שורש: ה-MutationObserver
-           חובר לדף רק בתוך scanInner(), אחרי הבדיקה "יש פופאפ?". בטעינת דף
-           רגילה אין פופאפ, הסריקה יצאה מוקדם, והחיישן מעולם לא חובר — אז
-           פתיחת מוצר מאוחרת לא העירה את הסקריפט. בקונסולה זה תמיד עבד כי
-           הפופאפ היה פתוח ברגע ההדבקה. תיקון: חיבור החיישן מיד עם יצירתו.
+     [FIX] ה-MutationObserver חובר רק בתוך scanInner(), אחרי הבדיקה "יש
+           פופאפ?". בטעינת דף רגילה אין פופאפ, ולכן החיישן מעולם לא חובר.
+           בקונסולה זה תמיד עבד כי הפופאפ היה פתוח בזמן ההדבקה.
    ----------------------------------------------------------------------------
    שינויים מ-v0.5:
      [FIX] הפתיחה האוטומטית לא עבדה. סיבת שורש: השוויתי לטקסט "הראה עוד",
@@ -991,12 +1001,46 @@
     return m ? { name: m[1].trim(), inner: m[2].trim() } : null;
   }
 
+  /* ------------------------------------------------------------------------
+     כל אפשרות מתורגמת לקבוצת הרבעים שהיא מכסה.
+     מפת הרבעים (RTL, כפי שהלקוח והטבח רואים את הקופסה פתוחה):
+       1 = ימין עליון   2 = שמאל עליון   3 = שמאל תחתון   4 = ימין תחתון
+
+     ההתאמה סלחנית בכוונה: אותה משמעות מזוהה בכמה ניסוחים, כדי שהמסעדן
+     יוכל לקצר או להאריך שמות בלי שנצטרך לגעת בקוד. כל השמות הישנים
+     ("רבע 1", "על הכל", "על חצי") ממשיכים לעבוד — אפס שבירה במעבר.
+     ------------------------------------------------------------------------ */
+  var VARIANTS = [
+    /* פיצה שלמה */
+    [/^(על\s*)?(כל\s*ה?(מגש|פיצה)|הכל|שלם|שלמה|מלא)$/, [1, 2, 3, 4]],
+    /* חצאים */
+    [/^(על\s*)?(חצי\s*)?ימין$|^(על\s*)?ימין\s*חצי$/, [1, 4]],
+    [/^(על\s*)?(חצי\s*)?שמאל$|^(על\s*)?שמאל\s*חצי$/, [2, 3]],
+    [/^(על\s*)?(חצי\s*)?עליון$/, [1, 2]],
+    [/^(על\s*)?(חצי\s*)?תחתון$/, [3, 4]],
+    /* רבעים מילוליים — שני סדרי מילים */
+    [/^(רבע\s*)?ימין\s*עליון$|^(רבע\s*)?עליון\s*ימין$/, [1]],
+    [/^(רבע\s*)?שמאל\s*עליון$|^(רבע\s*)?עליון\s*שמאל$/, [2]],
+    [/^(רבע\s*)?שמאל\s*תחתון$|^(רבע\s*)?תחתון\s*שמאל$/, [3]],
+    [/^(רבע\s*)?ימין\s*תחתון$|^(רבע\s*)?תחתון\s*ימין$/, [4]]
+  ];
+
+  /* "חצי" סתמי בלי כיוון — נשמר לתאימות לאחור בלבד. */
+  var HALF_PLAIN = /^(על\s*)?חצי(\s*פיצה)?$/;
+
   function parseVariant(s) {
-    var t = String(s).replace(/["'״׳]/g, '').replace(/\s+/g, ' ').trim();
-    if (/^(על\s*)?(הכל|כל\s*הפיצה|שלם|שלמה|מלא)$/.test(t)) return { kind: 'whole' };
-    if (/^(על\s*)?(חצי|חצי\s*פיצה)$/.test(t)) return { kind: 'half' };
-    var m = t.match(/^(?:על\s*)?רבע\s*([1-4])$/);
-    if (m) return { kind: 'quarter', idx: parseInt(m[1], 10) };
+    var t = String(s)
+      .replace(/["\'״׳]/g, '')
+      .replace(/[\u200e\u200f\u202a-\u202e\u2066-\u2069]/g, '')
+      .replace(/[-–—]/g, ' ')
+      .replace(/\s+/g, ' ').trim();
+
+    for (var i = 0; i < VARIANTS.length; i++) {
+      if (VARIANTS[i][0].test(t)) return { quarters: VARIANTS[i][1].slice(), legacy: false };
+    }
+    var m = t.match(/^(?:על\s*)?רבע\s*([1-4])$/);          /* "רבע 1" הישן */
+    if (m) return { quarters: [parseInt(m[1], 10)], legacy: false };
+    if (HALF_PLAIN.test(t)) return { quarters: [1, 4], legacy: true };
     return null;
   }
 
@@ -1030,14 +1074,20 @@
 
       var t = map.get(parts.name);
       if (!t) {
-        t = { whole: null, half: null, q: {}, rows: [], img: null, anchor: row, all: [] };
+        t = { opts: [], rows: [], img: null, anchor: row, all: [] };
         map.set(parts.name, t);
       }
 
-      var slot = { input: input, price: price };
-      if (variant.kind === 'whole') t.whole = slot;
-      else if (variant.kind === 'half') t.half = slot;
-      else t.q[variant.idx] = slot;
+      /* כל אפשרות = קבוצת רבעים + מחיר. אין יותר "whole/half/quarter"
+         נפרדים — הכל מיוצג אחיד, וזה מה שמאפשר את בורר הצירופים. */
+      t.opts.push({
+        input: input,
+        price: price,
+        quarters: variant.quarters,
+        mask: variant.quarters.reduce(function (a, q) { return a | (1 << (q - 1)); }, 0),
+        label: parts.inner,
+        legacy: variant.legacy
+      });
 
       t.rows.push(row);
       t.all.push(input);
@@ -1049,9 +1099,11 @@
     }
 
     map.forEach(function (t, name) {
-      var n = (t.whole ? 1 : 0) + (t.half ? 1 : 0) + Object.keys(t.q).length;
-      if (n < 2) map.delete(name);
-      else t.hasQ = Object.keys(t.q).length > 0;
+      if (t.opts.length < 2) { map.delete(name); return; }
+      /* המחיר המלא = האפשרות שמכסה את כל 4 הרבעים, אם קיימת */
+      var whole = t.opts.filter(function (o) { return o.mask === 15; })[0];
+      t.wholePrice = whole ? whole.price : null;
+      t.coverage = t.opts.reduce(function (a, o) { return a | o.mask; }, 0);
     });
 
     return map;
@@ -1071,37 +1123,61 @@
   /* ==========================================================================
      3. תרגום בחירה -> צ'קבוקסים
      ========================================================================== */
+  /* ------------------------------------------------------------------------
+     בורר הצירוף הקצר ביותר.
+     בהינתן הרבעים שהלקוח סימן, מוצא את קבוצת האפשרויות שמכסה אותם
+     בדיוק — בלי חפיפה (חפיפה = חיוב כפול על אותו רבע) — עם הכי מעט
+     שורות. שוויון בשורות מוכרע לפי המחיר הנמוך לטובת הלקוח.
+
+     למה כוח גס: עד 8 אפשרויות לתוספת = 256 צירופים, שנבדקים בפחות
+     ממילישנייה. אלגוריתם חכם יותר יהיה קשה יותר לתחזוקה בלי שום רווח.
+
+     זה מה שמקצר את הבון: 3 רבעים הופכים ל"חצי ימין" + "רבע שמאל עליון"
+     במקום שלוש שורות רבע נפרדות.
+     ------------------------------------------------------------------------ */
   function computePlan(t, sel) {
-    var n = sel.size, checks = new Map();
-    t.all.forEach(function (el) { checks.set(el, false); });
+    var checks = new Map();
+    t.opts.forEach(function (o) { checks.set(o.input, false); });
 
-    if (n === 0) return { ok: true, checks: checks, price: 0 };
+    var want = 0;
+    sel.forEach(function (q) { want |= (1 << (q - 1)); });
+    if (!want) return { ok: true, checks: checks, price: 0, lines: 0 };
 
-    if (n === 4 && t.whole) {                       /* בון נקי: שורה אחת */
-      checks.set(t.whole.input, true);
-      return { ok: true, checks: checks, price: t.whole.price };
+    var opts = t.opts, n = Math.min(opts.length, 12), best = null;
+
+    for (var combo = 1; combo < (1 << n); combo++) {
+      var mask = 0, price = 0, lines = 0, clash = false;
+      for (var i = 0; i < n; i++) {
+        if (!(combo & (1 << i))) continue;
+        if (mask & opts[i].mask) { clash = true; break; }   /* חפיפה — פסול */
+        mask |= opts[i].mask;
+        price += opts[i].price;
+        lines++;
+      }
+      if (clash || mask !== want) continue;
+      if (!best || lines < best.lines || (lines === best.lines && price < best.price)) {
+        best = { combo: combo, lines: lines, price: price };
+      }
     }
 
-    if (t.hasQ) {
-      var price = 0, missing = [];
-      sel.forEach(function (i) {
-        if (t.q[i]) { checks.set(t.q[i].input, true); price += t.q[i].price; }
-        else missing.push(i);
-      });
-      if (missing.length) return { ok: false, reason: 'רבע ' + missing.join(', ') + ' לא הוגדר בתפריט' };
-      return { ok: true, checks: checks, price: price };
+    if (!best) {
+      return { ok: false, reason: 'הצירוף הזה לא מוגדר בתפריט של המסעדה' };
     }
 
-    if (n === 2 && t.half) { checks.set(t.half.input, true); return { ok: true, checks: checks, price: t.half.price }; }
-    if (n === 4 && t.half && !t.whole) { checks.set(t.half.input, true); return { ok: true, checks: checks, price: t.half.price }; }
-    return { ok: false, reason: 'התוספת הזו זמינה בחצי או בפיצה שלמה בלבד' };
+    for (var k = 0; k < n; k++) {
+      if (best.combo & (1 << k)) checks.set(opts[k].input, true);
+    }
+    return { ok: true, checks: checks, price: best.price, lines: best.lines };
   }
 
+  /* מצב נוכחי = איחוד הרבעים של כל האפשרויות המסומנות.
+     ה-DOM נשאר מקור האמת: המיקום מקודד בשם האפשרות עצמה,
+     ולכן עריכה מהעגלה משחזרת את הבחירה במדויק. */
   function readSel(t) {
     var s = new Set();
-    if (t.whole && t.whole.input.checked) { s.add(1); s.add(2); s.add(3); s.add(4); }
-    if (t.half && t.half.input.checked) { s.add(1); s.add(2); }
-    for (var i = 1; i <= 4; i++) if (t.q[i] && t.q[i].input.checked) s.add(i);
+    t.opts.forEach(function (o) {
+      if (o.input.checked) o.quarters.forEach(function (q) { s.add(q); });
+    });
     return s;
   }
 
@@ -1244,7 +1320,7 @@
       p.classList.toggle('mhq-on', sel.has(parseInt(p.getAttribute('data-q'), 10)));
     });
 
-    var txt = sel.size ? '₪' + (plan.ok ? plan.price : 0) : (t.whole ? '₪' + t.whole.price : '');
+    var txt = sel.size ? '₪' + (plan.ok ? plan.price : 0) : (t.wholePrice != null ? '₪' + t.wholePrice : '');
     var pe = card.querySelector('.mhq-price');
     if (pe.textContent !== txt) pe.textContent = txt;
 
@@ -1550,6 +1626,68 @@
           .map(function (i) { return i.closest('.v-list-item').innerText.replace(/\s+/g, ' ').trim(); })
       };
     },
+    /* ------------------------------------------------------------------
+       audit() — כלי בדיקת תפריט. מדפיס לכל תוספת:
+         1. אילו אפשרויות זוהו ואילו רבעים כל אחת מכסה
+         2. אפשרויות שלא זוהו (שגיאת כתיב בשם — לא יעבדו!)
+         3. סימולציה של כל 15 הבחירות האפשריות וכמה שורות בון כל אחת
+            תייצר — בלי להזמין ובלי להדפיס
+       ------------------------------------------------------------------ */
+    audit: function () {
+      var p = document.querySelector('.product-popup');
+      if (!p) { console.error('פתח פופאפ מוצר תחילה'); return; }
+      var map = collect(p);
+
+      /* אפשרויות עם סוגריים שלא זוהו — כאן מתגלות שגיאות כתיב */
+      var unknown = [];
+      p.querySelectorAll('input[type="checkbox"]').forEach(function (inp) {
+        var row = inp.closest('.v-list-item');
+        if (!row || row.closest('.mhq-card')) return;
+        var ttl = row.querySelector('.v-list-item-title');
+        if (!ttl) return;
+        var lbl = ttl.innerText.replace(/\s+/g, ' ').trim();
+        var parts = splitLabel(lbl);
+        if (parts && !parseVariant(parts.inner)) unknown.push(lbl);
+      });
+      if (unknown.length) {
+        console.log('%c⚠️ אפשרויות שלא זוהו — בדוק כתיב:', 'color:#b3161b;font-weight:bold');
+        unknown.forEach(function (u) { console.log('   ' + u); });
+      }
+
+      var NAMES = { 1: 'ימין עליון', 2: 'שמאל עליון', 3: 'שמאל תחתון', 4: 'ימין תחתון' };
+      var worst = 0, totalLines = 0, cases = 0;
+
+      map.forEach(function (t, name) {
+        console.log('%c▸ ' + name, 'color:#e31e24;font-weight:bold');
+        console.log('   אפשרויות: ' + t.opts.map(function (o) {
+          return o.label + ' [' + o.quarters.map(function (q) { return NAMES[q]; }).join(' + ') + ']';
+        }).join('  |  '));
+
+        var rows = [];
+        for (var bits = 1; bits < 16; bits++) {
+          var sel = new Set();
+          for (var i = 0; i < 4; i++) if (bits & (1 << i)) sel.add(i + 1);
+          var plan = computePlan(t, sel);
+          var picked = plan.ok
+            ? t.opts.filter(function (o) { return plan.checks.get(o.input); })
+                .map(function (o) { return o.label; }).join(' + ')
+            : '✗ ' + plan.reason;
+          rows.push({
+            'בחירת הלקוח': Array.from(sel).map(function (q) { return NAMES[q]; }).join(' + '),
+            'שורות בבון': plan.ok ? plan.lines : '✗',
+            'מחיר': plan.ok ? plan.price : '-',
+            'מה יודפס': picked
+          });
+          if (plan.ok) { totalLines += plan.lines; cases++; if (plan.lines > worst) worst = plan.lines; }
+        }
+        console.table(rows);
+      });
+
+      console.log('%cסיכום: ממוצע ' + (totalLines / (cases || 1)).toFixed(2) +
+        ' שורות לתוספת | הגרוע ביותר ' + worst + ' שורות',
+        'color:#e31e24;font-weight:bold');
+    },
+
     destroy: function () {
       SETTLE.forEach(clearTimeout); SETTLE = [];
       EXPAND_N = 0; LAST_POPUP = null; PENDING_EXPAND = false;
