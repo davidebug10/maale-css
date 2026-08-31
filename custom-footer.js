@@ -1703,3 +1703,308 @@
   console.log('%c[mhq] Pizza Quarters פעיל. בדיקה: __mhq.stats()  |  ביטול: __mhq.destroy()',
     'color:#e31e24;font-weight:bold');
 })();
+
+/* =========================================================================
+   אכיפת סוג משלוח לפי מיקום — MH Zone Enforcement  |  v1.3.0 | 2026-08-30
+   -------------------------------------------------------------------------
+   מה זה עושה:
+     מסווג את כתובת המסירה של הלקוח מול פוליגון מעלה אדומים (כולל מישור
+     אדומים), וכופה את סוג ההזמנה הנכון:
+       בתוך העיר  → delivery  (התעריף הזול)
+       מחוץ לעיר  → custom_2  (התעריף היקר)
+
+     "איסוף עצמי" (pickup) ו"הוצאה לרכב" (custom_1) — הסקריפט לא נוגע בהם
+     לעולם. אם הלקוח בוחר באחד מהם, הסקריפט מזהה ומרפה.
+
+   שתי שכבות:
+     1. רשת   — מתקן את order_type בקריאות cart/validate ובשליחת ההזמנה.
+                זו שכבת הכסף. נכשלת סגור: בכל ספק → התעריף היקר.
+     2. תצוגה — מציג את האופציה הנכונה, מסתיר את השגויה, ומוסיף שורת הסבר.
+                נכשלת פתוח: אם המבנה לא מזוהה — לא מסתיר כלום.
+
+   למה ברמת הרשת ולא ב-DOM:
+     מבנה ה-DOM של Hyperzod משתנה בעדכוני גרסה (data-v-XXXXX ומחלקות
+     Tailwind). מבנה ה-API יציב הרבה יותר. שכבת הכסף לא תלויה ב-DOM כלל.
+
+   Dependencies: אין. וניל JS.
+
+   אבחון בייצור (לוגים כבויים כברירת מחדל):
+     localStorage.setItem('mh_zone_debug','1')  → רענן → לוגים מלאים
+     localStorage.removeItem('mh_zone_debug')   → כיבוי
+     MH_ZONE.stats()      — מוני פעולות + הסיווג האחרון
+     MH_ZONE.test()       — 7 נקודות ביקורת גיאוגרפיות
+     MH_ZONE.check(lat,lng) — סיווג נקודה בודדת
+     MH_ZONE.showAll()    — חילוץ חירום: מחזיר את כל האופציות לגלויות
+
+   עדכון גבול העיר: לערוך את CFG.POLY בלבד. פורמט GeoJSON — [lng, lat].
+   ========================================================================= */
+(function () {
+'use strict';
+
+if (window.__MH_ZONE__) { return; }
+window.__MH_ZONE__ = true;
+
+var CFG = {
+  VERSION:      '1.3.0',
+  INSIDE_TYPE:  'delivery',
+  OUTSIDE_TYPE: 'custom_2',
+  MANAGED:      ['delivery', 'custom_2'],
+  EDGE_WARN_M:  300,
+  NOTE_ID:      'mh-zone-note',
+  MAX_CLICKS:   8,
+  DEBUG:        (function(){ try { return localStorage.getItem('mh_zone_debug') === '1'; }
+                             catch(e){ return false; } })(),
+  /* גבול מעלה אדומים + מישור אדומים. מכויל מול Google Geocoding, 10/10. */
+  POLY: [
+    [35.2780,31.7780],[35.2800,31.7900],[35.2920,31.7960],[35.3100,31.7990],
+    [35.3300,31.8090],[35.3550,31.8120],[35.3750,31.8020],[35.3780,31.7860],
+    [35.3450,31.7800],[35.3200,31.7760],[35.3150,31.7620],[35.2960,31.7510],
+    [35.2820,31.7620]
+  ]
+};
+
+/* קירוב שטוח — מדויק לחלוטין בסקאלה של עיר (קו רוחב ~31.79°) */
+var MLAT = 111320, MLNG = 94640;
+var S = { vSeen:0, vFixed:0, oSeen:0, oFixed:0,
+          uiClicks:0, uiHides:0, uiShows:0, uiSkips:0, errors:0 };
+var LAST = { zone:null, type:null, addr:null };
+var appliedSig = null, busy = false;
+
+function log(){ if(CFG.DEBUG) console.log.apply(console,
+  ['%c[MH-ZONE]','color:#e31e24;font-weight:bold'].concat([].slice.call(arguments))); }
+function warn(){ console.warn.apply(console,['[MH-ZONE]'].concat([].slice.call(arguments))); }
+
+/* ---------- גיאומטריה ---------- */
+
+/* Ray casting — point in polygon */
+function inPoly(lng, lat, p) {
+  var ins = false;
+  for (var i=0, j=p.length-1; i<p.length; j=i++) {
+    var xi=p[i][0], yi=p[i][1], xj=p[j][0], yj=p[j][1];
+    if (((yi>lat)!==(yj>lat)) && (lng < (xj-xi)*(lat-yi)/(yj-yi) + xi)) ins = !ins;
+  }
+  return ins;
+}
+
+/* מרחק במטרים מהגבול — להתראה על מקרי קצה בלבד, לא משנה סיווג */
+function edgeDist(lng, lat, p) {
+  var px=lng*MLNG, py=lat*MLAT, best=Infinity;
+  for (var i=0, j=p.length-1; i<p.length; j=i++) {
+    var ax=p[j][0]*MLNG, ay=p[j][1]*MLAT, bx=p[i][0]*MLNG, by=p[i][1]*MLAT;
+    var dx=bx-ax, dy=by-ay, L=dx*dx+dy*dy;
+    var t = L ? Math.max(0, Math.min(1, ((px-ax)*dx+(py-ay)*dy)/L)) : 0;
+    best = Math.min(best, Math.hypot(px-(ax+t*dx), py-(ay+t*dy)));
+  }
+  return best;
+}
+
+/* סיווג. קואורדינטה חסרה או לא תקינה → OUTSIDE (Fail-Closed) */
+function classify(lat, lng) {
+  if (!isFinite(lat) || !isFinite(lng) || (lat===0 && lng===0))
+    return { zone:'UNKNOWN', type:CFG.OUTSIDE_TYPE, edge:null };
+  var ins = inPoly(lng, lat, CFG.POLY), d = Math.round(edgeDist(lng, lat, CFG.POLY));
+  if (d < CFG.EDGE_WARN_M) warn('קרוב לגבול ('+d+' מ׳):', lat, lng, ins?'בפנים':'בחוץ');
+  return { zone: ins?'INSIDE':'OUTSIDE', type: ins?CFG.INSIDE_TYPE:CFG.OUTSIDE_TYPE, edge:d };
+}
+
+/* שליפת קואורדינטה לפי מזהה כתובת מתוך vuex */
+function addrById(id) {
+  if (!id) return null;
+  try {
+    var l = ((JSON.parse(localStorage.getItem('vuex')||'{}').Address)||{}).addresses||[];
+    for (var i=0;i<l.length;i++) {
+      if (l[i].id===id || l[i]._id===id) {
+        var c = l[i].location_lat_lon||[];
+        return { lat:+c[0], lng:+c[1], text:l[i].address };
+      }
+    }
+  } catch(e){ S.errors++; warn('vuex', e); }
+  return null;
+}
+
+/* ---------- שכבה 1: רשת (שכבת הכסף) ---------- */
+
+/* cart/validate נושאת גם את סוג ההזמנה וגם את הקואורדינטה, וממנה נגזר
+   ה-checksum והמחיר. לכן זו נקודת האכיפה — ולא ה-POST הסופי. */
+function fixValidate(url) {
+  if (url.indexOf('/cart/validate') === -1) return url;
+  var u; try { u = new URL(url, location.origin); } catch(e){ return url; }
+  var ot = u.searchParams.get('order_type');
+  if (CFG.MANAGED.indexOf(ot) === -1) return url;   /* pickup / custom_1 — לא נוגעים */
+  S.vSeen++;
+
+  var aid = u.searchParams.get('address_id');
+  var loc = u.searchParams.getAll('delivery_location[]'), lat, lng;
+  if (loc.length >= 2) { lat=parseFloat(loc[0]); lng=parseFloat(loc[1]); }
+  else { var a0 = addrById(aid); if (a0){ lat=a0.lat; lng=a0.lng; } }
+  if (!isFinite(lat) || !isFinite(lng)) return url;   /* אין כתובת עדיין */
+
+  var c = classify(lat, lng), rec = addrById(aid);
+  LAST = { zone:c.zone, type:c.type, addr: rec ? rec.text : null };
+  setTimeout(reconcileUI, 60);
+
+  if (c.type === ot) { log('✓ validate תקין:', ot, '|', c.zone); return url; }
+  u.searchParams.set('order_type', c.type);
+  S.vFixed++;
+  log('🔧 validate:', ot, '→', c.type, '|', c.zone);
+  return u.toString();
+}
+
+/* POST /store/v1/order — רשת ביטחון אחרונה. במצב תקין oFixed נשאר 0. */
+function fixOrder(body) {
+  if (typeof body !== 'string') return body;
+  var o; try { o = JSON.parse(body); } catch(e){ return body; }
+  if (!o || CFG.MANAGED.indexOf(o.order_type) === -1) return body;
+  S.oSeen++;
+
+  var a = addrById(o.delivery_address_id);
+  if (!a) { warn('POST: כתובת לא נמצאה — מאלץ', CFG.OUTSIDE_TYPE);
+            o.order_type = CFG.OUTSIDE_TYPE; S.oFixed++; return JSON.stringify(o); }
+  var c = classify(a.lat, a.lng);
+  if (c.type === o.order_type) { log('✅ POST תקין:', o.order_type, '|', c.zone); return body; }
+  log('🔧 POST:', o.order_type, '→', c.type, '|', c.zone);
+  o.order_type = c.type; S.oFixed++;
+  return JSON.stringify(o);
+}
+
+var IS_ORDER = /\/store\/v1\/order(\?|$)/;
+
+/* Hyperzod משתמשת ב-axios שרץ על XHR. fetch עטוף ליתר ביטחון. */
+var _o = XMLHttpRequest.prototype.open, _s = XMLHttpRequest.prototype.send;
+XMLHttpRequest.prototype.open = function(m, url) {
+  var a = [].slice.call(arguments);
+  try { a[1] = fixValidate(String(url)); } catch(e){ S.errors++; warn('open', e); }
+  this.__mhU = String(a[1]);
+  return _o.apply(this, a);
+};
+XMLHttpRequest.prototype.send = function(b) {
+  try { if (this.__mhU && IS_ORDER.test(this.__mhU)) b = fixOrder(b); }
+  catch(e){ S.errors++; warn('send', e); }
+  return _s.call(this, b);
+};
+var _f = window.fetch;
+window.fetch = function(input, init) {
+  try {
+    if (typeof input === 'string') {
+      input = fixValidate(input);
+      if (init && init.body && IS_ORDER.test(input))
+        init = Object.assign({}, init, { body: fixOrder(init.body) });
+    }
+  } catch(e){ S.errors++; warn('fetch', e); }
+  return _f.call(this, input, init);
+};
+
+/* ---------- שכבה 2: תצוגה (נכשלת פתוח) ---------- */
+
+function currentChecked(){
+  var el = document.querySelector('.custom-radio.checked[value]');
+  return el ? el.getAttribute('value') : null;
+}
+
+function noteEl(container, create){
+  var n = document.getElementById(CFG.NOTE_ID);
+  if (n || !create) return n;
+  n = document.createElement('div');
+  n.id = CFG.NOTE_ID;
+  n.setAttribute('style',
+    'background:#fff5f5;border:1px solid rgba(227,30,36,.18);border-radius:12px;' +
+    'padding:8px 12px;margin:8px 0 0;font-size:12.5px;line-height:1.5;' +
+    'color:#4a5568;direction:rtl;text-align:right;');
+  container.parentElement.insertBefore(n, container.nextSibling);
+  return n;
+}
+
+function reconcileUI(){
+  if (busy || !LAST.type) return;
+  try {
+    busy = true;
+
+    /* עוגן: ל-.custom-radio יש value עם ה-slug. יציב וסמנטי.
+       לא משתמשים ב-data-v-XXXXX — הוא משתנה בעדכוני גרסה. */
+    var rIn  = document.querySelector('.custom-radio[value="'+CFG.INSIDE_TYPE+'"]');
+    var rOut = document.querySelector('.custom-radio[value="'+CFG.OUTSIDE_TYPE+'"]');
+    if (!rIn || !rOut) return;                        /* אין בורר → לא נוגעים */
+    var iIn  = rIn.closest('.v-list-item');
+    var iOut = rOut.closest('.v-list-item');
+    if (!iIn || !iOut) return;                        /* מבנה השתנה → לא נוגעים */
+
+    var outside   = (LAST.type === CFG.OUTSIDE_TYPE);
+    var keepItem  = outside ? iOut : iIn;
+    var keepRadio = outside ? rOut : rIn;
+    var hideItem  = outside ? iIn  : iOut;
+
+    /* קודם להחזיר את הנכון, ורק אז להסתיר את השגוי.
+       בלי ההחזרה, החלפת כתובת משאירה את שניהם מוסתרים. */
+    if (keepItem.style.display === 'none') {
+      keepItem.style.display = ''; S.uiShows++;
+      log('👁 הוחזר:', LAST.type);
+    }
+    if (hideItem.style.display !== 'none') {
+      hideItem.style.display = 'none'; S.uiHides++;
+      log('🙈 הוסתר:', outside ? CFG.INSIDE_TYPE : CFG.OUTSIDE_TYPE);
+    }
+
+    var cur = currentChecked();
+    var isDelivery = !cur || CFG.MANAGED.indexOf(cur) !== -1;
+
+    /* שורת ההסבר רלוונטית רק במשלוח. באיסוף עצמי היא מבלבלת. */
+    var n = noteEl(keepItem.parentElement, isDelivery);
+    if (n) n.style.display = isDelivery ? '' : 'none';
+    if (n && isDelivery) {
+      var txt = '📍 סוג המשלוח נקבע לפי הכתובת' + (LAST.addr ? ': ' + LAST.addr : '');
+      if (n.textContent !== txt) n.textContent = txt;
+    }
+
+    /* הלקוח בחר איסוף עצמי / הוצאה לרכב — בחירה לגיטימית. מרפים. */
+    if (!isDelivery) { S.uiSkips++; return; }
+
+    /* בחירה אוטומטית — פעם אחת לכל צירוף כתובת/סיווג.
+       appliedSig + MAX_CLICKS מונעים לולאת קליקים מול MutationObserver. */
+    var sig = LAST.type + '|' + (LAST.addr||'');
+    if (!keepRadio.classList.contains('checked') && appliedSig !== sig
+        && S.uiClicks < CFG.MAX_CLICKS) {
+      appliedSig = sig; S.uiClicks++;
+      keepItem.click();
+      log('🖱 נבחר אוטומטית:', LAST.type);
+    }
+
+  } catch(e){ S.errors++; warn('reconcileUI', e); }
+  finally { busy = false; }
+}
+
+/* SPA — הבורר נוצר ונהרס בניווט. debounce 200ms. */
+var t = null;
+new MutationObserver(function(){
+  clearTimeout(t); t = setTimeout(reconcileUI, 200);
+}).observe(document.body, { childList:true, subtree:true });
+
+/* ---------- אבחון ---------- */
+window.MH_ZONE = {
+  version: CFG.VERSION,
+  stats: function(){ console.table(S); console.log('סיווג:', LAST, '| applied:', appliedSig); return S; },
+  check: function(lat,lng){ return classify(lat,lng); },
+  reset: function(){ S.uiClicks = 0; appliedSig = null; },
+  showAll: function(){
+    [].forEach.call(document.querySelectorAll('.custom-radio[value]'), function(r){
+      var it = r.closest('.v-list-item'); if (it) it.style.display = '';
+    });
+    var n = document.getElementById(CFG.NOTE_ID); if (n) n.remove();
+    console.log('[MH-ZONE] כל האופציות הוחזרו');
+  },
+  test: function(){
+    [['מרכז מעלה אדומים',31.7715,35.2986,'INSIDE'],
+     ['מצפה נבו',31.7927,35.3029,'INSIDE'],
+     ['מישור אדומים',31.7936,35.3337,'INSIDE'],
+     ['כפר אדומים',31.8272,35.3372,'OUTSIDE'],
+     ['אלון',31.8334,35.3536,'OUTSIDE'],
+     ['נופי פרת',31.8235,35.3199,'OUTSIDE'],
+     ['הר הצופים',31.7931,35.2449,'OUTSIDE']]
+    .forEach(function(x){
+      var r = classify(x[1],x[2]);
+      console.log((r.zone===x[3]?'✅':'❌ שגוי!'), x[0], '→', r.zone);
+    });
+  }
+};
+
+log('פעיל | גרסה', CFG.VERSION);
+})();
