@@ -849,7 +849,7 @@
     }
 
     function categoryOf(target) {
-        var popup = target.closest('.product-popup');
+        var popup = target.closest('.product-popup') || pizzaRoot();
         if (popup) {
             var c = popup.querySelector('.product-category-name');
             return c ? c.textContent.trim() : null;
@@ -1378,7 +1378,7 @@
   }
 
   function onAddClick(e) {
-    var popup = document.querySelector('.product-popup');
+    var popup = pizzaRoot();
     if (!popup || !e.target || !e.target.closest) return;
     /* [v0.5] המגן פעיל אך ורק בפופאפ שבו הכרטיסים שלנו קיימים.
        בלי זה היינו מאזינים לכל הוספה לעגלה בכל הפלטפורמה — ומסעדן
@@ -1467,7 +1467,7 @@
 
     setTimeout(function () {
       BUSY = false;
-      var p2 = document.querySelector('.product-popup');
+      var p2 = pizzaRoot();
       if (!p2) return;
       var after = expandSig(p2);
       if (after === before) {
@@ -1491,9 +1491,21 @@
     catch (err) { console.error('[mhq] שגיאה בסריקה — הממשק נשאר כפי שהוא:', err); }
   }
 
+  /* [v1.3] שורש הווידג'ט: עד היום רק '.product-popup'. מאז שקישורים ישירים
+     לעמוד המוצר (‎/m/<slug>/<id>/product/<pid>‎) נכנסו לשימוש, אותו מוצר נפתח
+     גם כעמוד מלא — DOM אחר, בלי הפופאפ — ובורר הרבעים פשוט לא נטען והלקוח
+     ראה רשימת תיבות. הפתרון: בעמוד מוצר (‏/product/ ב-URL) השורש הוא #app.
+     מוגבל ל-URL של מוצר בכוונה, כדי שלא נסרוק את כל האפליקציה בדפים אחרים. */
+  function pizzaRoot() {
+    var popup = document.querySelector('.product-popup');
+    if (popup) return popup;
+    if (!/\/product\//.test(location.pathname)) return null;
+    return document.querySelector('#app') || document.querySelector('.v-application');
+  }
+
   function scanInner() {
     if (BUSY) return;
-    var popup = document.querySelector('.product-popup');
+    var popup = pizzaRoot();
     if (!popup) return;
 
     /* מוצר חדש = מאפסים את מונה הפתיחות */
@@ -1577,7 +1589,7 @@
     var probe = document.createElement('div');
     probe.className = 'mhq-css-probe';
     probe.style.cssText = 'position:absolute;visibility:hidden';
-    var host = document.querySelector('.product-popup') || document.body;
+    var host = pizzaRoot() || document.body;
     host.appendChild(probe);
     var ok = getComputedStyle(probe).getPropertyValue('--mhq') .trim() === 'on';
     probe.remove();
@@ -1610,7 +1622,7 @@
     scan: scan,
     settle: settle,
     stats: function () {
-      var p = document.querySelector('.product-popup');
+      var p = pizzaRoot();
       if (!p) return 'אין פופאפ';
       var cards = [].slice.call(p.querySelectorAll('.mhq-card'));
       return {
