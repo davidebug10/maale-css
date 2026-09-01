@@ -1103,6 +1103,14 @@
       /* המחיר המלא = האפשרות שמכסה את כל 4 הרבעים, אם קיימת */
       var whole = t.opts.filter(function (o) { return o.mask === 15; })[0];
       t.wholePrice = whole ? whole.price : null;
+      /* המחיר לרבע = האפשרות שמכסה רבע בודד (mask של ביט אחד: 1/2/4/8).
+         זה מה שהכרטיס מציג לפני שנבחרו רבעים — הצגת המחיר למגש שלם נקראה
+         כאילו התוספת עצמה עולה ₪10 (דוד, 1.9). נפילה ל-¼ מהמלא אם אין רבע. */
+      var quarter = t.opts.filter(function (o) {
+        return o.mask === 1 || o.mask === 2 || o.mask === 4 || o.mask === 8;
+      })[0];
+      t.quarterPrice = quarter ? quarter.price
+        : (t.wholePrice != null ? Math.round(t.wholePrice * 25) / 100 : null);
       t.coverage = t.opts.reduce(function (a, o) { return a | o.mask; }, 0);
     });
 
@@ -1320,7 +1328,11 @@
       p.classList.toggle('mhq-on', sel.has(parseInt(p.getAttribute('data-q'), 10)));
     });
 
-    var txt = sel.size ? '₪' + (plan.ok ? plan.price : 0) : (t.wholePrice != null ? '₪' + t.wholePrice : '');
+    /* לפני בחירה מציגים "₪2.5 לרבע" ולא את מחיר המגש השלם — אחרת הלקוח
+       קורא ₪10 וחושב שזה מחיר התוספת. אחרי בחירה: המחיר בפועל. */
+    var txt = sel.size ? '₪' + (plan.ok ? plan.price : 0)
+      : (t.quarterPrice != null ? '₪' + t.quarterPrice + ' לרבע'
+        : (t.wholePrice != null ? '₪' + t.wholePrice : ''));
     var pe = card.querySelector('.mhq-price');
     if (pe.textContent !== txt) pe.textContent = txt;
 
@@ -1523,6 +1535,11 @@
         });
 
         var parent = t.anchor.parentNode;
+        /* כל כללי ה-CSS של הבורר ממוקדים ב-'.product-popup .mhq-*'. בעמוד
+           המוצר העצמאי אין פופאפ, ולכן הכרטיסים רונדרו בלי שום עיצוב —
+           הבדיקה cssLoaded() לא תפסה את זה כי כלל ה-probe אינו ממוקד.
+           מסמנים את ההורה, וכל הכללים הקיימים חלים. */
+        if (!parent.closest('.product-popup')) parent.classList.add('product-popup', 'mhq-scope');
         var grid = parent.querySelector(':scope > [data-mhq-grid]');
         if (!grid) {
           grid = document.createElement('div');
