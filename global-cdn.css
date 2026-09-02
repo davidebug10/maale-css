@@ -5912,3 +5912,14 @@ html body span.review img {
   .product-popup .mhq-q,
   .product-popup .mhq-vq { transition:none; }
 }
+
+/* ==========================================================================
+   תיאור החנות בראש דף המרצ'נט (Custom Text / storefront_message) — 2.9.2026
+   דוד רוצה שלוש שורות: אלרגנים / כשרות / "התמונות להמחשה בלבד". הטקסט נשמר
+   עם שורות חדשות (\n), אבל הבועה ב-Hyperzod היא white-space:normal ומקפלת
+   אותן לשורה אחת. pre-line = שורה חדשה בטקסט הופכת לשורה חדשה על המסך.
+   ========================================================================== */
+.merchant-page #merchant-header-v3 div.tw-inline-block.tw-font-semibold.tw-text-sm {
+  white-space: pre-line !important;
+  text-align: right !important;
+}
