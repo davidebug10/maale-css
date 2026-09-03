@@ -5933,12 +5933,20 @@ html body span.review img {
    הטקסט של Vuetify — מונע את הזום, לא משנה את הדסקטופ. גובה השדה נשאר 40px.
    ========================================================================== */
 @media (max-width: 767px) {
+  /* ספציפיות גבוהה בכוונה: לשדה החיפוש בנייד (#MultiVendorHeaderRoot .home-mobile-search-row) יש
+     כלל !important של Hyperzod שגובר על סלקטור כללי (אומת 3.9: רק סלקטור עם id ניצח) */
+  html body #MultiVendorHeaderRoot .home-mobile-search-row .v-field input,
+  html body #MultiVendorHeaderRoot .v-field input.v-field__input,
+  html body #MultiVendorHeaderRoot #navSearchBar,
   html body .web-main-search .v-field input,
   html body #navSearchBar,
   html body input#search,
+  html body #mobileLocationSearch .v-field input,
+  html body .v-input .v-field .v-field__field input.v-field__input,
   html body .v-field input,
   html body .v-field__input,
   html body textarea.v-field__input {
     font-size: 16px !important;
   }
 }
+/* mh-ios-zoom-v2 */
