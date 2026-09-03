@@ -5953,11 +5953,11 @@ html body span.review img {
 
 /* =========================================================
    חלק 30: חלונית קופונים בצ'ק-אאוט — "החל" במקום "סנן" (3.9.2026, פיילוט עיצוב באפליקציה)
-   סקופ: nav.scheme-coupon-panel (מגירת הקופונים בלבד; מגירת הסינון .scheme-filter-* לא נוגעים).
+   סקופ: nav.scheme-coupon-panel (דסקטופ) וגם .v-overlay .v-bottom-sheet__content (הגיליון התחתון במובייל — 3.9: במובייל זה רכיב אחר, available-coupons-mobile); מגירת הסינון .scheme-filter-* לא נוגעים.
    מבנה חי (אומת בדפדפן של דוד): .scheme-coupon-content > .scheme-coupon-input > input#couponInput + button(.v-btn__content "סנן").
    ========================================================= */
 /* 1. שורת הקלט — קפסולת קריסטל עם מסגרת אדומה, גבוהה ונוחה לאצבע */
-html body nav.scheme-coupon-panel .scheme-coupon-input {
+:is(html body nav.scheme-coupon-panel, html body .v-overlay .v-bottom-sheet__content) .scheme-coupon-input {
     min-height: 56px !important;
     padding: 6px 6px 6px 6px !important;
     background: rgba(255, 255, 255, 0.9) !important;
@@ -5967,7 +5967,7 @@ html body nav.scheme-coupon-panel .scheme-coupon-input {
     gap: 8px !important;
 }
 /* 2. השדה — 16px (גם מונע זום ב-iPhone), טקסט כהה, placeholder רך */
-html body nav.scheme-coupon-panel .scheme-coupon-input input#couponInput {
+:is(html body nav.scheme-coupon-panel, html body .v-overlay .v-bottom-sheet__content) .scheme-coupon-input input#couponInput {
     font-size: 16px !important;
     font-weight: 600 !important;
     color: #1a1a1a !important;
@@ -5975,12 +5975,12 @@ html body nav.scheme-coupon-panel .scheme-coupon-input input#couponInput {
     padding: 0 12px !important;
     letter-spacing: 0.5px !important;
 }
-html body nav.scheme-coupon-panel .scheme-coupon-input input#couponInput::placeholder {
+:is(html body nav.scheme-coupon-panel, html body .v-overlay .v-bottom-sheet__content) .scheme-coupon-input input#couponInput::placeholder {
     color: rgba(0, 0, 0, 0.4) !important;
     font-weight: 500 !important;
 }
 /* 3. כפתור ההחלה — QLED אדום, גדול, טקסט לבן "החל" */
-html body nav.scheme-coupon-panel .scheme-coupon-input button {
+:is(html body nav.scheme-coupon-panel, html body .v-overlay .v-bottom-sheet__content) .scheme-coupon-input button {
     min-width: 92px !important;
     height: 44px !important;
     padding: 0 18px !important;
@@ -5991,17 +5991,17 @@ html body nav.scheme-coupon-panel .scheme-coupon-input button {
     opacity: 1 !important;
     transition: transform 0.15s ease, box-shadow 0.15s ease !important;
 }
-html body nav.scheme-coupon-panel .scheme-coupon-input button:active { transform: scale(0.96) !important; }
-html body nav.scheme-coupon-panel .scheme-coupon-input button .v-btn__overlay,
-html body nav.scheme-coupon-panel .scheme-coupon-input button .v-btn__underlay { display: none !important; }
+:is(html body nav.scheme-coupon-panel, html body .v-overlay .v-bottom-sheet__content) .scheme-coupon-input button:active { transform: scale(0.96) !important; }
+:is(html body nav.scheme-coupon-panel, html body .v-overlay .v-bottom-sheet__content) .scheme-coupon-input button .v-btn__overlay,
+:is(html body nav.scheme-coupon-panel, html body .v-overlay .v-bottom-sheet__content) .scheme-coupon-input button .v-btn__underlay { display: none !important; }
 /* "סנן" → "החל": מכבים את הטקסט המקורי ומציירים תווית חדשה (התבנית של התרגומים בקובץ הזה) */
-html body nav.scheme-coupon-panel .scheme-coupon-input button .v-btn__content,
-html body nav.scheme-coupon-panel .scheme-coupon-input button > span {
+:is(html body nav.scheme-coupon-panel, html body .v-overlay .v-bottom-sheet__content) .scheme-coupon-input button .v-btn__content,
+:is(html body nav.scheme-coupon-panel, html body .v-overlay .v-bottom-sheet__content) .scheme-coupon-input button > span {
     font-size: 0 !important;
     color: transparent !important;
 }
-html body nav.scheme-coupon-panel .scheme-coupon-input button .v-btn__content::before,
-html body nav.scheme-coupon-panel .scheme-coupon-input button > span::before {
+:is(html body nav.scheme-coupon-panel, html body .v-overlay .v-bottom-sheet__content) .scheme-coupon-input button .v-btn__content::before,
+:is(html body nav.scheme-coupon-panel, html body .v-overlay .v-bottom-sheet__content) .scheme-coupon-input button > span::before {
     content: "החל" !important;
     font-size: 16px !important;
     font-weight: 800 !important;
@@ -6022,4 +6022,4 @@ html body nav.scheme-coupon-panel .scheme-coupon-content p.tw-text-\[12px\] {
     font-weight: 700 !important;
     margin-top: 8px !important;
 }
-/* mh-coupon-v1 */
+/* mh-coupon-v2 */
