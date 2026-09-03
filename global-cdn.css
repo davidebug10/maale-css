@@ -5923,3 +5923,22 @@ html body span.review img {
   white-space: pre-line !important;
   text-align: right !important;
 }
+
+/* ==========================================================================
+   iOS זום בפוקוס על שדה החיפוש (3.9.2026) — הסיבה: Safari/Chrome ב-iPhone
+   מגדילים את הדף אוטומטית כשנכנסים לשדה טקסט שהפונט שלו קטן מ-16px. Hyperzod
+   מגדירים לשדה החיפוש בדף הבית 14px (index.css: .web-main-search .v-field input)
+   ו-12px ב-non-critical.css, ולשדה הכתובת 14px — הכללים שלנו לא נגעו בשדות האלה
+   (אומת 3.9: אף סלקטור שלנו לא תואם #navSearchBar). בנייד בלבד: 16px לכל שדות
+   הטקסט של Vuetify — מונע את הזום, לא משנה את הדסקטופ. גובה השדה נשאר 40px.
+   ========================================================================== */
+@media (max-width: 767px) {
+  html body .web-main-search .v-field input,
+  html body #navSearchBar,
+  html body input#search,
+  html body .v-field input,
+  html body .v-field__input,
+  html body textarea.v-field__input {
+    font-size: 16px !important;
+  }
+}
