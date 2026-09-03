@@ -5950,3 +5950,76 @@ html body span.review img {
   }
 }
 /* mh-ios-zoom-v2 */
+
+/* =========================================================
+   חלק 30: חלונית קופונים בצ'ק-אאוט — "החל" במקום "סנן" (3.9.2026, פיילוט עיצוב באפליקציה)
+   סקופ: nav.scheme-coupon-panel (מגירת הקופונים בלבד; מגירת הסינון .scheme-filter-* לא נוגעים).
+   מבנה חי (אומת בדפדפן של דוד): .scheme-coupon-content > .scheme-coupon-input > input#couponInput + button(.v-btn__content "סנן").
+   ========================================================= */
+/* 1. שורת הקלט — קפסולת קריסטל עם מסגרת אדומה, גבוהה ונוחה לאצבע */
+html body nav.scheme-coupon-panel .scheme-coupon-input {
+    min-height: 56px !important;
+    padding: 6px 6px 6px 6px !important;
+    background: rgba(255, 255, 255, 0.9) !important;
+    border: 1.2px solid #e31e24 !important;
+    border-radius: 14px !important;
+    box-shadow: 0 6px 18px rgba(227, 30, 36, 0.10) !important;
+    gap: 8px !important;
+}
+/* 2. השדה — 16px (גם מונע זום ב-iPhone), טקסט כהה, placeholder רך */
+html body nav.scheme-coupon-panel .scheme-coupon-input input#couponInput {
+    font-size: 16px !important;
+    font-weight: 600 !important;
+    color: #1a1a1a !important;
+    height: 44px !important;
+    padding: 0 12px !important;
+    letter-spacing: 0.5px !important;
+}
+html body nav.scheme-coupon-panel .scheme-coupon-input input#couponInput::placeholder {
+    color: rgba(0, 0, 0, 0.4) !important;
+    font-weight: 500 !important;
+}
+/* 3. כפתור ההחלה — QLED אדום, גדול, טקסט לבן "החל" */
+html body nav.scheme-coupon-panel .scheme-coupon-input button {
+    min-width: 92px !important;
+    height: 44px !important;
+    padding: 0 18px !important;
+    border-radius: 11px !important;
+    background: linear-gradient(135deg, #e31e24, #b3161b) !important;
+    color: #fff !important;
+    box-shadow: 0 6px 16px rgba(227, 30, 36, 0.30) !important;
+    opacity: 1 !important;
+    transition: transform 0.15s ease, box-shadow 0.15s ease !important;
+}
+html body nav.scheme-coupon-panel .scheme-coupon-input button:active { transform: scale(0.96) !important; }
+html body nav.scheme-coupon-panel .scheme-coupon-input button .v-btn__overlay,
+html body nav.scheme-coupon-panel .scheme-coupon-input button .v-btn__underlay { display: none !important; }
+/* "סנן" → "החל": מכבים את הטקסט המקורי ומציירים תווית חדשה (התבנית של התרגומים בקובץ הזה) */
+html body nav.scheme-coupon-panel .scheme-coupon-input button .v-btn__content,
+html body nav.scheme-coupon-panel .scheme-coupon-input button > span {
+    font-size: 0 !important;
+    color: transparent !important;
+}
+html body nav.scheme-coupon-panel .scheme-coupon-input button .v-btn__content::before,
+html body nav.scheme-coupon-panel .scheme-coupon-input button > span::before {
+    content: "החל" !important;
+    font-size: 16px !important;
+    font-weight: 800 !important;
+    color: #fff !important;
+    letter-spacing: 0.3px !important;
+    line-height: 1 !important;
+}
+/* 4. כותרת "קופונים זמינים" — קצת יותר נוכחת */
+html body nav.scheme-coupon-panel .scheme-coupon-content .tw-text-xs,
+html body nav.scheme-coupon-panel .scheme-coupon-content span.tw-font-semibold {
+    font-size: 13px !important;
+    font-weight: 800 !important;
+    color: #1a1a1a !important;
+}
+/* 5. הודעת "קוד קופון לא חוקי" — קריאה יותר (הייתה 12px רגילה) */
+html body nav.scheme-coupon-panel .scheme-coupon-content p.tw-text-\[12px\] {
+    font-size: 13px !important;
+    font-weight: 700 !important;
+    margin-top: 8px !important;
+}
+/* mh-coupon-v1 */
