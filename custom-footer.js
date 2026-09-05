@@ -2264,7 +2264,7 @@ log('פעיל | גרסה', CFG.VERSION);
 })();
 
 /* =========================================================================
-   SEO לדפי האתר — MH SEO  |  v1.0.0 | 2026-09-06
+   SEO לדפי האתר — MH SEO  |  v1.0.1 | 2026-09-06
    -------------------------------------------------------------------------
    מה זה עושה (רק head/meta, לא נוגע בעגלה, בתשלום או בהזמנה):
      1. כותרת (<title>) ותיאור (meta description) לכל דף לפי הנתיב:
@@ -2323,6 +2323,16 @@ var SEO_MERCHANTS = {
     d: 'חומוס אדומים, החומוסייה הוותיקה של מישור אדומים: מסבחה, פול, סביח ושקשוקה על חומוס, כשר רבנות. משלוחים עד הבית בכל מעלה אדומים. הזמינו במעלה המשלוחים.' },
   'toastrack':              { he: 'טוסטראק', t: 'טוסטראק כפר אדומים | משלוחים למעלה אדומים והזמנה אונליין', c: 'טוסטים, כריכים בשריים, מזון מהיר',
     d: 'טוסטראק: טוסטים בשריים בהרכבה אישית על באגט פריך, נקניקיות וצ\'יפס, מכפר אדומים במשלוחים עד הבית למעלה אדומים. תרכיבו את הביס והזמינו במעלה המשלוחים.' }
+};
+/* עמודי תוכן (Custom Pages): תיאור מאושר לפי slug */
+var SEO_PAGES = {
+  'mishlohim-maale-adumim': 'מזמינים משלוחי אוכל במעלה אדומים בקליק: פיצה, המבורגר, פלאפל, פסטה, מאפים ועוד ממסעדות העיר, עם שליחים מקומיים עד הדלת. בלי שיחות ובלי המתנה.',
+  'pizza-maale-adumim': "משלוחי פיצה במעלה אדומים עם שליחים מקומיים: בנ'ס פיצה שופ הכשרה למהדרין, פיצות מקפית אגם אדומים, פיצות אישיות מברכת השבת ועוד. מזמינים בקליק.",
+  'hamburger-maale-adumim': 'משלוחי המבורגר במעלה אדומים: בורגר מרקט עם בשר שנטחן במקום, פטריקס הבשרית הכשרה למהדרין, טוסטים בשריים מטוסטראק. מזמינים בקליק ושליח מקומי מביא.',
+  'bakery-maale-adumim': 'מאפייה וקונדיטוריה במעלה אדומים במשלוח: לחמי מחמצת ועוגות מרולדין, בורקסים ורוגלך מברכת השבת, סמבוסק ובייגלה ממפגש השייח. מזמינים בקליק עד הדלת.',
+  'kosher-restaurants-maale-adumim': 'מסעדות כשרות במעלה אדומים עם משלוחים: פלאפל וסביח, מעורב ירושלמי, פסטה, סלטים, פיצה ומאפים, עם סוג הכשרות של כל עסק. מזמינים בקליק ושליח מקומי מביא.',
+  'join-business': 'בעלי עסקים במעלה אדומים: הצטרפו למעלה המשלוחים, אפליקציית המשלוחים המקומית. שליחים מהעיר, תפריט דיגיטלי, תשלום באתר או במזומן, מודל עמלה על הזמנות. דברו איתנו.',
+  'contact-us': 'דברו איתנו: שירות הלקוחות של מעלה המשלוחים, אפליקציית המשלוחים של מעלה אדומים. שאלות על הזמנה, בעלי עסקים שרוצים להצטרף, הערות ומחמאות.'
 };
 var DEBUG = (function(){ try { return localStorage.getItem('mh_seo_debug') === '1'; } catch(e){ return false; } })();
 var LAST = null, timer = null, lastKey = null, PN = {};
@@ -2434,7 +2444,11 @@ function compute(){
   if (p === '/' || p === '/he' || p === '/he/home') return { key: 'home', title: HOME.title, desc: HOME.desc, canon: ORIGIN + '/he', ld: homeJsonLd(), ldId: 'mh-ld-home' };
   if (/\/page\//.test(p)) {
     var h = document.querySelector('h1'); var pt = (h && h.textContent.trim()) || document.title;
-    return { key: 'p:' + p, title: pt + ' | ' + SITE, desc: cut((document.querySelector('main, #app') || document.body).innerText.replace(/^[\s\S]{0,0}/, ''), 155), canon: canon, ld: null, ldId: 'mh-ld-page' };
+    var slug = (p.match(/\/page\/([^\/]+)/) || [])[1] || '';
+    /* תיאור: מהטבלה, ואם אין — הפסקה הראשונה אחרי ה-H1 (לא כל טקסט הדף עם התפריט) */
+    var firstP = h && h.parentElement && h.parentElement.querySelector('p');
+    var pd = SEO_PAGES[slug] || (firstP ? firstP.textContent : '') || pt;
+    return { key: 'p:' + p, title: pt + ' | ' + SITE, desc: cut(pd, 155), canon: canon, ld: null, ldId: 'mh-ld-page' };
   }
   return { key: 'x:' + p, title: null, desc: null, canon: canon, ld: null, ldId: null };
 }
@@ -2458,6 +2472,6 @@ new MutationObserver(function(){ clearTimeout(timer); timer = setTimeout(apply, 
 new MutationObserver(function(){ clearTimeout(timer); timer = setTimeout(apply, 400); }).observe(document.body || document.documentElement, { childList: true, subtree: true });
 window.addEventListener('popstate', function(){ setTimeout(apply, 300); });
 setTimeout(apply, 800); setTimeout(apply, 2500);
-window.MH_SEO = { version: '1.0.0', apply: apply, last: function(){ return LAST; }, table: SEO_MERCHANTS };
+window.MH_SEO = { version: '1.0.1', apply: apply, last: function(){ return LAST; }, table: SEO_MERCHANTS };
 log('פעיל');
 })();
