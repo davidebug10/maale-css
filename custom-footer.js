@@ -2262,3 +2262,202 @@ window.MH_PRE = {
 };
 log('פעיל | גרסה', CFG.VERSION);
 })();
+
+/* =========================================================================
+   SEO לדפי האתר — MH SEO  |  v1.0.0 | 2026-09-06
+   -------------------------------------------------------------------------
+   מה זה עושה (רק head/meta, לא נוגע בעגלה, בתשלום או בהזמנה):
+     1. כותרת (<title>) ותיאור (meta description) לכל דף לפי הנתיב:
+        דף הבית, דף עסק (טבלת SEO לפי slug + נתוני העסק החיים), עמוד תוכן, מוצר.
+     2. lang=he על <html>, canonical לכתובת הקנונית (/he/...), og:title/og:description.
+     3. JSON-LD: Organization + WebSite בדף הבית; Restaurant/LocalBusiness בדף עסק
+        (מהאובייקט החי של Hyperzod: שם, כתובת, לוגו, קטגוריות, טלפון).
+     נכשל פתוח: אין store / מבנה לא מזוהה → לא נוגעים. מריץ מחדש בכל ניווט (SPA).
+
+   טבלת SEO (SEO_MERCHANTS): מפתח = slug של העסק. שדות: he (שם בעברית לכותרת),
+   d (meta description), c (servesCuisine). עסק שלא בטבלה מקבל ברירת מחדל
+   מהשם והקטגוריות שלו. עדכון הטבלה = חלק מרוטינת "הוספת עסק חדש".
+
+   אבחון: localStorage.setItem('mh_seo_debug','1') → רענן. MH_SEO.apply(), MH_SEO.last()
+   ========================================================================= */
+(function () {
+'use strict';
+if (window.__MH_SEO__) { return; }
+window.__MH_SEO__ = true;
+
+var SITE = 'מעלה המשלוחים';
+var CITY = 'מעלה אדומים';
+var ORIGIN = 'https://www.maalehamishlohim.co.il';
+var HOME = {
+  title: 'משלוחי אוכל במעלה אדומים | ' + SITE,
+  desc: 'מזמינים אוכל במעלה אדומים מהמסעדות, הפיצריות, המאפיות והחנויות של העיר, עם שליחים מקומיים ומשלוח מהיר עד הבית. הזמנה אונליין בקליק.'
+};
+/* ponytail: טבלה קבועה בקוד — 14 עסקים; לעדכן בכל עסק חדש. */
+var SEO_MERCHANTS = {
+  /* slug: { he: שם בעברית לכותרות, t: כותרת מאושרת, d: תיאור מאושר, c: servesCuisine, type: סוג Schema } — אושר ע"י דוד 6.9.2026 */
+  'patricks':               { he: 'פטריקס', t: 'פטריקס מעלה אדומים | משלוחים והזמנה אונליין', c: 'בשרים, המבורגרים, בר',
+    d: 'פטריקס מעלה אדומים — בר-מסעדה בשרי, כשר למהדרין. בשר על האש, בירה מהחבית ואווירה של פאב — ועכשיו גם משלוחים עד הבית. מרימים? מזמינים אונליין.' },
+  'bens-pizza-shop':        { he: "בנ'ס פיצה שופ", t: "בנ'ס פיצה שופ מעלה אדומים | משלוחים והזמנה אונליין", c: 'פיצה, איטלקי',
+    d: "בנ'ס פיצה שופ מעלה אדומים — פיצה מקומית כשרה למהדרין מכיכר יהלום: בצק טרי, תוספות לפי רבעים, פסטות ולחם שום. משלוחים עד הבית — אז מה בא לכם? הזמינו." },
+  'burger-market':          { he: 'בורגר מרקט', t: 'בורגר מרקט מעלה אדומים | משלוחים והזמנה אונליין', c: 'המבורגרים, אמריקאי',
+    d: 'בורגר מרקט מעלה אדומים — המבורגר ובירה בסגנון השוק, במרכז קרסו. בשר שנטחן במקום, לחמנייה מהמאפייה ורטבים ביתיים. יאללה, משלוחים עד הבית — מזמינים אונליין.' },
+  'milk':                   { he: 'מילק', t: 'מילק מעלה אדומים | משלוחים והזמנה אונליין', c: 'חנות נוחות, מזון ומשקאות', type: 'ConvenienceStore',
+    d: 'מילק מעלה אדומים — חנות נוחות ומזון: שתייה, חטיפים, מוצרי יסוד ומה שנגמר בבית. משלוחים עד הבית במעלה אדומים — הזמינו אונליין.' },
+  'stage-food':             { he: "סטייג' Stage & Food", t: "סטייג' Stage & Food מעלה אדומים | משלוחים והזמנה אונליין", c: 'איטלקי, חלבי, דגים',
+    d: 'Stage & Food מעלה אדומים — מסעדה חלבית-איטלקית בהיכל התרבות: פסטות, פוקאצ\'ות מהטאבון, דגים וקינוחים. עכשיו גם משלוחים עד הבית — הזמינו ארוחה אונליין.' },
+  'falafel':                { he: 'פלאפל בתחנה כפר אדומים', t: 'פלאפל בתחנה כפר אדומים | משלוחים למעלה אדומים והזמנה אונליין', c: 'פלאפל, ים-תיכוני, ישראלי',
+    d: 'פלאפל בתחנה כפר אדומים — הפלאפל של כביש 1, בתחנת סונול: מעורב ירושלמי, סביח, שניצל בבאגט. כשר. משלוחים לכפר אדומים ומעלה אדומים — בואו רעבים, הזמינו.' },
+  'waffle-bus':             { he: 'וופל בס כפר אדומים', t: 'וופל בס כפר אדומים | משלוחים למעלה אדומים והזמנה אונליין', c: 'וופלים, קינוחים, בית קפה',
+    d: 'וופל בס כפר אדומים — עגלת הקפה הכשרה בדרך לים המלח: וופל בלגי עמוס תוספות, קרפ, גלידה, שייקים וארוחות בוקר. משלוחים לכפר אדומים ומעלה אדומים — הזמינו מתוק.' },
+  'roladin':                { he: 'רולדין מעלה אדומים', t: 'רולדין מעלה אדומים | משלוחים והזמנה אונליין', c: 'מאפייה, קונדיטוריה, בית קפה', type: 'Bakery',
+    d: 'רולדין מעלה אדומים במשלוחים עד הבית: קרואסוני חמאה, לחמי מחמצת, עוגות ופטיסרי. כשר חלבי, מגשי אירוח יום מראש. הזמינו עכשיו דרך מעלה המשלוחים.' },
+  'mifgash-hasheikh':       { he: 'מפגש השייח', t: 'מפגש השייח מעלה אדומים | משלוחים והזמנה אונליין', c: 'מאפייה, מאפים ירושלמיים, טאבון', type: 'Bakery',
+    d: 'מפגש השייח מעלה אדומים: סמבוסק, בייגל טוסט ובייגלה ירושלמי מהטאבון, כשר למהדרין חלבי. פתוח 24 שעות ראשון–חמישי, משלוחים עד הבית. הזמינו במעלה המשלוחים.' },
+  'birkat-hashabbat':       { he: 'ברכת השבת', t: 'ברכת השבת מעלה אדומים | משלוחים והזמנה אונליין', c: 'מאפייה, מאפים', type: 'Bakery',
+    d: 'מאפיית ברכת השבת מעלה אדומים: בורקסים, קרואסונים, פיתות ומאפים טריים מהיום, כשר מהדרין רבנות מעלה אדומים. משלוחים עד הבית. הזמינו במעלה המשלוחים.' },
+  'pasta-basta-maale-adumim': { he: 'פסטה בסטה', t: 'פסטה בסטה מעלה אדומים | משלוחים והזמנה אונליין', c: 'איטלקי, פסטה',
+    d: 'פסטה בסטה מעלה אדומים: פסטה טרייה מוקפצת עם הרוטב שאתם בוחרים, כשר חלבי, קניון עופר. משלוחים עד הבית בכל מעלה אדומים. הזמינו עכשיו דרך מעלה המשלוחים.' },
+  'cafe-agam-adumim':       { he: 'קפית אגם אדומים', t: 'קפית אגם אדומים | משלוחים והזמנה אונליין במעלה אדומים', c: 'בית קפה, חלבי, ישראלי, פיצה, פסטה', type: 'CafeOrCoffeeShop',
+    d: 'קפית אגם אדומים: ארוחת בוקר, פיצות, פסטות, סלטים ודגים מהמסעדה החלבית הכשרה על שפת האגם, במשלוחים עד הבית בכל מעלה אדומים. הזמינו עכשיו במעלה המשלוחים.' },
+  'hummus-adumim':          { he: 'חומוס אדומים', t: 'חומוס אדומים מעלה אדומים | משלוחים והזמנה אונליין', c: 'חומוסייה, ישראלי, מזרח תיכוני',
+    d: 'חומוס אדומים, החומוסייה הוותיקה של מישור אדומים: מסבחה, פול, סביח ושקשוקה על חומוס, כשר רבנות. משלוחים עד הבית בכל מעלה אדומים. הזמינו במעלה המשלוחים.' },
+  'toastrack':              { he: 'טוסטראק', t: 'טוסטראק כפר אדומים | משלוחים למעלה אדומים והזמנה אונליין', c: 'טוסטים, כריכים בשריים, מזון מהיר',
+    d: 'טוסטראק: טוסטים בשריים בהרכבה אישית על באגט פריך, נקניקיות וצ\'יפס, מכפר אדומים במשלוחים עד הבית למעלה אדומים. תרכיבו את הביס והזמינו במעלה המשלוחים.' }
+};
+var DEBUG = (function(){ try { return localStorage.getItem('mh_seo_debug') === '1'; } catch(e){ return false; } })();
+var LAST = null, timer = null, lastKey = null, PN = {};
+
+function log(){ if (DEBUG) console.log.apply(console, ['%c[MH-SEO]','color:#1f4e79;font-weight:bold'].concat([].slice.call(arguments))); }
+function store(){ try { var a = document.querySelector('#app'), v = a && a.__vue_app__; return (v && v.config && v.config.globalProperties.$store) || null; } catch(e){ return null; } }
+function cut(s, n){ s = String(s || '').replace(/\s+/g, ' ').trim(); return s.length > n ? s.slice(0, n - 1).replace(/\s+\S*$/, '') + '…' : s; }
+
+function meta(sel, attrs, content){
+  var el = document.head.querySelector(sel);
+  if (!el) { el = document.createElement('meta'); Object.keys(attrs).forEach(function(k){ el.setAttribute(k, attrs[k]); }); document.head.appendChild(el); }
+  if (el.getAttribute('content') !== content) el.setAttribute('content', content);
+}
+function link(rel, href){
+  var el = document.head.querySelector('link[rel="' + rel + '"][data-mh]');
+  if (!el) { el = document.createElement('link'); el.setAttribute('rel', rel); el.setAttribute('data-mh', '1'); document.head.appendChild(el); }
+  if (el.getAttribute('href') !== href) el.setAttribute('href', href);
+}
+function jsonld(id, obj){
+  var el = document.getElementById(id);
+  if (!obj) { if (el) el.remove(); return; }
+  var txt = JSON.stringify(obj);
+  if (!el) { el = document.createElement('script'); el.type = 'application/ld+json'; el.id = id; document.head.appendChild(el); }
+  if (el.textContent !== txt) el.textContent = txt;
+}
+
+/* העסק המוצג עכשיו (דף עסק / מוצר) */
+function merchantOnPage(st){
+  var m = location.pathname.match(/\/m\/([^\/]+)\/([0-9a-f]{24})/);
+  if (!m) return null;
+  var md = st && st.state.Merchant && st.state.Merchant.merchantData;
+  if (md && (md.merchant_id === m[2] || md._id === m[2])) return { slug: m[1], id: m[2], data: md };
+  return { slug: m[1], id: m[2], data: null };
+}
+function heName(slug, data){
+  var t = SEO_MERCHANTS[slug];
+  return (t && t.he) || (data && data.name) || '';
+}
+/* מוצר לפי מזהה מתוך רשימות המוצרים שהאפליקציה מחזיקה */
+function productById(st, pid){
+  var found = null;
+  function walk(x, d){ if (found || !x || d > 4) return; if (Array.isArray(x)) { for (var i=0;i<x.length && !found;i++) walk(x[i], d+1); return; }
+    if (typeof x !== 'object') return; if ((x.product_id === pid || x._id === pid) && x.name) { found = x; return; }
+    for (var k in x) if (Object.prototype.hasOwnProperty.call(x, k)) walk(x[k], d+1); }
+  try { var M = st && st.state.Merchant || {}; walk(M.categoryProducts, 0); walk(M.categoryPageProducts, 0); walk(M.searchedProducts, 0);
+        if (!found) { var P = st && st.state.Product || {}; walk([P.addItem, P.holdItem, P.cartItem], 0); } } catch(e){}
+  return found;
+}
+function catNames(data){
+  var cs = (data && data.merchant_categories) || [];
+  return cs.map(function(c){ return c && c.name; }).filter(Boolean);
+}
+function merchantJsonLd(m){
+  var d = m.data; if (!d) return null;
+  var t = SEO_MERCHANTS[m.slug] || {};
+  /* Hyperzod: merchant_location = GeoJSON Point [lng,lat]; merchant_address_location = [lat,lng] */
+  var loc = d.merchant_location || d.merchant_address_location || {}, lat, lng;
+  if (loc && Array.isArray(loc.coordinates)) { lng = loc.coordinates[0]; lat = loc.coordinates[1]; }
+  else if (Array.isArray(loc)) { lat = loc[0]; lng = loc[1]; }
+  else { lat = loc.lat || loc.latitude; lng = loc.lng || loc.longitude; }
+  var img = d.images && (d.images.logo || d.images.banner);
+  if (img && typeof img === 'object') img = img.image_url || img.url || img.file_url;
+  var street = typeof d.address === 'string' ? d.address : (d.address && (d.address.address || d.address.street || d.address.formatted_address));
+  var obj = {
+    '@context': 'https://schema.org', '@type': t.type || 'Restaurant',
+    name: heName(m.slug, d), url: ORIGIN + '/he/m/' + m.slug + '/' + m.id,
+    image: (typeof img === 'string' && img) || undefined,
+    telephone: (typeof d.phone === 'string' && d.phone) || undefined,
+    address: { '@type': 'PostalAddress', streetAddress: street || undefined, addressLocality: (typeof d.city === 'string' && d.city) || CITY, addressCountry: 'IL' },
+    servesCuisine: t.c || catNames(d).join(', ') || undefined,
+    areaServed: CITY,
+    potentialAction: { '@type': 'OrderAction', target: ORIGIN + '/he/m/' + m.slug + '/' + m.id, deliveryMethod: 'http://purl.org/goodrelations/v1#DeliveryModeOwnFleet' }
+  };
+  if (lat && lng) obj.geo = { '@type': 'GeoCoordinates', latitude: lat, longitude: lng };
+  return obj;
+}
+function homeJsonLd(){
+  return [{ '@context': 'https://schema.org', '@type': 'Organization', name: SITE, url: ORIGIN + '/he', areaServed: CITY,
+            sameAs: ['https://www.facebook.com/share/1AR58c5rMD/'] },
+          { '@context': 'https://schema.org', '@type': 'WebSite', name: SITE, url: ORIGIN + '/he', inLanguage: 'he' }];
+}
+
+function compute(){
+  var st = store();
+  var p = location.pathname.replace(/\/+$/, '') || '/';
+  var canon = ORIGIN + (p === '/' || p === '/he' || p === '/he/home' ? '/he' : p);
+  var m = merchantOnPage(st);
+  if (m) {
+    var d = m.data, name = heName(m.slug, d), t = SEO_MERCHANTS[m.slug] || {};
+    if (!name) return null;                                   /* העסק עוד לא נטען — ננסה שוב */
+    var pm = p.match(/\/product\/([0-9a-f]{24})/);
+    var prod = pm ? productById(st, pm[1]) : null;
+    if (pm && !prod) return null;                              /* המוצר עוד לא נטען — ננסה שוב */
+    var nameCity = name.indexOf(CITY) === -1 ? name + ' ' + CITY : name;
+    var cats = catNames(d);
+    var desc = t.d || ('משלוחים מ' + name + ' ב' + CITY + (cats.length ? ' — ' + cats.join(', ') : '') + '. מזמינים אונליין ב' + SITE + ' והשליחים המקומיים מביאים עד הבית.');
+    if (prod) {
+      var pd = (typeof prod.description === 'string' && prod.description.trim()) || '';
+      return { key: 'm:' + m.id + ':' + pm[1], title: prod.name + ' | ' + nameCity + ' | ' + SITE,
+               desc: cut(pd ? prod.name + ' — ' + pd : prod.name + ' במשלוח מ' + nameCity + '. ' + desc, 155),
+               canon: canon, ld: null, ldId: 'mh-ld-merchant' };
+    }
+    return {
+      key: 'm:' + m.id,
+      title: (t.t || (nameCity + ' | משלוחים והזמנה אונליין')) + ' | ' + SITE,
+      desc: cut(desc, 155), canon: ORIGIN + '/he/m/' + m.slug + '/' + m.id, ld: merchantJsonLd(m), ldId: 'mh-ld-merchant'
+    };
+  }
+  if (p === '/' || p === '/he' || p === '/he/home') return { key: 'home', title: HOME.title, desc: HOME.desc, canon: ORIGIN + '/he', ld: homeJsonLd(), ldId: 'mh-ld-home' };
+  if (/\/page\//.test(p)) {
+    var h = document.querySelector('h1'); var pt = (h && h.textContent.trim()) || document.title;
+    return { key: 'p:' + p, title: pt + ' | ' + SITE, desc: cut((document.querySelector('main, #app') || document.body).innerText.replace(/^[\s\S]{0,0}/, ''), 155), canon: canon, ld: null, ldId: 'mh-ld-page' };
+  }
+  return { key: 'x:' + p, title: null, desc: null, canon: canon, ld: null, ldId: null };
+}
+
+function apply(){
+  try {
+    var r = compute(); if (!r) { return; }
+    document.documentElement.setAttribute('lang', 'he');
+    if (r.title && document.title !== r.title) document.title = r.title;
+    if (r.title) meta('meta[property="og:title"]', { property: 'og:title' }, r.title);
+    if (r.desc) { meta('meta[name="description"]', { name: 'description' }, r.desc); meta('meta[property="og:description"]', { property: 'og:description' }, r.desc); }
+    link('canonical', r.canon);
+    ['mh-ld-home', 'mh-ld-merchant', 'mh-ld-page'].forEach(function(id){ if (id !== r.ldId) jsonld(id, null); });
+    if (r.ldId) jsonld(r.ldId, r.ld);
+    if (r.key !== lastKey) { lastKey = r.key; log('✓', r.key, '|', r.title); }
+    LAST = r;
+  } catch(e){ console.warn('[MH-SEO]', e); }
+}
+/* Hyperzod מציבה document.title בעצמה בניווט — עוקבים אחרי שינויי ה-head וה-URL */
+new MutationObserver(function(){ clearTimeout(timer); timer = setTimeout(apply, 250); }).observe(document.head, { childList: true, subtree: true, characterData: true });
+new MutationObserver(function(){ clearTimeout(timer); timer = setTimeout(apply, 400); }).observe(document.body || document.documentElement, { childList: true, subtree: true });
+window.addEventListener('popstate', function(){ setTimeout(apply, 300); });
+setTimeout(apply, 800); setTimeout(apply, 2500);
+window.MH_SEO = { version: '1.0.0', apply: apply, last: function(){ return LAST; }, table: SEO_MERCHANTS };
+log('פעיל');
+})();
