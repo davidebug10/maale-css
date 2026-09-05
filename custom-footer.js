@@ -2037,3 +2037,228 @@ window.MH_ZONE = {
 
 log('פעיל | גרסה', CFG.VERSION);
 })();
+
+/* =========================================================================
+   הזמנה מראש בלבד — MH Preorder Scheduling Guard  |  v1.0.0 | 2026-09-05
+   -------------------------------------------------------------------------
+   מה זה עושה:
+     מוצר שבתיאורו כתוב "להזמנה 24 שעות מראש" (או "יום מראש" / "הזמנה מראש")
+     אפשר להזמין רק ב"משלוח מתוזמן". כשיש מוצר כזה בעגלה:
+       1. רשת   — POST /store/v1/order בלי scheduling_slot.is_scheduled=true
+                  נחסם לפני השליחה + טוסט אדום. זו שכבת הכסף.
+       2. תצוגה — שורת "משלוח מיידי" (#deliveryTime) מוסתרת, נוספת שורת הסבר,
+                  ובורר המועדים נפתח אוטומטית פעם אחת. נכשלת פתוח: מבנה לא
+                  מזוהה → לא מסתירים כלום.
+     עגלה בלי מוצרי "מראש" → הסקריפט לא נוגע בכלום (מיידי + מתוזמן נשארים).
+     פעיל רק כשלמרצ'נט של העגלה scheduling_setting.enable=true (רולדין) —
+     אחרת Hyperzod לא מציעה תזמון בכלל ואין מה לאכוף.
+
+   זיהוי מוצרים: מאובייקטי המוצר של Hyperzod עצמה (עגלה / דף המרצ'נט) לפי
+   התיאור — אין רשימת מזהים קבועה, כל מוצר שדוד יכתוב לו "להזמנה 24 שעות
+   מראש" נכנס אוטומטית. המזהים שנלמדו נשמרים ב-localStorage (mh_pre_ids)
+   למקרה שהעגלה שוחזרה מהשרת בלי אובייקטי המוצר.
+
+   אבחון בייצור (לוגים כבויים כברירת מחדל):
+     localStorage.setItem('mh_pre_debug','1') → רענן → לוגים
+     MH_PRE.stats()  — מונים + המצב האחרון      MH_PRE.check() — בדיקת העגלה עכשיו
+     MH_PRE.known()  — מזהי מוצרי "מראש" שנלמדו  MH_PRE.reset() — מאפשר פתיחה אוטומטית שוב
+   ========================================================================= */
+(function () {
+'use strict';
+
+if (window.__MH_PRE__) { return; }
+window.__MH_PRE__ = true;
+
+var CFG = {
+  VERSION: '1.0.0',
+  RX:      /\d+\s*שעות\s*מראש|יום\s*מראש|ימים\s*מראש|הזמנה\s*מראש/,
+  NOTE_ID: 'mh-pre-note',
+  LS:      'mh_pre_ids',
+  MSG:     'המוצרים בעגלה הם להזמנה מראש בלבד — יש לבחור מועד למשלוח (משלוח מתוזמן)',
+  DEBUG:   (function(){ try { return localStorage.getItem('mh_pre_debug') === '1'; }
+                        catch(e){ return false; } })()
+};
+var S = { oSeen:0, oBlocked:0, uiHides:0, uiShows:0, autoOpen:0, errors:0 };
+var LAST = { active:false, enabled:null, names:[], items:0 };
+var known = {}, autoOpened = false, busy = false;
+try { known = JSON.parse(localStorage.getItem(CFG.LS) || '{}') || {}; } catch(e){ known = {}; }
+
+function log(){ if (CFG.DEBUG) console.log.apply(console,
+  ['%c[MH-PRE]','color:#c9a227;font-weight:bold'].concat([].slice.call(arguments))); }
+function warn(){ console.warn.apply(console, ['[MH-PRE]'].concat([].slice.call(arguments))); }
+
+/* ה-store של Hyperzod (Vue 3 + Vuex). אין → הסקריפט שקוף לחלוטין. */
+function store(){
+  try {
+    var a = document.querySelector('#app'), v = a && a.__vue_app__;
+    return (v && v.config && v.config.globalProperties.$store) || null;
+  } catch(e){ return null; }
+}
+function descOf(p){
+  var d = typeof p.description === 'string' ? p.description : '';
+  var lt = p.language_translation;
+  if (Array.isArray(lt)) for (var i=0;i<lt.length;i++)
+    if (lt[i] && lt[i].key === 'description' && lt[i].value) d += '\n' + lt[i].value;
+  return d;
+}
+/* לומד מזהי "מראש" מכל אובייקט מוצר שהאפליקציה מחזיקה כרגע (עגלה + דף מרצ'נט) */
+function learn(st){
+  var changed = false;
+  function see(p){
+    var id = p.product_id || p.id || p._id;
+    if (!id) return;
+    id = String(id);
+    var pre = CFG.RX.test(descOf(p));
+    if (pre && !known[id]) { known[id] = 1; changed = true; }
+    else if (!pre && known[id]) { delete known[id]; changed = true; }
+  }
+  function walk(x, d){
+    if (!x || d > 3) return;
+    if (Array.isArray(x)) { for (var i=0;i<x.length;i++) walk(x[i], d+1); return; }
+    if (typeof x !== 'object') return;
+    if (Array.isArray(x.language_translation)) { see(x); return; }
+    for (var k in x) if (Object.prototype.hasOwnProperty.call(x, k)) walk(x[k], d+1);
+  }
+  try {
+    walk(st.getters.getCartProducts, 0);
+    var M = st.state.Merchant || {};
+    walk(M.categoryProducts, 0); walk(M.categoryPageProducts, 0); walk(M.searchedProducts, 0);
+  } catch(e){ S.errors++; warn('learn', e); }
+  if (changed) { try { localStorage.setItem(CFG.LS, JSON.stringify(known)); } catch(e){} }
+}
+/* מצב העגלה של מרצ'נט נתון (ברירת מחדל: המרצ'נט של העגלה). null = לא ידוע. */
+function evaluate(mid){
+  var st = store(); if (!st) return null;
+  try {
+    var C = st.state.Cart || {}, g = st.getters;
+    var m = null, list = Array.isArray(C.cartMerchant) ? C.cartMerchant : [];
+    if (mid) for (var j=0;j<list.length;j++)
+      if (list[j] && (list[j].merchant_id === mid || list[j]._id === mid)) { m = list[j]; break; }
+    if (!m) m = g.getCartMerchant || null;
+    if (!mid && m) mid = m.merchant_id || m._id;
+    /* תזמון זמין? לפי אובייקט המרצ'נט או לפי תשובת getSchedulingSlots (הצ'ק-אאוט טוען אותה) */
+    var sch = g.getScheduling;
+    var enabled = !!((m && m.scheduling_setting && m.scheduling_setting.enable) || (sch && sch.scheduling_enabled));
+    var items = (Array.isArray(C.cartItems) ? C.cartItems : []).filter(function(it){
+      return it && (!mid || it.merchant_id === mid); });
+    learn(st);
+    var names = [];
+    for (var i=0;i<items.length;i++)
+      if (known[String(items[i].product_id)]) names.push(items[i].product_name || String(items[i].product_id));
+    LAST = { active: enabled && names.length > 0, enabled: enabled, names: names, items: items.length };
+    return LAST;
+  } catch(e){ S.errors++; warn('evaluate', e); return null; }
+}
+function toast(msg){
+  var st = store();
+  try { if (st) st.commit('setToast', { message: msg, color: 'red', show: true }); } catch(e){}
+}
+
+/* ---------- שכבה 1: רשת ---------- */
+
+var IS_ORDER = /\/store\/v1\/order(\?|$)/;
+
+/* true = מותר לשלוח. חוסם רק הזמנה של Hyperzod (יש scheduling_slot) עם מוצרי
+   "מראש" ובלי מועד. כל ספק על המבנה → מותר (הסקריפט לא חוסם הזמנות רגילות). */
+function guardOrder(body){
+  if (typeof body !== 'string') return true;
+  var o; try { o = JSON.parse(body); } catch(e){ return true; }
+  if (!o || !o.merchant_id || !Object.prototype.hasOwnProperty.call(o, 'scheduling_slot')) return true;
+  S.oSeen++;
+  var ev = evaluate(o.merchant_id);
+  if (!ev || !ev.active) return true;
+  var s = o.scheduling_slot || {};
+  if (s.is_scheduled === true && s.date && s.date !== '0000-00-00') {
+    log('✅ הזמנה מתוזמנת:', s.date, s.time); return true;
+  }
+  S.oBlocked++;
+  warn('🛑 הזמנה נחסמה — מוצרי הזמנה מראש בלי מועד:', ev.names.join(', '));
+  setTimeout(function(){ toast(CFG.MSG); }, 400);
+  setTimeout(reconcile, 50);
+  return false;
+}
+
+/* Hyperzod = axios על XHR. עוטף מעל העטיפה של MH-ZONE (השרשור תקין). fetch ליתר ביטחון. */
+var _o = XMLHttpRequest.prototype.open, _s = XMLHttpRequest.prototype.send;
+XMLHttpRequest.prototype.open = function(m, url){
+  try { this.__mhPre = String(m).toUpperCase() === 'POST' && IS_ORDER.test(String(url)); }
+  catch(e){ this.__mhPre = false; }
+  return _o.apply(this, arguments);
+};
+XMLHttpRequest.prototype.send = function(b){
+  if (this.__mhPre) {
+    var ok = true;
+    try { ok = guardOrder(b); } catch(e){ S.errors++; warn('send', e); ok = true; }
+    if (!ok) throw new Error(CFG.MSG);
+  }
+  return _s.apply(this, arguments);
+};
+var _f = window.fetch;
+window.fetch = function(input, init){
+  try {
+    var u = typeof input === 'string' ? input : ((input && input.url) || '');
+    var m = String((init && init.method) || (input && input.method) || 'GET').toUpperCase();
+    if (m === 'POST' && IS_ORDER.test(u) && init && typeof init.body === 'string' && !guardOrder(init.body))
+      return Promise.reject(new Error(CFG.MSG));
+  } catch(e){ S.errors++; warn('fetch', e); }
+  return _f.apply(this, arguments);
+};
+
+/* ---------- שכבה 2: תצוגה (נכשלת פתוח) ---------- */
+
+function noteEl(after, create){
+  var n = document.getElementById(CFG.NOTE_ID);
+  if (n || !create) return n;
+  n = document.createElement('div');
+  n.id = CFG.NOTE_ID;
+  n.setAttribute('style',
+    'background:#fffbea;border:1px solid rgba(201,162,39,.45);border-radius:12px;' +
+    'padding:8px 12px;margin:0 0 12px;font-size:12.5px;line-height:1.5;' +
+    'color:#4a5568;direction:rtl;text-align:right;');
+  after.parentElement.insertBefore(n, after.nextSibling);
+  return n;
+}
+
+function reconcile(){
+  if (busy) return;
+  try {
+    busy = true;
+    /* עוגן: #deliveryTime = שורת "משלוח מיידי" (בנייד ובדסקטופ), לצידה .custom-radio */
+    var asap = document.getElementById('deliveryTime'); if (!asap) return;
+    var row = asap.parentElement;
+    if (!row || !row.querySelector('.custom-radio')) return;      /* מבנה השתנה → לא נוגעים */
+    var ev = evaluate(); if (!ev) return;
+    var n = noteEl(row, ev.active);
+    if (ev.active) {
+      if (row.style.display !== 'none') { row.style.display = 'none'; S.uiHides++; log('🙈 משלוח מיידי הוסתר:', ev.names.join(', ')); }
+      var txt = '🕒 ' + ev.names.join(', ') + ' — להזמנה מראש בלבד. בחרו מועד למשלוח.';
+      if (n && n.textContent !== txt) n.textContent = txt;
+      var st = store(), sch = st && st.getters.getOrderSchedule;
+      if (!autoOpened && !(sch && sch.is_scheduled)) {
+        var box = row.closest('#OrderScheduling') || (row.parentElement && row.parentElement.parentElement);
+        var item = box && box.querySelector('.navigation-item');
+        if (item) { autoOpened = true; S.autoOpen++; setTimeout(function(){ item.click(); }, 500); log('📅 בורר המועדים נפתח'); }
+      }
+    } else {
+      if (row.style.display === 'none') { row.style.display = ''; S.uiShows++; log('👁 משלוח מיידי הוחזר'); }
+      if (n) n.remove();
+    }
+  } catch(e){ S.errors++; warn('reconcile', e); }
+  finally { busy = false; }
+}
+
+/* SPA — הבורר נוצר ונהרס בניווט, והעגלה משתנה בצ'ק-אאוט. debounce 200ms. */
+var t = null;
+new MutationObserver(function(){
+  clearTimeout(t); t = setTimeout(reconcile, 200);
+}).observe(document.body || document.documentElement, { childList:true, subtree:true });
+
+window.MH_PRE = {
+  version: CFG.VERSION,
+  stats: function(){ console.table(S); console.log('מצב:', LAST, '| ידועים:', Object.keys(known).length); return S; },
+  check: function(mid){ return evaluate(mid); },
+  known: function(){ return Object.keys(known); },
+  reset: function(){ autoOpened = false; }
+};
+log('פעיל | גרסה', CFG.VERSION);
+})();
