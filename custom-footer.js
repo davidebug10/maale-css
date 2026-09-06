@@ -2513,7 +2513,7 @@ log('פעיל');
 })();
 
 /* ============================================================
-   תשלום אונליין בלי כתובת — MH PayIntent Country Guard  |  v1.0.0 | 2026-09-06
+   תשלום אונליין בלי כתובת — MH PayIntent Country Guard  |  v1.0.1 | 2026-09-06
    הבעיה: בסוגי הזמנה בלי כתובת (למשל קפית: "משלוח עד הבית" = custom_1, "משלוח עד הבית מורחב" = pickup)
    החנות שולחת ב-POST /store/v1/pg/paymentIntent/... את address.country מתוך המיקום שנבחר בסרגל,
    והגיאוקודר של Hyperzod מחזיר country=null למעלה אדומים → השרת עונה
@@ -2525,8 +2525,8 @@ log('פעיל');
   'use strict';
   if (window.__MH_PAYINTENT__) { return; }
   window.__MH_PAYINTENT__ = true;
-  var VERSION = '1.0.0';
-  var RE = /\/store\/v1\/pg\/paymentIntent\//;
+  var VERSION = '1.0.1';
+  var RE = /\/pg\/paymentIntent\//; // כל בסיס: בפועל הנתיב הוא /store/v1/payment/pg/paymentIntent/<alias>
   var stats = { version: VERSION, fixes: 0, seen: 0 };
 
   // פונקציה טהורה: מקבלת גוף (אובייקט) ומחזירה {body, changed}
