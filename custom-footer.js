@@ -2475,3 +2475,39 @@ setTimeout(apply, 800); setTimeout(apply, 2500);
 window.MH_SEO = { version: '1.0.1', apply: apply, last: function(){ return LAST; }, table: SEO_MERCHANTS };
 log('פעיל');
 })();
+
+/* ============================================================
+   אמצעי תשלום — MH Pay  |  v1.0.0 | 2026-09-06
+   מסמן את כרטיס אמצעי התשלום הנבחר במחלקה mh-pay-on (ואת המזומן ב-mh-pay-cash).
+   העיצוב עצמו ב-global-cdn.css (Part 8h v2) — שם הזיהוי הוא :has(); הבלוק הזה הוא
+   גיבוי לדפדפנים ישנים בלי :has(). נכשל-פתוח: אם משהו כאן נשבר, ה-CSS הטהור ממשיך לעבוד.
+   בדיקה: window.MH_PAY.sync() מחזיר את מספר הכרטיסים שסונכרנו.
+   ============================================================ */
+(function () {
+  'use strict';
+  var VERSION = '1.0.0';
+  var pending = false;
+  function sync() {
+    pending = false;
+    var cards = document.querySelectorAll('#payment-card .payment-method');
+    for (var i = 0; i < cards.length; i++) {
+      var c = cards[i];
+      var on = !!c.querySelector('.v-selection-control--dirty, input:checked');
+      var cash = /-cod$/.test(c.getAttribute('data-test-id') || '');
+      /* משנים רק כשצריך — toggle "ריק" גם מפעיל MutationObserver וזה היה לולאה */
+      if (c.classList.contains('mh-pay-on') !== on) c.classList.toggle('mh-pay-on', on);
+      if (c.classList.contains('mh-pay-cash') !== cash) c.classList.toggle('mh-pay-cash', cash);
+    }
+    return cards.length;
+  }
+  function schedule() { if (pending) return; pending = true; requestAnimationFrame(sync); }
+  var mo = new MutationObserver(schedule);
+  function start() {
+    mo.observe(document.body, { subtree: true, childList: true, attributes: true, attributeFilter: ['class', 'checked'] });
+    sync();
+  }
+  try {
+    if (document.body) start(); else document.addEventListener('DOMContentLoaded', start);
+  } catch (e) { console.warn('[MH Pay] disabled:', e); }
+  window.MH_PAY = { version: VERSION, sync: sync, off: function () { mo.disconnect(); } };
+})();
