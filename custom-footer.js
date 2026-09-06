@@ -2625,3 +2625,67 @@ log('פעיל');
   tick();
   window.MH_PAY_NOSEL = { version: VERSION, stats: function () { return Object.assign({}, stats); } };
 })();
+
+/* ============================================================
+   דף תוצאות חיפוש — MH Search  |  v1.0.0 | 2026-09-06
+   טקסטים בדף החיפוש הגלובלי (#MultiVendorSearch בלבד) ש-CSS לא יכול לתקן:
+     "30 mins" → "30 דק׳", "קילומטר" → "ק״מ", "No merchants found." → עברית,
+     "לא מדורג" → מסומן ב-mh-unrated (ה-CSS מסתיר), "0 תוצאות" → הודעת מצב ריק ידידותית.
+   העיצוב עצמו ב-global-cdn.css (חלק 26ב). נכשל-פתוח: כל שגיאה → הדף נשאר כמו שהוא.
+   בדיקה: window.MH_SEARCH.stats()
+   ============================================================ */
+(function () {
+  'use strict';
+  if (window.__MH_SEARCH__) { return; }
+  window.__MH_SEARCH__ = true;
+  var VERSION = '1.0.0';
+  var stats = { version: VERSION, fixes: 0, runs: 0 };
+  var MAP = [
+    [/(\d+)\s*mins?\b/g, '$1 דק׳'],
+    [/\bmins?\b/g, 'דק׳'],
+    [/קילומטר/g, 'ק״מ'],
+    [/No merchants found\.?/g, 'לא נמצאו חנויות'],
+    [/No products found\.?/g, 'לא נמצאו מוצרים']
+  ];
+  function fixText(node) {
+    var t = node.nodeValue; if (!t) return;
+    var n = t;
+    for (var i = 0; i < MAP.length; i++) n = n.replace(MAP[i][0], MAP[i][1]);
+    if (n !== t) { node.nodeValue = n; stats.fixes++; }
+  }
+  function walk(root) {
+    var w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT); var n;
+    while ((n = w.nextNode())) fixText(n);
+  }
+  function sync() {
+    var main = document.getElementById('MultiVendorSearch');
+    if (!main) return;
+    stats.runs++;
+    var texts = main.querySelectorAll('#SearchedMerchantAverageTimeAndDistance, #merchantDistance, .tab-item-merchant h6.text-h6, .tab-item-product h6.text-h6');
+    for (var i = 0; i < texts.length; i++) walk(texts[i]);
+    var ratings = main.querySelectorAll('#SearchedMerchantRating');
+    for (var j = 0; j < ratings.length; j++) {
+      var un = /לא מדורג|not rated/i.test(ratings[j].textContent);
+      if (ratings[j].classList.contains('mh-unrated') !== un) ratings[j].classList.toggle('mh-unrated', un);
+    }
+    /* מצב ריק במוצרים: "0 תוצאות" */
+    var counter = main.querySelector('.tab-item-product > .tw-flex > span');
+    var empty = main.querySelector('#mh-search-empty');
+    var isZero = !!counter && /^0\s/.test(counter.textContent.trim());
+    if (isZero && !empty) {
+      var d = document.createElement('div'); d.id = 'mh-search-empty';
+      d.textContent = 'לא מצאנו מנות שמתאימות לחיפוש. נסו מילה אחרת, או עברו לטאב "חנויות".';
+      counter.parentNode.insertAdjacentElement('afterend', d);
+    } else if (!isZero && empty) { empty.remove(); }
+  }
+  var pending = false;
+  function schedule() {
+    if (pending) return; pending = true;
+    setTimeout(function () { pending = false; try { sync(); } catch (e) { /* נכשל-פתוח */ } }, 60);
+  }
+  try {
+    new MutationObserver(schedule).observe(document.documentElement, { subtree: true, childList: true, characterData: true });
+    schedule();
+  } catch (e) { console.warn('[MH Search] disabled:', e); }
+  window.MH_SEARCH = { version: VERSION, sync: sync, stats: function () { return Object.assign({}, stats); } };
+})();

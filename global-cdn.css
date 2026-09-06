@@ -4741,75 +4741,10 @@ html body .v-bottom-sheet__content:has(#addAddressForm) .search-results.tw-bg-wh
 }
 
 /* =========================================================
-   חלק 30: עיצוב טאבים וכרטיס מסעדה בדף החיפוש
-   תאריך: 2026-05-01
-   Scope: #MultiVendorSearch
-   מטרה:
-   1. טאבים "מוצר/חנות" - גרדיאנט אדום מותגי במקום שחור
-   2. כרטיס מסעדה בתוצאות חיפוש - Liquid Glass במקום אפור #f8f8f8
+   חלק 30 (2026-05-01, טאבים וכרטיס מסעדה בדף החיפוש) — הוסר ב-6.9.2026.
+   הוחלף במלואו ע"י "חלק 26ב: דף תוצאות חיפוש — MH Search" בסוף הקובץ
+   (סקופ html body main#MultiVendorSearch). ההיסטוריה ב-git.
    ========================================================= */
-
-/* === 1. טאבים - Liquid Red === */
-html body #MultiVendorSearch .v-slide-group__content .v-tab {
-    border-radius: 14px !important;
-    border: 1.5px solid rgba(227, 30, 36, 0.15) !important;
-    background: rgba(255, 255, 255, 0.6) !important;
-    backdrop-filter: blur(20px) saturate(180%) !important;
-    -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
-    color: #4a5568 !important;
-    font-weight: 700 !important;
-    font-size: 14px !important;
-    padding: 0 18px !important;
-    height: 38px !important;
-    min-height: 38px !important;
-    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04) !important;
-}
-
-html body #MultiVendorSearch .v-slide-group__content .v-tab .v-btn__content {
-    color: inherit !important;
-}
-
-/* === 2. טאב פעיל - גרדיאנט אדום מותגי === */
-html body #MultiVendorSearch .v-slide-group__content .v-tab.v-tab-item--selected,
-html body #MultiVendorSearch .v-slide-group__content .v-tab[aria-selected="true"] {
-    background: linear-gradient(135deg, #e31e24 0%, #b3161b 100%) !important;
-    border: 1.5px solid rgba(227, 30, 36, 0.4) !important;
-    color: #ffffff !important;
-    box-shadow: 0 6px 20px rgba(227, 30, 36, 0.35) !important;
-    transform: translateY(-1px) !important;
-}
-
-html body #MultiVendorSearch .v-slide-group__content .v-tab.v-tab-item--selected .v-btn__content,
-html body #MultiVendorSearch .v-slide-group__content .v-tab[aria-selected="true"] .v-btn__content {
-    color: #ffffff !important;
-    font-weight: 800 !important;
-}
-
-/* === 3. הסתרת המחוון התחתון של Vuetify === */
-html body #MultiVendorSearch .v-slide-group__content .v-tab .v-tab__slider {
-    display: none !important;
-}
-
-/* === 4. כרטיס מסעדה בתוצאות חיפוש - Liquid Glass === */
-html body #MultiVendorSearch .v-window-item .tw-bg-\[\#f8f8f8\].tw-rounded-lg {
-    background: rgba(255, 255, 255, 0.7) !important;
-    backdrop-filter: blur(40px) saturate(200%) !important;
-    -webkit-backdrop-filter: blur(40px) saturate(200%) !important;
-    border: 1px solid rgba(255, 255, 255, 0.5) !important;
-    border-radius: 22px !important;
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.05) !important;
-    padding: 14px 6px !important;
-    transition: all 0.3s ease !important;
-}
-
-/* === 5. שם המסעדה - הדגשה מותגית === */
-html body #MultiVendorSearch .v-window-item .tw-bg-\[\#f8f8f8\] .tw-font-semibold.tw-text-\[\#000\] {
-    color: #1a1a1a !important;
-    font-weight: 800 !important;
-    font-size: 16px !important;
-}
-
 
 /* =========================================================
    חלק 2+3 חדש: HEADER LIQUID GLASS V3 + SHRINK ON SCROLL
@@ -6169,3 +6104,242 @@ html body nav.scheme-coupon-panel .scheme-coupon-content p.tw-text-\[12px\] {
     margin-top: 8px !important;
 }
 /* mh-coupon-v2 */
+
+/* =========================================================
+   חלק 26ב: דף תוצאות חיפוש — MH Search v1.0.0 | 2026-09-06
+   סקופ קשיח: כל כלל כאן מתחיל ב-html body main#MultiVendorSearch (דף החיפוש הגלובלי בלבד).
+   לא נוגע בדף המרצ'נט, בדף הבית, בפופאפ מוצר או בצ'ק-אאוט — גם אם שם יש אותם קלאסים.
+   מה זה עושה: טאבים "מוצרים/חנויות" (תיקון "מוצרs"), קבוצת מרצ'נט ככרטיס לבן, רשימת מוצרים
+   אנכית במובייל (במקום קרוסלה חתוכה) וגריד בדסקטופ, כרטיס מוצר קומפקטי עם תמונה 96px.
+   טקסטים ("mins" → דק׳, "קילומטר" → ק״מ, "לא מדורג" מוסתר, "No merchants found") — בבלוק MH Search ב-custom-footer.js.
+   ========================================================= */
+
+/* 1. הדר החיפוש הדביק — זכוכית עדינה */
+html body main#MultiVendorSearch .scheme-global-search-mobile-header {
+    background: rgba(255, 255, 255, 0.88) !important;
+    backdrop-filter: blur(18px) saturate(160%) !important;
+    -webkit-backdrop-filter: blur(18px) saturate(160%) !important;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06) !important;
+    padding: 10px 0 !important;
+}
+
+/* 2. טאבים — בורר מקטע (מוצרים | חנויות) */
+html body main#MultiVendorSearch .scheme-global-search-tabs {
+    margin: 10px 0 14px !important;
+    border-bottom: 0 !important;
+    height: auto !important;
+}
+html body main#MultiVendorSearch .scheme-global-search-tabs .v-slide-group__container,
+html body main#MultiVendorSearch .scheme-global-search-tabs .v-slide-group__content {
+    display: flex !important;
+    width: 100% !important;
+}
+html body main#MultiVendorSearch .scheme-global-search-tabs .v-slide-group__content {
+    gap: 6px !important;
+    padding: 4px !important;
+    background: #f1f2f4 !important;
+    border-radius: 16px !important;
+    box-sizing: border-box !important;
+}
+html body main#MultiVendorSearch .scheme-global-search-tabs .v-btn.v-tab {
+    flex: 1 1 0 !important;
+    min-width: 0 !important;
+    height: 44px !important;
+    margin: 0 !important;
+    border-radius: 12px !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    border: 0 !important;
+    color: #374151 !important;
+    text-transform: none !important;
+    letter-spacing: 0 !important;
+    transition: background-color 0.2s ease, color 0.2s ease !important;
+}
+html body main#MultiVendorSearch .scheme-global-search-tabs .v-btn.v-tab.v-tab--selected {
+    background: #e31e24 !important;
+    color: #ffffff !important;
+    box-shadow: 0 6px 16px rgba(227, 30, 36, 0.25) !important;
+}
+html body main#MultiVendorSearch .scheme-global-search-tabs .v-tab__slider,
+html body main#MultiVendorSearch .scheme-global-search-tabs .v-btn__overlay,
+html body main#MultiVendorSearch .scheme-global-search-tabs .v-btn__underlay { display: none !important; }
+/* Hyperzod מדביקה "s" לתרגום ("מוצרs", "חנותs") — מציירים את התווית מחדש */
+html body main#MultiVendorSearch .scheme-global-search-tabs .v-btn.v-tab .v-btn__content { font-size: 0 !important; color: inherit !important; }
+html body main#MultiVendorSearch #search-product-tab .v-btn__content::before { content: "מוצרים"; font-size: 15px; font-weight: 800; }
+html body main#MultiVendorSearch #search-merchant-tab .v-btn__content::before { content: "חנויות"; font-size: 15px; font-weight: 800; }
+
+/* 3. מונה תוצאות */
+html body main#MultiVendorSearch .tab-item-product > .tw-flex.tw-justify-between.tw-items-center.tw-mb-3 { margin: 0 4px 10px !important; }
+html body main#MultiVendorSearch .tab-item-product > .tw-flex.tw-justify-between.tw-items-center.tw-mb-3 > span {
+    font-size: 15px !important;
+    font-weight: 800 !important;
+    color: #111111 !important;
+}
+html body main#MultiVendorSearch #mh-search-empty {
+    margin: 18px 4px 0;
+    padding: 18px 16px;
+    border: 1px dashed #d1d5db;
+    border-radius: 16px;
+    color: #6b7280;
+    font-size: 14px;
+    font-weight: 600;
+    text-align: center;
+}
+
+/* 4. קבוצת מרצ'נט — כרטיס לבן */
+html body main#MultiVendorSearch .scheme-global-search-product-group {
+    background: #ffffff !important;
+    border: 1px solid #e5e7eb !important;
+    border-radius: 18px !important;
+    padding: 14px 12px 12px !important;
+    margin: 0 0 12px !important;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.04) !important;
+}
+html body main#MultiVendorSearch .scheme-global-search-product-group > .tw-ms-3 { margin: 0 !important; }
+html body main#MultiVendorSearch .scheme-global-search-product-group > .tw-ms-3 > a { text-decoration: none !important; display: block !important; }
+html body main#MultiVendorSearch .scheme-global-search-product-group > .tw-ms-3 > a > div {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: baseline !important;
+    gap: 10px !important;
+    font-size: 17px !important;
+    font-weight: 800 !important;
+    color: #111111 !important;
+    line-height: 1.3 !important;
+}
+html body main#MultiVendorSearch .scheme-global-search-product-group > .tw-ms-3 > a > div::after {
+    content: "לכל התפריט ‹";
+    flex: 0 0 auto;
+    font-size: 12.5px;
+    font-weight: 700;
+    color: #e31e24;
+    white-space: nowrap;
+}
+/* שורת המידע: זמן • מרחק (הדירוג "לא מדורג" מוסתר ע"י ה-JS דרך mh-unrated) */
+html body main#MultiVendorSearch .scheme-global-search-product-group > .tw-ms-3 > .tw-flex.tw-mt-1 {
+    margin-top: 4px !important;
+    font-size: 13px !important;
+    color: #6b7280 !important;
+}
+html body main#MultiVendorSearch #SearchedMerchantRating.mh-unrated { display: none !important; }
+html body main#MultiVendorSearch #SearchedMerchantAverageTimeAndDistance img { width: 14px !important; max-width: 14px !important; opacity: 0.7 !important; }
+html body main#MultiVendorSearch #SearchedMerchantAverageTimeAndDistance span {
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    color: #6b7280 !important;
+}
+
+/* 5. רשימת המוצרים — אנכית במובייל (במקום קרוסלה שנחתכת), גריד בדסקטופ */
+html body main#MultiVendorSearch .scheme-global-search-product-group .simple-slider { margin-top: 12px !important; }
+html body main#MultiVendorSearch .scheme-global-search-product-group .simple-slider-container { overflow: visible !important; }
+html body main#MultiVendorSearch .scheme-global-search-product-group .slider-inner-container {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 10px !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    overflow: visible !important;
+    width: 100% !important;
+    scroll-snap-type: none !important;
+}
+html body main#MultiVendorSearch .scheme-global-search-product-group .slider-inner-container > .tw-py-2 {
+    padding: 0 !important;
+    width: 100% !important;
+    flex: 0 0 auto !important;
+}
+html body main#MultiVendorSearch .scheme-global-search-product-group .slider-inner-container > .tw-py-2 > div {
+    width: 100% !important;
+    max-width: none !important;
+    min-width: 0 !important;
+}
+/* חצי הקרוסלה / הבלוק הריק אחריה — לא רלוונטיים ברשימה אנכית */
+html body main#MultiVendorSearch .scheme-global-search-product-group > .tw-flex[class*="tw-col-span-4"] { display: none !important; }
+
+/* 6. כרטיס מוצר קומפקטי */
+html body main#MultiVendorSearch .product-horizontal-card {
+    background: #ffffff !important;
+    border: 1px solid #eceef1 !important;
+    border-radius: 14px !important;
+    box-shadow: none !important;
+    min-height: 0 !important;
+    height: auto !important;
+}
+html body main#MultiVendorSearch .product-horizontal-card > .v-card-text { padding: 10px 12px !important; }
+html body main#MultiVendorSearch .product-horizontal-card .tw-grid.tw-grid-cols-12 {
+    display: flex !important;
+    gap: 12px !important;
+    align-items: stretch !important;
+}
+html body main#MultiVendorSearch .product-horizontal-card .tw-col-span-7 { flex: 1 1 auto !important; min-width: 0 !important; }
+html body main#MultiVendorSearch .product-horizontal-card .pro-card-h {
+    flex: 0 0 96px !important;
+    width: 96px !important;
+    padding: 0 !important;
+}
+html body main#MultiVendorSearch .product-horizontal-card .pro-card-h-img {
+    width: 96px !important;
+    height: 96px !important;
+    border-radius: 12px !important;
+    margin: 0 0 22px !important;
+    box-shadow: none !important;
+    border: 1px solid #f0f0f0 !important;
+}
+html body main#MultiVendorSearch .product-horizontal-card .rec-item-title h4 {
+    font-size: 15px !important;
+    font-weight: 800 !important;
+    color: #111111 !important;
+    line-height: 1.3 !important;
+    margin: 0 0 3px !important;
+    white-space: normal !important;
+    overflow: hidden !important;
+    display: -webkit-box !important;
+    -webkit-box-orient: vertical !important;
+    -webkit-line-clamp: 2 !important;
+}
+html body main#MultiVendorSearch .product-horizontal-card .description {
+    font-size: 12.5px !important;
+    font-weight: 500 !important;
+    color: #6b7280 !important;
+    line-height: 1.35 !important;
+    margin: 0 !important;
+    -webkit-line-clamp: 2 !important;
+    max-height: 2.8em !important;
+}
+html body main#MultiVendorSearch .product-horizontal-card .price h4 {
+    font-size: 16px !important;
+    font-weight: 800 !important;
+    color: #111111 !important;
+    margin-top: 6px !important;
+}
+html body main#MultiVendorSearch .product-horizontal-card .add-product-btn > span {
+    font-size: 10px !important;
+    color: #9ca3af !important;
+    bottom: -11px !important;
+}
+
+/* 7. דסקטופ — שני טורים (ומעל 1280px שלושה) */
+@media (min-width: 768px) {
+    html body main#MultiVendorSearch .scheme-global-search-product-group .slider-inner-container {
+        display: grid !important;
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        gap: 12px !important;
+    }
+    html body main#MultiVendorSearch .scheme-global-search-product-group { padding: 16px 16px 14px !important; }
+    html body main#MultiVendorSearch .scheme-global-search-tabs .v-slide-group__content { max-width: 420px !important; }
+}
+@media (min-width: 1280px) {
+    html body main#MultiVendorSearch .scheme-global-search-product-group .slider-inner-container {
+        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    }
+}
+
+/* 8. טאב חנויות — ריווח ומצב ריק */
+html body main#MultiVendorSearch .tab-item-merchant .v-row { margin: 0 -6px !important; }
+html body main#MultiVendorSearch .tab-item-merchant h6.text-h6,
+html body main#MultiVendorSearch .tab-item-product h6.text-h6 {
+    margin-top: 36px !important;
+    font-size: 16px !important;
+    font-weight: 700 !important;
+    color: #6b7280 !important;
+}
+/* mh-search-v1 */
