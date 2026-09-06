@@ -2511,3 +2511,81 @@ log('פעיל');
   } catch (e) { console.warn('[MH Pay] disabled:', e); }
   window.MH_PAY = { version: VERSION, sync: sync, off: function () { mo.disconnect(); } };
 })();
+
+/* ============================================================
+   תשלום אונליין בלי כתובת — MH PayIntent Country Guard  |  v1.0.0 | 2026-09-06
+   הבעיה: בסוגי הזמנה בלי כתובת (למשל קפית: "משלוח עד הבית" = custom_1, "משלוח עד הבית מורחב" = pickup)
+   החנות שולחת ב-POST /store/v1/pg/paymentIntent/... את address.country מתוך המיקום שנבחר בסרגל,
+   והגיאוקודר של Hyperzod מחזיר country=null למעלה אדומים → השרת עונה
+   "The address.country field is required." והלקוח לא מגיע לדף התשלום.
+   הפתרון: רק בבקשה הזאת, אם address.country / country_code ריקים — ממלאים "IL". לא נוגעים בשום בקשה אחרת.
+   נכשל-פתוח: כל שגיאה כאן → הבקשה יוצאת כמו שהיא. בדיקה: window.MH_PAYINTENT.fixes (מונה תיקונים).
+   ============================================================ */
+(function () {
+  'use strict';
+  if (window.__MH_PAYINTENT__) { return; }
+  window.__MH_PAYINTENT__ = true;
+  var VERSION = '1.0.0';
+  var RE = /\/store\/v1\/pg\/paymentIntent\//;
+  var stats = { version: VERSION, fixes: 0, seen: 0 };
+
+  // פונקציה טהורה: מקבלת גוף (אובייקט) ומחזירה {body, changed}
+  function fix(body) {
+    if (!body || typeof body !== 'object' || Array.isArray(body)) return { body: body, changed: false };
+    var changed = false;
+    var addr = body.address;
+    if (addr && typeof addr === 'object' && !Array.isArray(addr)) {
+      if (addr.country === null || addr.country === undefined || String(addr.country).trim() === '') { addr.country = 'IL'; changed = true; }
+    }
+    if (body.country_code === null || body.country_code === undefined || String(body.country_code).trim() === '') { body.country_code = 'IL'; changed = true; }
+    return { body: body, changed: changed };
+  }
+
+  // מחרוזת JSON → מחרוזת JSON מתוקנת (או המקור אם אין מה לתקן / לא JSON)
+  function fixJsonText(text) {
+    try {
+      if (typeof text !== 'string' || text.charAt(0) !== '{') return text;
+      var r = fix(JSON.parse(text));
+      if (!r.changed) return text;
+      stats.fixes++;
+      return JSON.stringify(r.body);
+    } catch (e) { return text; }
+  }
+
+  function isIntent(method, url) {
+    return String(method || 'GET').toUpperCase() === 'POST' && RE.test(String(url || ''));
+  }
+
+  try {
+    // XHR (axios בדפדפן)
+    var xo = XMLHttpRequest.prototype.open, xs = XMLHttpRequest.prototype.send;
+    XMLHttpRequest.prototype.open = function (method, url) {
+      try { this.__mhPI = isIntent(method, url); } catch (e) { this.__mhPI = false; }
+      return xo.apply(this, arguments);
+    };
+    XMLHttpRequest.prototype.send = function (body) {
+      try {
+        if (this.__mhPI) { stats.seen++; if (typeof body === 'string') body = fixJsonText(body); }
+      } catch (e) { /* נכשל-פתוח */ }
+      return xs.call(this, body);
+    };
+    // fetch
+    if (window.fetch) {
+      var of = window.fetch;
+      window.fetch = function (input, init) {
+        try {
+          var url = (typeof input === 'string') ? input : (input && input.url);
+          var method = (init && init.method) || (input && input.method) || 'GET';
+          if (isIntent(method, url) && init && typeof init.body === 'string') {
+            stats.seen++;
+            var nb = fixJsonText(init.body);
+            if (nb !== init.body) init = Object.assign({}, init, { body: nb });
+          }
+        } catch (e) { /* נכשל-פתוח */ }
+        return of.call(this, input, init);
+      };
+    }
+  } catch (e) { console.warn('[MH PayIntent] disabled:', e); }
+
+  window.MH_PAYINTENT = { version: VERSION, fix: fix, fixJsonText: fixJsonText, stats: function () { return Object.assign({}, stats); } };
+})();
