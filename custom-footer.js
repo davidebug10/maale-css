@@ -2589,3 +2589,39 @@ log('פעיל');
 
   window.MH_PAYINTENT = { version: VERSION, fix: fix, fixJsonText: fixJsonText, stats: function () { return Object.assign({}, stats); } };
 })();
+
+/* ============================================================
+   אמצעי תשלום — MH Pay NoPreselect  |  v1.1.0 | 2026-09-06
+   Hyperzod זוכר את אמצעי התשלום האחרון של הלקוח (Payment.recentlySelectedPaymentMethod ב-vuex)
+   ומסמן אותו אוטומטית בכניסה לצ'ק-אאוט. לקוח ששילם פעם במזומן קיבל "מזומן" מסומן מראש בכל
+   הזמנה — הסיבה האמיתית ל"בחרתי מזומן בטעות". כאן, פעם אחת בכל טעינת דף, מנקים את הזיכרון הזה
+   (ואת paymentModeId) כך שכל לקוח בוחר אמצעי תשלום באופן פעיל. בחירה ידנית אחרי זה עובדת רגיל.
+   נכשל-פתוח: אם ה-store לא נמצא תוך 12 שניות — לא עושים כלום.
+   ============================================================ */
+(function () {
+  'use strict';
+  if (window.__MH_PAY_NOSEL__) { return; }
+  window.__MH_PAY_NOSEL__ = true;
+  var VERSION = '1.1.0';
+  var stats = { version: VERSION, cleared: false, hadRecent: null, tries: 0 };
+  function store() {
+    try { var app = document.querySelector('#app'); return app && app.__vue_app__ && app.__vue_app__.config.globalProperties.$store; } catch (e) { return null; }
+  }
+  function clearOnce(st) {
+    var recent = null;
+    try { recent = st.state && st.state.Payment ? st.state.Payment.recentlySelectedPaymentMethod : (st.getters.getRecentlySelectedPaymentMethod || null); } catch (e) { recent = null; }
+    stats.hadRecent = !!recent;
+    if (!recent) return;            /* אין זיכרון → אין מה לנקות (לקוח חדש) */
+    st.commit('setRecentlySelectedPaymentMethod', null);
+    st.commit('setPaymentModeId', null); /* אם הצ'ק-אאוט כבר מוצג — ה-watcher של Hyperzod מנקה גם את הסימון */
+    stats.cleared = true;
+  }
+  function tick() {
+    stats.tries++;
+    var st = store();
+    if (st) { try { clearOnce(st); } catch (e) { console.warn('[MH Pay NoPreselect] skipped:', e); } return; }
+    if (stats.tries < 40) setTimeout(tick, 300);
+  }
+  tick();
+  window.MH_PAY_NOSEL = { version: VERSION, stats: function () { return Object.assign({}, stats); } };
+})();
