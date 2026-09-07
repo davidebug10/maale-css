@@ -2728,3 +2728,42 @@ log('פעיל');
   } catch (e) { console.warn('[MH Options] disabled:', e); }
   window.MH_OPTIONS = { version: VERSION, sync: sync, stats: function () { return Object.assign({}, stats); } };
 })();
+
+/* ============================================================
+   סרגל הקטגוריות בדף העסק — MH CatNav  |  v1.0.0 | 2026-09-07
+   ה-CSS (חלק 33 ב-global-cdn.css) מרחיב את הגלולות; Swiper מדד את רוחב הפריטים לפני שה-CSS מה-CDN
+   נטען, ולכן בלי update() הפריטים האחרונים עלולים להיות לא נגישים בגלילה. הבלוק קורא
+   swiper.update() כשהסרגל מופיע וכשהגופנים נטענים. נכשל-פתוח: בלי Swiper — לא עושים כלום.
+   בדיקה: window.MH_CATNAV.stats()
+   ============================================================ */
+(function () {
+  'use strict';
+  if (window.__MH_CATNAV__) { return; }
+  window.__MH_CATNAV__ = true;
+  var VERSION = '1.0.0';
+  var stats = { version: VERSION, updates: 0, seen: 0 };
+  var last = null;
+  function update() {
+    var el = document.getElementById('ProductCategoriesSlider');
+    if (!el) { last = null; return false; }
+    if (el !== last) { stats.seen++; last = el; }
+    var sw = el.swiper;
+    if (sw && typeof sw.update === 'function') { try { sw.update(); stats.updates++; return true; } catch (e) { /* נכשל-פתוח */ } }
+    return false;
+  }
+  var pending = false;
+  function schedule() {
+    if (pending) return; pending = true;
+    setTimeout(function () { pending = false; try { update(); } catch (e) { /* נכשל-פתוח */ } }, 120);
+  }
+  try {
+    new MutationObserver(function (muts) {
+      for (var i = 0; i < muts.length; i++) { if (muts[i].addedNodes && muts[i].addedNodes.length) { schedule(); return; } }
+    }).observe(document.documentElement, { subtree: true, childList: true });
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(schedule);
+    window.addEventListener('load', schedule);
+    window.addEventListener('resize', schedule);
+    schedule();
+  } catch (e) { console.warn('[MH CatNav] disabled:', e); }
+  window.MH_CATNAV = { version: VERSION, update: update, stats: function () { return Object.assign({}, stats); } };
+})();
