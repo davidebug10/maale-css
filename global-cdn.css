@@ -2673,345 +2673,10 @@ html body .location-search-custom-height input#search {
 }
 
 /* =========================================================
-   חלק 22א: שלד דף מוצר ותמונה - LIQUID GLASS DNA
-   מטרה: הפיכת המודאל לזכוכית, שחזור התמונה ועיצוב הדר
+   חלקי 22א–22ח (דף המוצר: שלד, הדר, זהות, טופס, פוטר, תמונה, סליידר, תיקונים) — הוסרו ב-7.9.2026.
+   הוחלפו במלואם ע"י "חלק 22ט: MH Options" (רשימת האופציות) ו-"חלק 22י: MH Product" (כל השאר)
+   בסוף הקובץ. ההיסטוריה ב-git.
    ========================================================= */
-
-/* 1. המכולה הראשית של ה-Popup - מעטפת זכוכית נוזלית */
-.v-overlay__content.v-bottom-sheet__content:has(.product-popup) .product-popup {
-    background: rgba(255, 255, 255, 0.7) !important;
-    backdrop-filter: blur(45px) saturate(210%) !important;
-    -webkit-backdrop-filter: blur(45px) saturate(210%) !important;
-    border-radius: 32px 32px 0 0 !important; /* עיגול פרימיום עליון */
-    border: 1px solid rgba(255, 255, 255, 0.5) !important;
-    box-shadow: 0 -15px 50px rgba(0, 0, 0, 0.1) !important;
-    overflow: hidden !important;
-}
-
-/* 2. הדר המודאל — הועבר ל-"חלק 22ט: MH Options" בסוף הקובץ (7.9.2026) */
-/* שם המוצר בהדר */
-.product-popup .v-card-title .tw-text-black {
-    font-weight: 900 !important;
-    font-size: 18px !important;
-    color: #1a1a1a !important;
-}
-
-/* כפתור החזור - אדום QLED */
-.product-popup .back-btn {
-    background: rgba(255, 255, 255, 0.8) !important;
-    border: 1px solid rgba(227, 30, 36, 0.15) !important;
-    border-radius: 12px !important;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05) !important;
-}
-
-.product-popup .back-btn svg path {
-    fill: #e31e24 !important; /* חץ אדום מותג */
-}
-
-}
-
-/* =========================================================
-   חלק 22ב: זהות המוצר ואריחי קריסטל (תוספות)
-   מטרה: עיצוב שם המוצר והפיכת התוספות לכפתורי זכוכית נוזלית
-   ========================================================= */
-
-/* 1. זהות המוצר (שם, קטגוריה ומחיר) */
-.product-popup #productInfo {
-    text-align: right !important;
-    padding: 20px 16px !important;
-}
-
-/* קטגוריית המוצר */
-.product-popup .product-category-name {
-    color: #e31e24 !important; /* אדום מותג עדין */
-    font-size: 13px !important;
-    font-weight: 700 !important;
-    text-transform: uppercase !important;
-    margin-bottom: 4px !important;
-    opacity: 0.8 !important;
-}
-
-/* שם המוצר הראשי */
-.product-popup .product-name {
-    font-size: 24px !important;
-    font-weight: 900 !important;
-    color: #000000 !important;
-    line-height: 1.2 !important;
-    margin-bottom: 8px !important;
-}
-
-/* המחיר - בולט ויוקרתי */
-.product-popup .product-price {
-    color: #e31e24 !important;
-    font-size: 22px !important;
-    font-weight: 900 !important;
-    margin-top: 10px !important;
-    display: block !important;
-}
-
-/* תיאור המוצר */
-.product-popup .product-description {
-    color: #666666 !important;
-    font-size: 14px !important;
-    line-height: 1.5 !important;
-    font-weight: 500 !important;
-    margin-top: 8px !important;
-}
-
-/* 2–4. כותרות קבוצות, אריחי התוספות והרדיו — הוחלפו ע"י "חלק 22ט: MH Options" בסוף הקובץ (7.9.2026) */
-
-/* 5. טיפול בתוספות במבנה סליידר (אם קיימות) */
-.product-popup .simple-slider .v-card {
-    background: rgba(255, 255, 255, 0.6) !important;
-    backdrop-filter: blur(15px) !important;
-    border: 1px solid rgba(255, 255, 255, 0.5) !important;
-    border-radius: 20px !important;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.04) !important;
-    padding: 10px !important;
-}
-
-.product-popup .simple-slider .v-img {
-    border-radius: 14px !important;
-    margin-bottom: 10px !important;
-}
-
-/* 6. ניקוי רקע הטופס האפור (#F6F6F6) שחונק את הזכוכית */
-.product-popup #ProductPopupForm,
-.product-popup .tw-bg-\[\#F6F6F6\] {
-    background: transparent !important;
-}
-
-
-/* =========================================================
-   חלק 22ג+ד: גוף הטופס, אריחי קריסטל וכפתור הרחבה
-   סטטוס: איחוד כוחות סופי - דריסה אגרסיבית לפי HTML LIVE
-   ========================================================= */
-
-/* 1. ניקוי שורש המודאל - השמדת ה-White Wall מהיסוד */
-.product-popup[data-v-4e145e4c],
-.product-popup .v-card-text[data-v-4e145e4c],
-.product-popup #ProductPopupForm,
-.product-popup div[data-v-4e145e4c].tw-bg-\[\#F6F6F6\] {
-    background: transparent !important;
-    background-color: transparent !important;
-    --v-theme-surface: transparent !important;
-    box-shadow: none !important;
-}
-
-/* 2–4. מעטפת הרשימה, אריחים, אפקט בחירה, צביעת V — הוחלפו ע"י "חלק 22ט: MH Options" בסוף הקובץ (7.9.2026) */
-
-/* 5. עיצוב כפתור "להראות יותר" - THE LIQUID GLASS CAPSULE */
-.product-popup button.text-primary.tw-ms-3 {
-    /* מירכוז DNA */
-    display: flex !important;
-    position: relative !important;
-    margin: 30px auto !important; 
-    left: 0 !important;
-    right: 0 !important;
-    
-    width: fit-content !important;
-    min-width: 175px !important;
-    height: 44px !important;
-    z-index: 10 !important;
-
-    /* עיצוב זכוכית */
-    background: rgba(255, 255, 255, 0.8) !important;
-    backdrop-filter: blur(25px) !important;
-    -webkit-backdrop-filter: blur(25px) !important;
-    
-    /* מסגרת אדומה וטקסט */
-    border: 1.2px solid #e31e24 !important;
-    border-radius: 50px !important;
-    color: #e31e24 !important;
-    box-shadow: 0 8px 25px rgba(227, 30, 36, 0.15) !important;
-}
-
-.product-popup button.text-primary.tw-ms-3 .v-btn__content {
-    font-weight: 800 !important;
-    font-size: 15px !important;
-}
-
-/* 6. ניקוי שכבות ה-Underlay — עבר ל-"חלק 22ט: MH Options" (7.9.2026) */
-
-
-/* =========================================================
-   חלק 22ה: עיצוב פנים הפוטר (הוספה לסל ומונה)
-   סטטוס: עיצוב אלמנטים פנימיים בלבד - שמירה על שקיפות קיימת
-   ========================================================= */
-
-/* 1. עיצוב כפתור ההוספה (The Master QLED Button) */
-.product-popup [data-v-4e145e4c] button.add-btn.bg-button_normal {
-    /* זהות המותג - אדום QLED */
-    background: linear-gradient(135deg, #e31e24 0%, #b31419 100%) !important;
-    color: #ffffff !important;
-    
-    /* צורה ועומק */
-    border-radius: 16px !important;
-    height: 58px !important;
-    border: 1px solid rgba(255, 255, 255, 0.2) !important;
-    box-shadow: 0 10px 25px rgba(227, 30, 36, 0.35) !important;
-    
-    /* טקסט */
-    font-size: 18px !important;
-    font-weight: 900 !important;
-    letter-spacing: 0.5px !important;
-    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
-}
-
-/* אפקט לחיצה טקטילי */
-.product-popup button.add-btn:active {
-    transform: scale(0.96) !important;
-    box-shadow: 0 4px 12px rgba(227, 30, 36, 0.2) !important;
-}
-
-/* 2. עיצוב המונה (The Quantity Stepper) - קריסטל שקוף */
-.product-popup [data-v-4e145e4c] .tw-flex-none.tw-border {
-    /* הפיכה מזכוכית אטומה לקריסטל שקוף */
-    background: rgba(255, 255, 255, 0.4) !important;
-    backdrop-filter: blur(10px) !important;
-    -webkit-backdrop-filter: blur(10px) !important;
-    
-    border: 1px solid rgba(0, 0, 0, 0.08) !important;
-    border-radius: 16px !important;
-    height: 58px !important;
-    width: 130px !important;
-    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.02) !important;
-}
-
-/* 3. כפתורי הפלוס והמינוס - אדום QLED */
-.product-popup .decrement-btn, 
-.product-popup .increment-btn {
-    color: #e31e24 !important;
-    font-weight: 900 !important;
-    font-size: 26px !important;
-    background: transparent !important;
-}
-
-/* 4. עיצוב המספר במרכז המונה */
-.product-popup input#quantity {
-    color: #000000 !important;
-    font-weight: 900 !important;
-    font-size: 19px !important;
-    background: transparent !important;
-}
-
-/* 5. ניקוי סופי של שכבות "רפאים" בתוך המונה */
-.product-popup #add_to_cart_hide_from_mobile_app .v-field__overlay,
-.product-popup #add_to_cart_hide_from_mobile_app .v-field__outline {
-    display: none !important;
-}
-
-
-/* =========================================================
-   חלק ו22: שחזור תמונת מוצר במודאל - THE FINAL FIX
-   ========================================================= */
-
-/* וידוא שהסייזר של התמונה חי וקיים במודאל */
-.product-popup .v-responsive__sizer {
-    display: block !important;
-    padding-bottom: 70% !important; /* קובע את גובה התמונה */
-}
-
-/* הכרחת התמונה להיות גלויה */
-.product-popup .v-img__img {
-    opacity: 1 !important;
-    visibility: visible !important;
-    object-fit: cover !important;
-}
-
-/* ביטול חניקת גובה של Vuetify Window */
-.product-popup .v-window, 
-.product-popup .v-window-item {
-    height: auto !important;
-}
-
-/* =========================================================
-   חלק 22ז: עיצוב קרוסלת תמונה - THE LIQUID SLIDER
-   מטרה: ניקוי ה"מסגרת המגעילה" והפיכת התמונה לפרמיום
-   ========================================================= */
-
-/* 1. המכולה הראשית של הסליידר - ניקוי גובה קשיח */
-.product-popup .product-image-slider {
-    height: auto !important;
-    background: transparent !important;
-    margin-bottom: 10px !important;
-}
-
-/* 2. ניקוי כרטיס ה-v-card הפנימי שיוצר את המסגרת הלבנה */
-.product-popup .v-carousel-item .v-card {
-    background: transparent !important;
-    background-color: transparent !important;
-    --v-theme-surface: transparent !important;
-    border: none !important;
-    box-shadow: none !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    padding: 0 !important;
-    aspect-ratio: unset !important;
-}
-
-/* 3. עיצוב התמונה עצמה - THE FLOATING CRYSTAL */
-.product-popup .v-carousel-item .v-img.image {
-    border-radius: 20px !important;
-    border: none !important;
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08) !important;
-    width: 100% !important;
-    max-width: 100% !important;
-    margin: 0 !important;
-    overflow: hidden !important;
-}
-
-/* 4. תיקון ה-Sizer של התמונה בתוך הקרוסלה */
-.product-popup .v-carousel-item .v-img.image .v-responsive__sizer {
-    padding-bottom: 100% !important; /* תמונה מרובעת מושלמת בתוך המכולה */
-}
-
-/* 5. עיצוב כפתורי הניווט (Arrows) והדוטס (Dots) אם קיימים */
-.product-popup .v-carousel__controls {
-    background: rgba(255, 255, 255, 0.2) !important;
-    backdrop-filter: blur(5px) !important;
-    border-radius: 20px !important;
-    height: 40px !important;
-    bottom: 20px !important;
-}
-
-.product-popup .v-carousel__controls .v-btn--active {
-    color: #e31e24 !important; /* דוט פעיל באדום מותג */
-}
-
-/* 6. הסרת שכבת ה-Underlay של ה-v-card הפנימי שחוסמת שקיפות */
-.product-popup .v-carousel-item .v-card__underlay {
-    display: none !important;
-}
-
-/* =========================================================
-   חלק 22ח: תיקון סופי - ריבוע לבן בתמונה + תוספות
-   ========================================================= */
-/* --- FIX 1: הריבוע הלבן מאחורי תמונת המוצר --- */
-/* ה-v-card הפנימי בתוך הקרוסלה שיוצר את הריבוע */
-html body .product-popup .v-carousel-item .v-responsive__content .v-card {
-    background: transparent !important;
-    background-color: transparent !important;
-    box-shadow: none !important;
-    border: none !important;
-    padding: 0 !important;
-    elevation: 0 !important;
-}
-html body .product-popup .v-carousel-item .v-responsive__content .v-card .v-card__loader {
-    display: none !important;
-}
-html body .product-popup .v-carousel-item .v-responsive__content .v-card .v-card__underlay {
-    display: none !important;
-}
-/* דריסת variant-elevated שמוסיף רקע לבן */
-html body .product-popup .v-carousel-item .v-card--variant-elevated {
-    background: transparent !important;
-    box-shadow: none !important;
-    --v-theme-surface: transparent !important;
-}
-/* --- FIX 2 (רשימת התוספות) — הוחלף ע"י "חלק 22ט: MH Options" בסוף הקובץ (7.9.2026) --- */
-
 
 /* ==========================================================================
    חלק 23: עיצוב כירורגי לדף "הוספת כתובת" - Red & White Liquid Glass
@@ -6219,14 +5884,7 @@ html body main#MultiVendorSearch .tab-item-product h6.text-h6 {
    והעיגול/הריבוע מצוירים ב-CSS (הסימן של Hyperzod היה שחור ולא אדום). אין :hover במגע (hover:hover בלבד).
    ========================================================= */
 
-/* 1. הדר דביק — אטום, כדי שהתוכן שנגלל מתחתיו לא "ייחתך" דרכו */
-html body .product-popup .v-card-title {
-    background: rgba(255, 255, 255, 0.96) !important;
-    backdrop-filter: blur(14px) !important;
-    -webkit-backdrop-filter: blur(14px) !important;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.06) !important;
-    min-height: 64px !important;
-}
+/* 1. ההדר הדביק — עבר ל-"חלק 22י: MH Product" (בעלים יחיד של ההדר) */
 
 /* 2. כותרת קבוצה + תג "נדרש" */
 html body .product-popup .addon-heading {
@@ -6410,3 +6068,286 @@ html body .product-popup .v-selection-control--disabled * {
     opacity: 1 !important;
 }
 /* mh-options-v1 */
+
+/* =========================================================
+   חלק 22י: דף מוצר (הפופאפ) — MH Product v1.0.0 | 2026-09-07 — Liquid Glass + אדום QLED
+   מחליף את כל חלקי 22א–22ח (שלד, הדר, זהות, טופס, פוטר, תמונה, סליידר, תיקונים) שהוסרו מהקובץ.
+   רשימת האופציות = חלק 22ט (MH Options) שלפני זה; רבעי הפיצה (mhq) לא נגעו.
+   סקופ: html body .product-popup בלבד. הבלוק הגנרי של ה-Bottom Sheet (חלק "Bottom Sheet" למעלה,
+   .v-bottom-sheet__content .v-card {padding:24px 20px}) זולג לפופאפ המוצר ומכווץ את ההדר — מנוטרל כאן
+   רק עבור .product-popup, בלי לגעת בחלוניות האחרות (סיכום הזמנה).
+   ========================================================= */
+
+/* 1. המעטפת — זכוכית נוזלית, בלי ריפוד (התוכן משתמש בריפוד משלו) */
+html body .v-bottom-sheet__content .v-card.product-popup,
+html body .product-popup {
+    background: rgba(255, 255, 255, 0.86) !important;
+    backdrop-filter: blur(40px) saturate(180%) !important;
+    -webkit-backdrop-filter: blur(40px) saturate(180%) !important;
+    border-radius: 30px 30px 0 0 !important;
+    border: 0 !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.7) !important;
+    box-shadow: 0 -18px 60px rgba(0, 0, 0, 0.14) !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    overflow: hidden !important;
+    display: flex !important;
+    flex-direction: column !important;
+}
+html body .product-popup .v-card__loader,
+html body .product-popup > .v-card__underlay { display: none !important; }
+
+/* 2. ההדר — רוחב מלא, זכוכית אטומה, כפתור חזרה QLED */
+html body .product-popup .v-card-title {
+    position: relative !important;
+    flex: 0 0 auto !important;
+    width: 100% !important;
+    min-height: 62px !important;
+    margin: 0 !important;
+    padding: 0 64px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background: rgba(255, 255, 255, 0.92) !important;
+    backdrop-filter: blur(16px) !important;
+    -webkit-backdrop-filter: blur(16px) !important;
+    border-bottom: 1px solid rgba(227, 30, 36, 0.12) !important;
+    border-radius: 0 !important;
+    overflow: visible !important;
+    z-index: 3 !important;
+}
+html body .product-popup .v-card-title .tw-text-black {
+    width: 100% !important;
+    text-align: center !important;
+    font-size: 17px !important;
+    font-weight: 800 !important;
+    color: #111111 !important;
+    line-height: 1.3 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+html body .product-popup .v-card-title button {
+    position: absolute !important;
+    left: 14px !important;
+    right: auto !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    width: 40px !important;
+    height: 40px !important;
+    min-width: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border-radius: 50% !important;
+    background: linear-gradient(135deg, #ff3b41 0%, #c8151b 100%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.35) !important;
+    box-shadow: 0 6px 16px rgba(227, 30, 36, 0.35) !important;
+    color: #ffffff !important;
+    transition: transform 0.15s ease, box-shadow 0.15s ease !important;
+}
+html body .product-popup .v-card-title button:active { transform: translateY(-50%) scale(0.94) !important; box-shadow: 0 3px 8px rgba(227, 30, 36, 0.3) !important; }
+html body .product-popup .v-card-title button .v-icon,
+html body .product-popup .v-card-title button svg,
+html body .product-popup .v-card-title button svg path { color: #ffffff !important; fill: #ffffff !important; }
+html body .product-popup .v-card-title button .v-btn__overlay,
+html body .product-popup .v-card-title button .v-btn__underlay { display: none !important; }
+
+/* 3. אזור הגלילה */
+html body .product-popup .v-card-text {
+    flex: 1 1 auto !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    background: transparent !important;
+    scrollbar-width: none !important;
+}
+html body .product-popup .v-card-text::-webkit-scrollbar { display: none !important; }
+
+/* 4. התמונה — קריסטל צף, ריבועית, בלי הריבוע הלבן של Vuetify */
+html body .product-popup .product-image-slider {
+    height: auto !important;
+    background: transparent !important;
+    margin: 14px 16px 0 !important;
+}
+html body .product-popup .v-window,
+html body .product-popup .v-window-item { height: auto !important; }
+html body .product-popup .v-carousel-item .v-card,
+html body .product-popup .v-carousel-item .v-card--variant-elevated,
+html body .product-popup .v-carousel-item .v-responsive__content .v-card {
+    background: transparent !important;
+    --v-theme-surface: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    aspect-ratio: unset !important;
+}
+html body .product-popup .v-carousel-item .v-card__loader,
+html body .product-popup .v-carousel-item .v-card__underlay { display: none !important; }
+html body .product-popup .v-carousel-item .v-img.image {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    border-radius: 22px !important;
+    border: 1px solid rgba(255, 255, 255, 0.6) !important;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.10) !important;
+    overflow: hidden !important;
+    background: #f3f4f6 !important;
+}
+html body .product-popup .v-carousel-item .v-img.image .v-responsive__sizer { display: block !important; padding-bottom: 100% !important; }
+html body .product-popup .v-carousel-item .v-img.image .v-img__img { opacity: 1 !important; visibility: visible !important; object-fit: cover !important; }
+html body .product-popup .v-carousel__controls {
+    background: rgba(255, 255, 255, 0.35) !important;
+    backdrop-filter: blur(6px) !important;
+    -webkit-backdrop-filter: blur(6px) !important;
+    border-radius: 20px !important;
+    height: 36px !important;
+    bottom: 14px !important;
+}
+html body .product-popup .v-carousel__controls .v-btn--active { color: #e31e24 !important; }
+
+/* 5. זהות המוצר — קטגוריה כתג, שם גדול, מחיר אדום QLED, תיאור */
+html body .product-popup #productInfo {
+    text-align: right !important;
+    padding: 18px 18px 6px !important;
+}
+html body .product-popup .product-category-name {
+    display: inline-block !important;
+    background: rgba(227, 30, 36, 0.10) !important;
+    color: #c8151b !important;
+    font-size: 11px !important;
+    font-weight: 800 !important;
+    letter-spacing: 0.2px !important;
+    text-transform: none !important;
+    padding: 3px 10px !important;
+    border-radius: 999px !important;
+    margin: 0 0 8px !important;
+    opacity: 1 !important;
+}
+html body .product-popup .product-name {
+    font-size: 24px !important;
+    font-weight: 900 !important;
+    color: #111111 !important;
+    line-height: 1.2 !important;
+    letter-spacing: -0.3px !important;
+    margin: 0 0 6px !important;
+}
+html body .product-popup .product-price {
+    display: inline-block !important;
+    font-size: 24px !important;
+    font-weight: 900 !important;
+    line-height: 1.2 !important;
+    margin: 4px 0 6px !important;
+    color: #e31e24 !important;
+    background: linear-gradient(135deg, #ff3b41 0%, #c8151b 100%) !important;
+    -webkit-background-clip: text !important;
+    background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    text-shadow: 0 6px 18px rgba(227, 30, 36, 0.18) !important;
+}
+html body .product-popup .product-description {
+    color: #555555 !important;
+    font-size: 14px !important;
+    line-height: 1.55 !important;
+    font-weight: 500 !important;
+    margin: 6px 0 0 !important;
+}
+html body .product-popup hr.v-divider {
+    margin: 12px 18px 0 !important;
+    border-color: rgba(227, 30, 36, 0.10) !important;
+    opacity: 1 !important;
+}
+
+/* 6. הטופס — שקוף (רקע ה-#F6F6F6 של Hyperzod חונק את הזכוכית) */
+html body .product-popup #ProductPopupForm,
+html body .product-popup .scheme-product-options-surface,
+html body .product-popup .tw-bg-\[\#F6F6F6\] {
+    background: transparent !important;
+    background-color: transparent !important;
+    box-shadow: none !important;
+}
+
+/* 7. כפתור "להראות יותר" — קפסולת זכוכית עם מסגרת אדומה */
+html body .product-popup button.text-primary.tw-ms-3 {
+    display: flex !important;
+    position: relative !important;
+    margin: 22px auto 6px !important;
+    left: 0 !important;
+    right: 0 !important;
+    width: fit-content !important;
+    min-width: 170px !important;
+    height: 42px !important;
+    background: rgba(255, 255, 255, 0.85) !important;
+    backdrop-filter: blur(20px) !important;
+    -webkit-backdrop-filter: blur(20px) !important;
+    border: 1.2px solid #e31e24 !important;
+    border-radius: 999px !important;
+    color: #e31e24 !important;
+    box-shadow: 0 8px 22px rgba(227, 30, 36, 0.14) !important;
+}
+html body .product-popup button.text-primary.tw-ms-3 .v-btn__content { font-weight: 800 !important; font-size: 15px !important; }
+
+/* 8. הפוטר — הוספה לסל (QLED) + מונה (קריסטל) */
+html body .product-popup .v-card-actions,
+html body .product-popup #add_to_cart_hide_from_mobile_app {
+    flex: 0 0 auto !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+    margin: 0 !important;
+    padding: 12px 16px calc(14px + env(safe-area-inset-bottom, 0px)) !important;
+    background: rgba(255, 255, 255, 0.92) !important;
+    backdrop-filter: blur(18px) !important;
+    -webkit-backdrop-filter: blur(18px) !important;
+    border-top: 1px solid rgba(227, 30, 36, 0.10) !important;
+    min-height: 0 !important;
+}
+html body .product-popup .v-card-actions button.add-btn,
+html body .product-popup #add_to_cart_hide_from_mobile_app button.add-btn {
+    flex: 1 1 auto !important;
+    height: 56px !important;
+    min-height: 56px !important;
+    border-radius: 16px !important;
+    background: linear-gradient(135deg, #ff3b41 0%, #c8151b 100%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.25) !important;
+    color: #ffffff !important;
+    box-shadow: 0 10px 26px rgba(227, 30, 36, 0.32) !important;
+    font-size: 17px !important;
+    font-weight: 900 !important;
+    letter-spacing: 0.2px !important;
+    transition: transform 0.15s ease, box-shadow 0.15s ease !important;
+}
+html body .product-popup .v-card-actions button.add-btn *,
+html body .product-popup #add_to_cart_hide_from_mobile_app button.add-btn * { color: #ffffff !important; }
+html body .product-popup .v-card-actions button.add-btn:active,
+html body .product-popup #add_to_cart_hide_from_mobile_app button.add-btn:active { transform: scale(0.97) !important; box-shadow: 0 4px 12px rgba(227, 30, 36, 0.25) !important; }
+html body .product-popup .v-card-actions button.add-btn .v-btn__overlay,
+html body .product-popup .v-card-actions button.add-btn .v-btn__underlay { display: none !important; }
+html body .product-popup .product-quantity-control,
+html body .product-popup #add_to_cart_hide_from_mobile_app .tw-flex-none.tw-border {
+    flex: 0 0 auto !important;
+    height: 56px !important;
+    width: 128px !important;
+    border-radius: 16px !important;
+    background: rgba(255, 255, 255, 0.6) !important;
+    backdrop-filter: blur(10px) !important;
+    -webkit-backdrop-filter: blur(10px) !important;
+    border: 1px solid rgba(0, 0, 0, 0.08) !important;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.03) !important;
+    overflow: hidden !important;
+}
+html body .product-popup .decrement-btn,
+html body .product-popup .increment-btn {
+    color: #e31e24 !important;
+    font-weight: 900 !important;
+    font-size: 24px !important;
+    background: transparent !important;
+    min-width: 40px !important;
+}
+html body .product-popup input#quantity {
+    color: #111111 !important;
+    font-weight: 900 !important;
+    font-size: 18px !important;
+    background: transparent !important;
+    text-align: center !important;
+}
+html body .product-popup #add_to_cart_hide_from_mobile_app .v-field__overlay,
+html body .product-popup #add_to_cart_hide_from_mobile_app .v-field__outline { display: none !important; }
+/* mh-product-v1 */
