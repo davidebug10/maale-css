@@ -6166,6 +6166,15 @@ html body .product-popup .product-image-slider {
     height: auto !important;
     background: transparent !important;
     margin: 14px 16px 0 !important;
+    /* Vuetify נותנת לקרוסלה רוחב מלא של החלון — עם השוליים היא גלשה 16px מעבר לקצה (QA חי 7.9) */
+    width: auto !important;
+    max-width: none !important;
+}
+html body .product-popup .product-image-slider .v-window__container,
+html body .product-popup .product-image-slider .v-window-item,
+html body .product-popup .product-image-slider .v-window-item > .v-responsive {
+    width: 100% !important;
+    max-width: 100% !important;
 }
 html body .product-popup .v-window,
 html body .product-popup .v-window-item { height: auto !important; }
