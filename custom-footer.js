@@ -2689,3 +2689,42 @@ log('פעיל');
   } catch (e) { console.warn('[MH Search] disabled:', e); }
   window.MH_SEARCH = { version: VERSION, sync: sync, stats: function () { return Object.assign({}, stats); } };
 })();
+
+/* ============================================================
+   אופציות בפופאפ המוצר — MH Options  |  v1.0.0 | 2026-09-07
+   מסמן mh-opt-on על שורת אופציה (.v-list-item) שהרדיו/צ'קבוקס שלה מסומן. הסיבה: Safari ב-iOS לא
+   מרענן :has(input:checked) כש-Vue מחליף את הבחירה — המסגרת האדומה נשארה על אופציה אחת והנקודה
+   על אחרת. ה-CSS (חלק 22ט ב-global-cdn.css) נשען על המחלקה הזאת ועל .v-selection-control--dirty.
+   נכשל-פתוח: בלי הבלוק הזה ה-CSS עדיין עובד לפי המחלקה של Vuetify. בדיקה: window.MH_OPTIONS.stats()
+   ============================================================ */
+(function () {
+  'use strict';
+  if (window.__MH_OPTIONS__) { return; }
+  window.__MH_OPTIONS__ = true;
+  var VERSION = '1.0.0';
+  var stats = { version: VERSION, syncs: 0, marked: 0 };
+  function sync() {
+    var rows = document.querySelectorAll('.product-popup .scheme-product-options-card .v-list-item');
+    var n = 0;
+    for (var i = 0; i < rows.length; i++) {
+      var r = rows[i];
+      var on = !!r.querySelector('.v-selection-control--dirty, input:checked');
+      if (r.classList.contains('mh-opt-on') !== on) r.classList.toggle('mh-opt-on', on);
+      if (on) n++;
+    }
+    stats.syncs++; stats.marked = n;
+    return rows.length;
+  }
+  var pending = false;
+  function schedule() {
+    if (pending) return; pending = true;
+    setTimeout(function () { pending = false; try { sync(); } catch (e) { /* נכשל-פתוח */ } }, 30);
+  }
+  try {
+    new MutationObserver(schedule).observe(document.documentElement, { subtree: true, childList: true, attributes: true, attributeFilter: ['class', 'checked'] });
+    document.addEventListener('change', schedule, true);
+    document.addEventListener('click', schedule, true);
+    schedule();
+  } catch (e) { console.warn('[MH Options] disabled:', e); }
+  window.MH_OPTIONS = { version: VERSION, sync: sync, stats: function () { return Object.assign({}, stats); } };
+})();
