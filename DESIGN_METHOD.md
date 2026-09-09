@@ -143,6 +143,13 @@ curl -s <vendor url> -o tools/hz/vendor.css; curl -s <index url> -o tools/hz/ind
 ### 5.5 `which-rule.mjs` — מי מנצח
 `node --experimental-websocket tools/which-rule.mjs "<url>" "<selector>" "background-color,border-radius" [--mobile]` — מדפיס את כל הכללים (מכל הגיליונות, כולל @import) שתופסים את האלמנט לפי סדר, עם `!important`, ואת הערך המחושב. זה הכלי לפני שמוחקים/מחליפים בלוק.
 
+### 5.7 סרטון הירו — המרה לפני שמעלים לריפו
+כלי הווידאו של דוד (Seedance וכד') מוציאים **HEVC** עם `moov` בסוף הקובץ ובגודל 30MB+. HEVC לא מתנגן בכרום/אנדרואיד, ו-`moov` בסוף מונע התחלת נגינה לפני הורדה מלאה. אין `ffmpeg` במכונה — משתמשים ב-`avconvert` המובנה של macOS (H.264 + fast-start כברירת מחדל):
+```bash
+avconvert --source in.mp4 --preset Preset1920x1080 --output <business>-hero.mp4 --replace
+```
+בדיקה שהיציאה תקינה: סדר התיבות חייב להיות `ftyp, moov, mdat` (moov לפני mdat), והקודק `avc1` ולא `hvc1`. 30MB HEVC → ~9.6MB H.264 (מחניודה, 9.9.2026).
+
 ### 5.6 מה **לא** עובד
 - **Chrome MCP** (הדפדפן של דוד): לא פותח localhost; חותך פלט (~1500 תווים); חוסם פלט עם `?`, `=`, `&`, base64 ו-URL (להחליף ל-`＝` וכד' לפני return); כשחלון הכרום של דוד ברקע הטאב **קפוא**: קוד סינכרוני רץ, אבל promises, XHR, לחיצות אמיתיות וצילומי מסך לא. לכן: למידה ובדיקות ב-Chrome ללא ראש; הדפדפן של דוד רק כשהוא פתוח ומול העיניים (למשל Search Console, צ'ק-אאוט עם החשבון שלו).
 - `pdftoppm` לא מותקן → PDF קוראים עם PyMuPDF ב-venv (`python3 -m venv .venv && .venv/bin/pip install pymupdf`), או פותחים ב-Chrome ללא ראש (`file://…pdf`) ומצלמים.
@@ -204,6 +211,7 @@ curl -s <vendor url> -o tools/hz/vendor.css; curl -s <index url> -o tools/hz/ind
 | transition + מדידה מיידית | ערכי צבע באמצע מעבר | להמתין 300–450ms במדידה |
 | טאב ברקע בכרום של דוד | כלום לא זז, צילומים נכשלים | Chrome ללא ראש; לבקש מדוד לפתוח את החלון |
 | GitHub Pages cache | דוד רואה גרסה ישנה | לסגור ולפתוח את האפליקציה; לבדוק ב-curl עם הסמן |
+| סרטון הירו כמו שהוא מהטלפון/AI | הירו שחור באנדרואיד, או נטען שניות ארוכות | להמיר ל-H.264 עם fast-start (ראה 5.7). כלי AI מייצרים HEVC עם `moov` בסוף הקובץ |
 | רוחב `100vw` של קרוסלת התמונה | תמונה גולשת 16px מהקצה | `width:auto` על `.product-image-slider` |
 | `line-clamp` של Hyperzod | שמות ארוכים נחתכים | `-webkit-line-clamp: unset` בסקופ |
 | `[TRUNCATED]`/`{}` מה-MCP | פלט ארוך/אסינכרוני | לשמור ב-`window.__rep` ולקרוא בפרוסות |
