@@ -45,7 +45,9 @@
 
 ### 1.2 בלוקי ה-JS ב-`custom-footer.js`
 
-כל בלוק: IIFE, `'use strict'`, שומר ריצה-אחת (`window.__MH_X__`), נכשל-פתוח (try/catch, בלי לזרוק), חושף `window.MH_X = { version, stats() }` לבדיקות. רשימה: בחירת ישראל בכתובת · MH-ZONE (אזור משלוח) · MH Preorder (הזמנה מראש) · MH SEO · Pizza Quarters (`__mhq`) · MH Pay (סימון אמצעי תשלום נבחר) · MH PayIntent (מילוי country בבקשת התשלום) · MH Pay NoPreselect (ביטול סימון אוטומטי של אמצעי התשלום האחרון) · MH Search (טקסטים בדף החיפוש) · MH Options (`mh-opt-on` על אופציה נבחרת) · MH CatNav (`swiper.update()`).
+כל בלוק: IIFE, `'use strict'`, שומר ריצה-אחת (`window.__MH_X__`), נכשל-פתוח (try/catch, בלי לזרוק), חושף `window.MH_X = { version, stats() }` לבדיקות. רשימה: בחירת ישראל בכתובת · MH-ZONE (אזור משלוח) · MH Preorder (הזמנה מראש) · MH SEO · Pizza Quarters (`__mhq`) · MH Pay (סימון אמצעי תשלום נבחר) · MH PayIntent (מילוי country בבקשת התשלום) · MH Pay NoPreselect (ביטול סימון אוטומטי של אמצעי התשלום האחרון) · MH Search (טקסטים בדף החיפוש) · MH Options (`mh-opt-on` על אופציה נבחרת) · MH CatNav (`swiper.update()`) · MH AgeGate (`window.MH_AGEGATE`, שער 18+ לקטגוריות בשם המדויק "אלכוהול"/"סיגריות"; v1.1.1 9.9).
+
+**מלכודת (9.9):** כל בלוק הוא IIFE נפרד — פונקציה של בלוק אחד (למשל `pizzaRoot` של רבעי הפיצה) לא נגישה מבלוק אחר; קריאה כזו נכשלת רק בזמן הלחיצה (ReferenceError שקט), `node --check` לא תופס. השער 18+ היה שבור מ-1.9 עד 9.9 מהסיבה הזאת. לכן: בדיקה חיה של הוספה **מהכרטיס** (רשת + קרוסלה) **וגם מהפופאפ** אחרי כל שינוי בפוטר (`scratchpad/10bis/gate/live-test.mjs` כתבנית), ובכל בלוק `try/catch` סביב הלוגיקה של המאזין.
 
 ---
 
