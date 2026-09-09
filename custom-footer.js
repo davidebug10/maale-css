@@ -822,12 +822,15 @@
 })();
 
 /* =========================================================
-   אישור גיל 18+ בהוספה לעגלה (אלכוהול / סיגריות) | 2026-07-25
+   אישור גיל 18+ בהוספה לעגלה (אלכוהול / סיגריות) — MH AgeGate v1.1.0 | 2026-07-25, עדכון 2026-09-09
    - תופס לחיצה על button.add-btn בשלב ה-capture (לפני Vue)
-   - מזהה קטגוריה: .product-category-name בפופאפ מוצר,
-     או h3.category-name בתוך .special-listing-inner ברשימה
+   - מזהה קטגוריה: .product-category-name בפופאפ מוצר; ברשימה — כותרת הסקשן
+     (.special-listing-inner / .cat-item): ה-h3 הראשון שאינו בתוך כרטיס מוצר.
+     (v1.1.0, דוד 9.9: Hyperzod הסירה את h3.category-name מכותרת הסקשן — נשאר רק בסרגל
+     הקטגוריות — ולכן "הוספה" מהכרטיס ברשת/בקרוסלה עקפה את השער. אומת חי במחניודה.)
    - חוסם רק אם שם הקטגוריה הוא בדיוק "אלכוהול" או "סיגריות"
    - אחרי אישור: נשמר ב-sessionStorage ומופעל click חוזר על הכפתור
+   - בדיקה: window.MH_AGEGATE.categoryOf(button) / .stats()
    ========================================================= */
 (function () {
     'use strict';
@@ -848,16 +851,24 @@
         document.head.appendChild(st);
     }
 
+    var stats = { version: '1.1.0', checked: 0, gated: 0 };
     function categoryOf(target) {
         var popup = target.closest('.product-popup') || pizzaRoot();
         if (popup) {
             var c = popup.querySelector('.product-category-name');
             return c ? c.textContent.trim() : null;
         }
-        var section = target.closest('.special-listing-inner');
-        if (section) {
-            var h = section.querySelector('h3.category-name');
-            return h ? h.textContent.trim() : null;
+        var section = target.closest('.special-listing-inner, .cat-item, [id^="cat_"]');
+        if (!section) { return null; }
+        var legacy = section.querySelector('h3.category-name');
+        if (legacy) { return legacy.textContent.trim(); }
+        // כותרת הסקשן = ה-h3/h2 הראשון שאינו שם מוצר בתוך כרטיס
+        var hs = section.querySelectorAll('h3, h2');
+        for (var i = 0; i < hs.length; i++) {
+            var h = hs[i];
+            if (h.closest('.v-card') || h.classList.contains('product-name')) { continue; }
+            var t = h.textContent.trim();
+            if (t) { return t; }
         }
         return null;
     }
@@ -898,12 +909,16 @@
         var btn = e.target.closest('button.add-btn');
         if (!btn) { return; }
         var cat = categoryOf(e.target);
+        stats.checked++;
         if (!cat || RESTRICTED.indexOf(cat) === -1) { return; }
+        stats.gated++;
         e.preventDefault();
         e.stopPropagation();
         e.stopImmediatePropagation();
         showGate(btn);
     }, true);
+    window.MH_AGEGATE = { version: stats.version, categoryOf: categoryOf, stats: function () { return { version: stats.version, checked: stats.checked, gated: stats.gated }; } };
+    /* mh-agegate-v1.1.0 */
 })();
 
 /* ============================================================================
