@@ -2661,7 +2661,7 @@ log('פעיל');
   'use strict';
   if (window.__MH_PAY_NOSEL__) { return; }
   window.__MH_PAY_NOSEL__ = true;
-  var VERSION = '1.1.1';
+  var VERSION = '1.1.2';
   var stats = { version: VERSION, cleared: false, hadRecent: null, tries: 0 };
   function store() {
     try { var app = document.querySelector('#app'); return app && app.__vue_app__ && app.__vue_app__.config.globalProperties.$store; } catch (e) { return null; }
@@ -2828,7 +2828,7 @@ log('פעיל');
 })();
 
 /* ============================================================
-   מפת הקטגוריות בדף העסק — MH CatMap  |  v1.1.1 | 2026-09-09
+   מפת הקטגוריות בדף העסק — MH CatMap  |  v1.1.2 | 2026-09-09
    הבעיה: בחנות עם הרבה קטגוריות (גואה 15, מחניודה 14) סרגל הגלולות האופקי
    ארוך פי 4.9 מרוחב המסך — כ-7 החלקות אצבע כדי להגיע לקטגוריה האחרונה.
    הפתרון: כפתור צמוד לקצה הסרגל שפותח רשימה אנכית של כל הקטגוריות.
@@ -2845,7 +2845,7 @@ log('פעיל');
   if (window.__MH_CATMAP__) { return; }
   window.__MH_CATMAP__ = true;
 
-  var VERSION = '1.1.1';
+  var VERSION = '1.1.2';
   var MIN_CATS = 8;                 /* מתחת לזה הסרגל האופקי נוח ממילא */
   var BTN_ID = 'mh-catmap-btn';
   var SHEET_ID = 'mh-catmap';
@@ -2958,6 +2958,14 @@ log('פעיל');
              לולאת אנימציה שמבטלת כל scrollTo חלק (נמדד חי — גלילה חלקה נשארה על 0,
              גלילה מיידית עבדה). חוץ מזה, אנימציה על 25,000px היא ממילא מעצבנת. */
           sc.scrollTop = sc.scrollTop + delta;
+          /* אחרי קפיצה של עשרות אלפי פיקסלים תמונות עצלות נטענות ומזיזות את הפריסה,
+             והיעד "בורח". תיקון אחד, פעם אחת — לא לולאה. */
+          setTimeout(function () {
+            try {
+              var d2 = el.getBoundingClientRect().top - stickyBottom();
+              if (Math.abs(d2) > 40) { sc.scrollTop = sc.scrollTop + d2; }
+            } catch (e2) {}
+          }, 260);
         } catch (e) {}
       }, 500);
     }, 210);
