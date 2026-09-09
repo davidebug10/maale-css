@@ -822,13 +822,21 @@
 })();
 
 /* =========================================================
-   אישור גיל 18+ בהוספה לעגלה (אלכוהול / סיגריות) — MH AgeGate v1.1.1 | 2026-07-25, עדכון 2026-09-09
+   אישור גיל 18+ בהוספה לעגלה — MH AgeGate v1.2.0 | 2026-07-25, עדכון 2026-09-09
    - תופס לחיצה על button.add-btn בשלב ה-capture (לפני Vue)
    - מזהה קטגוריה: .product-category-name בפופאפ מוצר; ברשימה — כותרת הסקשן
      (.special-listing-inner / .cat-item): ה-h3 הראשון שאינו בתוך כרטיס מוצר.
      (v1.1.0, דוד 9.9: Hyperzod הסירה את h3.category-name מכותרת הסקשן — נשאר רק בסרגל
      הקטגוריות — ולכן "הוספה" מהכרטיס ברשת/בקרוסלה עקפה את השער. אומת חי במחניודה.)
-   - חוסם רק אם שם הקטגוריה הוא בדיוק "אלכוהול" או "סיגריות"
+   - שתי דרכים לחסום, שתיהן מצומצמות בכוונה:
+     (א) שם קטגוריה מדויק מתוך RESTRICTED (התאמה מלאה, לא הכלה) — עובד בכל דף,
+         כולל דף החיפוש שבו אין מזהה חנות ב-URL.
+     (ב) חנות שכל המלאי בה 18+ — לפי מזהה החנות ב-URL בלבד (AGE_MERCHANTS).
+         זה שורד שינוי שמות קטגוריות אצל המסעדן, ואינו יכול לדלוף לחנות אחרת
+         כי הוא נעול על מזהה מפורש.
+   - v1.2.0 (9.9, אישור דוד): גואה נפתחה עם 15 קטגוריות עישון/אידוי ורק "סיגריות"
+     נחסמה — 14 עקפו את השער. נוספו שמות הקטגוריות של גואה, ובנוסף גואה סומנה
+     כחנות 18+ שלמה. נבדק שאף שם חדש אינו קיים באף אחת מ-11 החנויות האחרות.
    - אחרי אישור: נשמר ב-sessionStorage ומופעל click חוזר על הכפתור
    - בדיקה: window.MH_AGEGATE.categoryOf(button) / .stats()
    ========================================================= */
@@ -838,7 +846,20 @@
     if (window.__mhAgeGateInit) { return; }
     window.__mhAgeGateInit = true;
 
-    var RESTRICTED = ['אלכוהול', 'סיגריות'];
+    /* שמות קטגוריה מדויקים (===, לא indexOf על הטקסט). נבדק 9.9.2026 מול כל 11 החנויות
+       בפלטפורמה: אף אחד מהשמות האלה לא קיים בחנות אחרת, ולכן אין סיכון לחסימה מיותרת. */
+    var RESTRICTED = [
+        'אלכוהול', 'סיגריות',
+        /* גואה (כיכר יהלום 5) — נוספו 9.9.2026 */
+        'סיגריות חד פעמיות', 'מכשירי אידוי', 'נוזלים לאידוי', 'פודים וסלילים',
+        'טבק לגלגול', 'נלווים לעישון', 'ניירות גלגול ופילטרים',
+        'פאקטים - סיגריות', 'פאקטים - טבק',
+        'תערובות לנרגילה', 'נרגילות', 'גחלים לנרגילה', 'אביזרים לנרגילה',
+        'הפינה הירוקה'
+    ];
+    /* חנויות שכל המלאי בהן 18+. חסימה לפי מזהה החנות ב-URL בלבד — סקופ נעול,
+       לא נוגע בשום חנות אחרת גם אם שמות הקטגוריות ישתנו. */
+    var AGE_MERCHANTS = ['6aa076d67a4248e3ff053582']; /* גואה */
     var KEY = 'mhAgeOK';
     var STYLE_ID = 'mh-age-style';
     var GATE_ID = 'mh-age-gate';
@@ -851,7 +872,12 @@
         document.head.appendChild(st);
     }
 
-    var stats = { version: '1.1.1', checked: 0, gated: 0 };
+    var stats = { version: '1.2.0', checked: 0, gated: 0, byMerchant: 0, byCategory: 0 };
+    /* /he/m/<slug>/<merchantId> — מחזיר true רק אם המזהה נמצא ברשימה המפורשת */
+    function onAgeMerchant() {
+        var m = String(location.pathname).match(/\/m\/[^/]+\/([0-9a-fA-F]{16,})/);
+        return !!(m && AGE_MERCHANTS.indexOf(m[1]) !== -1);
+    }
     // עמוד מוצר עצמאי (/product/ ב-URL, בלי .product-popup): השורש הוא #app — אותה לוגיקה כמו
     // pizzaRoot בבלוק רבעי הפיצה. v1.1.1 (9.9): הבלוק קרא ל-pizzaRoot שמוגדרת בסגור אחר → ReferenceError
     // בכל לחיצה מהכרטיס מאז 1.9 — זה מה ששבר את השער ברשימה (הפופאפ עבד כי ה-|| לא הגיע לקריאה).
@@ -917,15 +943,26 @@
         if (!btn) { return; }
         var cat = categoryOf(e.target);
         stats.checked++;
-        if (!cat || RESTRICTED.indexOf(cat) === -1) { return; }
+        var byMerchant = onAgeMerchant();
+        var byCategory = !!cat && RESTRICTED.indexOf(cat) !== -1;
+        if (!byMerchant && !byCategory) { return; }
         stats.gated++;
+        if (byMerchant) { stats.byMerchant++; }
+        if (byCategory) { stats.byCategory++; }
         e.preventDefault();
         e.stopPropagation();
         e.stopImmediatePropagation();
         showGate(btn);
     }, true);
-    window.MH_AGEGATE = { version: stats.version, categoryOf: categoryOf, stats: function () { return { version: stats.version, checked: stats.checked, gated: stats.gated }; } };
-    /* mh-agegate-v1.1.1 */
+    window.MH_AGEGATE = {
+        version: stats.version,
+        categoryOf: categoryOf,
+        onAgeMerchant: onAgeMerchant,
+        restricted: RESTRICTED.slice(),
+        ageMerchants: AGE_MERCHANTS.slice(),
+        stats: function () { return { version: stats.version, checked: stats.checked, gated: stats.gated, byMerchant: stats.byMerchant, byCategory: stats.byCategory }; }
+    };
+    /* mh-agegate-v1.2.0 */
 })();
 
 /* ============================================================================
