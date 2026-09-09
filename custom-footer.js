@@ -2854,9 +2854,11 @@ log('פעיל');
   function links() {
     return [].slice.call(document.querySelectorAll('#ProductCategoriesSlider a.scrollactive-item'));
   }
+  /* vue-scrollactive לא מסמן שום קטגוריה כשהדף בראשו — במצב הזה הקטגוריה
+     הנוכחית היא הראשונה, ולכן נופלים אליה במקום להשאיר את הרשימה בלי הדגשה. */
   function activeIndex(ls) {
     for (var i = 0; i < ls.length; i++) { if (ls[i].classList.contains('is-active')) { return i; } }
-    return -1;
+    return ls.length ? 0 : -1;
   }
 
   /* ---------- הגיליון ---------- */
