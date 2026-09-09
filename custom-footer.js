@@ -822,7 +822,7 @@
 })();
 
 /* =========================================================
-   אישור גיל 18+ בהוספה לעגלה (אלכוהול / סיגריות) — MH AgeGate v1.1.0 | 2026-07-25, עדכון 2026-09-09
+   אישור גיל 18+ בהוספה לעגלה (אלכוהול / סיגריות) — MH AgeGate v1.1.1 | 2026-07-25, עדכון 2026-09-09
    - תופס לחיצה על button.add-btn בשלב ה-capture (לפני Vue)
    - מזהה קטגוריה: .product-category-name בפופאפ מוצר; ברשימה — כותרת הסקשן
      (.special-listing-inner / .cat-item): ה-h3 הראשון שאינו בתוך כרטיס מוצר.
@@ -851,9 +851,16 @@
         document.head.appendChild(st);
     }
 
-    var stats = { version: '1.1.0', checked: 0, gated: 0 };
+    var stats = { version: '1.1.1', checked: 0, gated: 0 };
+    // עמוד מוצר עצמאי (/product/ ב-URL, בלי .product-popup): השורש הוא #app — אותה לוגיקה כמו
+    // pizzaRoot בבלוק רבעי הפיצה. v1.1.1 (9.9): הבלוק קרא ל-pizzaRoot שמוגדרת בסגור אחר → ReferenceError
+    // בכל לחיצה מהכרטיס מאז 1.9 — זה מה ששבר את השער ברשימה (הפופאפ עבד כי ה-|| לא הגיע לקריאה).
+    function productPageRoot() {
+        if (!/\/product\//.test(location.pathname)) { return null; }
+        return document.querySelector('#app') || document.querySelector('.v-application');
+    }
     function categoryOf(target) {
-        var popup = target.closest('.product-popup') || pizzaRoot();
+        var popup = target.closest('.product-popup') || productPageRoot();
         if (popup) {
             var c = popup.querySelector('.product-category-name');
             return c ? c.textContent.trim() : null;
@@ -918,7 +925,7 @@
         showGate(btn);
     }, true);
     window.MH_AGEGATE = { version: stats.version, categoryOf: categoryOf, stats: function () { return { version: stats.version, checked: stats.checked, gated: stats.gated }; } };
-    /* mh-agegate-v1.1.0 */
+    /* mh-agegate-v1.1.1 */
 })();
 
 /* ============================================================================
