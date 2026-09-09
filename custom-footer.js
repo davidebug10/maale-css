@@ -2826,3 +2826,185 @@ log('פעיל');
   } catch (e) { console.warn('[MH CatNav] disabled:', e); }
   window.MH_CATNAV = { version: VERSION, update: update, stats: function () { return Object.assign({}, stats); } };
 })();
+
+/* ============================================================
+   מפת הקטגוריות בדף העסק — MH CatMap  |  v1.0.0 | 2026-09-09
+   הבעיה: בחנות עם הרבה קטגוריות (גואה 15, מחניודה 14) סרגל הגלולות האופקי
+   ארוך פי 4.9 מרוחב המסך — כ-7 החלקות אצבע כדי להגיע לקטגוריה האחרונה.
+   הפתרון: כפתור צמוד לקצה הסרגל שפותח רשימה אנכית של כל הקטגוריות.
+   הניווט עצמו מואצל ללינק המקורי (a.scrollactive-item.click()) — אנחנו לא
+   גוללים בעצמנו, כדי לא להתנגש ב-vue-scrollactive.
+   למה אין "גרירה על הסרגל כדי לגלול": הרשימה עצמה נגללת (15 שורות > גובה המסך),
+   ואותה תנועת אצבע לא יכולה גם לגלול את הרשימה וגם לגרור את הדף. לחיצה = קפיצה.
+   מופיע רק מ-8 קטגוריות ומעלה; בחנויות קטנות (בנ'ס 6) שום דבר לא משתנה.
+   נכשל-פתוח: כל שגיאה → הסרגל נשאר כפי שהוא.
+   בדיקה: window.MH_CATMAP.stats() / .open() / .close()
+   ============================================================ */
+(function () {
+  'use strict';
+  if (window.__MH_CATMAP__) { return; }
+  window.__MH_CATMAP__ = true;
+
+  var VERSION = '1.0.0';
+  var MIN_CATS = 8;                 /* מתחת לזה הסרגל האופקי נוח ממילא */
+  var BTN_ID = 'mh-catmap-btn';
+  var SHEET_ID = 'mh-catmap';
+  var stats = { version: VERSION, built: 0, opens: 0, jumps: 0, cats: 0 };
+
+  function links() {
+    return [].slice.call(document.querySelectorAll('#ProductCategoriesSlider a.scrollactive-item'));
+  }
+  function activeIndex(ls) {
+    for (var i = 0; i < ls.length; i++) { if (ls[i].classList.contains('is-active')) { return i; } }
+    return -1;
+  }
+
+  /* ---------- הגיליון ---------- */
+  var sheet = null, rowsEl = null, rows = [];
+
+  function buildSheet(ls) {
+    var ov = document.createElement('div');
+    ov.id = SHEET_ID;
+    ov.setAttribute('role', 'dialog');
+    ov.setAttribute('aria-modal', 'true');
+    ov.setAttribute('aria-label', 'מפת הקטגוריות');
+    var html = '<div class="mh-cm-scrim"></div><div class="mh-cm-panel">' +
+      '<div class="mh-cm-grip"></div>' +
+      '<div class="mh-cm-head"><span class="mh-cm-title">לאן קופצים?</span>' +
+      '<span class="mh-cm-count">' + ls.length + ' קטגוריות</span>' +
+      '<button type="button" class="mh-cm-x" aria-label="סגירה">✕</button></div>' +
+      '<div class="mh-cm-rows" role="list">';
+    for (var i = 0; i < ls.length; i++) {
+      html += '<button type="button" class="mh-cm-row" role="listitem" data-i="' + i + '">' +
+        '<span class="mh-cm-n">' + (i + 1) + '</span>' +
+        '<span class="mh-cm-t"></span></button>';
+    }
+    html += '</div></div>';
+    ov.innerHTML = html;
+    document.body.appendChild(ov);
+    rowsEl = ov.querySelector('.mh-cm-rows');
+    rows = [].slice.call(ov.querySelectorAll('.mh-cm-row'));
+    for (var j = 0; j < rows.length; j++) { rows[j].querySelector('.mh-cm-t').textContent = ls[j].textContent.trim(); }
+
+    ov.querySelector('.mh-cm-scrim').addEventListener('click', close);
+    ov.querySelector('.mh-cm-x').addEventListener('click', close);
+
+    /* לחיצה = קפיצה. הניווט עצמו של Hyperzod. */
+    rowsEl.addEventListener('click', function (e) {
+      var row = e.target.closest ? e.target.closest('.mh-cm-row') : null;
+      if (!row) { return; }
+      jump(parseInt(row.getAttribute('data-i'), 10));
+    });
+
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && sheet && sheet.classList.contains('on')) { close(); }
+    });
+    stats.built++;
+    return ov;
+  }
+
+  /* מדגיש שורה אחת בלבד */
+  function mark(idx) {
+    for (var i = 0; i < rows.length; i++) {
+      var on = (i === idx);
+      if (rows[i].classList.contains('on') !== on) {
+        rows[i].classList.toggle('on', on);
+        /* הדגשה ויזואלית לבדה לא נקראת בקורא מסך (WebAIM) */
+        if (on) { rows[i].setAttribute('aria-current', 'true'); } else { rows[i].removeAttribute('aria-current'); }
+      }
+    }
+  }
+
+  function jump(idx) {
+    var ls = links();
+    if (!ls[idx]) { return; }
+    stats.jumps++;
+    mark(idx);
+    close();
+    setTimeout(function () { try { ls[idx].click(); } catch (e) {} }, 210);
+  }
+
+  function open() {
+    var ls = links();
+    if (ls.length < MIN_CATS) { return; }
+    if (!sheet || !document.body.contains(sheet)) { sheet = buildSheet(ls); }
+    else if (rows.length !== ls.length) { sheet.remove(); sheet = buildSheet(ls); }
+    for (var i = 0; i < rows.length; i++) { rows[i].querySelector('.mh-cm-t').textContent = ls[i].textContent.trim(); }
+    mark(activeIndex(ls));
+    stats.opens++;
+    sheet.classList.add('on');
+    document.documentElement.classList.add('mh-cm-lock');
+    var b = document.getElementById(BTN_ID);
+    if (b) { b.setAttribute('aria-expanded', 'true'); }
+    var cur = sheet.querySelector('.mh-cm-row.on');
+    if (cur && cur.scrollIntoView) { try { cur.scrollIntoView({ block: 'nearest' }); } catch (e) {} }
+  }
+  function close() {
+    if (!sheet) { return; }
+    sheet.classList.remove('on');
+    document.documentElement.classList.remove('mh-cm-lock');
+    var b = document.getElementById(BTN_ID);
+    if (b) { b.setAttribute('aria-expanded', 'false'); }
+  }
+
+  /* ---------- הכפתור ---------- */
+  function syncButton() {
+    var nav = document.getElementById('ProductCategoriesNav');
+    var ls = links();
+    stats.cats = ls.length;
+    var btn = document.getElementById(BTN_ID);
+    if (!nav || ls.length < MIN_CATS) {
+      if (btn) { btn.remove(); }
+      if (nav) { nav.classList.remove('mh-cm-has'); }
+      return false;
+    }
+    if (!btn) {
+      btn = document.createElement('button');
+      btn.id = BTN_ID;
+      btn.type = 'button';
+      btn.setAttribute('aria-label', 'כל הקטגוריות');
+      btn.setAttribute('aria-haspopup', 'dialog');
+      btn.setAttribute('aria-expanded', 'false');
+      btn.innerHTML = '<span class="mh-cm-bars"><i></i><i></i><i></i></span><span class="mh-cm-num"></span>';
+      btn.addEventListener('click', function (e) { e.preventDefault(); e.stopPropagation(); open(); });
+      nav.appendChild(btn);
+    }
+    var num = btn.querySelector('.mh-cm-num');
+    if (num && num.textContent !== String(ls.length)) { num.textContent = String(ls.length); }
+    nav.classList.add('mh-cm-has');
+    return true;
+  }
+
+  var pending = false;
+  function schedule() {
+    if (pending) { return; }
+    pending = true;
+    setTimeout(function () {
+      pending = false;
+      try {
+        var had = !!document.getElementById(BTN_ID);
+        syncButton();
+        /* ה-CSS מוסיף ריפוד לפריט האחרון — Swiper צריך למדוד מחדש */
+        if (!had && document.getElementById(BTN_ID) && window.MH_CATNAV) { window.MH_CATNAV.update(); }
+      } catch (e) {}
+    }, 140);
+  }
+
+  try {
+    new MutationObserver(function (muts) {
+      for (var i = 0; i < muts.length; i++) {
+        if (muts[i].addedNodes && muts[i].addedNodes.length) { schedule(); return; }
+        if (muts[i].removedNodes && muts[i].removedNodes.length) { schedule(); return; }
+      }
+    }).observe(document.documentElement, { subtree: true, childList: true });
+    window.addEventListener('load', schedule);
+    window.addEventListener('resize', schedule);
+    schedule();
+  } catch (e) { console.warn('[MH CatMap] disabled:', e); }
+
+  window.MH_CATMAP = {
+    version: VERSION, open: open, close: close, sync: syncButton,
+    stats: function () { return Object.assign({}, stats); }
+  };
+  /* mh-catmap-v1 */
+})();

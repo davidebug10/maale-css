@@ -6444,3 +6444,199 @@ html body #ProductCategoriesSlider a.scrollactive-item:focus-visible {
     outline-offset: 2px !important;
 }
 /* mh-catnav-v1 */
+
+/* =========================================================
+   חלק 38: מפת הקטגוריות בדף העסק — MH CatMap v1.0.0 | 2026-09-09 — Liquid Glass + אדום QLED
+   מחליף: כלום. תוספת לחלק 33 (MH CatNav) ולא החלפה שלו — הסרגל האופקי נשאר בדיוק כפי שהוא.
+   סקופ: html body #ProductCategoriesNav.mh-cm-has (הכפתור) + html body #mh-catmap (הגיליון).
+         הגיליון נבנה ע"י MH CatMap ב-custom-footer.js ויושב על body, לכן אין לו הורה משותף
+         עם שום רכיב של Hyperzod. כל סלקטור מתחיל ב-id ייחודי שלנו.
+   מצבים: #mh-catmap.on = פתוח; .mh-cm-row.on = הקטגוריה המודגשת (אחת בכל רגע).
+   הכפתור מוצג רק מ-8 קטגוריות ומעלה (הלוגיקה ב-JS מוסיפה .mh-cm-has).
+   ========================================================= */
+/* הסרגל הופך לשורת flex: [הסליידר גמיש] + [הכפתור קבוע]. הכפתור לא מרחף מעל הגלולות
+   ולכן שום פריט לא נחתך. הסליידר מצטמצם ב-~62px, ולכן MH CatMap קורא ל-swiper.update(). */
+html body #ProductCategoriesNav.mh-cm-has {
+    display: flex !important;
+    align-items: center !important;
+    overflow: hidden !important;
+}
+html body #ProductCategoriesNav.mh-cm-has > div:first-child {
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+}
+html body #mh-catmap-btn {
+    flex: 0 0 auto !important;
+    margin-inline-end: 10px !important;
+    margin-inline-start: 4px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    height: 34px !important;
+    min-width: 0 !important;
+    padding: 0 11px !important;
+    border: 1px solid rgba(227,30,36,.22) !important;
+    border-radius: 999px !important;
+    background: rgba(255,255,255,.92) !important;
+    -webkit-backdrop-filter: blur(16px) saturate(180%) !important;
+    backdrop-filter: blur(16px) saturate(180%) !important;
+    box-shadow: 0 4px 14px rgba(0,0,0,.10) !important;
+    color: #c8151b !important;
+    font-size: 12.5px !important;
+    font-weight: 800 !important;
+    line-height: 1 !important;
+    cursor: pointer !important;
+    -webkit-tap-highlight-color: transparent !important;
+    transition: transform .15s ease, box-shadow .2s ease !important;
+}
+html body #mh-catmap-btn:active { transform: scale(.94) !important; }
+@media (hover: hover) { html body #mh-catmap-btn:hover { box-shadow: 0 6px 18px rgba(227,30,36,.22) !important; } }
+html body #mh-catmap-btn:focus-visible { outline: 2px solid #e31e24 !important; outline-offset: 2px !important; }
+html body #mh-catmap-btn .mh-cm-bars {
+    display: inline-flex !important; flex-direction: column !important; justify-content: center !important;
+    gap: 3px !important; width: 13px !important;
+}
+html body #mh-catmap-btn .mh-cm-bars i {
+    display: block !important; height: 2px !important; border-radius: 2px !important;
+    background: linear-gradient(135deg, #ff3b41 0%, #c8151b 100%) !important;
+}
+html body #mh-catmap-btn .mh-cm-bars i:nth-child(1) { width: 13px !important; }
+html body #mh-catmap-btn .mh-cm-bars i:nth-child(2) { width: 9px !important; }
+html body #mh-catmap-btn .mh-cm-bars i:nth-child(3) { width: 11px !important; }
+html body #mh-catmap-btn .mh-cm-num { font-variant-numeric: tabular-nums !important; }
+
+/* ---------- הגיליון ---------- */
+html.mh-cm-lock, html.mh-cm-lock body { overflow: hidden !important; }
+html body #mh-catmap {
+    position: fixed !important;
+    inset: 0 !important;
+    z-index: 2147482000 !important;
+    direction: rtl !important;
+    display: block !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    transition: opacity .26s ease, visibility 0s linear .26s !important;
+}
+html body #mh-catmap.on { visibility: visible !important; opacity: 1 !important; transition: opacity .26s ease !important; }
+html body #mh-catmap .mh-cm-scrim {
+    position: absolute !important; inset: 0 !important;
+    background: rgba(17,17,20,.42) !important;
+    -webkit-backdrop-filter: blur(6px) !important; backdrop-filter: blur(6px) !important;
+}
+html body #mh-catmap .mh-cm-panel {
+    position: absolute !important;
+    left: 0 !important; right: 0 !important; bottom: 0 !important;
+    max-height: 82vh !important;
+    display: flex !important;
+    flex-direction: column !important;
+    box-sizing: border-box !important;
+    padding: 8px 14px calc(14px + env(safe-area-inset-bottom, 0px)) !important;
+    border-radius: 30px 30px 0 0 !important;
+    background: rgba(255,255,255,.9) !important;
+    -webkit-backdrop-filter: blur(40px) saturate(180%) !important;
+    backdrop-filter: blur(40px) saturate(180%) !important;
+    box-shadow: 0 -18px 50px rgba(0,0,0,.22) !important;
+    transform: translateY(14px) !important;
+    transition: transform .3s cubic-bezier(.22,1,.36,1) !important;
+}
+html body #mh-catmap.on .mh-cm-panel { transform: translateY(0) !important; }
+html body #mh-catmap .mh-cm-grip {
+    width: 42px !important; height: 4px !important; border-radius: 999px !important;
+    background: rgba(0,0,0,.14) !important; margin: 2px auto 10px !important; flex: 0 0 auto !important;
+}
+html body #mh-catmap .mh-cm-head {
+    display: flex !important; align-items: center !important; gap: 8px !important;
+    padding: 0 4px 10px !important; flex: 0 0 auto !important;
+}
+html body #mh-catmap .mh-cm-title { font-size: 18px !important; font-weight: 900 !important; color: #111 !important; }
+html body #mh-catmap .mh-cm-count {
+    font-size: 11px !important; font-weight: 800 !important; color: #c8151b !important;
+    background: rgba(227,30,36,.10) !important; border-radius: 999px !important; padding: 4px 9px !important;
+}
+html body #mh-catmap .mh-cm-x {
+    margin-inline-start: auto !important;
+    width: 32px !important; height: 32px !important; border: 0 !important; border-radius: 999px !important;
+    background: rgba(0,0,0,.05) !important; color: #4b5563 !important;
+    font-size: 14px !important; font-weight: 800 !important; line-height: 1 !important; cursor: pointer !important;
+}
+html body #mh-catmap .mh-cm-rows {
+    flex: 1 1 auto !important;
+    overflow-y: auto !important;
+    overscroll-behavior: contain !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 7px !important;
+    padding: 2px 2px 4px !important;
+    touch-action: pan-y !important;
+    scrollbar-width: none !important;
+}
+html body #mh-catmap .mh-cm-rows::-webkit-scrollbar { width: 0 !important; height: 0 !important; display: none !important; }
+html body #mh-catmap .mh-cm-row {
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    flex: 0 0 auto !important;
+    min-height: 46px !important;
+    padding: 0 14px !important;
+    border: 1px solid #e6e8ec !important;
+    border-radius: 14px !important;
+    background: #fff !important;
+    color: #374151 !important;
+    font-size: 15px !important;
+    font-weight: 700 !important;
+    text-align: start !important;
+    cursor: pointer !important;
+    -webkit-tap-highlight-color: transparent !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,.03) !important;
+    transition: background .18s ease, color .18s ease, transform .18s ease, box-shadow .18s ease !important;
+}
+html body #mh-catmap .mh-cm-row .mh-cm-n {
+    flex: 0 0 auto !important;
+    min-width: 22px !important; height: 22px !important;
+    display: inline-flex !important; align-items: center !important; justify-content: center !important;
+    border-radius: 999px !important;
+    background: rgba(0,0,0,.05) !important;
+    color: #6b7280 !important;
+    font-size: 11px !important; font-weight: 800 !important;
+    font-variant-numeric: tabular-nums !important;
+    transition: background .18s ease, color .18s ease !important;
+}
+html body #mh-catmap .mh-cm-row .mh-cm-t { flex: 1 1 auto !important; text-align: start !important; }
+/* ההדגשה — אחת בכל רגע */
+html body #mh-catmap .mh-cm-row.on {
+    background: linear-gradient(135deg, #ff3b41 0%, #c8151b 100%) !important;
+    border-color: transparent !important;
+    color: #fff !important;
+    font-size: 16.5px !important;
+    font-weight: 900 !important;
+    min-height: 54px !important;
+    transform: scale(1.015) !important;
+    box-shadow: 0 8px 22px rgba(227,30,36,.30) !important;
+}
+html body #mh-catmap .mh-cm-row.on .mh-cm-n { background: rgba(255,255,255,.22) !important; color: #fff !important; }
+html body #mh-catmap .mh-cm-row:active { transform: scale(.985) !important; }
+html body #mh-catmap .mh-cm-row.on:active { transform: scale(1) !important; }
+@media (hover: hover) {
+    html body #mh-catmap .mh-cm-row:not(.on):hover { background: rgba(227,30,36,.06) !important; color: #c8151b !important; }
+}
+/* מסך רחב: הגיליון הופך לכרטיס ממורכז במקום רצועה על כל הרוחב */
+@media (min-width: 700px) {
+    html body #mh-catmap .mh-cm-panel {
+        left: 50% !important;
+        right: auto !important;
+        bottom: 24px !important;
+        width: min(520px, calc(100vw - 48px)) !important;
+        max-height: 74vh !important;
+        transform: translateX(-50%) translateY(14px) !important;
+        border-radius: 26px !important;
+        padding-bottom: 16px !important;
+        box-shadow: 0 24px 60px rgba(0,0,0,.28) !important;
+    }
+    html body #mh-catmap.on .mh-cm-panel { transform: translateX(-50%) translateY(0) !important; }
+}
+@media (prefers-reduced-motion: reduce) {
+    html body #mh-catmap, html body #mh-catmap .mh-cm-panel, html body #mh-catmap .mh-cm-row { transition: none !important; }
+}
+/* mh-catmap-v1 */
