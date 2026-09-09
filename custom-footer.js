@@ -2828,7 +2828,7 @@ log('פעיל');
 })();
 
 /* ============================================================
-   מפת הקטגוריות בדף העסק — MH CatMap  |  v1.0.0 | 2026-09-09
+   מפת הקטגוריות בדף העסק — MH CatMap  |  v1.1.0 | 2026-09-09
    הבעיה: בחנות עם הרבה קטגוריות (גואה 15, מחניודה 14) סרגל הגלולות האופקי
    ארוך פי 4.9 מרוחב המסך — כ-7 החלקות אצבע כדי להגיע לקטגוריה האחרונה.
    הפתרון: כפתור צמוד לקצה הסרגל שפותח רשימה אנכית של כל הקטגוריות.
@@ -2845,11 +2845,11 @@ log('פעיל');
   if (window.__MH_CATMAP__) { return; }
   window.__MH_CATMAP__ = true;
 
-  var VERSION = '1.0.0';
+  var VERSION = '1.1.0';
   var MIN_CATS = 8;                 /* מתחת לזה הסרגל האופקי נוח ממילא */
   var BTN_ID = 'mh-catmap-btn';
   var SHEET_ID = 'mh-catmap';
-  var stats = { version: VERSION, built: 0, opens: 0, jumps: 0, cats: 0 };
+  var stats = { version: VERSION, built: 0, opens: 0, jumps: 0, fallbacks: 0, cats: 0 };
 
   function links() {
     return [].slice.call(document.querySelectorAll('#ProductCategoriesSlider a.scrollactive-item'));
@@ -2917,13 +2917,48 @@ log('פעיל');
     }
   }
 
+  /* מכולת הגלילה של דף העסק היא .merchant-page (לא החלון) */
+  function scroller() {
+    var p = document.querySelector('.merchant-page');
+    if (p && p.scrollHeight > p.clientHeight + 10) { return p; }
+    return document.scrollingElement || document.documentElement;
+  }
+  /* גובה הכותרת הדביקה — כדי שהקטגוריה לא תיקבר מתחתיה */
+  function stickyBottom() {
+    var h = document.getElementById('mobileStickyHeader');
+    var r = h && h.getBoundingClientRect ? h.getBoundingClientRect() : null;
+    return r && r.bottom > 0 ? Math.round(r.bottom) : 110;
+  }
   function jump(idx) {
     var ls = links();
-    if (!ls[idx]) { return; }
+    var a = ls[idx];
+    if (!a) { return; }
+    var href = a.getAttribute('href') || '';
     stats.jumps++;
     mark(idx);
     close();
-    setTimeout(function () { try { ls[idx].click(); } catch (e) {} }, 210);
+    setTimeout(function () {
+      var sc = scroller();
+      var startY = sc.scrollTop;
+      try { a.click(); } catch (e) {}
+      /* גיבוי: לפעמים הניווט של vue-scrollactive לא מגיב בכלל (נצפה חי במחניודה)
+         והלחיצה פשוט לא עושה כלום. חצי שנייה אחרי הלחיצה: אם הגלילה לא זזה
+         *אפילו פיקסל אחד* — גוללים בעצמנו לעוגן. אם היא כן זזה, לא נוגעים,
+         כדי לא להילחם באנימציה שכבר רצה. */
+      setTimeout(function () {
+        try {
+          if (sc.scrollTop !== startY) { return; }
+          if (!href || href.charAt(0) !== '#') { return; }
+          var el = document.getElementById(href.slice(1));
+          if (!el) { return; }
+          var delta = el.getBoundingClientRect().top - stickyBottom();
+          if (Math.abs(delta) < 40) { return; }
+          stats.fallbacks++;
+          if (sc.scrollTo) { sc.scrollTo({ top: sc.scrollTop + delta, behavior: 'smooth' }); }
+          else { sc.scrollTop = sc.scrollTop + delta; }
+        } catch (e) {}
+      }, 500);
+    }, 210);
   }
 
   function open() {
