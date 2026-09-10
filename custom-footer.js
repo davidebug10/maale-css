@@ -3357,3 +3357,95 @@ log('פעיל');
   window.MH_LANG = { version: VERSION, sync: sync, stats: function () { return JSON.parse(JSON.stringify(stats)); } };
   /* mh-lang-v1 */
 })();
+
+/* ============================================================
+   הדגשת שדה "הזנת כתובת ידנית" בצ'ק-אאוט של קפית — MH KafitAddr  |  v1.0.0 | 2026-09-10
+   הבעיה: לקפית אין כרטיס כתובת (שני סוגי המשלוח שלה מוגדרים אצל Hyperzod
+   כ-requires_address:false), ולכן הכתובת נכתבת בשדה טקסט חופשי שלקוחות מפספסים.
+   הבלוק מאתר את הכרטיס לפי **הטקסט** ("הזנת כתובת ידנית") ולא לפי מחלקה של Hyperzod,
+   כי השדה מוגדר בצד המסעדן ואין לו id יציב. מוסיף מחלקות בלבד — ה-CSS בחלק 42.
+   סקופ כפול ונעול:
+     1. רק בדף הצ'ק-אאוט (#checkout קיים)
+     2. רק כשעסק העגלה הוא קפית (MERCHANT), לפי getCartMerchant
+   לא נוגע בהתנהגות: לא חוסם הזמנה, לא משנה ערכים, לא מוסיף required. עיצוב בלבד.
+   נכשל-פתוח: לא נמצא כרטיס → לא קורה כלום.
+   בדיקה: window.MH_KAFITADDR.stats()
+   ============================================================ */
+(function () {
+  'use strict';
+  if (window.__MH_KAFITADDR__) { return; }
+  window.__MH_KAFITADDR__ = true;
+
+  var VERSION = '1.0.0';
+  var MERCHANT = '6a95042205b27b504d058bc5';        /* קפית אגם אדומים */
+  var NEEDLE = 'הזנת כתובת ידנית';                   /* התחלה של הכותרת; סובלני לניקוד/סימני פיסוק */
+  var CARD = 'mh-kafit-addr';
+  var stats = { version: VERSION, tagged: 0, filled: 0, scans: 0, merchant: null };
+
+  function onCheckout() { return !!document.getElementById('checkout'); }
+  function isKafit() {
+    try {
+      var st = document.getElementById('app').__vue_app__.config.globalProperties.$store;
+      var m = st.getters.getCartMerchant;
+      var id = m && (m.merchant_id || m._id || m.id);
+      stats.merchant = id || null;
+      return id === MERCHANT;
+    } catch (e) { return false; }
+  }
+
+  /* הכרטיס = האב הראשון של הכותרת שמכיל גם שדה קלט */
+  function cardOf(el) {
+    var n = el;
+    for (var i = 0; i < 8 && n && n !== document.body; i++) {
+      if (n.querySelector && n.querySelector('input, textarea')) { return n; }
+      n = n.parentElement;
+    }
+    return null;
+  }
+
+  function sync() {
+    stats.scans++;
+    if (!onCheckout() || !isKafit()) {
+      var old = document.querySelector('.' + CARD);
+      if (old) { old.classList.remove(CARD, CARD + '-filled'); }
+      return;
+    }
+    var co = document.getElementById('checkout');
+    var heads = co.querySelectorAll('h1, h2, h3, h4, h5, p, span, div, label');
+    var head = null;
+    for (var i = 0; i < heads.length; i++) {
+      var e = heads[i];
+      if (e.children.length) { continue; }                       /* אלמנט עלה בלבד */
+      if ((e.textContent || '').indexOf(NEEDLE) === -1) { continue; }
+      head = e; break;
+    }
+    if (!head) { return; }
+    var card = cardOf(head);
+    if (!card) { return; }
+    if (!card.classList.contains(CARD)) { card.classList.add(CARD); stats.tagged++; }
+    /* מצב "מולא" — כדי שההדגשה תירגע אחרי שהלקוח כתב */
+    var input = card.querySelector('input, textarea');
+    var filled = !!(input && String(input.value || '').trim().length > 1);
+    if (card.classList.contains(CARD + '-filled') !== filled) {
+      card.classList.toggle(CARD + '-filled', filled);
+      if (filled) { stats.filled++; }
+    }
+    if (input && !input.__mhKafitBound) {
+      input.__mhKafitBound = true;
+      input.addEventListener('input', schedule);
+      input.addEventListener('blur', schedule);
+    }
+  }
+
+  var pending = false;
+  function schedule() { if (pending) { return; } pending = true; setTimeout(function () { pending = false; try { sync(); } catch (e) {} }, 180); }
+  try {
+    new MutationObserver(function (muts) {
+      for (var i = 0; i < muts.length; i++) { if (muts[i].addedNodes && muts[i].addedNodes.length) { schedule(); return; } }
+    }).observe(document.documentElement, { subtree: true, childList: true });
+    window.addEventListener('load', schedule); schedule();
+  } catch (e) { console.warn('[MH KafitAddr] disabled:', e); }
+
+  window.MH_KAFITADDR = { version: VERSION, sync: sync, merchant: MERCHANT, stats: function () { return JSON.parse(JSON.stringify(stats)); } };
+  /* mh-kafitaddr-v1 */
+})();

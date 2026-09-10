@@ -6698,3 +6698,96 @@ html body #SelectAddress .scheme-status-badge--success::before {
     html body #SelectAddress .v-card-text > div[data-test-id^="test-id-"] { transition: none !important; }
 }
 /* mh-addrpick-v1 */
+
+/* =========================================================
+   חלק 42: הדגשת שדה הכתובת הידנית בצ'ק-אאוט של קפית — MH KafitAddr v1.0.0 | 2026-09-10 — אדום QLED
+   מחליף: כלום. סקופ: html body #checkout .mh-kafit-addr בלבד — המחלקה מתווספת ע"י MH KafitAddr
+   ב-custom-footer.js אך ורק כשעסק העגלה הוא קפית ורק בדף הצ'ק-אאוט. בשום עסק אחר המחלקה
+   לא קיימת, ולכן אף שדה אחר בצ'ק-אאוט לא מושפע (חלק 8ג "הערה למטבח" ו-8ד "הוראות לשליח" לא נוגעים).
+   מצבים: .mh-kafit-addr = ריק (הדגשה מלאה) · .mh-kafit-addr-filled = מולא (ההדגשה נרגעת לירוק).
+   עיצוב בלבד: לא חוסם הזמנה ולא הופך את השדה ל-required.
+   ========================================================= */
+html body #checkout .mh-kafit-addr {
+    position: relative !important;
+    border: 2px solid #e31e24 !important;
+    border-radius: 18px !important;
+    background: #fff6f6 !important;
+    box-shadow: 0 8px 24px rgba(227, 30, 36, 0.16) !important;
+    animation: mhKafitPulse 2.4s ease-in-out 3 !important;
+    transition: border-color .3s ease, background-color .3s ease, box-shadow .3s ease !important;
+}
+@keyframes mhKafitPulse {
+    0%, 100% { box-shadow: 0 8px 24px rgba(227, 30, 36, 0.16); }
+    50%      { box-shadow: 0 8px 30px rgba(227, 30, 36, 0.34); }
+}
+/* תג "חובה" צף בפינה */
+html body #checkout .mh-kafit-addr::before {
+    content: 'חובה למילוי' !important;
+    position: absolute !important;
+    top: -11px !important;
+    inset-inline-end: 16px !important;
+    z-index: 2 !important;
+    padding: 4px 12px !important;
+    border-radius: 999px !important;
+    background: linear-gradient(135deg, #ff3b41 0%, #c8151b 100%) !important;
+    color: #fff !important;
+    font-size: 11px !important;
+    font-weight: 800 !important;
+    line-height: 1.4 !important;
+    letter-spacing: .2px !important;
+    box-shadow: 0 4px 12px rgba(227, 30, 36, 0.35) !important;
+}
+/* הכותרת בתוך הכרטיס */
+html body #checkout .mh-kafit-addr h1,
+html body #checkout .mh-kafit-addr h2,
+html body #checkout .mh-kafit-addr h3,
+html body #checkout .mh-kafit-addr h4 {
+    color: #c8151b !important;
+    font-weight: 900 !important;
+}
+/* שדה הקלט עצמו — בולט, גבוה, עם מסגרת אדומה */
+html body #checkout .mh-kafit-addr input,
+html body #checkout .mh-kafit-addr textarea {
+    min-height: 52px !important;
+    border-radius: 14px !important;
+    background: #fff !important;
+    font-size: 15px !important;
+    font-weight: 600 !important;
+    color: #111 !important;
+}
+html body #checkout .mh-kafit-addr .v-field {
+    border: 1.5px solid rgba(227, 30, 36, 0.45) !important;
+    border-radius: 14px !important;
+    background: #fff !important;
+}
+html body #checkout .mh-kafit-addr .v-field--focused {
+    border-color: #e31e24 !important;
+    box-shadow: 0 0 0 3px rgba(227, 30, 36, 0.12) !important;
+}
+html body #checkout .mh-kafit-addr input::placeholder,
+html body #checkout .mh-kafit-addr textarea::placeholder {
+    color: #c8151b !important;
+    opacity: .55 !important;
+    font-weight: 600 !important;
+}
+/* אחרי שהלקוח מילא — ההדגשה נרגעת לירוק, בלי צעקות */
+html body #checkout .mh-kafit-addr.mh-kafit-addr-filled {
+    border-color: #1a9c54 !important;
+    background: #f4fbf6 !important;
+    box-shadow: 0 4px 14px rgba(26, 156, 84, 0.14) !important;
+    animation: none !important;
+}
+html body #checkout .mh-kafit-addr.mh-kafit-addr-filled::before {
+    content: 'מולא ✓' !important;
+    background: linear-gradient(135deg, #22b866 0%, #1a9c54 100%) !important;
+    box-shadow: 0 4px 12px rgba(26, 156, 84, 0.30) !important;
+}
+html body #checkout .mh-kafit-addr.mh-kafit-addr-filled h1,
+html body #checkout .mh-kafit-addr.mh-kafit-addr-filled h2,
+html body #checkout .mh-kafit-addr.mh-kafit-addr-filled h3,
+html body #checkout .mh-kafit-addr.mh-kafit-addr-filled h4 { color: #157a42 !important; }
+html body #checkout .mh-kafit-addr.mh-kafit-addr-filled .v-field { border-color: rgba(26, 156, 84, 0.45) !important; }
+@media (prefers-reduced-motion: reduce) {
+    html body #checkout .mh-kafit-addr { animation: none !important; }
+}
+/* mh-kafitaddr-v1 */
