@@ -3179,3 +3179,124 @@ log('פעיל');
   window.MH_MENULOAD = { version: VERSION, run: run, findComp: findComp, stats: function () { return JSON.parse(JSON.stringify(stats)); } };
   /* mh-menuload-v1 */
 })();
+
+/* ============================================================
+   "הצג עוד" בקטגוריה חתוכה בדף העסק — MH ShowMore  |  v1.0.0 | 2026-09-10
+   הבעיה (סקר 11 חנויות, 10.9): Hyperzod מביאה עד 20 מוצרים לקטגוריה ומסמנת
+   is_paginated, אבל החנות לא קוראת את הדגל ואין שום דרך לראות את השאר —
+   14 קטגוריות ב-4 חנויות, 230 מוצרים מוסתרים (בגואה "סיגריות" 20 מתוך 65).
+   הפתרון: כפתור "הצג עוד" בתחתית כל קטגוריה מסומנת. לחיצה מביאה את הדף הבא
+   מ-Search.getProductsByCategory ודוחפת את המוצרים ל-category_products של
+   הקטגוריה ב-store — Vue מצייר אותם באותו רכיב כרטיס, ולכן הם זהים לחלוטין
+   ל-20 הראשונים (אומת: אותן מחלקות, רוחב, רדיוס, גופנים). כשאין דף הבא —
+   הכפתור נעלם. קרוסלה (view_type=card) היא גלילה טבעית (.slider-inner-container,
+   לא Swiper) — הסליידים החדשים נגישים מיד; אם יימצא Swiper, קוראים update().
+   נכשל-פתוח: בלי הרכיב/ה-store — אין כפתורים, הדף כפי שהיה.
+   בדיקה: window.MH_SHOWMORE.stats()
+   ============================================================ */
+(function () {
+  'use strict';
+  if (window.__MH_SHOWMORE__) { return; }
+  window.__MH_SHOWMORE__ = true;
+
+  var VERSION = '1.0.0';
+  var PAGE = 20;
+  var CLS = 'mh-more';
+  var stats = { version: VERSION, buttons: 0, clicks: 0, loaded: 0, finished: 0, errors: 0 };
+  var pages = {};      /* catId → הדף האחרון שנטען */
+  var inflight = {};
+  var done = {};       /* catId → אין עוד דפים; לא בונים כפתור מחדש */
+
+  function app() { var el = document.getElementById('app'); return el && el.__vue_app__ ? el : null; }
+  function store() { try { return app().__vue_app__.config.globalProperties.$store; } catch (e) { return null; } }
+  function cats() { try { var a = store().state.Merchant.categoryProducts; return Array.isArray(a) ? a : []; } catch (e) { return []; } }
+  function comp() {
+    var el = app(); if (!el || !el._vnode) { return null; }
+    var found = null;
+    function walkInst(inst, d) { if (!inst || found || d > 60) { return; } var p = inst.proxy;
+      try { if (p && typeof p.apiRequest === 'function' && ('merchantId' in p)) { found = p; return; } } catch (e) {}
+      walkV(inst.subTree, d + 1); }
+    function walkV(v, d) { if (!v || found || d > 200) { return; } if (v.component) { walkInst(v.component, d + 1); }
+      if (v.suspense && v.suspense.activeBranch) { walkV(v.suspense.activeBranch, d + 1); }
+      if (Array.isArray(v.children)) { for (var i = 0; i < v.children.length && !found; i++) { walkV(v.children[i], d + 1); } } }
+    walkV(el._vnode, 0); return found;
+  }
+  /* is_paginated הוא דגל מדויק של Hyperzod: בסקר 11 החנויות הוא true בדיוק ב-14 הקטגוריות
+     שיש בהן יותר מ-20, ו-false בקטגוריות של בדיוק 20 (נוזלים לאידוי, פיצוחים). */
+  function needsMore(cat) { return !!cat.is_paginated; }
+  function label(cat) {
+    var n = (cat.category_products || []).length;
+    return '<span class="' + CLS + '-t">הצג עוד מוצרים</span><span class="' + CLS + '-n">מציג ' + n + '</span>';
+  }
+
+  function loadNext(cat, btn) {
+    var id = cat._id;
+    if (inflight[id]) { return; }
+    var p = comp(); if (!p) { return; }
+    inflight[id] = true; stats.clicks++;
+    btn.classList.add('is-loading'); btn.disabled = true;
+    var next = (pages[id] || 1) + 1;
+    var req;
+    try { req = p.apiRequest('Search', 'getProductsByCategory', { product_category_id: id, merchant_id: p.merchantId, locale: (p.getActiveLocale ? p.getActiveLocale().locale : 'he'), page: next }); }
+    catch (e) { req = Promise.reject(e); }
+    Promise.resolve(req).then(function (r) {
+      var pr = r && r.data && r.data.data && r.data.data.products;
+      var list = pr && Array.isArray(pr.data) ? pr.data : [];
+      pages[id] = next;
+      /* דחיפה ל-store: אותו אובייקט ריאקטיבי שממנו Vue מצייר את הכרטיסים */
+      var live = cats().filter(function (c) { return c._id === id; })[0] || cat;
+      var have = {}; (live.category_products || []).forEach(function (x) { if (x && x._id) { have[x._id] = 1; } });
+      var added = 0;
+      list.forEach(function (x) {
+        if (!x || (x._id && have[x._id])) { return; }
+        if (!('product_options' in x)) { x.product_options = []; }   /* שדה שקיים בתפריט ולא ב-API; הכרטיס משתמש ב-has_product_options */
+        live.category_products.push(x); added++;
+      });
+      stats.loaded += added;
+      var more = !!(pr && pr.next_page_url) && list.length > 0;
+      setTimeout(function () {
+        try { var sec = document.getElementById('cat_' + id); var sw = sec && sec.querySelector('.swiper'); if (sw && sw.swiper && sw.swiper.update) { sw.swiper.update(); } } catch (e) {}
+        try { if (typeof p.scrollSpy === 'function') { p.scrollSpy(); } } catch (e) {}
+        btn.classList.remove('is-loading'); btn.disabled = false;
+        if (more) { btn.innerHTML = label(live); }
+        else { stats.finished++; done[id] = true; btn.classList.add('is-done'); btn.innerHTML = '<span class="' + CLS + '-t">זה הכל · ' + (live.category_products || []).length + ' מוצרים</span>'; btn.disabled = true; setTimeout(function () { if (btn.parentNode) { btn.parentNode.removeChild(btn); } }, 1800); }
+        inflight[id] = false;
+      }, 120);
+    }).catch(function (e) {
+      stats.errors++; inflight[id] = false;
+      btn.classList.remove('is-loading'); btn.disabled = false;
+      try { console.warn('[MH ShowMore]', e); } catch (e2) {}
+    });
+  }
+
+  function sync() {
+    var list = cats(); if (!list.length) { return; }
+    var host = document.getElementById('merchant-content'); if (!host) { return; }
+    list.forEach(function (cat) {
+      var id = cat._id; if (!id) { return; }
+      var sec = document.getElementById('cat_' + id); if (!sec) { return; }
+      var inner = sec.querySelector('.special-listing-inner') || sec;
+      var btn = inner.querySelector('button.' + CLS);
+      if (done[id] || !needsMore(cat)) { return; }
+      if (!btn) {
+        btn = document.createElement('button');
+        btn.type = 'button'; btn.className = CLS;
+        btn.setAttribute('aria-label', 'הצג עוד מוצרים בקטגוריה ' + (cat.name || ''));
+        btn.innerHTML = label(cat);
+        btn.addEventListener('click', function (e) { e.preventDefault(); e.stopPropagation(); loadNext(cat, btn); });
+        inner.appendChild(btn); stats.buttons++;
+      }
+    });
+  }
+
+  var pending = false;
+  function schedule() { if (pending) { return; } pending = true; setTimeout(function () { pending = false; try { sync(); } catch (e) {} }, 220); }
+  try {
+    new MutationObserver(function (muts) { for (var i = 0; i < muts.length; i++) { if (muts[i].addedNodes && muts[i].addedNodes.length) { schedule(); return; } } })
+      .observe(document.documentElement, { subtree: true, childList: true });
+    window.addEventListener('load', schedule); schedule();
+  } catch (e) { console.warn('[MH ShowMore] disabled:', e); }
+
+  window.MH_SHOWMORE = { version: VERSION, sync: sync, stats: function () { return JSON.parse(JSON.stringify(stats)); } };
+  /* mh-showmore-v1 */
+})();

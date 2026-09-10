@@ -6640,3 +6640,50 @@ html body #mh-catmap .mh-cm-row.on:active { transform: scale(1) !important; }
     html body #mh-catmap, html body #mh-catmap .mh-cm-panel, html body #mh-catmap .mh-cm-row { transition: none !important; }
 }
 /* mh-catmap-v1 */
+
+/* =========================================================
+   חלק 39: כפתור "הצג עוד" בקטגוריה חתוכה בדף העסק — MH ShowMore v1.0.0 | 2026-09-10 — Liquid Glass + אדום QLED
+   מחליף: כלום (רכיב חדש). סקופ: html body #merchant-content button.mh-more — אלמנט שלנו בלבד,
+   שנבנה ע"י MH ShowMore ב-custom-footer.js בתחתית .special-listing-inner של קטגוריה מסומנת is_paginated.
+   מצבים: .is-loading (בקשה בדרך), .is-done (אין עוד — נעלם אחרי 1.8 שנ').
+   ========================================================= */
+html body #merchant-content button.mh-more {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 10px !important;
+    width: min(100%, 360px) !important;
+    margin: 14px auto 6px !important;
+    height: 44px !important;
+    padding: 0 18px !important;
+    border: 1px solid rgba(227,30,36,.22) !important;
+    border-radius: 999px !important;
+    background: rgba(255,255,255,.92) !important;
+    -webkit-backdrop-filter: blur(16px) saturate(180%) !important;
+    backdrop-filter: blur(16px) saturate(180%) !important;
+    box-shadow: 0 4px 14px rgba(0,0,0,.08) !important;
+    color: #c8151b !important;
+    font-size: 14px !important;
+    font-weight: 800 !important;
+    line-height: 1 !important;
+    cursor: pointer !important;
+    -webkit-tap-highlight-color: transparent !important;
+    transition: transform .15s ease, box-shadow .2s ease, opacity .2s ease !important;
+}
+html body #merchant-content button.mh-more .mh-more-n {
+    font-size: 11.5px !important; font-weight: 700 !important; color: #6b7280 !important;
+    background: rgba(0,0,0,.05) !important; border-radius: 999px !important; padding: 4px 9px !important;
+    font-variant-numeric: tabular-nums !important;
+}
+html body #merchant-content button.mh-more:active { transform: scale(.97) !important; }
+@media (hover: hover) { html body #merchant-content button.mh-more:hover { box-shadow: 0 6px 18px rgba(227,30,36,.22) !important; } }
+html body #merchant-content button.mh-more:focus-visible { outline: 2px solid #e31e24 !important; outline-offset: 2px !important; }
+html body #merchant-content button.mh-more.is-loading { opacity: .72 !important; cursor: progress !important; }
+html body #merchant-content button.mh-more.is-loading .mh-more-t::after {
+    content: '…' !important; display: inline-block !important; width: 1.2em !important; text-align: start !important;
+    animation: mhMoreDots 1s steps(3, end) infinite !important;
+}
+@keyframes mhMoreDots { 0% { clip-path: inset(0 100% 0 0); } 100% { clip-path: inset(0 0 0 0); } }
+html body #merchant-content button.mh-more.is-done { color: #6b7280 !important; border-color: rgba(0,0,0,.08) !important; box-shadow: none !important; cursor: default !important; }
+@media (prefers-reduced-motion: reduce) { html body #merchant-content button.mh-more, html body #merchant-content button.mh-more .mh-more-t::after { transition: none !important; animation: none !important; } }
+/* mh-showmore-v1 */
