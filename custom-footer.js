@@ -3303,7 +3303,7 @@ log('פעיל');
 })();
 
 /* ============================================================
-   מחרוזות שאין להן תרגום בחבילת השפה — MH Lang  |  v1.0.0 | 2026-09-10
+   מחרוזות שאין להן תרגום בחבילת השפה — MH Lang  |  v1.1.0 | 2026-09-10
    Hyperzod מציירת טקסטים עם ברירת מחדל באנגלית כשמפתח חסר בחבילה:
    getLug().common.customizable || "Customizable". המפתח common.customizable לא קיים
    בחבילה של האתר (88 מפתחות ב-common, נבדק 10.9), ולכן התג בכרטיס המוצר באנגלית.
@@ -3314,10 +3314,14 @@ log('פעיל');
   'use strict';
   if (window.__MH_LANG__) { return; }
   window.__MH_LANG__ = true;
-  var VERSION = '1.0.0';
+  var VERSION = '1.1.0';
   /* סלקטור → { אנגלית: עברית } */
   var MAP = [
     { sel: '.product-customizable-tag', text: { 'Customizable': 'ניתן להתאמה' } }
+  ];
+  /* החלפת תחילית בתוך טקסט קיים (לא שוויון מלא), לאלמנטים שהטקסט שלהם מורכב מתווית + ערך */
+  var PREFIX = [
+    { sel: '#SelectAddress .v-card-text > div[data-test-id^="test-id-"] div', from: 'Phone:', to: 'טלפון:' }
   ];
   var stats = { version: VERSION, replaced: 0, scans: 0 };
   function sync() {
@@ -3328,6 +3332,17 @@ log('פעיל');
         var t = (els[j].textContent || '').trim();
         var he = MAP[i].text[t];
         if (he && els[j].textContent !== he) { els[j].textContent = he; stats.replaced++; }
+      }
+    }
+    for (var k = 0; k < PREFIX.length; k++) {
+      var ps = document.querySelectorAll(PREFIX[k].sel);
+      for (var n = 0; n < ps.length; n++) {
+        var el = ps[n];
+        if (el.children.length) { continue; }                  /* רק אלמנט עלה, לא מכל */
+        var txt = el.textContent || '';
+        if (txt.indexOf(PREFIX[k].from) === -1) { continue; }
+        el.textContent = txt.replace(PREFIX[k].from, PREFIX[k].to);
+        stats.replaced++;
       }
     }
   }

@@ -6492,3 +6492,209 @@ html body .merchant-page .product-card-slider .add-product-btn button.add-btn:ac
     }
 }
 /* mh-cards-v1 */
+
+/* =========================================================
+   חלק 41: חלונית "בחר כתובת" בצ'ק-אאוט — MH AddrPick v1.0.0 | 2026-09-10 — Liquid Glass + אדום QLED
+   מחליף: כלום. רכיב חדש של Hyperzod (בילד index-C04UkX5H) שלא היה לו עיצוב אצלנו.
+   סקופ: html body #SelectAddress בלבד — id ייחודי שקיים רק בחלונית הזאת. שום סלקטור לא יוצא ממנו,
+         ולכן חלוניות תחתונות אחרות (סיכום הזמנה, קופונים, פופאפ מוצר, בחירת מיקום) לא מושפעות.
+   מנטרל לוקאלית את הבלוק הגנרי `.v-bottom-sheet__content .v-card { padding: 24px 20px }` שדוחס
+   את החלונית — אותה מלכודת שטופלה ב-22י לפופאפ המוצר.
+   מצבים: .scheme-status-badge--success = הכתובת הפעילה (Hyperzod מסמנת); כותרת השורה בכתובת הפעילה אדומה.
+   ========================================================= */
+/* המעטפת: זכוכית, פינות עליונות 30, בלי הריפוד הגנרי */
+html body .v-bottom-sheet__content .v-card#SelectAddress,
+html body #SelectAddress {
+    padding: 0 !important;
+    border-radius: 30px 30px 0 0 !important;
+    background: rgba(255, 255, 255, 0.92) !important;
+    -webkit-backdrop-filter: blur(40px) saturate(180%) !important;
+    backdrop-filter: blur(40px) saturate(180%) !important;
+    border: 0 !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.6) !important;
+    box-shadow: 0 -18px 50px rgba(0, 0, 0, 0.18) !important;
+    overflow: hidden !important;
+}
+/* ידית גרירה כמו בשאר החלוניות */
+html body #SelectAddress::before {
+    content: '' !important;
+    display: block !important;
+    width: 42px !important;
+    height: 4px !important;
+    margin: 10px auto 2px !important;
+    border-radius: 999px !important;
+    background: rgba(0, 0, 0, 0.14) !important;
+    flex: 0 0 auto !important;
+}
+/* הכותרת */
+html body #SelectAddress .v-card-title {
+    padding: 6px 16px 12px !important;
+    min-height: 0 !important;
+    border: 0 !important;
+    background: transparent !important;
+    flex: 0 0 auto !important;
+}
+html body #SelectAddress .v-card-title > div:first-child {
+    padding-top: 0 !important;
+    font-size: 19px !important;
+    font-weight: 900 !important;
+    color: #111 !important;
+    line-height: 1.2 !important;
+}
+/* כפתור הסגירה — עיגול זכוכית */
+html body #SelectAddress .close-btn {
+    width: 34px !important;
+    height: 34px !important;
+    min-width: 34px !important;
+    border-radius: 999px !important;
+    background: rgba(0, 0, 0, 0.05) !important;
+    border: 0 !important;
+    box-shadow: none !important;
+}
+html body #SelectAddress .close-btn .v-btn__overlay,
+html body #SelectAddress .close-btn .v-btn__underlay { display: none !important; }
+html body #SelectAddress .close-btn img { width: 15px !important; height: 15px !important; opacity: .55 !important; }
+
+/* "הוסף כתובת חדשה" — גלולת פעולה אדומה */
+html body #SelectAddress .scheme-address-select-add {
+    padding: 0 16px !important;
+    margin: 2px 0 0 !important;
+    background: transparent !important;
+}
+html body #SelectAddress .add-address-btn {
+    height: 48px !important;
+    border-radius: 999px !important;
+    border: 1px solid rgba(227, 30, 36, 0.22) !important;
+    background: rgba(227, 30, 36, 0.06) !important;
+    box-shadow: none !important;
+    justify-content: center !important;
+}
+html body #SelectAddress .add-address-btn .v-btn__overlay,
+html body #SelectAddress .add-address-btn .v-btn__underlay { display: none !important; }
+html body #SelectAddress .add-address-btn > .v-btn__content > div {
+    justify-content: center !important;
+    padding: 0 !important;
+    gap: 8px !important;
+}
+html body #SelectAddress .add-address-btn span.tw-font-medium {
+    color: #c8151b !important;
+    font-size: 14.5px !important;
+    font-weight: 800 !important;
+    margin: 0 !important;
+    transform: none !important;
+}
+html body #SelectAddress .add-address-btn .scheme-address-select-icon { filter: none !important; }
+html body #SelectAddress .add-address-btn .scheme-address-select-icon .v-img__img,
+html body #SelectAddress .add-address-btn .scheme-address-select-icon img {
+    filter: invert(16%) sepia(88%) saturate(5000%) hue-rotate(350deg) brightness(85%) contrast(95%) !important;
+}
+html body #SelectAddress .add-address-btn > .v-btn__content > div > div:first-child { transform: none !important; }
+@media (hover: hover) { html body #SelectAddress .add-address-btn:hover { background: rgba(227, 30, 36, 0.10) !important; } }
+html body #SelectAddress .add-address-btn:active { transform: scale(0.985) !important; }
+
+/* "כתובות שמורות" */
+html body #SelectAddress h3 {
+    margin: 18px 0 10px !important;
+    padding: 0 18px !important;
+    font-size: 12px !important;
+    font-weight: 800 !important;
+    letter-spacing: .6px !important;
+    color: #9aa0aa !important;
+    background: transparent !important;
+}
+/* רשימת הכתובות */
+html body #SelectAddress .v-card-text {
+    padding: 0 16px 16px !important;
+    padding-bottom: calc(16px + env(safe-area-inset-bottom, 0px)) !important;
+    background: transparent !important;
+    scrollbar-width: none !important;
+}
+html body #SelectAddress .v-card-text::-webkit-scrollbar { width: 0 !important; display: none !important; }
+
+/* כרטיס כתובת */
+html body #SelectAddress .v-card-text > div[data-test-id^="test-id-"] {
+    margin-bottom: 10px !important;
+    padding: 14px 14px !important;
+    gap: 12px !important;
+    border: 1px solid #e6e8ec !important;
+    border-radius: 16px !important;
+    background: #fff !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03) !important;
+    transition: border-color .18s ease, box-shadow .18s ease, transform .15s ease !important;
+}
+html body #SelectAddress .v-card-text > div[data-test-id^="test-id-"]:active { transform: scale(0.99) !important; }
+@media (hover: hover) {
+    html body #SelectAddress .v-card-text > div[data-test-id^="test-id-"]:hover {
+        border-color: rgba(227, 30, 36, 0.30) !important;
+        box-shadow: 0 6px 18px rgba(227, 30, 36, 0.10) !important;
+    }
+}
+/* הכתובת הפעילה — מסגרת אדומה ורקע ורדרד (אותה שפה כמו אופציה נבחרת בפופאפ) */
+html body #SelectAddress .v-card-text > div[data-test-id^="test-id-"]:has(.scheme-status-badge--success) {
+    border-color: #e31e24 !important;
+    background: #fff5f5 !important;
+    box-shadow: 0 6px 18px rgba(227, 30, 36, 0.12) !important;
+}
+/* עמודת האייקון והמרחק */
+html body #SelectAddress .v-card-text > div[data-test-id^="test-id-"] > div:first-child { width: 42px !important; }
+html body #SelectAddress .scheme-address-select-icon .v-img__img,
+html body #SelectAddress .scheme-address-select-icon img { opacity: .55 !important; }
+html body #SelectAddress .v-card-text > div[data-test-id^="test-id-"]:has(.scheme-status-badge--success) .scheme-address-select-icon .v-img__img,
+html body #SelectAddress .v-card-text > div[data-test-id^="test-id-"]:has(.scheme-status-badge--success) .scheme-address-select-icon img {
+    opacity: 1 !important;
+    filter: invert(16%) sepia(88%) saturate(5000%) hue-rotate(350deg) brightness(85%) contrast(95%) !important;
+}
+/* המרחק — גלולה אפורה קטנה */
+html body #SelectAddress .v-card-text > div[data-test-id^="test-id-"] span.tw-text-\[9px\] {
+    display: inline-block !important;
+    padding: 3px 7px !important;
+    border-radius: 999px !important;
+    background: rgba(0, 0, 0, 0.05) !important;
+    color: #6b7280 !important;
+    font-size: 9.5px !important;
+    font-weight: 800 !important;
+    line-height: 1 !important;
+}
+/* שם הכתובת */
+html body #SelectAddress .v-card-text > div[data-test-id^="test-id-"] span.tw-text-\[14px\] {
+    font-size: 15px !important;
+    font-weight: 800 !important;
+    color: #111 !important;
+}
+html body #SelectAddress .v-card-text > div[data-test-id^="test-id-"]:has(.scheme-status-badge--success) span.tw-text-\[14px\] { color: #c8151b !important; }
+/* הכתובת עצמה + הטלפון */
+html body #SelectAddress .v-card-text > div[data-test-id^="test-id-"] p {
+    font-size: 13px !important;
+    font-weight: 500 !important;
+    color: #6b7280 !important;
+    line-height: 1.45 !important;
+    margin: 0 !important;
+}
+/* שורת הטלפון. הטקסט עצמו ("Phone: " → "טלפון: ") מוחלף ע"י MH Lang ב-custom-footer.js —
+   font-size:0 על המכל היה מעלים גם את המספר, כי הוא טקסט ישיר של אותו אלמנט. */
+html body #SelectAddress .v-card-text > div[data-test-id^="test-id-"] .tw-text-xs.tw-text-\[\#767C8F\]:not(p) {
+    font-size: 12px !important;
+    font-weight: 600 !important;
+    color: #9aa0aa !important;
+    direction: rtl !important;
+    unicode-bidi: plaintext !important;
+}
+/* התג "Active" → גלולה אדומה בשפת העיצוב */
+html body #SelectAddress .scheme-status-badge--success {
+    padding: 4px 10px !important;
+    border-radius: 999px !important;
+    background: rgba(227, 30, 36, 0.10) !important;
+    color: #c8151b !important;
+    font-size: 0 !important;
+    font-weight: 800 !important;
+    line-height: 1 !important;
+}
+html body #SelectAddress .scheme-status-badge--success::before {
+    content: 'נבחרה' !important;
+    font-size: 10.5px !important;
+    letter-spacing: .2px !important;
+}
+@media (prefers-reduced-motion: reduce) {
+    html body #SelectAddress .v-card-text > div[data-test-id^="test-id-"] { transition: none !important; }
+}
+/* mh-addrpick-v1 */
