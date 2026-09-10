@@ -3301,3 +3301,44 @@ log('פעיל');
   window.MH_SHOWMORE = { version: VERSION, sync: sync, stats: function () { return JSON.parse(JSON.stringify(stats)); } };
   /* mh-showmore-v1 */
 })();
+
+/* ============================================================
+   מחרוזות שאין להן תרגום בחבילת השפה — MH Lang  |  v1.0.0 | 2026-09-10
+   Hyperzod מציירת טקסטים עם ברירת מחדל באנגלית כשמפתח חסר בחבילה:
+   getLug().common.customizable || "Customizable". המפתח common.customizable לא קיים
+   בחבילה של האתר (88 מפתחות ב-common, נבדק 10.9), ולכן התג בכרטיס המוצר באנגלית.
+   הבלוק מחליף טקסט בלבד, רק באלמנטים ברשימה, רק כשהטקסט שווה בדיוק למחרוזת האנגלית.
+   נכשל-פתוח. בדיקה: window.MH_LANG.stats()
+   ============================================================ */
+(function () {
+  'use strict';
+  if (window.__MH_LANG__) { return; }
+  window.__MH_LANG__ = true;
+  var VERSION = '1.0.0';
+  /* סלקטור → { אנגלית: עברית } */
+  var MAP = [
+    { sel: '.product-customizable-tag', text: { 'Customizable': 'ניתן להתאמה' } }
+  ];
+  var stats = { version: VERSION, replaced: 0, scans: 0 };
+  function sync() {
+    stats.scans++;
+    for (var i = 0; i < MAP.length; i++) {
+      var els = document.querySelectorAll(MAP[i].sel);
+      for (var j = 0; j < els.length; j++) {
+        var t = (els[j].textContent || '').trim();
+        var he = MAP[i].text[t];
+        if (he && els[j].textContent !== he) { els[j].textContent = he; stats.replaced++; }
+      }
+    }
+  }
+  var pending = false;
+  function schedule() { if (pending) { return; } pending = true; setTimeout(function () { pending = false; try { sync(); } catch (e) {} }, 150); }
+  try {
+    new MutationObserver(function (muts) {
+      for (var i = 0; i < muts.length; i++) { if (muts[i].addedNodes && muts[i].addedNodes.length) { schedule(); return; } }
+    }).observe(document.documentElement, { subtree: true, childList: true });
+    window.addEventListener('load', schedule); schedule();
+  } catch (e) { console.warn('[MH Lang] disabled:', e); }
+  window.MH_LANG = { version: VERSION, sync: sync, stats: function () { return JSON.parse(JSON.stringify(stats)); } };
+  /* mh-lang-v1 */
+})();

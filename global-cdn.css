@@ -1577,7 +1577,7 @@ a[href^="tel:"] svg path {
 }
 
 /* --- 12ו: דף הבית (Merchant & Product Cards) --- */
-.merchant-card, .product-card-basic {
+.merchant-card {  /* 10.9.2026: .product-card-basic הוסר מהסלקטור — כרטיסי המוצר החדשים שקופים בכוונה (חלק 40) */
     background: rgba(255, 255, 255, 0.75) !important;
     backdrop-filter: blur(45px) saturate(210%) !important;
     border-radius: 32px !important;
@@ -2240,305 +2240,12 @@ div[style*="box-shadow: rgba(0, 0, 0, 0.05) 0px 0px 24px 5px;"] {
     box-shadow: none !important;
 }
 
-/*חלק 18 א+ב */
-/* אנחנו מוודאים שהטור עצמו לא מפעיל לחץ או Padding על התמונה */
-html body .merchant-page .pro-card-h {
-    padding: 0 !important;
-    display: flex !important;
-    justify-content: flex-start !important; /* נועל את התוכן לצד החיצוני (שמאל) */
-}
-
-/* 2. ניקוי ויישור כרטיס התמונה (The Inner Card) */
-/* ביטול המרג'ינים שגרמו לציפה ונעילת רוחב למניעת כיווץ באייפון */
-html body .merchant-page .pro-card-h-img {
-    width: 128px !important;
-    height: 128px !important;
-    flex: 0 0 128px !important; /* חובה: מונע מהגריד "לחנוק" את התמונה באייפון */
-    margin: 0 !important;       /* ביטול margin-left: auto שגרם לניתק מהדופן */
-    border: none !important;
-    background: transparent !important;
-    box-shadow: none !important;
-    overflow: visible !important; /* מאפשר לכפתורים/באדג'ים לצוף בעתיד */
-    position: relative !important;
-}
-
-/* 3. נעילת התמונה הפיזית (The Image Component) */
-html body .merchant-page .product-image {
-    width: 128px !important;
-    height: 128px !important;
-    min-width: 128px !important;
-    max-width: 128px !important;
-    /* עיגול פינות DNA - רק בצד הפנימי (ימין) כדי להישאר "דבוק" לדופן שמאל */
-    /* אם אתה רוצה עיגול מלא, שנה ל-16px */
-    border-radius: 16px !important; 
-    overflow: hidden !important;
-    position: absolute !important;
-    top: 0 !important;
-    left: 0 !important;
-}
-
 /* =========================================================
-      FIX PART 18B: SCOPED SIZER KILL (PREVENTS DOMINO)
-=========================================================
-*/
-/* ביטול ה-Sizer רק בכרטיסים רוחביים כדי למנוע קריסת תמונות בשאר האתר */
-html body .merchant-page .product-card-horizontal:not(.product-popup) .v-responsive__sizer {
-    display: none !important;
-}
-
-/* 5. וידוא שהטקסט (הטור השני) מקבל את המרווח שלו מהתמונה */
-html body .merchant-page .xs\:tw-col-span-9,
-html body .merchant-page .tw-col-span-8 {
-    padding-right: 12px !important; /* יוצר את המרווח היוקרתי בין הטקסט לתמונה */
-}
-
-/* 6. הסרת פדינג מיותר מכרטיס האב שחנק את התמונה */
-html body .merchant-page .product-card-horizontal .v-card-text {
-    padding-left: 0 !important; /* מצמיד את התמונה לדופן השמאלית של הכרטיס */
-    padding-top: 10px !important;
-    padding-bottom: 10px !important;
-}
-
-/* =========================================================
-   חלק 18ג: תיקון כפתור הוספה נבלע ב-iOS (WebKit Clip Fix v3)
-   iOS WebKit חותך overflow כשיש border-radius על כל אלמנט בשרשרת
-   פתרון: overflow:visible + padding-bottom על הכרטיס החיצוני
+   חלקים 18 א+ב, 18ג, 19/20 (כרטיסי מוצר בדף העסק: תמונה 128px אבסולוטית, זכוכית על
+   .product-card-basic, סליידר) — הוסרו 10.9.2026. נכתבו למבנה הכרטיס הישן של Hyperzod;
+   בבילד index-C04UkX5H (10.9) הכרטיס נבנה מחדש (.product-image-frame ריבועית) והכללים האלה
+   חתכו את התמונה ל-128px בתוך מסגרת של 173px. הוחלפו ע"י "חלק 40: MH Cards".
    ========================================================= */
-/* 1. הכרטיס החיצוני - חייב overflow visible כי הכפתור בולט מחוצה לו */
-html body .merchant-page .product-card-horizontal {
-    overflow: visible !important;
-}
-html body .merchant-page .product-card-horizontal > .v-card__underlay {
-    border-radius: 8px !important;
-    overflow: hidden !important;
-}
-/* 2. v-card-text בתוך הכרטיס */
-html body .merchant-page .product-card-horizontal > .v-card-text {
-    overflow: visible !important;
-}
-/* 3. עמודת התמונה */
-html body .merchant-page .pro-card-h {
-    overflow: visible !important;
-}
-/* 4. ה-v-card של התמונה - ביטול border-radius מהקונטיינר */
-html body .merchant-page .pro-card-h-img {
-    overflow: visible !important;
-    border-radius: 0 !important;
-    border: none !important;
-    background: transparent !important;
-    box-shadow: none !important;
-}
-/* 5. העברת border-radius + border לתמונה עצמה בלבד */
-html body .merchant-page .pro-card-h-img .product-image {
-    border-radius: 12px !important;
-    overflow: hidden !important;
-    border: 1px solid #e0e0e0 !important;
-}
-/* 6. הכפתור מעל הכל */
-html body .merchant-page .pro-card-h-img .add-product-btn {
-    z-index: 10 !important;
-    position: relative !important;
-}
-/* 7. הוספת padding-bottom לכרטיס כדי שיהיה מקום לכפתור שבולט */
-html body .merchant-page .product-card-horizontal {
-    padding-bottom: 10px !important;
-}
-/* 8. Vuetify v-card elevated variant - ביטול clipping */
-html body .merchant-page .product-card-horizontal.v-card {
-    -webkit-mask-image: none !important;
-    mask-image: none !important;
-}
-
-/* =========================================================
-      FIX PART 19/20: GLOBAL LIQUID GLASS FOR VERTICAL CARDS
-=========================================================
-*/
-/* החלת עיצוב הזכוכית על כל סוגי הכרטיסים האנכיים באתר (כולל סליידרים) */
-html body .merchant-page .product-card-basic {
-    background: rgba(255, 255, 255, 0.7) !important;
-    backdrop-filter: blur(30px) saturate(200%) !important;
-    -webkit-backdrop-filter: blur(30px) saturate(200%) !important;
-    border: 1px solid rgba(255, 255, 255, 0.6) !important;
-    border-radius: 24px !important;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.04) !important;
-    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
-    margin-bottom: 25px !important; /* רווח עבור הטקסט "התאמה אישית" שלא ייחתך */
-    overflow: visible !important;
-}
-
-/* ביטול שכבות מערכת */
-html body .merchant-page .ProductHighlights .v-card__underlay,
-html body .merchant-page .ProductHighlights .v-card__overlay {
-    display: none !important;
-}
-
-/* נעילת גובה לתמונה בכרטיס אנכי למניעת קריסה לאחר ביטול ה-Sizer */
-html body .merchant-page .product-card-basic .product-image {
-    height: 140px !important; 
-    width: calc(100% - 12px) !important;
-    margin: 6px auto !important;
-    border-radius: 18px !important;
-    overflow: hidden !important;
-    position: relative !important;
-    background: #f8f9fa !important;
-}
-
-/* נטרול ה-Sizer של Vuetify */
-html body .merchant-page .ProductHighlights:not(.product-popup) .v-responsive__sizer {
-    display: none !important;
-}
-
-/* עיצוב שם המוצר והמחיר */
-html body .merchant-page .ProductHighlights .product-name {
-    color: #1A1A1A !important;
-    font-weight: 800 !important;
-    font-size: 14px !important;
-    text-align: center !important;
-}
-
-html body .merchant-page .ProductHighlights .product-price {
-    color: #e31e24 !important;
-    font-weight: 900 !important;
-    font-size: 15px !important;
-    text-align: center !important;
-    width: 100% !important;
-}
-
-/* עיצוב הכפתור בתוך ה-Highlights */
-html body .merchant-page .ProductHighlights button.add-btn {
-    background: #ffffff !important;
-    border: 1.5px solid #e31e24 !important;
-    color: #e31e24 !important;
-    border-radius: 12px !important;
-    font-weight: 800 !important;
-    height: 32px !important;
-    min-width: 75px !important;
-    box-shadow: 0 4px 10px rgba(227, 30, 36, 0.15) !important;
-}
-
-/* מירכוז אלמנט ה-footer של הכרטיס */
-html body .merchant-page .ProductHighlights .card-footer {
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: center !important;
-    gap: 8px !important;
-    padding-bottom: 12px !important;
-}
-
-/* טיפול בטקסט "התאמה אישית" */
-html body .merchant-page .ProductHighlights .tw-text-gray-400 {
-    color: rgba(0, 0, 0, 0.3) !important;
-    font-weight: 600 !important;
-    bottom: -18px !important;
-}
-
-
-/* =============================================================================
-   PART 20: THE ULTIMATE SLIDER CARD REBORN (VERTICAL CARDS GLOBAL FIX)
-   ============================================================================= */
-
-/* 1. מכולת הכרטיס - Liquid Glass DNA */
-html body .merchant-page .product-card-slider {
-    background: rgba(255, 255, 255, 0.7) !important;
-    backdrop-filter: blur(40px) saturate(210%) !important;
-    -webkit-backdrop-filter: blur(40px) saturate(210%) !important;
-    border: 1px solid rgba(255, 255, 255, 0.5) !important;
-    border-radius: 22px !important;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05) !important;
-    min-height: 280px !important; /* מבטיח שהכרטיס לא יקרוס פנימה */
-    display: flex !important;
-    flex-direction: column !important;
-    overflow: visible !important;
-    transition: transform 0.3s ease !important;
-}
-
-/* 2. ניקוי שכבות וצללים של Vuetify */
-html body .merchant-page .product-card-slider .v-card__underlay,
-html body .merchant-page .product-card-slider .v-card__overlay {
-    display: none !important;
-}
-
-
-/* 1. כפיית גובה לתמונה - פתרון סופי להיעלמות */
-html body .merchant-page .product-card-slider .product-image {
-    height: 120px !important; /* גובה קבוע באייפון ובדפדפן */
-    width: calc(100% - 12px) !important;
-    margin: 6px auto !important;
-    border-radius: 16px !important;
-    overflow: hidden !important;
-    position: relative !important;
-    background: #f9f9f9 !important;
-    flex-shrink: 0 !important;
-}
-
-/* 2. וידוא פריסת התמונה בתוך הכלוב */
-html body .merchant-page .product-card-slider .v-img__img {
-    height: 100% !important;
-    object-fit: cover !important;
-    position: absolute !important;
-    top: 0 !important;
-}
-
-/* 3. שחרור ה-Sizer רק לכרטיסי סליידר כדי לאפשר גובה קבוע */
-html body .merchant-page .product-card-slider:not(.product-popup) .v-responsive__sizer {
-    display: none !important;
-}
-
-
-/* 1. מכולת הטקסט - סידור ורטיקלי */
-html body .merchant-page .product-card-slider .v-card-text {
-    padding: 8px 10px 15px 10px !important;
-    display: flex !important;
-    flex-direction: column !important;
-    justify-content: space-between !important;
-    flex-grow: 1 !important;
-}
-
-/* 2. שם המוצר */
-html body .merchant-page .product-card-slider .product-name {
-    color: #000000 !important;
-    font-weight: 800 !important;
-    font-size: 13px !important;
-    line-height: 1.2 !important;
-    text-align: center !important;
-    margin-bottom: 5px !important;
-}
-
-/* 3. המחיר - אדום QLED */
-html body .merchant-page .product-card-slider .product-price {
-    color: #e31e24 !important;
-    font-weight: 900 !important;
-    font-size: 15px !important;
-    text-align: center !important;
-    margin-bottom: 8px !important;
-}
-
-/* 4. כפתור ההוספה הקריסטלי */
-html body .merchant-page .product-card-slider button.add-btn {
-    background: #ffffff !important;
-    border: 1.5px solid #e31e24 !important;
-    color: #e31e24 !important;
-    border-radius: 10px !important;
-    font-weight: 800 !important;
-    height: 32px !important;
-    min-width: 80px !important;
-    margin: 0 auto !important;
-    box-shadow: 0 4px 10px rgba(227, 30, 36, 0.1) !important;
-}
-
-/* 5. טקסט "התאמה אישית" */
-html body .merchant-page .product-card-slider .tw-text-gray-400 {
-    font-size: 10px !important;
-    font-weight: 700 !important;
-    color: rgba(0, 0, 0, 0.3) !important;
-    position: absolute !important;
-    bottom: -18px !important;
-    width: 100% !important;
-    left: 0 !important;
-    text-align: center !important;
-}
-
-
 /* =========================================================
    חלק 21א: הדר הוספת כתובת - טיפול שורש קריסטלי
    מטרה: מעבר מלבן אטום לזכוכית, תרגום ועיצוב כפתור חזור
@@ -6691,3 +6398,97 @@ html body #merchant-content button.mh-more.is-done { color: #6b7280 !important; 
    :is(...) סלחני: דפדפן בלי :has מסתיר רק את הקישור, עם :has גם את שורת הגריד הריקה שלו. */
 html body #merchant-content [id^="cat_"].mh-has-more :is(.scheme-pb-view-all, .tw-col-span-full:has(> .scheme-pb-view-all)) { display: none !important; }
 /* mh-showmore-v1 */
+
+/* =========================================================
+   חלק 40: כרטיסי מוצר בדף העסק — MH Cards v1.0.0 | 2026-09-10 — Liquid Glass + אדום QLED
+   מחליף: חלקים 18 א+ב, 18ג, 19/20 (הוסרו). רקע: בבילד index-C04UkX5H (10.9) Hyperzod בנתה מחדש את
+   כרטיס המוצר: מסגרת תמונה ריבועית .product-image-frame (aspect 1:1, רקע #f5f5f5, רדיוס 8), כרטיס שקוף,
+   כפתור הוספה עגול 44px עם אייקון בלבד, שורת תיאור .product-description ותג .product-customizable-tag.
+   העיקרון: לא נוגעים בגודל/מיקום של .product-image או .v-img — Hyperzod ממלאת את המסגרת לבד.
+   סקופ: html body :is(.merchant-page .product-cards.merchant-grid-view, #ProductHighlights) .product-card-basic (גריד)
+         html body .merchant-page .product-card-slider (קרוסלה)
+         html body :is(.merchant-page, #ProductHighlights) .product-customizable-tag (התג; הטקסט מתורגם ב-MH Lang ב-custom-footer.js)
+   ========================================================= */
+/* מסגרת התמונה — רדיוס של שפת העיצוב, מסגרת עדינה; הגודל נשאר של Hyperzod */
+html body :is(.merchant-page .product-cards.merchant-grid-view, #ProductHighlights) .product-card-basic .product-image-frame,
+html body .merchant-page .product-card-slider .product-image-frame {
+    border-radius: 14px !important;
+    border: 1px solid #e6e8ec !important;
+    background: #f6f6f8 !important;
+    overflow: hidden !important;
+}
+/* שם המוצר */
+html body :is(.merchant-page .product-cards.merchant-grid-view, #ProductHighlights) .product-card-basic .product-name,
+html body .merchant-page .product-card-slider .product-name,
+html body .merchant-page .product-card-slider h3 {
+    color: #111 !important;
+    font-weight: 700 !important;
+}
+/* מחיר — אדום QLED (הנקודה האדומה של הכרטיס) */
+html body :is(.merchant-page .product-cards.merchant-grid-view, #ProductHighlights) .product-card-basic .product-price,
+html body .merchant-page .product-card-slider .product-price {
+    color: #c8151b !important;
+    font-weight: 800 !important;
+}
+/* תיאור — משני, שתי שורות */
+html body :is(.merchant-page .product-cards.merchant-grid-view, #ProductHighlights) .product-card-basic .product-description {
+    color: #6b7280 !important;
+    font-size: 12.5px !important;
+    font-weight: 500 !important;
+    line-height: 1.35 !important;
+}
+/* תג "ניתן להתאמה" — גלולה אדומה שקופה כמו תג "נדרש" בפופאפ */
+html body :is(.merchant-page, #ProductHighlights) .product-customizable-tag {
+    display: inline-flex !important;
+    align-items: center !important;
+    height: 20px !important;
+    padding: 0 8px !important;
+    border-radius: 999px !important;
+    background: rgba(227, 30, 36, 0.10) !important;
+    color: #c8151b !important;
+    font-size: 11px !important;
+    font-weight: 800 !important;
+    line-height: 1 !important;
+}
+/* כפתור ההוספה בכרטיס — עגול, אייקון בלבד, כמו בגריד של Hyperzod. בלי זה הכלל הגלובלי של חלק 4
+   (html body .v-btn.add-btn: רדיוס 10, טקסט 13px) תופס את כפתור הקרוסלה ומציג "הוספה" חתוך בתוך 36px. */
+html body :is(.merchant-page .product-cards.merchant-grid-view, #ProductHighlights) .product-card-basic .add-product-btn button.add-btn,
+html body .merchant-page .product-card-slider .add-product-btn button.add-btn {
+    width: 36px !important;
+    height: 36px !important;
+    min-width: 36px !important;
+    max-width: 36px !important;
+    padding: 0 !important;
+    aspect-ratio: 1 / 1 !important;
+    border-radius: 999px !important;
+    border: 1px solid rgba(227, 30, 36, 0.22) !important;
+    background: #fff !important;
+    color: #e31e24 !important;
+    font-size: 0 !important;
+    line-height: 0 !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.10) !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+html body :is(.merchant-page .product-cards.merchant-grid-view, #ProductHighlights) .product-card-basic .add-product-btn button.add-btn svg,
+html body .merchant-page .product-card-slider .add-product-btn button.add-btn svg {
+    width: 13px !important;
+    height: 13px !important;
+    margin: 0 !important;
+}
+html body :is(.merchant-page .product-cards.merchant-grid-view, #ProductHighlights) .product-card-basic .add-product-btn button.add-btn:active,
+html body .merchant-page .product-card-slider .add-product-btn button.add-btn:active {
+    transform: scale(0.92) !important;
+    background: #fff !important;
+}
+@media (min-width: 600px) {
+    html body :is(.merchant-page .product-cards.merchant-grid-view, #ProductHighlights) .product-card-basic .add-product-btn button.add-btn,
+    html body .merchant-page .product-card-slider .add-product-btn button.add-btn {
+        width: 44px !important;
+        height: 44px !important;
+        min-width: 44px !important;
+        max-width: 44px !important;
+    }
+}
+/* mh-cards-v1 */
