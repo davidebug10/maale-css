@@ -6796,3 +6796,27 @@ html body #checkout .mh-kafit-addr.mh-kafit-addr-filled .v-field { border-color:
     html body #checkout .mh-kafit-addr { animation: none !important; }
 }
 /* mh-kafitaddr-v1 */
+
+/* =========================================================
+   חלק 43: רמז ושגיאת "שם מלא" בטופס ההרשמה — MH FullName v1.0.0 | 2026-09-10 — אדום QLED
+   מחליף: כלום. סקופ: .mh-fullname-hint (נוצר ע"י MH FullName ב-custom-footer.js מיד אחרי
+   ה-.v-input של #firstName בטופס ההרשמה בלבד) ו-.mh-fullname-error על אותו .v-input.
+   שום שדה אחר לא מושפע. מצבים: רמז אפור קבוע · שגיאה אדומה אחרי ניסיון הרשמה עם שם של מילה אחת.
+   ========================================================= */
+html body .mh-fullname-hint {
+    font-size: 12.5px !important;
+    line-height: 1.35 !important;
+    color: #6b7280 !important;
+    margin: 0 4px 10px !important;
+    text-align: right !important;
+    direction: rtl !important;
+}
+html body .mh-fullname-error + .mh-fullname-hint {
+    color: #e31e24 !important;
+    font-weight: 700 !important;
+}
+html body .mh-fullname-error .v-field {
+    box-shadow: 0 0 0 2px #e31e24 inset !important;
+    border-radius: 12px !important;
+}
+/* mh-fullname-v1 */

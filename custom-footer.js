@@ -3449,3 +3449,69 @@ log('פעיל');
   window.MH_KAFITADDR = { version: VERSION, sync: sync, merchant: MERCHANT, stats: function () { return JSON.parse(JSON.stringify(stats)); } };
   /* mh-kafitaddr-v1 */
 })();
+
+/* =========================================================
+   MH FullName v1.0.0 | 2026-09-10 — חובה שם פרטי + שם משפחה בהרשמה
+   למה: Grow דוחה שם של מילה אחת ביצירת קישור תשלום ("שדה לא תקין: pageFieldSettings[fullName]") —
+   לקוחות שנרשמו עם שם פרטי בלבד לא הצליחו לשלם באשראי (כ-40 ניסיונות של 7 לקוחות, 8–10.9.2026).
+   שרת הסליקה (render-starter/grow.js) כבר מוסיף אות לשם של מילה אחת, וכאן סוגרים את המקור:
+   בטופס ההרשמה של Hyperzod יש שדה שם אחד בלבד (#firstName; last_name נשלח null, אין שדה משפחה).
+   דורשים לפחות שתי מילים של 2+ אותיות: רמז קבוע מתחת לשדה, ובלחיצה על "הרשמה"/Enter עם פחות
+   מזה — חסימה (capture, לפני ה-handler של Vue) + הודעה אדומה + פוקוס לשדה. ההודעה נעלמת כשהשם תקין.
+   נכשל-פתוח: אין #firstName → כלום. סקופ: הטופס שמכיל את #firstName בלבד. CSS: חלק 43 ב-global-cdn.css.
+   ========================================================= */
+(function () {
+  'use strict';
+  if (window.__MH_FULLNAME__) { return; }
+  window.__MH_FULLNAME__ = true;
+  var VERSION = '1.0.0', MIN_WORDS = 2, MIN_LEN = 2;
+  var HINT = 'שם פרטי ושם משפחה (למשל: לינוי ארונציק)';
+  var ERR = 'חובה שם פרטי וגם שם משפחה — בלי שם משפחה התשלום באשראי לא עובר';
+  var stats = { hints: 0, blocked: 0, passed: 0 };
+
+  function words(v) {
+    return String(v || '').trim().split(/\s+/).filter(function (w) { return w.replace(/[^\p{L}]/gu, '').length >= MIN_LEN; }).length;
+  }
+  function ok(input) { return words(input.value) >= MIN_WORDS; }
+  function wrap(input) { return input.closest('.v-input') || input.parentElement; }
+  function hintOf(w) { var n = w && w.nextElementSibling; return n && n.classList && n.classList.contains('mh-fullname-hint') ? n : null; }
+  function setState(input, error) {
+    var w = wrap(input), h = hintOf(w);
+    if (!w || !h) { return; }
+    w.classList.toggle('mh-fullname-error', !!error);
+    h.textContent = error ? ERR : HINT;
+  }
+  function block(e, input) {
+    e.preventDefault(); e.stopImmediatePropagation();
+    stats.blocked++; setState(input, true);
+    try { input.focus(); } catch (x) {}
+  }
+  function attach(input) {
+    if (input.__mhFullName) { return; }
+    input.__mhFullName = true;
+    var w = wrap(input); if (!w) { return; }
+    var h = document.createElement('div'); h.className = 'mh-fullname-hint'; h.textContent = HINT;
+    w.insertAdjacentElement('afterend', h); stats.hints++;
+    try { input.setAttribute('autocomplete', 'name'); input.setAttribute('placeholder', 'שם פרטי ושם משפחה'); } catch (e) {}
+    input.addEventListener('input', function () { if (ok(input)) { setState(input, false); } });
+    input.addEventListener('keydown', function (e) { if (e.key === 'Enter' && !ok(input)) { block(e, input); } }, true);
+    var form = input.closest('form'); if (!form) { return; }
+    form.addEventListener('submit', function (e) { if (!ok(input)) { block(e, input); } else { stats.passed++; } }, true);
+    form.addEventListener('click', function (e) {
+      var btn = e.target && e.target.closest ? e.target.closest('button[type="submit"], .login-btn') : null;
+      if (btn && !ok(input)) { block(e, input); }
+    }, true);
+  }
+  function scan() { var input = document.getElementById('firstName'); if (input && input.tagName === 'INPUT') { attach(input); } }
+  var pending = false;
+  function schedule() { if (pending) { return; } pending = true; setTimeout(function () { pending = false; try { scan(); } catch (e) {} }, 150); }
+  try {
+    new MutationObserver(function (muts) {
+      for (var i = 0; i < muts.length; i++) { if (muts[i].addedNodes && muts[i].addedNodes.length) { schedule(); return; } }
+    }).observe(document.documentElement, { subtree: true, childList: true });
+    window.addEventListener('load', schedule); schedule();
+  } catch (e) { console.warn('[MH FullName] disabled:', e); }
+
+  window.MH_FULLNAME = { version: VERSION, words: words, stats: function () { return JSON.parse(JSON.stringify(stats)); } };
+  /* mh-fullname-v1 */
+})();

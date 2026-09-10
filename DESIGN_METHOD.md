@@ -48,6 +48,7 @@
 | קופונים בצ'ק-אאוט | "mh-coupon-v2" | |
 | חלונית "בחר כתובת" בצ'ק-אאוט | "חלק 41: MH AddrPick" | עוגן `#SelectAddress` (id ייחודי). מנטרל לוקאלית את הריפוד הגנרי של bottom-sheet |
 | שדה הכתובת הידנית בצ'ק-אאוט של קפית | "חלק 42: MH KafitAddr" | + JS `MH KafitAddr`. הזיהוי לפי **טקסט** ("הזנת כתובת ידנית"), הסקופ לפי `getCartMerchant` + `#checkout` |
+| שם מלא בטופס ההרשמה (רמז + שגיאה) | "חלק 43: MH FullName" | + JS `MH FullName`. סקופ `#firstName` בטופס ההרשמה (שדה השם היחיד; Hyperzod שולחת `last_name:null`). דורש 2 מילים של 2+ אותיות, חוסם "הרשמה"/Enter ב-capture לפני Vue. הסיבה: Grow דוחה שם של מילה אחת (10.9). בדיקה: scratchpad `signup/test-fullname.mjs` (מוק; הטופס החי לא נגיש ב-headless) |
 | סרגל ניווט תחתון | "חלק 31" | |
 
 ### 1.2 בלוקי ה-JS ב-`custom-footer.js`
