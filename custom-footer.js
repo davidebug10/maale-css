@@ -3055,3 +3055,127 @@ log('פעיל');
   };
   /* mh-catmap-v1 */
 })();
+
+/* ============================================================
+   טעינת כל קטגוריות התפריט בדף העסק — MH MenuLoad  |  v1.0.0 | 2026-09-10
+   הבעיה (נמדדה בגואה, 28 קטגוריות): Hyperzod מביאה את התפריט בדפים של 15
+   קטגוריות (max_categories_per_page) ומבקשת את הדף הבא רק כשאלמנט-זקיף
+   בתחתית הדף נכנס למסך. בכרום ללא ראש קפיצה לתחתית לא מפעילה אותו בכלל,
+   ודוד מדווח שבטלפונים מסוימים גם גלילה לסוף לא מביאה את דף 2 —
+   הלקוח רואה 15 קטגוריות ולא יודע שיש 28.
+   הפתרון: אחרי שדף 1 נטען, קוראים בעצמנו ל-loadMore() של רכיב דף העסק
+   (אותה פונקציה שהזקיף מפעיל) עד שדף מחזיר פחות מ-15 קטגוריות.
+   - לא נוגעים ב-DOM ולא ב-API: הרכיב של Hyperzod עושה את העבודה, ומסנן
+     כפילויות לפי _id (updateCategoryProducts).
+   - חנות שדף 1 שלה החזיר פחות מ-15 קטגוריות (בנ'ס 6, מחניודה 14) — אין דף 2,
+     לא נשלחת אף קריאה.
+   - loadMoreInFlight של הרכיב מונע התנגשות עם הזקיף של Hyperzod אם הוא כן עובד.
+   - נכשל-פתוח: אם המבנה של Vue ישתנה ולא נמצא הרכיב — לא עושים כלום.
+   בדיקה: window.MH_MENULOAD.stats()
+   ============================================================ */
+(function () {
+  'use strict';
+  if (window.__MH_MENULOAD__) { return; }
+  window.__MH_MENULOAD__ = true;
+
+  var VERSION = '1.0.0';
+  var PAGE_SIZE = 15;   /* max_categories_per_page של Hyperzod, נמדד 10.9.2026 */
+  var MAX_PAGES = 10;   /* תקרה בטיחותית: עד 150 קטגוריות */
+  var stats = { version: VERSION, runs: 0, calls: 0, added: 0, skipped: 0, lastMerchant: null };
+  var busy = false;
+
+  /* רכיב דף העסק של Hyperzod: היחיד שיש לו loadMore + page + merchantId.
+     ב-production אין __vueParentComponent, לכן הולכים מ-#app._vnode. */
+  function findComp() {
+    var el = document.getElementById('app');
+    if (!el || !el._vnode) { return null; }
+    var found = null;
+    function walkInst(inst, d) {
+      if (!inst || found || d > 60) { return; }
+      var p = inst.proxy;
+      try {
+        if (p && typeof p.loadMore === 'function' && ('page' in p) && ('merchantId' in p)) { found = p; return; }
+      } catch (e) {}
+      walkV(inst.subTree, d + 1);
+    }
+    function walkV(v, d) {
+      if (!v || found || d > 200) { return; }
+      if (v.component) { walkInst(v.component, d + 1); }
+      if (v.suspense && v.suspense.activeBranch) { walkV(v.suspense.activeBranch, d + 1); }
+      if (Array.isArray(v.children)) { for (var i = 0; i < v.children.length && !found; i++) { walkV(v.children[i], d + 1); } }
+    }
+    walkV(el._vnode, 0);
+    return found;
+  }
+
+  function catCount() {
+    try {
+      var st = document.getElementById('app').__vue_app__.config.globalProperties.$store;
+      var a = st.state.Merchant.categoryProducts;
+      if (Array.isArray(a)) { return a.length; }
+    } catch (e) {}
+    return document.querySelectorAll('#ProductCategoriesSlider a.scrollactive-item').length;
+  }
+
+  function finish() { busy = false; }
+
+  function step(p, mid, i) {
+    if (i >= MAX_PAGES || p.merchantId !== mid) { finish(); return; }
+    if (p.loadMoreInFlight) { setTimeout(function () { step(p, mid, i); }, 400); return; }
+    var before = catCount();
+    var r;
+    try { r = p.loadMore(); } catch (e) { finish(); return; }
+    stats.calls++;
+    Promise.resolve(r).then(function () {
+      setTimeout(function () {
+        var after = catCount();
+        var got = Math.max(0, after - before);
+        stats.added += got;
+        /* דף מלא (15) → אולי יש עוד; פחות מזה → זה היה הדף האחרון */
+        if (got >= PAGE_SIZE) { step(p, mid, i + 1); } else { finish(); }
+      }, 250);
+    }).catch(function () { finish(); });
+  }
+
+  /* מתי לרוץ: כל הדפים שנטענו עד עכשיו היו מלאים (count === page × 15) — כלומר ייתכן
+     דף נוסף. אחרי דף חלקי המשוואה נשברת ולא רצים שוב. כשהלקוח חוזר לחנות (SPA)
+     Hyperzod מאפסת page=1 וטוענת מחדש — והמשוואה שוב מתקיימת, ולכן רצים מחדש.
+     חנות שדף 1 שלה קטן מ-15 (בנ'ס, מחניודה) לעולם לא מקיימת אותה — אפס קריאות. */
+  function run() {
+    if (busy) { return; }
+    var p = findComp();
+    if (!p) { return; }
+    var mid = p.merchantId;
+    if (!mid) { return; }
+    if (p.loading || p.loadMoreInFlight) { return; }      /* דף בדרך — ננסה שוב במוטציה הבאה */
+    var page = p.page;
+    if (!(page >= 1)) { return; }
+    var n = catCount();
+    if (n === 0) { return; }                                  /* עוד לא רונדר */
+    stats.lastMerchant = mid;
+    if (n !== page * PAGE_SIZE) { if (page === 1) { stats.skipped++; } return; }
+    busy = true;
+    stats.runs++;
+    step(p, mid, 0);
+  }
+
+  var pending = false;
+  function schedule() {
+    if (pending) { return; }
+    pending = true;
+    setTimeout(function () { pending = false; try { run(); } catch (e) { busy = false; } }, 200);
+  }
+
+  try {
+    new MutationObserver(function (muts) {
+      for (var i = 0; i < muts.length; i++) {
+        if (muts[i].addedNodes && muts[i].addedNodes.length) { schedule(); return; }
+      }
+    }).observe(document.documentElement, { subtree: true, childList: true });
+    window.addEventListener('load', schedule);
+    schedule();
+  } catch (e) { console.warn('[MH MenuLoad] disabled:', e); }
+
+  window.MH_MENULOAD = { version: VERSION, run: run, findComp: findComp, stats: function () { return JSON.parse(JSON.stringify(stats)); } };
+  /* mh-menuload-v1 */
+})();
