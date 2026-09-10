@@ -3181,7 +3181,7 @@ log('פעיל');
 })();
 
 /* ============================================================
-   "הצג עוד" בקטגוריה חתוכה בדף העסק — MH ShowMore  |  v1.0.0 | 2026-09-10
+   "הצג עוד" בקטגוריה חתוכה בדף העסק — MH ShowMore  |  v1.0.1 | 2026-09-10
    הבעיה (סקר 11 חנויות, 10.9): Hyperzod מביאה עד 20 מוצרים לקטגוריה ומסמנת
    is_paginated, אבל החנות לא קוראת את הדגל ואין שום דרך לראות את השאר —
    14 קטגוריות ב-4 חנויות, 230 מוצרים מוסתרים (בגואה "סיגריות" 20 מתוך 65).
@@ -3199,7 +3199,7 @@ log('פעיל');
   if (window.__MH_SHOWMORE__) { return; }
   window.__MH_SHOWMORE__ = true;
 
-  var VERSION = '1.0.0';
+  var VERSION = '1.0.1';
   var PAGE = 20;
   var CLS = 'mh-more';
   var stats = { version: VERSION, buttons: 0, clicks: 0, loaded: 0, finished: 0, errors: 0 };
@@ -3285,6 +3285,7 @@ log('פעיל');
         btn.innerHTML = label(cat);
         btn.addEventListener('click', function (e) { e.preventDefault(); e.stopPropagation(); loadNext(cat, btn); });
         inner.appendChild(btn); stats.buttons++;
+        sec.classList.add('mh-has-more');   /* ה-CSS מסתיר את "צפה בהכל" של Hyperzod — הוא מוביל לדף שמציג 20 בלבד */
       }
     });
   }

@@ -6642,7 +6642,7 @@ html body #mh-catmap .mh-cm-row.on:active { transform: scale(1) !important; }
 /* mh-catmap-v1 */
 
 /* =========================================================
-   חלק 39: כפתור "הצג עוד" בקטגוריה חתוכה בדף העסק — MH ShowMore v1.0.0 | 2026-09-10 — Liquid Glass + אדום QLED
+   חלק 39: כפתור "הצג עוד" בקטגוריה חתוכה בדף העסק — MH ShowMore v1.0.1 | 2026-09-10 — Liquid Glass + אדום QLED
    מחליף: כלום (רכיב חדש). סקופ: html body #merchant-content button.mh-more — אלמנט שלנו בלבד,
    שנבנה ע"י MH ShowMore ב-custom-footer.js בתחתית .special-listing-inner של קטגוריה מסומנת is_paginated.
    מצבים: .is-loading (בקשה בדרך), .is-done (אין עוד — נעלם אחרי 1.8 שנ').
@@ -6686,4 +6686,8 @@ html body #merchant-content button.mh-more.is-loading .mh-more-t::after {
 @keyframes mhMoreDots { 0% { clip-path: inset(0 100% 0 0); } 100% { clip-path: inset(0 0 0 0); } }
 html body #merchant-content button.mh-more.is-done { color: #6b7280 !important; border-color: rgba(0,0,0,.08) !important; box-shadow: none !important; cursor: default !important; }
 @media (prefers-reduced-motion: reduce) { html body #merchant-content button.mh-more, html body #merchant-content button.mh-more .mh-more-t::after { transition: none !important; animation: none !important; } }
+/* "צפה בהכל" של Hyperzod (div.scheme-pb-view-all) מוביל לדף קטגוריה שמציג 20 מוצרים בלבד — דרך ללא מוצא.
+   מסתירים אותו רק בקטגוריה שבה יש לנו "הצג עוד" (המחלקה mh-has-more על הסקשן, מ-MH ShowMore).
+   :is(...) סלחני: דפדפן בלי :has מסתיר רק את הקישור, עם :has גם את שורת הגריד הריקה שלו. */
+html body #merchant-content [id^="cat_"].mh-has-more :is(.scheme-pb-view-all, .tw-col-span-full:has(> .scheme-pb-view-all)) { display: none !important; }
 /* mh-showmore-v1 */
