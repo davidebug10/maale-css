@@ -6709,10 +6709,15 @@ html body #SelectAddress .scheme-status-badge--success::before {
    ========================================================= */
 html body #checkout .mh-kafit-addr {
     position: relative !important;
+    /* מרווח עליון לתג. overflow:visible לא מספיק — לכרטיס האב של Hyperzod יש חיתוך משלו,
+       ולכן התג יושב *בתוך* הכרטיס (top:12) ולא מרחף מעליו (נמדד חי: נחתך למעלה). */
+    padding-top: 46px !important;
+    margin-top: 6px !important;
     border: 2px solid #e31e24 !important;
     border-radius: 18px !important;
     background: #fff6f6 !important;
     box-shadow: 0 8px 24px rgba(227, 30, 36, 0.16) !important;
+    overflow: visible !important;
     animation: mhKafitPulse 2.4s ease-in-out 3 !important;
     transition: border-color .3s ease, background-color .3s ease, box-shadow .3s ease !important;
 }
@@ -6724,7 +6729,7 @@ html body #checkout .mh-kafit-addr {
 html body #checkout .mh-kafit-addr::before {
     content: 'חובה למילוי' !important;
     position: absolute !important;
-    top: -11px !important;
+    top: 12px !important;
     inset-inline-end: 16px !important;
     z-index: 2 !important;
     padding: 4px 12px !important;
