@@ -5486,7 +5486,7 @@ html body .mh-fullname-error .v-field {
 /* mh-fullname-v1 */
 
 /* =========================================================
-   חלק 44: מסך הוספת/עריכת כתובת — MH AddrEditor v1.0.0 | 2026-09-22 — Liquid Glass + אדום QLED
+   חלק 44: מסך הוספת/עריכת כתובת — MH AddrEditor v1.0.1 | 2026-09-23 (v1.0.1: שדה הטלפון LTR — הדגל לא מכסה את הספרות) — Liquid Glass + אדום QLED
    הבעלים היחיד של המסך: הדר, שדה החיפוש, רשימת התוצאות, המפה, הטופס והפוטר —
    בחלונית במובייל (.scheme-address-editor) ובמגירה בדסקטופ (.v-navigation-drawer .address-panel-swap).
    מחליף במלואם את חלקים 12ד, 12ה, 16א–16ה, 21א, 21ב, 23, 28, 29, 29.1,
@@ -5830,10 +5830,13 @@ html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) 
 html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) #AddressInputCountry {
     display: none !important;
 }
-/* טלפון: הדגל + הקידומת + המספר בקפסולה אחת */
+/* טלפון: Hyperzod בונה את השדה משמאל לימין (דגל קבוע בשמאל, אחריו +972, אחריו הספרות). בתוך הטופס
+   ה-RTL הקידומת קפצה לימין והדגל נשאר על הספרות הראשונות (דיווח דוד 23.9). הפתרון: הקפסולה כולה LTR —
+   דגל ▾ | +972 | 052-... — כמו שמספר טלפון נקרא. */
 html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) #AddressInputContactPhoneNumber #login-input {
-    display: flex !important;
-    align-items: stretch !important;
+    position: relative !important;
+    direction: ltr !important;
+    display: block !important;
     background: #f5f5f7 !important;
     border-radius: 14px !important;
     border: 1.5px solid transparent !important;
@@ -5845,17 +5848,89 @@ html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) 
     border-color: #e31e24 !important;
     box-shadow: 0 0 0 4px rgba(227, 30, 36, 0.10) !important;
 }
+/* הדגל: קבוע בשמאל, ממורכז אנכית, לא נוגע בספרות */
+html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) #AddressInputContactPhoneNumber .v-input__prepend-outer {
+    position: absolute !important;
+    left: 0 !important;
+    top: 0 !important;
+    bottom: 0 !important;
+    width: 64px !important;
+    height: auto !important;
+    z-index: 2 !important;
+    display: flex !important;
+    align-items: center !important;
+}
+html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) #AddressInputContactPhoneNumber .country-select {
+    display: block !important;
+    height: auto !important;
+    width: 100% !important;
+}
+html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) #AddressInputContactPhoneNumber .country-select-toggle {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 2px !important;
+    height: 54px !important;
+    padding: 0 0 0 10px !important;
+    cursor: pointer !important;
+}
+html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) #AddressInputContactPhoneNumber .country-select-toggle img {
+    width: 24px !important;
+    height: 18px !important;
+    border-radius: 3px !important;
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.08) !important;
+}
+html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) #AddressInputContactPhoneNumber .country-select-dropdown {
+    direction: ltr !important;
+    text-align: left !important;
+}
+/* השדה עצמו: LTR, הקידומת אחרי הדגל, הספרות אחריה */
+html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) #AddressInputContactPhoneNumber .v-input,
+html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) #AddressInputContactPhoneNumber .v-field {
+    direction: ltr !important;
+}
 html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) #AddressInputContactPhoneNumber .v-field,
 html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) #AddressInputContactPhoneNumber .v-field--focused {
     background: transparent !important;
     border-color: transparent !important;
     box-shadow: none !important;
+    padding: 0 12px 0 64px !important;
+    min-height: 54px !important;
 }
-html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) #AddressInputContactPhoneNumber .country-select-toggle {
-    display: flex !important;
+html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) #AddressInputContactPhoneNumber .v-field__prepend-inner {
+    padding: 0 !important;
+    margin: 0 !important;
     align-items: center !important;
-    height: 54px !important;
-    padding: 0 10px !important;
+}
+html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) #AddressInputContactPhoneNumber .v-field__prepend-inner > div {
+    margin: 0 !important;
+    padding: 0 !important;
+    gap: 8px !important;
+    font-size: 15px !important;
+    font-weight: 700 !important;
+    color: #374151 !important;
+    direction: ltr !important;
+}
+html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) #AddressInputContactPhoneNumber .v-field__prepend-inner .tw-bg-\[\#ccc\] {
+    width: 1px !important;
+    height: 18px !important;
+    margin: 0 4px 0 8px !important;
+    background: rgba(0, 0, 0, 0.14) !important;
+}
+html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) #AddressInputContactPhoneNumber input#contactPhoneNumber {
+    direction: ltr !important;
+    text-align: left !important;
+    padding: 0 0 0 4px !important;
+    min-height: 54px !important;
+    font-size: 16px !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.3px !important;
+    color: #111 !important;
+}
+html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) #AddressInputContactPhoneNumber input#contactPhoneNumber::placeholder {
+    color: #8a8f98 !important;
+    font-weight: 500 !important;
+    letter-spacing: 0 !important;
 }
 /* "לשמור את הכתובת בתור": גלולות, הנבחרת אדומה */
 html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) #AddressSelectType label {
