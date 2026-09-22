@@ -3577,7 +3577,7 @@ log('פעיל');
 })();
 
 /* ============================================================
-   רחובות של מעלה אדומים שגוגל לא מכיר — MH Streets  |  v1.0.0 | 2026-09-22
+   רחובות של מעלה אדומים שגוגל לא מכיר — MH Streets  |  v1.0.1 | 2026-09-22
    הבעיה (לקוח אמיתי, 22.9): "הפסנתר" ו"הר הלבונה" לא נמצאו בחיפוש הכתובת. חיפוש
    הכתובות של Hyperzod עובר דרך Google Places (השרת שלהם, /store/v1/places/search),
    ול-Google פשוט אין את הרחובות החדשים של מעלה אדומים (נבדק גם Mapbox ו-OSM: אין).
@@ -3587,7 +3587,14 @@ log('פעיל');
    תוצאה משלנו בראש הרשימה. הבחירה עוברת בנתיב ה-Mapbox הקיים של Hyperzod (אובייקט
    mapbox_data עם center) — בלי קריאת רשת, בלי שינוי בקוד שלהם — והלקוח מדייק את
    הסיכה במפה (המסך ממילא מבקש "הזז את הסיכה למיקום המסירה המדויק").
-   סקופ: רק פעולת ה-Vuex "searchLocation". לא נוגע בשמירה, בתשלום או באזורי המשלוח.
+   שני נתיבים ברכיב (location-master): (1) גוגל הצליחה → הרשימה מגיעה מ-Vuex (getSearchedLocations);
+   (2) גוגל החזירה "No results"/נכשלה/עברה 2 שניות → הרכיב נופל בשקט ל-Mapbox ומציב את התשובה
+   ישירות (this.locations), בלי Vuex. לכן: בנתיב 1 מוסיפים ל-store (ומחזירים הצלחה כשיש לנו
+   התאמה, כדי שהרכיב לא יברח ל-Mapbox); בנתיב 2 עוטפים את fetch של Mapbox ומקדימים את
+   הרחובות שלנו כ-features (נמדד חי 22.9: "הר הלבונה" → גוגל "No results" → Mapbox החזירה
+   "הלבונה, בנימינה" ודרסה את ההזרקה — v1.0.1).
+   סקופ: פעולת ה-Vuex "searchLocation" + בקשות fetch ל-api.mapbox.com/geocoding בלבד.
+   לא נוגע בשמירה, בתשלום או באזורי המשלוח.
    נכשל-פתוח: אין store → כלום; שגיאה → התוצאות של Google כרגיל.
    רענון הטבלה: node tools/streets-govmap.mjs (ראו DESIGN_METHOD).
    בדיקה: window.MH_STREETS.stats() / window.MH_STREETS.find('הפסנתר 8')
@@ -3596,7 +3603,7 @@ log('פעיל');
   'use strict';
   if (window.__MH_STREETS__) { return; }
   window.__MH_STREETS__ = true;
-  var VERSION = '1.0.0', CITY = 'מעלה אדומים', MAX = 3;
+  var VERSION = '1.0.1', CITY = 'מעלה אדומים', MAX = 3;
   /* [שם רחוב לתצוגה, lat, lng] — מקור: GovMap 22.9.2026 (146 רחובות; 4 שאין להם מיקום בשום מפה: הזוגן, החורן, החלמונית, השרון) */
   var STREETS = [
   ["אבני החושן",31.775122,35.301897],
@@ -3807,7 +3814,7 @@ log('פעיל');
       }
     };
   }
-  var stats = { version: VERSION, hooked: false, searches: 0, injected: 0, last: null, streets: STREETS.length };
+  var stats = { version: VERSION, hooked: false, fetchHooked: false, searches: 0, injected: 0, rescued: 0, mapboxInjected: 0, last: null, streets: STREETS.length };
   function augment(store, q) {
     var matches = find(q);
     if (!matches.length) { return; }
@@ -3816,10 +3823,11 @@ log('פעיל');
     for (var i = 0; i < matches.length; i++) {
       if (!googleHas(list, matches[i].street)) { add.push(makeResult(matches[i])); }
     }
-    if (!add.length) { return; }
+    if (!add.length) { return false; }
     stats.injected += add.length;
     stats.last = { q: q, added: add.map(function (r) { return r.mapbox_data.place_name; }) };
     store.commit('setSearchedLocations', add.concat(list));
+    return true;
   }
   function hook(store) {
     var orig = store.dispatch;
@@ -3829,14 +3837,54 @@ log('פעיל');
         if (type === 'searchLocation' && payload && payload.q) {
           stats.searches++;
           var q = payload.q;
-          p = p.then(function (r) { try { augment(store, q); } catch (e) { console.warn('[MH Streets]', e); } return r; },
-                     function (e) { try { augment(store, q); } catch (e2) {} throw e; });
+          p = p.then(function (r) {
+            var added = false;
+            try { added = augment(store, q); } catch (e) { console.warn('[MH Streets]', e); }
+            /* גוגל "No results" (r = מחרוזת) + יש לנו רחוב → מדווחים הצלחה, אחרת הרכיב בורח ל-Mapbox ודורס */
+            return (added && r !== 1) ? (stats.rescued++, 1) : r;
+          }, function (e) { try { augment(store, q); } catch (e2) {} throw e; });
         }
       } catch (e) { console.warn('[MH Streets]', e); }
       return p;
     };
     stats.hooked = true;
   }
+  /* נתיב Mapbox: הרכיב קורא fetch('https://api.mapbox.com/geocoding/v5/mapbox.places/<q>.json?…') ומציב
+     u.features ישירות. מקדימים features בפורמט Mapbox (place_name נקי — הוא נשמר ככתובת). */
+  function mapboxFeature(m) {
+    var s = m.street, label = s.name + (m.num ? ' ' + m.num : '');
+    return { id: 'mh.' + label, type: 'Feature', place_type: ['address'], relevance: 1, text: label,
+      place_name: label + ', ' + CITY + ', ישראל', center: [s.lng, s.lat], geometry: { type: 'Point', coordinates: [s.lng, s.lat] },
+      context: [{ id: 'place.mh', text: CITY }, { id: 'region.mh', text: 'מחוז ירושלים' }, { id: 'country.mh', text: 'ישראל', short_code: 'il' }] };
+  }
+  function hookFetch() {
+    if (typeof window.fetch !== 'function') { return; }
+    var orig = window.fetch;
+    window.fetch = function (input) {
+      var url = (typeof input === 'string') ? input : (input && input.url) || '';
+      var mm = /api\.mapbox\.com\/geocoding\/v5\/mapbox\.places\/([^?]+)\.json/.exec(url);
+      if (!mm) { return orig.apply(this, arguments); }
+      var q = ''; try { q = decodeURIComponent(mm[1]); } catch (e) { return orig.apply(this, arguments); }
+      var matches = find(q);
+      var p = orig.apply(this, arguments);
+      if (!matches.length) { return p; }
+      return p.then(function (res) {
+        return res.clone().json().then(function (json) {
+          var feats = (json && json.features) || [];
+          var have = feats.map(function (f) { return { address: f.place_name }; });
+          var add = [];
+          for (var i = 0; i < matches.length; i++) { if (!googleHas(have, matches[i].street)) { add.push(mapboxFeature(matches[i])); } }
+          if (!add.length) { return res; }
+          stats.mapboxInjected += add.length;
+          stats.last = { q: q, added: add.map(function (f) { return f.place_name; }), via: 'mapbox' };
+          json.features = add.concat(feats);
+          return new Response(JSON.stringify(json), { status: 200, headers: { 'Content-Type': 'application/json' } });
+        }, function () { return res; });
+      });
+    };
+    stats.fetchHooked = true;
+  }
+  try { hookFetch(); } catch (e) { console.warn('[MH Streets] fetch hook', e); }
   /* תרגום placeholder חסר בחבילת השפה ("Search for area or address") — טקסט בלבד */
   function placeholder() {
     var els = document.querySelectorAll('.scheme-location-master input#search');
@@ -3859,6 +3907,6 @@ log('פעיל');
     new MutationObserver(function () { if (pend) { return; } pend = true; setTimeout(function () { pend = false; placeholder(); }, 200); })
       .observe(document.documentElement, { subtree: true, childList: true });
   } catch (e) {}
-  window.MH_STREETS = { version: VERSION, find: find, parse: parse, stats: function () { return JSON.parse(JSON.stringify(stats)); } };
+  window.MH_STREETS = { version: VERSION, find: find, parse: parse, mapboxFeature: mapboxFeature, stats: function () { return JSON.parse(JSON.stringify(stats)); } };
   /* mh-streets-v1 */
 })();
