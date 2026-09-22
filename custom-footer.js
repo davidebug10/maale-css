@@ -966,7 +966,17 @@
 })();
 
 /* ============================================================================
-   MH Pizza Quarters — Production v1.2
+   MH Pizza Quarters — Production v1.4
+   ----------------------------------------------------------------------------
+   שינויים מ-v1.3 (22.9.2026, mhq-halves-v1):
+     [NEW] מסעדה שמוכרת חצאים בלבד (שיבולת השרון: "(הכל)/(חצי ימין)/(חצי שמאל)",
+           בלי רבע בודד בתפריט) — הגלגל מצייר שני חצאים ימין/שמאל במקום
+           ארבעה רבעים שאי אפשר לקנות. התווית "₪4 לחצי" במקום "₪2 לרבע"
+           המומצא, הכותרת "איזה חצי?", וצ'יפ אחד לחצי בתצוגת הפיצה.
+           ההחלטה לכל תוספת בנפרד: יש אפשרות של רבע בודד -> ארבעה רבעים,
+           בדיוק כמו קודם (בנ'ס לא זז — נבדק במוק מול הגרסה הקודמת).
+           הנתיבים של החצאים קיימים תמיד ב-SVG אך מוסתרים ב-CSS, ונחשפים
+           רק תחת .mhq-halves.
    ----------------------------------------------------------------------------
    שינויים מ-v1.1:
      [NEW] בורר הצירוף הקצר ביותר. הבון אצל המסעדן היה ארוך ומבלבל — שורה
@@ -1171,6 +1181,11 @@
       t.quarterPrice = quarter ? quarter.price
         : (t.wholePrice != null ? Math.round(t.wholePrice * 25) / 100 : null);
       t.coverage = t.opts.reduce(function (a, o) { return a | o.mask; }, 0);
+      /* [v1.4] אין רבע בודד בתפריט אבל יש חצי ימין/שמאל -> גלגל של שני חצאים.
+         ponytail: רק ימין/שמאל (mask 9/6); עליון/תחתון נשארים בגלגל הרבעים. */
+      var half = t.opts.filter(function (o) { return o.mask === 9 || o.mask === 6; })[0];
+      t.halfOnly = !quarter && !!half;
+      t.halfPrice = half ? half.price : null;
     });
 
     return map;
@@ -1266,6 +1281,9 @@
     4: 'M50,50 L96,50 A46,46 0 0,1 50,96 Z'
   };
   var QNUM = { 1: [71, 36], 2: [29, 36], 3: [29, 70], 4: [71, 70] };
+  /* [v1.4] חצי ימין = רבעים 1+4, חצי שמאל = 2+3 (כמו VARIANTS) */
+  var HALF_Q = { R: [1, 4], L: [2, 3] };
+  var HPATH = { R: 'M50,4 A46,46 0 0,1 50,96 Z', L: 'M50,96 A46,46 0 0,1 50,4 Z' };
 
   function circleSvg(big) {
     var s = '<svg class="mhq-circle" viewBox="0 0 100 100">';
@@ -1273,6 +1291,7 @@
       s += '<path class="mhq-q" data-q="' + i + '" d="' + QPATH[i] + '"></path>';
       if (big) s += '<text class="mhq-num" x="' + QNUM[i][0] + '" y="' + QNUM[i][1] + '">' + i + '</text>';
     }
+    s += '<path class="mhq-h" data-h="R" d="' + HPATH.R + '"></path><path class="mhq-h" data-h="L" d="' + HPATH.L + '"></path>';
     return s + '</svg>';
   }
 
@@ -1287,6 +1306,7 @@
       veil += '<path class="mhq-vq" data-q="' + i + '" d="' + QPATH[i] + '"></path>';
       veil += '<text class="mhq-vnum" x="' + QNUM[i][0] + '" y="' + QNUM[i][1] + '">' + i + '</text>';
     }
+    veil += '<path class="mhq-vh" data-h="R" d="' + HPATH.R + '"></path><path class="mhq-vh" data-h="L" d="' + HPATH.L + '"></path>';
     veil += '</svg>';
     p.innerHTML =
       '<div class="mhq-pizza"><img class="mhq-pizza-img" alt="">' + veil +
@@ -1310,6 +1330,18 @@
     prev.querySelectorAll('.mhq-vq').forEach(function (p) {
       p.classList.toggle('mhq-on', perQ[p.getAttribute('data-q')].length > 0);
     });
+    /* [v1.4] כל התוספות חצאים-בלבד -> הצללה לפי חצי, בלי מספרים, צ'יפ אחד לחצי
+       (ה-CSS מסתיר את תיבות 3/4 וממרכז את 1/2 — בחירת חצי מסמנת את שני רבעיו) */
+    var halves = map.size > 0;
+    map.forEach(function (t) { if (!t.halfOnly) halves = false; });
+    prev.classList.toggle('mhq-halves', halves);
+    prev.querySelectorAll('.mhq-vh').forEach(function (p) {
+      var qs = HALF_Q[p.getAttribute('data-h')];
+      p.classList.toggle('mhq-on', perQ[qs[0]].length > 0 || perQ[qs[1]].length > 0);
+    });
+    var cap = prev.querySelector('.mhq-cap');
+    var capTxt = halves ? 'בחרו תוספת ואז את החצי שעליו היא תופיע' : 'בחרו תוספת ואז את הרבעים שעליהם היא תופיע';
+    if (cap.textContent !== capTxt) cap.textContent = capTxt;
 
     /* בונים צ'יפים מחדש רק כשההרכב באמת השתנה — אחרת האנימציה תרוץ בלולאה.
        החתימה כוללת גם את התמונה, כדי שצ'יפ יתעדכן כשתמונה נטענת מאוחר. */
@@ -1367,6 +1399,20 @@
       });
     });
 
+    /* [v1.4] לחיצה על חצי = שני הרבעים שלו יחד (נבחר "(חצי ימין)" בשורה אחת) */
+    card.querySelectorAll('.mhq-panel .mhq-h').forEach(function (p) {
+      p.addEventListener('click', function (e) {
+        e.stopPropagation();
+        var t = card.__t; if (!t) return;
+        var qs = HALF_Q[p.getAttribute('data-h')], cur = readSel(t);
+        var on = cur.has(qs[0]) && cur.has(qs[1]);
+        qs.forEach(function (q) { on ? cur.delete(q) : cur.add(q); });
+        var pl = computePlan(t, cur);
+        if (!pl.ok) { flash(card, pl.reason); return; }
+        applyPlan(pl); settle();
+      });
+    });
+
     card.querySelectorAll('.mhq-btn').forEach(function (b) {
       b.addEventListener('click', function (e) {
         e.stopPropagation();
@@ -1386,11 +1432,20 @@
     card.querySelectorAll('.mhq-q').forEach(function (p) {
       p.classList.toggle('mhq-on', sel.has(parseInt(p.getAttribute('data-q'), 10)));
     });
+    /* [v1.4] מצב חצאים: המחלקה חושפת את נתיבי החצאים ומסתירה את הרבעים */
+    card.classList.toggle('mhq-halves', !!t.halfOnly);
+    card.querySelectorAll('.mhq-h').forEach(function (p) {
+      var qs = HALF_Q[p.getAttribute('data-h')];
+      p.classList.toggle('mhq-on', sel.has(qs[0]) && sel.has(qs[1]));
+    });
+    var hint = card.querySelector('.mhq-hint'), hintTxt = t.halfOnly ? 'איזה חצי?' : 'אילו רבעים?';
+    if (hint.textContent !== hintTxt) hint.textContent = hintTxt;
 
     /* לפני בחירה מציגים "₪2.5 לרבע" ולא את מחיר המגש השלם — אחרת הלקוח
        קורא ₪10 וחושב שזה מחיר התוספת. אחרי בחירה: המחיר בפועל. */
     var txt = sel.size ? '₪' + (plan.ok ? plan.price : 0)
-      : (t.quarterPrice != null ? '₪' + t.quarterPrice + ' לרבע'
+      : (t.halfOnly ? '₪' + t.halfPrice + ' לחצי'
+        : t.quarterPrice != null ? '₪' + t.quarterPrice + ' לרבע'
         : (t.wholePrice != null ? '₪' + t.wholePrice : ''));
     var pe = card.querySelector('.mhq-price');
     if (pe.textContent !== txt) pe.textContent = txt;
@@ -1703,6 +1758,7 @@
       var cards = [].slice.call(p.querySelectorAll('.mhq-card'));
       return {
         cards: cards.length,
+        halves: cards.filter(function (c) { return c.classList.contains('mhq-halves'); }).length,   /* mhq-halves-v1 */
         withImage: cards.filter(function (c) { return c.querySelector('img.mhq-thumb'); }).length,
         grids: p.querySelectorAll('[data-mhq-grid]').length,
         hiddenRows: p.querySelectorAll('.mhq-hidden').length,

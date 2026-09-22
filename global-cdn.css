@@ -5221,12 +5221,54 @@ html body span.review img {
   padding:12px 14px;
   margin:8px 12px;
 }
+/* [v1.4] חצאים בלבד (mhq-halves-v1): מסעדה בלי רבע בודד בתפריט (שיבולת השרון).
+   ברירת המחדל: נתיבי החצאים מוסתרים — חנות רבעים (בנ'ס) לא רואה שום שינוי.
+   תחת .mhq-halves: הרבעים והמספרים נעלמים, שני חצאים ימין/שמאל מופיעים,
+   ובתצוגת הפיצה תיבות הצ'יפים 3/4 נעלמות ו-1/2 יורדות למרכז החצי. */
+.product-popup .mhq-h,
+.product-popup .mhq-vh { display:none; }
+.product-popup .mhq-card.mhq-halves .mhq-q,
+.product-popup .mhq-card.mhq-halves .mhq-num,
+.product-popup .mhq-preview.mhq-halves .mhq-vq,
+.product-popup .mhq-preview.mhq-halves .mhq-vnum,
+.product-popup .mhq-preview.mhq-halves .mhq-chips[data-q="3"],
+.product-popup .mhq-preview.mhq-halves .mhq-chips[data-q="4"] { display:none; }
+.product-popup .mhq-card.mhq-halves .mhq-h {
+  display:block;
+  fill:#e8e8e8;
+  stroke:#fff;
+  stroke-width:2.5;
+  cursor:pointer;
+  transition:fill .22s ease;
+}
+.product-popup .mhq-card.mhq-halves .mhq-mini .mhq-h {
+  cursor:default;
+  stroke-width:6;
+  fill:#dcdcdc;
+}
+.product-popup .mhq-card.mhq-halves .mhq-h.mhq-on,
+.product-popup .mhq-card.mhq-halves .mhq-mini .mhq-h.mhq-on { fill:#e31e24; }
+.product-popup .mhq-preview.mhq-halves .mhq-vh {
+  display:block;
+  fill:rgba(20,12,10,.42);
+  stroke:rgba(255,255,255,.75);
+  stroke-width:.8;
+  transition:fill .3s ease;
+}
+.product-popup .mhq-preview.mhq-halves .mhq-vh.mhq-on,
+.product-popup .mhq-preview.mhq-halves:not(.mhq-lit) .mhq-vh { fill:transparent; }
+.product-popup .mhq-preview.mhq-halves .mhq-chips[data-q="1"],
+.product-popup .mhq-preview.mhq-halves .mhq-chips[data-q="2"] { top:50%; }
+/* mhq-halves-v1 */
+
 @media (prefers-reduced-motion:reduce) {
   .product-popup .mhq-chip,
   .product-popup .mhq-card.mhq-open .mhq-panel { animation:none; }
   .product-popup .mhq-tile,
   .product-popup .mhq-btn,
   .product-popup .mhq-q,
+  .product-popup .mhq-h,
+  .product-popup .mhq-vh,
   .product-popup .mhq-vq { transition:none; }
 }
 
