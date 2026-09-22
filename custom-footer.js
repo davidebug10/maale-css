@@ -3359,7 +3359,7 @@ log('פעיל');
 })();
 
 /* ============================================================
-   מחרוזות שאין להן תרגום בחבילת השפה — MH Lang  |  v1.2.0 | 2026-09-22 (v1.1.0: 10.9)
+   מחרוזות שאין להן תרגום בחבילת השפה — MH Lang  |  v1.3.0 | 2026-09-23 (v1.2.0: 22.9, v1.1.0: 10.9)
    Hyperzod מציירת טקסטים עם ברירת מחדל באנגלית כשמפתח חסר בחבילה:
    getLug().common.customizable || "Customizable". המפתח common.customizable לא קיים
    בחבילה של האתר (88 מפתחות ב-common, נבדק 10.9), ולכן התג בכרטיס המוצר באנגלית.
@@ -3370,18 +3370,24 @@ log('פעיל');
   'use strict';
   if (window.__MH_LANG__) { return; }
   window.__MH_LANG__ = true;
-  var VERSION = '1.2.0';
+  var VERSION = '1.3.0';
   /* סלקטור → { אנגלית: עברית } */
   var MAP = [
     { sel: '.product-customizable-tag', text: { 'Customizable': 'ניתן להתאמה' } },
     /* מסך הוספת כתובת (22.9): כותרת רשימת התוצאות ותווית סוג הכתובת */
     { sel: '.scheme-location-results-heading', text: { 'Search Results': 'תוצאות חיפוש' } },
-    { sel: '#AddressSelectType label', text: { 'Save address as': 'לשמור את הכתובת בתור', 'SAVE ADDRESS AS': 'לשמור את הכתובת בתור' } }
+    { sel: '#AddressSelectType label', text: { 'Save address as': 'לשמור את הכתובת בתור', 'SAVE ADDRESS AS': 'לשמור את הכתובת בתור' } },
+    /* מסך "ניהול כתובות" (23.9): תג הכתובת הפעילה, טעינה, וחלונית "אפשרויות כתובת" (מחרוזות קשיחות באנגלית בקוד של Hyperzod) */
+    { sel: '#addresses .scheme-status-badge', text: { 'Active': 'פעילה' } },
+    { sel: '#addresses p.tw-mt-4', text: { 'Loading Addresses...': 'טוען כתובות...' } },
+    { sel: '.v-bottom-sheet__content .v-card-title span.tw-text-base', text: { 'Address options': 'אפשרויות כתובת' } },
+    { sel: '.v-bottom-sheet__content .tw-h-\\[44px\\].tw-cursor-pointer span.tw-font-medium', text: { 'Edit': 'עריכה', 'Delete': 'מחיקה' } }
   ];
   /* החלפת תחילית בתוך טקסט קיים (לא שוויון מלא), לאלמנטים שהטקסט שלהם מורכב מתווית + ערך */
   var PREFIX = [
     { sel: '#SelectAddress .v-card-text > div[data-test-id^="test-id-"] div', from: 'Phone:', to: 'טלפון:' },
-    { sel: '.scheme-location-master .search-results p', from: 'No results found for', to: 'לא נמצאו תוצאות עבור' }
+    { sel: '.scheme-location-master .search-results p', from: 'No results found for', to: 'לא נמצאו תוצאות עבור' },
+    { sel: '#addresses div.tw-font-inter.tw-text-xs', from: 'Phone:', to: 'טלפון:' }
   ];
   var stats = { version: VERSION, replaced: 0, scans: 0 };
   function sync() {

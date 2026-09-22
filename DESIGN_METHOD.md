@@ -51,6 +51,7 @@
 | שדה הכתובת הידנית בצ'ק-אאוט של קפית | "חלק 42: MH KafitAddr" | + JS `MH KafitAddr`. הזיהוי לפי **טקסט** ("הזנת כתובת ידנית"), הסקופ לפי `getCartMerchant` + `#checkout` |
 | שם מלא בטופס ההרשמה (רמז + שגיאה) | "חלק 43: MH FullName" | + JS `MH FullName`. סקופ `#firstName` בטופס ההרשמה (שדה השם היחיד; Hyperzod שולחת `last_name:null`). דורש 2 מילים של 2+ אותיות, חוסם "הרשמה"/Enter ב-capture לפני Vue. הסיבה: Grow דוחה שם של מילה אחת (10.9). בדיקה: scratchpad `signup/test-fullname.mjs` (מוק; הטופס החי לא נגיש ב-headless) |
 | בועת וואטסאפ צפה (דף הבית + דפי עסק) | "חלק 45: MH WhatsApp" | + JS `MH WhatsApp` (יוצר `#mh-wa`, מדליק `.mh-wa-on`). קטנה (44/48px), שמאל-תחתון, מעל סרגל הניווט התחתון (`--mh-wa-bottom` מה-JS). מוסתרת בכל חלונית/מגירה שעל המסך, בעמוד מוצר, בחיפוש ובצ'ק-אאוט; בדף עסק מופיעה רק אחרי גלילה של 160px. המספר מ-`business_phone` ב-boot |
+| מסך "ניהול כתובות" (`/he/profile/address`): הדר, כפתור "הוסף כתובת חדשה", כרטיסי הכתובות, תפריט 3 הנקודות | "חלק 46: MH Addresses" | + `MH Lang` v1.3.0 (Active/Phone:/Address options/Edit/Delete). עוגן `#addresses` (id של הרכיב Addresses-setting), ההדר תחת `.scheme-profile-page:has(#addresses)`, חלונית האפשרויות לפי מבנה (שתי שורות 44px בתיבה מעוגלת). הדף דורש התחברות — ה-DOM שוחזר מהתבנית (ראו מלכודות) |
 | סרגל ניווט תחתון | "חלק 31" | |
 
 ### 1.2 בלוקי ה-JS ב-`custom-footer.js`
@@ -232,6 +233,8 @@ avconvert --source in.mp4 --preset Preset1920x1080 --output <business>-hero.mp4 
 ---
 
 ## 7. מלכודות שנתקלנו בהן (כדי לא לחזור עליהן)
+
+**מסך שדורש התחברות בלי חשבון (23.9, ניהול כתובות):** `/he/profile/address` מפנה אורח לדף הבית. במקום ללכוד DOM, שולפים את התבנית מה-JS: מסלולי הפרופיל ב-`index-*.js` מצביעים על chunk עצל (`tL=()=>import("./address-DFV0AZVj.js")`), וה-chunk מכיל את פונקציית הרנדר עם כל המחלקות (`#addresses`, `.kebab-btn`, `.scheme-status-badge`, `.scheme-colorable-icon--home/office/map-pin`). ההדר של דפי הפרופיל הוא `MobilePageHeader` ב-bundle הראשי (`.scheme-mobile-page-header` קבוע בראש, `__title` עם `mix-blend-difference` + `text-left`; החץ `.back-btn` ב-`ms-4`). חלונית 3 הנקודות (`AddressEditDrawer` ב-`AddressDeletedToast-*.js`) מכילה מחרוזות אנגלית קשיחות ("Address options"/"Edit"/"Delete") — לא בחבילת השפה, מתורגמות ב-MH Lang. מוק: `scratchpad/addrmgr/` (36 אסרטים). אימות חי אפשרי רק בדפדפן של דוד (Chrome MCP) או בצילום שלו.
 
 **רכיב צף משלנו (22.9, בועת הוואטסאפ):** לפני שממקמים משהו קבוע על המסך — למדוד מה כבר יושב שם: במובייל דף הבית = סרגל ניווט תחתון `#MultiVendorBottomNav` (83px, קפסולה `.floating-nav-pill` 20–370px, z 50); דף עסק = בלי סרגל, אבל עם עגלה מלאה יש כפתור "המשך לתשלום" קבוע במרכז (x 109–280, 52px גובה, 48px מהתחתית, z 99999); דסקטופ = מגירת "Add New Address" נפתחת לבד לאורח (ימין, 480px, z 19999). חלוניות של Vuetify נוספות ל-`.v-overlay-container` ולא ישירות ל-body — MutationObserver על body בלי `subtree` לא רואה אותן; מגירות נשארות עם `--active` גם כשהן מחוץ למסך — לבדוק `getBoundingClientRect` ולא רק את הכיתה. פופאפ "10% הנחה" פתוח בכל טעינה ולכן הבועה מופיעה רק אחרי שהלקוח סוגר אותו (רצוי). בדיקות: `scratchpad/wa/test.mjs` (24 אסרטים חיים, `INJECT=1` לפני דיפלוי).
 

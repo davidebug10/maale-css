@@ -6157,3 +6157,347 @@ html body #mh-wa:active {
     html body #mh-wa.mh-wa-on::after { animation: none !important; }
 }
 /* mh-whatsapp-v1 */
+
+/* =========================================================
+   חלק 46: מסך "ניהול כתובות" (/he/profile/address) — MH Addresses v1.0.0 | 2026-09-23 — Liquid Glass + אדום QLED
+   הבעלים היחיד של #addresses (רכיב Addresses-setting של Hyperzod) — כפתור "הוסף כתובת חדשה",
+   רשימת הכתובות השמורות, תפריט 3 הנקודות (חלונית "אפשרויות כתובת") ומצב ריק — ושל ההדר של
+   הפרופיל רק כשהדף הוא ניהול כתובות (.scheme-profile-page:has(#addresses)).
+   ה-DOM שוחזר מהתבנית של Hyperzod (address-DFV0AZVj.js + MobilePageHeader), לא נלכד מהאתר:
+   הדף דורש חשבון מחובר. הטקסטים באנגלית ("Active", "Phone:", "Address options", "Edit",
+   "Delete", "Loading Addresses...") מתורגמים ב-MH Lang v1.3.0.
+   ========================================================= */
+/* 1. ההדר של הדף: לבן-קריסטלי, כותרת מיושרת לימין, חץ אדום */
+html body .scheme-profile-page:has(#addresses) .scheme-mobile-page-header {
+    background: rgba(255, 255, 255, 0.96) !important;
+    -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+    backdrop-filter: blur(20px) saturate(180%) !important;
+    border-bottom: 1px solid rgba(227, 30, 36, 0.12) !important;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05) !important;
+}
+html body .scheme-profile-page:has(#addresses) .scheme-mobile-page-header__surface {
+    background: transparent !important;
+    min-height: 60px !important;
+}
+html body .scheme-profile-page:has(#addresses) .scheme-mobile-page-header__title {
+    color: #111 !important;
+    mix-blend-mode: normal !important;
+    transform: none !important;
+    text-align: right !important;
+    font-size: 18px !important;
+    font-weight: 800 !important;
+    letter-spacing: -0.2px !important;
+    padding-inline: 56px 20px !important;
+}
+html body .scheme-profile-page:has(#addresses) .scheme-mobile-page-header .back-btn {
+    width: 36px !important;
+    height: 36px !important;
+    border-radius: 999px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background: rgba(227, 30, 36, 0.08) !important;
+    margin-inline-start: 14px !important;
+}
+html body .scheme-profile-page:has(#addresses) .scheme-mobile-page-header .back-btn .v-icon {
+    color: #e31e24 !important;
+}
+
+/* 2. גוף הדף: לבן שקט, בלי המסגרות של Vuetify */
+html body #addresses,
+html body #addresses > .v-card {
+    background: #fff !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+}
+html body #addresses > .v-card > .v-card-text {
+    padding: 0 4px !important;
+}
+/* הפס הלבן הריק שה-Hyperzod מצמידה לתחתית (במובייל אין בו כפתור) */
+html body #addresses > div.tw-fixed.tw-bottom-0 {
+    display: none !important;
+}
+
+/* 3. "הוסף כתובת חדשה": כרטיס לבן עם פלוס אדום בעיגול */
+html body #addresses .tw-px-1 > .tw-border {
+    border: 1px solid rgba(0, 0, 0, 0.06) !important;
+    border-radius: 18px !important;
+    background: #fff !important;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06) !important;
+    transform: none !important;
+    margin-bottom: 26px !important;
+    overflow: hidden !important;
+}
+html body #addresses .tw-px-1 > .tw-border .v-btn {
+    height: 58px !important;
+    min-height: 58px !important;
+    border-radius: 18px !important;
+    text-transform: none !important;
+}
+html body #addresses .tw-px-1 > .tw-border .v-btn__overlay,
+html body #addresses .tw-px-1 > .tw-border .v-btn__underlay {
+    display: none !important;
+}
+html body #addresses .tw-px-1 > .tw-border .v-btn__content > div {
+    padding: 0 14px !important;
+    gap: 12px !important;
+}
+html body #addresses .tw-px-1 > .tw-border .v-btn__content > div > div:first-child {
+    width: 34px !important;
+    height: 34px !important;
+    border-radius: 999px !important;
+    background: #fff5f5 !important;
+    transform: none !important;
+}
+html body #addresses .scheme-colorable-icon--plus img {
+    filter: invert(20%) sepia(96%) saturate(5600%) hue-rotate(350deg) brightness(88%) !important;
+}
+html body #addresses .tw-px-1 > .tw-border .v-btn__content span {
+    font-size: 15px !important;
+    font-weight: 800 !important;
+    color: #111 !important;
+    transform: none !important;
+    margin: 0 !important;
+}
+
+/* 4. כותרת הרשימה */
+html body #addresses h3 {
+    font-size: 13px !important;
+    font-weight: 800 !important;
+    letter-spacing: 0.3px !important;
+    color: #8a8f98 !important;
+    margin: 0 6px 10px !important;
+    transform: none !important;
+}
+
+/* 5. כרטיס כתובת */
+html body #addresses .tw-w-full > div.tw-mb-\[12px\] {
+    border: 1px solid rgba(0, 0, 0, 0.06) !important;
+    border-radius: 18px !important;
+    background: #fff !important;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.05) !important;
+    padding: 14px 14px 14px 10px !important;
+    gap: 12px !important;
+    align-items: center !important;
+    margin-bottom: 12px !important;
+    transition: transform 0.12s ease, box-shadow 0.2s ease !important;
+}
+html body #addresses .tw-w-full > div.tw-mb-\[12px\]:active {
+    transform: scale(0.99) !important;
+}
+/* הכתובת הפעילה (מקבלת את תג "פעילה"): מסגרת אדומה ורקע ורדרד */
+html body #addresses .tw-w-full > div.tw-mb-\[12px\]:has(.scheme-status-badge) {
+    border-color: #e31e24 !important;
+    background: #fff5f5 !important;
+    box-shadow: 0 6px 18px rgba(227, 30, 36, 0.12) !important;
+}
+/* עמודת האייקון: ריבוע מעוגל אפור-בהיר, בפעילה אדום */
+html body #addresses .tw-w-full > div.tw-mb-\[12px\] > .tw-w-\[36px\] {
+    width: 44px !important;
+}
+html body #addresses .tw-w-full > div.tw-mb-\[12px\] > .tw-w-\[36px\] .tw-w-\[20px\].tw-h-\[20px\] {
+    width: 40px !important;
+    height: 40px !important;
+    border-radius: 14px !important;
+    background: #f5f5f7 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+html body #addresses .tw-w-full > div.tw-mb-\[12px\] > .tw-w-\[36px\] .scheme-colorable-icon {
+    width: 20px !important;
+    height: 20px !important;
+}
+html body #addresses .tw-w-full > div.tw-mb-\[12px\]:has(.scheme-status-badge) > .tw-w-\[36px\] .tw-w-\[20px\].tw-h-\[20px\] {
+    background: #ffe3e4 !important;
+}
+html body #addresses .tw-w-full > div.tw-mb-\[12px\]:has(.scheme-status-badge) .scheme-colorable-icon img {
+    filter: invert(20%) sepia(96%) saturate(5600%) hue-rotate(350deg) brightness(88%) !important;
+}
+/* המרחק מתחת לאייקון */
+html body #addresses .tw-w-full > div.tw-mb-\[12px\] > .tw-w-\[36px\] span {
+    font-size: 11px !important;
+    font-weight: 700 !important;
+    color: #8a8f98 !important;
+    line-height: 1 !important;
+}
+/* טקסטים */
+html body #addresses .tw-w-full > div.tw-mb-\[12px\] .tw-flex-1 > div:first-child {
+    height: auto !important;
+    margin-bottom: 4px !important;
+    gap: 8px !important;
+}
+html body #addresses .tw-w-full > div.tw-mb-\[12px\] .tw-flex-1 > div:first-child > span:first-child {
+    font-size: 16px !important;
+    font-weight: 800 !important;
+    color: #111 !important;
+    line-height: 1.2 !important;
+}
+html body #addresses .scheme-status-badge {
+    background: linear-gradient(135deg, #ff3b41 0%, #c8151b 100%) !important;
+    color: #fff !important;
+    font-size: 10px !important;
+    font-weight: 800 !important;
+    letter-spacing: 0.3px !important;
+    padding: 3px 9px !important;
+    border-radius: 999px !important;
+    text-transform: none !important;
+    margin: 0 !important;
+    align-self: center !important;
+}
+html body #addresses .tw-w-full > div.tw-mb-\[12px\] p {
+    font-size: 14px !important;
+    font-weight: 500 !important;
+    color: #4b5563 !important;
+    line-height: 1.4 !important;
+}
+html body #addresses .tw-w-full > div.tw-mb-\[12px\] .tw-flex-1 div.tw-text-xs {
+    font-size: 13px !important;
+    font-weight: 500 !important;
+    color: #8a8f98 !important;
+    direction: ltr !important;
+    unicode-bidi: plaintext !important;
+    text-align: right !important;
+}
+/* תפריט 3 הנקודות */
+html body #addresses .tw-w-full > div.tw-mb-\[12px\] > .tw-w-\[24px\] {
+    width: 32px !important;
+    height: 32px !important;
+}
+html body #addresses .kebab-btn {
+    width: 32px !important;
+    height: 32px !important;
+    border-radius: 999px !important;
+    background: #f5f5f7 !important;
+    color: #6b7280 !important;
+}
+html body #addresses .kebab-btn .v-btn__overlay,
+html body #addresses .kebab-btn .v-btn__underlay {
+    display: none !important;
+}
+html body #addresses .kebab-btn:active {
+    background: #ececf0 !important;
+}
+@media (hover: hover) {
+    html body #addresses .kebab-btn:hover { background: #ececf0 !important; }
+    html body #addresses .tw-w-full > div.tw-mb-\[12px\]:hover { box-shadow: 0 8px 22px rgba(0, 0, 0, 0.08) !important; }
+}
+
+/* 6. מצב ריק וטעינה */
+html body #addresses .tw-text-center.tw-px-2 h2 {
+    font-size: 18px !important;
+    font-weight: 800 !important;
+    color: #111 !important;
+}
+html body #addresses .tw-text-center.tw-px-2 p {
+    color: #6b7280 !important;
+    font-size: 14px !important;
+}
+html body #addresses .tw-text-center.tw-px-2 .v-btn {
+    background: linear-gradient(135deg, #ff3b41 0%, #c8151b 100%) !important;
+    color: #fff !important;
+    border-radius: 18px !important;
+    height: 54px !important;
+    font-weight: 900 !important;
+    font-size: 16px !important;
+    box-shadow: 0 10px 26px rgba(227, 30, 36, 0.3) !important;
+    text-transform: none !important;
+}
+
+/* 7. חלונית "אפשרויות כתובת" (תפריט 3 הנקודות): מזוהה לפי המבנה — כרטיס עם שתי שורות 44px בתוך תיבה מעוגלת */
+html body .v-bottom-sheet__content > .v-card.tw-rounded-t-xl:has(> .tw-px-4.tw-pb-8 > .tw-border.tw-rounded-xl > .tw-h-\[44px\].tw-cursor-pointer) {
+    border-radius: 24px 24px 0 0 !important;
+    background: #fff !important;
+    padding: 0 !important;
+}
+html body .v-bottom-sheet__content > .v-card.tw-rounded-t-xl:has(> .tw-px-4.tw-pb-8 > .tw-border.tw-rounded-xl > .tw-h-\[44px\].tw-cursor-pointer) > .v-card-title {
+    padding: 18px 18px 12px !important;
+}
+html body .v-bottom-sheet__content > .v-card.tw-rounded-t-xl:has(> .tw-px-4.tw-pb-8 > .tw-border.tw-rounded-xl > .tw-h-\[44px\].tw-cursor-pointer) > .v-card-title > span {
+    font-size: 17px !important;
+    font-weight: 800 !important;
+    color: #111 !important;
+}
+html body .v-bottom-sheet__content > .v-card.tw-rounded-t-xl:has(> .tw-px-4.tw-pb-8 > .tw-border.tw-rounded-xl > .tw-h-\[44px\].tw-cursor-pointer) > hr {
+    display: none !important;
+}
+html body .v-bottom-sheet__content > .v-card.tw-rounded-t-xl > .tw-px-4.tw-pb-8 > .tw-border.tw-rounded-xl:has(> .tw-h-\[44px\].tw-cursor-pointer) {
+    border: 0 !important;
+    border-radius: 18px !important;
+    background: #f5f5f7 !important;
+    padding: 6px !important;
+}
+html body .v-bottom-sheet__content > .v-card.tw-rounded-t-xl > .tw-px-4.tw-pb-8 > .tw-border.tw-rounded-xl > .tw-h-\[44px\].tw-cursor-pointer {
+    height: 54px !important;
+    border-radius: 14px !important;
+    padding: 0 12px !important;
+    background: #fff !important;
+    transition: background-color 0.15s ease !important;
+}
+html body .v-bottom-sheet__content > .v-card.tw-rounded-t-xl > .tw-px-4.tw-pb-8 > .tw-border.tw-rounded-xl > .tw-h-\[44px\].tw-cursor-pointer:active {
+    background: #fff5f5 !important;
+}
+html body .v-bottom-sheet__content > .v-card.tw-rounded-t-xl > .tw-px-4.tw-pb-8 > .tw-border.tw-rounded-xl > .tw-h-px {
+    height: 6px !important;
+    background: transparent !important;
+}
+html body .v-bottom-sheet__content > .v-card.tw-rounded-t-xl > .tw-px-4.tw-pb-8 > .tw-border.tw-rounded-xl > .tw-h-\[44px\].tw-cursor-pointer span {
+    font-size: 15px !important;
+    font-weight: 700 !important;
+    color: #111 !important;
+}
+html body .v-bottom-sheet__content > .v-card.tw-rounded-t-xl > .tw-px-4.tw-pb-8 > .tw-border.tw-rounded-xl > .tw-h-\[44px\].tw-cursor-pointer img {
+    width: 20px !important;
+    height: 20px !important;
+}
+/* שורת המחיקה (השנייה): אדומה */
+html body .v-bottom-sheet__content > .v-card.tw-rounded-t-xl > .tw-px-4.tw-pb-8 > .tw-border.tw-rounded-xl > .tw-h-\[44px\].tw-cursor-pointer:last-child span {
+    color: #c8151b !important;
+}
+html body .v-bottom-sheet__content > .v-card.tw-rounded-t-xl > .tw-px-4.tw-pb-8 > .tw-border.tw-rounded-xl > .tw-h-\[44px\].tw-cursor-pointer:last-child img {
+    filter: invert(20%) sepia(96%) saturate(5600%) hue-rotate(350deg) brightness(88%) !important;
+}
+
+/* 8. דסקטופ: אותו דף בכרטיס רחב — כותרת, כפתור הוספה אדום, כפתורי עריכה/מחיקה */
+@media (min-width: 960px) {
+    html body #addresses > .v-card {
+        border-radius: 22px !important;
+        border: 1px solid rgba(0, 0, 0, 0.06) !important;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06) !important;
+        padding: 8px 8px 24px !important;
+    }
+    html body #addresses .v-card-title h1 {
+        font-size: 22px !important;
+        font-weight: 900 !important;
+        color: #111 !important;
+    }
+    html body #addresses .v-card-title .add-address-btn {
+        background: linear-gradient(135deg, #ff3b41 0%, #c8151b 100%) !important;
+        color: #fff !important;
+        border-radius: 14px !important;
+        height: 44px !important;
+        font-weight: 800 !important;
+        text-transform: none !important;
+        box-shadow: 0 8px 20px rgba(227, 30, 36, 0.28) !important;
+    }
+    html body #addresses .scheme-address-icon {
+        border-radius: 14px !important;
+        background: #f5f5f7 !important;
+    }
+    html body #addresses .scheme-address-primary {
+        background: linear-gradient(135deg, #ff3b41 0%, #c8151b 100%) !important;
+        color: #fff !important;
+        border-radius: 12px !important;
+        text-transform: none !important;
+        font-weight: 800 !important;
+    }
+    html body #addresses .scheme-address-secondary {
+        background: #fff !important;
+        color: #111 !important;
+        border: 1px solid rgba(0, 0, 0, 0.12) !important;
+        border-radius: 12px !important;
+        text-transform: none !important;
+        font-weight: 700 !important;
+    }
+}
+/* mh-addresses-v1 */
