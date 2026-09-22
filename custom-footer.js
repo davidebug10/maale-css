@@ -3359,7 +3359,7 @@ log('פעיל');
 })();
 
 /* ============================================================
-   מחרוזות שאין להן תרגום בחבילת השפה — MH Lang  |  v1.1.0 | 2026-09-10
+   מחרוזות שאין להן תרגום בחבילת השפה — MH Lang  |  v1.2.0 | 2026-09-22 (v1.1.0: 10.9)
    Hyperzod מציירת טקסטים עם ברירת מחדל באנגלית כשמפתח חסר בחבילה:
    getLug().common.customizable || "Customizable". המפתח common.customizable לא קיים
    בחבילה של האתר (88 מפתחות ב-common, נבדק 10.9), ולכן התג בכרטיס המוצר באנגלית.
@@ -3370,14 +3370,18 @@ log('פעיל');
   'use strict';
   if (window.__MH_LANG__) { return; }
   window.__MH_LANG__ = true;
-  var VERSION = '1.1.0';
+  var VERSION = '1.2.0';
   /* סלקטור → { אנגלית: עברית } */
   var MAP = [
-    { sel: '.product-customizable-tag', text: { 'Customizable': 'ניתן להתאמה' } }
+    { sel: '.product-customizable-tag', text: { 'Customizable': 'ניתן להתאמה' } },
+    /* מסך הוספת כתובת (22.9): כותרת רשימת התוצאות ותווית סוג הכתובת */
+    { sel: '.scheme-location-results-heading', text: { 'Search Results': 'תוצאות חיפוש' } },
+    { sel: '#AddressSelectType label', text: { 'Save address as': 'לשמור את הכתובת בתור', 'SAVE ADDRESS AS': 'לשמור את הכתובת בתור' } }
   ];
   /* החלפת תחילית בתוך טקסט קיים (לא שוויון מלא), לאלמנטים שהטקסט שלהם מורכב מתווית + ערך */
   var PREFIX = [
-    { sel: '#SelectAddress .v-card-text > div[data-test-id^="test-id-"] div', from: 'Phone:', to: 'טלפון:' }
+    { sel: '#SelectAddress .v-card-text > div[data-test-id^="test-id-"] div', from: 'Phone:', to: 'טלפון:' },
+    { sel: '.scheme-location-master .search-results p', from: 'No results found for', to: 'לא נמצאו תוצאות עבור' }
   ];
   var stats = { version: VERSION, replaced: 0, scans: 0 };
   function sync() {
@@ -3570,4 +3574,291 @@ log('פעיל');
 
   window.MH_FULLNAME = { version: VERSION, words: words, stats: function () { return JSON.parse(JSON.stringify(stats)); } };
   /* mh-fullname-v1 */
+})();
+
+/* ============================================================
+   רחובות של מעלה אדומים שגוגל לא מכיר — MH Streets  |  v1.0.0 | 2026-09-22
+   הבעיה (לקוח אמיתי, 22.9): "הפסנתר" ו"הר הלבונה" לא נמצאו בחיפוש הכתובת. חיפוש
+   הכתובות של Hyperzod עובר דרך Google Places (השרת שלהם, /store/v1/places/search),
+   ול-Google פשוט אין את הרחובות החדשים של מעלה אדומים (נבדק גם Mapbox ו-OSM: אין).
+   ביקורת של 167 הרחובות הרשמיים (מאגר הרחובות הממשלתי): ~20 רחובות לא נמצאים ב-Google.
+   הפתרון: טבלה מקומית של רחובות העיר עם נקודת אמצע הרחוב מהמפה הממשלתית (GovMap,
+   מפ"י). כשלקוח מקליד רחוב מהטבלה ו-Google לא מחזירה שורת רחוב מתאימה — מוסיפים
+   תוצאה משלנו בראש הרשימה. הבחירה עוברת בנתיב ה-Mapbox הקיים של Hyperzod (אובייקט
+   mapbox_data עם center) — בלי קריאת רשת, בלי שינוי בקוד שלהם — והלקוח מדייק את
+   הסיכה במפה (המסך ממילא מבקש "הזז את הסיכה למיקום המסירה המדויק").
+   סקופ: רק פעולת ה-Vuex "searchLocation". לא נוגע בשמירה, בתשלום או באזורי המשלוח.
+   נכשל-פתוח: אין store → כלום; שגיאה → התוצאות של Google כרגיל.
+   רענון הטבלה: node tools/streets-govmap.mjs (ראו DESIGN_METHOD).
+   בדיקה: window.MH_STREETS.stats() / window.MH_STREETS.find('הפסנתר 8')
+   ============================================================ */
+(function () {
+  'use strict';
+  if (window.__MH_STREETS__) { return; }
+  window.__MH_STREETS__ = true;
+  var VERSION = '1.0.0', CITY = 'מעלה אדומים', MAX = 3;
+  /* [שם רחוב לתצוגה, lat, lng] — מקור: GovMap 22.9.2026 (146 רחובות; 4 שאין להם מיקום בשום מפה: הזוגן, החורן, החלמונית, השרון) */
+  var STREETS = [
+  ["אבני החושן",31.775122,35.301897],
+  ["אגן הסהר",31.769039,35.291484],
+  ["אוגדה",31.793437,35.328289],
+  ["אופירה",31.79589,35.337204],
+  ["איבי הנחל",31.774834,35.291149],
+  ["בית בלתין",31.769042,35.299457],
+  ["בת נדיב",31.773235,35.291128],
+  ["גבעת המיסדים",31.801259,35.329444],
+  ["דקלה",31.786025,35.332016],
+  ["הגיא",31.77817,35.301473],
+  ["הר הצופים",31.774435,35.293464],
+  ["ימית",31.797129,35.336268],
+  ["מדבר יהודה",31.774428,35.295765],
+  ["מצפה נבו",31.794209,35.302088],
+  ["קדם",31.775905,35.304293],
+  ["האבן",31.779344,35.312294],
+  ["האורן",31.766675,35.300192],
+  ["האזוב",31.768908,35.306884],
+  ["האלה",31.765987,35.300497],
+  ["האלמוג",31.790038,35.3095],
+  ["הארד",31.786332,35.309126],
+  ["האשל",31.767128,35.296287],
+  ["הבזלת",31.781034,35.315499],
+  ["הגביש",31.781304,35.311528],
+  ["הגומא",31.769573,35.304062],
+  ["הגזית",31.780252,35.313313],
+  ["הגילגל",31.796219,35.30375],
+  ["הגיר",31.779829,35.30928],
+  ["הגעש",31.782487,35.311735],
+  ["הגרניט",31.779468,35.310218],
+  ["הגתית",31.783333,35.299727],
+  ["הדקל",31.764724,35.2999],
+  ["הזיתים",31.770178,35.300137],
+  ["החומה",31.787716,35.310006],
+  ["החליל",31.780315,35.295168],
+  ["החלמיש",31.781328,35.309937],
+  ["החצוצרה",31.785296,35.299101],
+  ["החרסית",31.776608,35.312904],
+  ["הכורכר",31.78963,35.309306],
+  ["הכינור",31.782479,35.29707],
+  ["הכרכום",31.770543,35.307233],
+  ["המצדים",31.780756,35.302808],
+  ["המצוק",31.778599,35.306374],
+  ["המצילתים",31.786472,35.298003],
+  ["המרווה",31.767528,35.298846],
+  ["הנבל",31.783901,35.299328],
+  ["הנחושת",31.79196,35.310367],
+  ["הנחלים",31.777646,35.297999],
+  ["הנטיף",31.788267,35.309782],
+  ["הניקרה",31.77785,35.310543],
+  ["העוגב",31.781551,35.298961],
+  ["העירית",31.769192,35.307504],
+  ["הענבל",31.785895,35.29965],
+  ["הענבר",31.778182,35.315532],
+  ["הערבה",31.768046,35.304831],
+  ["העשור",31.781197,35.297101],
+  ["הפסנתר",31.781583,35.30037],
+  ["הפעמון",31.784854,35.299495],
+  ["הפרג",31.76957,35.308013],
+  ["הצוק",31.789356,35.312344],
+  ["הצור",31.782152,35.313962],
+  ["הצורן",31.777805,35.3123],
+  ["הציפחה",31.777891,35.313206],
+  ["הצלף",31.771157,35.311283],
+  ["הצלצל",31.783048,35.298532],
+  ["הצפצפה",31.767797,35.300869],
+  ["הקירטון",31.777975,35.30699],
+  ["הקנה",31.768617,35.304908],
+  ["הקרן",31.780144,35.295905],
+  ["הקתרוס",31.787052,35.297256],
+  ["הר גדור",31.770846,35.300069],
+  ["הר הלבונה",31.773484,35.301669],
+  ["הר מיכוור",31.771483,35.300486],
+  ["הר סרטבה",31.769966,35.299806],
+  ["הרותם",31.766454,35.302202],
+  ["הרכס",31.781768,35.311366],
+  ["השונית",31.779346,35.31419],
+  ["השופר",31.777429,35.295528],
+  ["השחם",31.783505,35.312559],
+  ["השיזף",31.766198,35.295486],
+  ["השיטה",31.76668,35.294966],
+  ["השיש",31.783897,35.311164],
+  ["השמינית",31.777881,35.294393],
+  ["השקמה",31.767174,35.297295],
+  ["השרך",31.76986,35.305407],
+  ["התוף",31.778296,35.294559],
+  ["התלתן",31.767243,35.302737],
+  ["חגוי הסלע",31.769183,35.293162],
+  ["חוט השני",31.771249,35.292941],
+  ["חולית",31.794464,35.337742],
+  ["חלוקי הנחל",31.789078,35.309029],
+  ["חרובית",31.788885,35.338732],
+  ["יהלום",31.77351,35.298898],
+  ["כוכב הירדן",31.769523,35.299365],
+  ["מבוא האורים",31.777163,35.302083],
+  ["מבוא האלון",31.767479,35.301996],
+  ["מבוא האשלג",31.783879,35.315275],
+  ["הגבים",31.778834,35.298571],
+  ["הורקניה",31.779753,35.302049],
+  ["מבוא המלוח",31.765767,35.303211],
+  ["מבוא המשרוקית",31.780158,35.29812],
+  ["מבוא הר הזיתים",31.773191,35.294971],
+  ["הרודיון",31.780797,35.303505],
+  ["מבוא השליש",31.779801,35.299347],
+  ["מבוא יפה נוף",31.784647,35.312107],
+  ["מבוא נחל ערוגות",31.773552,35.297395],
+  ["מדליקי המשואות",31.770039,35.299252],
+  ["נאות סיני",31.788169,35.344271],
+  ["נביעות",31.788151,35.330358],
+  ["נופי הסלע",31.782891,35.310066],
+  ["אפיקים",31.777312,35.299782],
+  ["האפוד",31.775056,35.302466],
+  ["העשרה",31.797685,35.328816],
+  ["הקרונית",31.777158,35.297006],
+  ["סופה",31.794001,35.330799],
+  ["אודם",31.775239,35.302183],
+  ["ברקת",31.775543,35.301368],
+  ["לשם",31.77547,35.301792],
+  ["נופך",31.776019,35.301426],
+  ["נחל אוג",31.778851,35.301406],
+  ["נחל בוקק",31.777942,35.300731],
+  ["נחל גורפן",31.777858,35.300085],
+  ["נחל דרגות",31.777776,35.299998],
+  ["נחל הרדוף",31.777569,35.299267],
+  ["נחל ורדית",31.777492,35.298704],
+  ["נחל זוהר",31.777663,35.298627],
+  ["נחל חבר",31.776906,35.29811],
+  ["נחל טור",31.77672,35.298147],
+  ["נחל יעלים",31.775965,35.297889],
+  ["ספיר",31.775824,35.300813],
+  ["פטדה",31.775711,35.302368],
+  ["שוהם",31.775611,35.301818],
+  ["תרשיש",31.775867,35.301551],
+  ["עצמונה",31.789807,35.343648],
+  ["עת הזמיר",31.775303,35.290096],
+  ["פרי גן",31.794537,35.329668],
+  ["פרי מגדים",31.771467,35.29387],
+  ["פריאל",31.794407,35.334675],
+  ["צמח השדה",31.767053,35.301627],
+  ["קדש ברנע",31.789204,35.328246],
+  ["קול התור",31.771219,35.291951],
+  ["החברה הכלכלית",31.787582,35.335798],
+  ["שדות",31.791376,35.340807],
+  ["כלי שיר",31.779524,35.296279],
+  ["שלהבת",31.787469,35.329969],
+  ["תלמי יוסף",31.790594,35.332429]
+];
+  var PREF = /^(סמטת|סמ|שכונת|שכ|שדרות|שד|מבוא|נתיב|משעול|רחוב|רח|דרך|ככר|כיכר)\s+/;
+  var CITY_WORDS = ['מעלה', 'אדומים', 'ישראל'];
+  function norm(s) {
+    return String(s || '').replace(/["'׳״]/g, '').replace(/[‎‏‪-‮]/g, '')
+      .replace(/[-–—,]/g, ' ').replace(/\s+/g, ' ').trim();
+  }
+  var INDEX = STREETS.map(function (r) {
+    var full = norm(r[0]);
+    return { name: r[0], full: full, core: full.replace(PREF, ''), lat: r[1], lng: r[2] };
+  });
+  /* "הפסנתר 8 מעלה אדומים" → { key:'הפסנתר', num:'8' }. מילות העיר (גם חלקיות, בזמן הקלדה) נזרקות. */
+  function parse(q) {
+    var toks = norm(q).split(' ').filter(Boolean), words = [], num = '';
+    for (var i = 0; i < toks.length; i++) {
+      if (!num && /^\d{1,4}[א-ת]?$/.test(toks[i])) { num = toks[i]; break; }   /* אחרי המספר מגיעה רק העיר */
+      words.push(toks[i]);
+    }
+    if (!num) {
+      while (words.length > 1) {                                        /* "הפסנתר מעל" → "הפסנתר" */
+        var last = words[words.length - 1], cityish = false;
+        for (var c = 0; c < CITY_WORDS.length; c++) { if (last.length >= 2 && CITY_WORDS[c].indexOf(last) === 0) { cityish = true; } }
+        if (!cityish) { break; }
+        words.pop();
+      }
+    }
+    return { key: norm(words.join(' ')).replace(PREF, ''), num: num };
+  }
+  function find(q) {
+    var p = parse(q);
+    if (p.key.length < 2) { return []; }
+    var exact = [], starts = [];
+    for (var i = 0; i < INDEX.length; i++) {
+      var s = INDEX[i];
+      if (s.core === p.key || s.full === p.key) { exact.push(s); }
+      else if (s.core.indexOf(p.key) === 0 || s.full.indexOf(p.key) === 0) { starts.push(s); }
+    }
+    return exact.concat(starts).slice(0, MAX).map(function (s) { return { street: s, num: p.num }; });
+  }
+  /* Google כבר החזירה שורת רחוב (לא עסק) לרחוב הזה בעיר? אז אין מה להוסיף. */
+  function googleHas(list, s) {
+    for (var i = 0; i < list.length; i++) {
+      var a = norm(list[i] && list[i].address);
+      if (a.indexOf(CITY) === -1) { continue; }
+      var head = a.split(' ' + CITY)[0].replace(PREF, '').replace(/\s+\d{1,4}[א-ת]?$/, '').trim();
+      if (head === s.core || head === s.full) { return true; }
+    }
+    return false;
+  }
+  function makeResult(m) {
+    var s = m.street, label = s.name + (m.num ? ' ' + m.num : '');
+    var placeName = label + ', ' + CITY + ', ישראל';
+    return {
+      address: label + ', ' + CITY + ' <span class="mh-st-tag">מהמפה הממשלתית · דייקו את הסיכה</span>',
+      place_id: 'mh-street:' + label,
+      mapbox_data: {
+        id: 'mh.' + label, type: 'Feature', place_type: ['address'], text: label, place_name: placeName,
+        center: [s.lng, s.lat], geometry: { type: 'Point', coordinates: [s.lng, s.lat] },
+        context: [{ id: 'place.mh', text: CITY }, { id: 'region.mh', text: 'מחוז ירושלים' }, { id: 'country.mh', text: 'ישראל', short_code: 'il' }]
+      }
+    };
+  }
+  var stats = { version: VERSION, hooked: false, searches: 0, injected: 0, last: null, streets: STREETS.length };
+  function augment(store, q) {
+    var matches = find(q);
+    if (!matches.length) { return; }
+    var list = (store.getters.getSearchedLocations || []).slice();
+    var add = [];
+    for (var i = 0; i < matches.length; i++) {
+      if (!googleHas(list, matches[i].street)) { add.push(makeResult(matches[i])); }
+    }
+    if (!add.length) { return; }
+    stats.injected += add.length;
+    stats.last = { q: q, added: add.map(function (r) { return r.mapbox_data.place_name; }) };
+    store.commit('setSearchedLocations', add.concat(list));
+  }
+  function hook(store) {
+    var orig = store.dispatch;
+    store.dispatch = function (type, payload) {
+      var p = orig.apply(this, arguments);
+      try {
+        if (type === 'searchLocation' && payload && payload.q) {
+          stats.searches++;
+          var q = payload.q;
+          p = p.then(function (r) { try { augment(store, q); } catch (e) { console.warn('[MH Streets]', e); } return r; },
+                     function (e) { try { augment(store, q); } catch (e2) {} throw e; });
+        }
+      } catch (e) { console.warn('[MH Streets]', e); }
+      return p;
+    };
+    stats.hooked = true;
+  }
+  /* תרגום placeholder חסר בחבילת השפה ("Search for area or address") — טקסט בלבד */
+  function placeholder() {
+    var els = document.querySelectorAll('.scheme-location-master input#search');
+    for (var i = 0; i < els.length; i++) {
+      if (/^Search for area/i.test(els[i].placeholder || '')) { els[i].placeholder = 'רחוב ומספר בית, למשל הפסנתר 8'; }
+    }
+  }
+  var tries = 0;
+  function boot() {
+    try {
+      var app = document.getElementById('app');
+      var store = app && app.__vue_app__ && app.__vue_app__.config.globalProperties.$store;
+      if (store && typeof store.dispatch === 'function') { hook(store); return; }
+    } catch (e) {}
+    if (++tries < 40) { setTimeout(boot, 250); }
+  }
+  boot();
+  try {
+    var pend = false;
+    new MutationObserver(function () { if (pend) { return; } pend = true; setTimeout(function () { pend = false; placeholder(); }, 200); })
+      .observe(document.documentElement, { subtree: true, childList: true });
+  } catch (e) {}
+  window.MH_STREETS = { version: VERSION, find: find, parse: parse, stats: function () { return JSON.parse(JSON.stringify(stats)); } };
+  /* mh-streets-v1 */
 })();

@@ -1788,312 +1788,9 @@ a[href^="tel:"] svg path {
 
 
 /* =========================================================
-   חלק 12ד: שדרוג מבני - נעילת מרכז וכלוב דינמי
+   חלקים 12ד, 12ה, 16א–16ה (כרטיס כתובת / מסך הוספת כתובת על data-v-3b7172a6 ו-data-v-bd9430d0 — hash-ים שכבר לא קיימים) — הוסרו.
+   הוחלף במלואו ע"י "חלק 44: MH AddrEditor" בסוף הקובץ (22.9.2026). ההיסטוריה ב-git.
    ========================================================= */
-
-/* 1. המכולה הראשית - הפיכה ל-Center ומעבר לזכוכית */
-[data-v-3b7172a6].tw-flex.tw-items-start.tw-relative {
-    display: flex !important;
-    align-items: center !important; /* מרכוז ורטיקלי של כל השורה */
-    justify-content: space-between !important;
-    padding: 20px 14px !important;
-    min-height: 90px !important; /* גובה מינימלי למניעת קפיצות */
-    background: rgba(255, 255, 255, 0.75) !important;
-    backdrop-filter: blur(30px) saturate(180%) !important;
-    -webkit-backdrop-filter: blur(30px) saturate(180%) !important;
-    border-radius: 24px !important;
-    border: 1px solid rgba(255, 255, 255, 0.5) !important;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03) !important;
-    transition: all 0.3s ease !important;
-}
-
-/* 2. הרחבת "כלוב" המרחק (Col 0) - מונע מהטקסט לצאת מהמסגרת */
-[data-v-3b7172a6] .tw-w-\[36px\].tw-shrink-0 {
-    width: 85px !important; /* הרחבה כדי להכיל "קילומטרים" או "מטרים" */
-    min-width: 85px !important;
-    flex-shrink: 0 !important;
-    margin-left: 8px !important; /* מרווח מהכתובת ב-RTL */
-    transform: none !important;
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: center !important;
-}
-
-/* עיצוב תג המרחק כבועה צפה */
-[data-v-3b7172a6] span.tw-text-\[9px\] {
-    background: rgba(0, 0, 0, 0.05) !important;
-    padding: 4px 8px !important;
-    border-radius: 10px !important;
-    font-size: 11px !important;
-    color: #1A1A1A !important;
-    font-weight: 700 !important;
-    margin-top: 6px !important;
-}
-
-/* 3. שחרור חניקת טקסט בכתובת (Col 1) */
-[data-v-3b7172a6] .tw-flex-1 {
-    display: flex !important;
-    flex-direction: column !important;
-    justify-content: center !important;
-    padding-left: 10px !important;
-    overflow: visible !important;
-}
-
-[data-v-3b7172a6] p.tw-text-xs,
-[data-v-3b7172a6] .tw-line-clamp-2 {
-    white-space: normal !important;
-    display: block !important;
-    -webkit-line-clamp: unset !important;
-    line-clamp: unset !important;
-    font-size: 14px !important;
-    line-height: 1.4 !important;
-}
-
-/* 4. מרכוז כפתור 3 נקודות (Col 2) */
-[data-v-3b7172a6] .tw-shrink-0.tw-flex.tw-items-center.tw-justify-center.tw-w-\[24px\] {
-    width: 40px !important;
-    height: 40px !important;
-    background: rgba(0, 0, 0, 0.03) !important;
-    border-radius: 50% !important;
-}
-
-/* 5. איפוס הזזות RTL אגרסיביות של המערכת */
-[data-v-3b7172a6] .tw-translate-x-\[-8px\], 
-[data-v-3b7172a6] .tw-ml-\[-8px\],
-[data-v-3b7172a6] .tw-translate-x-\[14px\] {
-    transform: none !important;
-    margin: 0 !important;
-}
-
-/* 6. צבע אדום מותג לאייקון הבית/מיקום */
-[data-v-3b7172a6] img.v-img__img--contain {
-    filter: brightness(0) saturate(100%) invert(18%) sepia(88%) saturate(5427%) hue-rotate(352deg) brightness(91%) contrast(92%) !important;
-}
-
-/* =========================================================
-   חלק 12ה: מרכוז כירורגי של תג המרחק והאייקון
-   מטרה: תיקון הציפה שמאלה ונעילת אלמנטים למרכז הטור
-   ========================================================= */
-
-/* 1. הרחבת הטור הראשי ומרכוזו (The Column Anchor) */
-[data-v-3b7172a6] .tw-w-\[36px\].tw-shrink-0 {
-    width: 85px !important;      /* הרחבה לרוחב שיכול להכיל "קילומטר" */
-    min-width: 85px !important;
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: center !important;    /* מרכוז אופקי של האייקון והטקסט */
-    justify-content: center !important; /* מרכוז ורטיקלי */
-    margin-left: 12px !important;      /* מרווח בטיחות מהטקסט של הכתובת */
-    margin-right: 0 !important;
-    transform: none !important;        /* ביטול הזזות מערכת */
-}
-
-/* 2. המכולה הפנימית של האייקון והטקסט */
-[data-v-3b7172a6] .tw-flex.tw-flex-col.tw-gap-\[8px\].tw-items-center {
-    width: 100% !important;
-    gap: 4px !important; /* צמצום המרווח בין האייקון למטרים */
-}
-
-/* 3. עיצוב ומרכוז תג המרחק (The Distance Tag) */
-[data-v-3b7172a6] span.whitespace-nowrap.tw-text-\[9px\] {
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    text-align: center !important;
-    width: auto !important;
-    min-width: 65px !important; /* מבטיח שגם "0 מטרים" ייראה מאוזן */
-    
-    /* עיצוב "בועה" קריסטלית */
-    background: rgba(0, 0, 0, 0.05) !important;
-    color: #1A1A1A !important;
-    padding: 3px 8px !important;
-    border-radius: 8px !important;
-    font-size: 10px !important;
-    font-weight: 800 !important;
-    line-height: 1 !important;
-}
-
-/* 4. תיקון אייקון המיקום/בית שיהיה במרכז מעל הטקסט */
-[data-v-3b7172a6] .tw-w-\[20px\].tw-h-\[20px\].tw-shrink-0 {
-    margin: 0 auto !important; /* מרכוז האייקון בתוך הטור */
-    display: block !important;
-}
-
-/* 5. ביטול דריסות RTL שגורמות לאלמנט "לברוח" שמאלה */
-[data-v-3b7172a6] .tw-translate-x-\[-8px\], 
-[data-v-3b7172a6] .tw-ml-\[-8px\] {
-    transform: none !important;
-    margin-left: 0 !important;
-}
-
-
-
-/* =========================================================
-   חלק 16א: בועת הנחיה במפה - MAP TOOLTIP
-   ========================================================= */
-
-/* 1. הפיכת בועת הטקסט השחורה לזכוכית אדומה יוקרתית */
-[data-v-bd9430d0] .tw-bg-\[\#212121\].tw-rounded-lg {
-    background: rgba(227, 30, 36, 0.85) !important; /* אדום מותג שקוף */
-    backdrop-filter: blur(12px) !important;
-    -webkit-backdrop-filter: blur(12px) !important;
-    border: 1px solid rgba(255, 255, 255, 0.2) !important;
-    border-radius: 12px !important;
-    padding: 8px 16px !important;
-    box-shadow: 0 8px 20px rgba(227, 30, 36, 0.2) !important;
-}
-
-/* 2. שינוי צבע המשולש של הבועה לאדום */
-[data-v-bd9430d0] .tw-border-t-\[\#212121\] {
-    border-top-color: rgba(227, 30, 36, 0.85) !important;
-}
-
-/* 3. הדגשת טקסט ההנחיה */
-[data-v-bd9430d0] .tw-text-white.tw-font-medium.tw-text-\[13px\] {
-    font-weight: 800 !important;
-    letter-spacing: -0.2px !important;
-    color: #ffffff !important;
-}
-
-
-/* =========================================================
-   חלק 16ב: כרטיס פרטי כתובת - ADDRESS DETAIL BOX
-   ========================================================= */
-
-/* 1. עיצוב המכולה של פרטי הכתובת ככרטיס Liquid Glass */
-[data-v-bd9430d0] .tw-px-4.tw-pt-3.tw-pb-3 {
-    background: rgba(255, 255, 255, 0.5) !important;
-    backdrop-filter: blur(20px) !important;
-    border-radius: 24px !important;
-    border: 1px solid rgba(227, 30, 36, 0.05) !important;
-    margin: 10px 16px !important;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03) !important;
-}
-
-/* 2. עיצוב הכותרת (שם הרחוב) וצביעת האייקון */
-[data-v-bd9430d0] h2.tw-text-\[18px\] {
-    color: #1A1A1A !important;
-    font-weight: 900 !important;
-    font-size: 20px !important;
-    display: flex !important;
-    align-items: center !important;
-    gap: 10px !important;
-}
-
-/* צביעת האייקון הקטן של המיקום ליד שם הרחוב לאדום */
-[data-v-bd9430d0] h2 img.tw-max-w-\[15px\] {
-    filter: brightness(0) saturate(100%) invert(18%) sepia(88%) saturate(5427%) hue-rotate(352deg) brightness(91%) contrast(92%) !important;
-}
-
-/* 3. עיצוב תת-הכותרת (העיר) */
-[data-v-bd9430d0] p.tw-text-\[14px\].tw-text-\[\#6B7280\] {
-    color: #6B7280 !important;
-    font-weight: 500 !important;
-    margin-right: 25px !important; /* יישור מתחת לטקסט של הכותרת */
-}
-
-
-/* =========================================================
-   חלק 16ג: שדות הטופס - MODERN GLASS INPUTS
-   ========================================================= */
-
-/* 1. הפיכת השדות לקפסולות זכוכית מעוגלות */
-[data-v-bd9430d0] .v-field--variant-underlined {
-    background: rgba(245, 245, 245, 0.6) !important;
-    border-radius: 16px !important;
-    padding: 12px 16px !important;
-    margin-bottom: 8px !important;
-    border: 1px solid transparent !important;
-    transition: all 0.3s ease !important;
-}
-
-/* מצב פוקוס - מסגרת אדומה עדינה */
-[data-v-bd9430d0] .v-field--focused.v-field--variant-underlined {
-    background: #ffffff !important;
-    border: 1px solid rgba(227, 30, 36, 0.3) !important;
-    box-shadow: 0 4px 15px rgba(227, 30, 36, 0.08) !important;
-}
-
-/* העלמת הקו התחתון המקורי של Vuetify */
-[data-v-bd9430d0] .v-field__outline {
-    display: none !important;
-}
-
-/* 2. תרגום כותרות קטנות (Labels) */
-/* תרגום "SAVE ADDRESS AS" */
-[data-v-bd9430d0] #AddressSelectType label {
-    font-size: 0 !important;
-}
-[data-v-bd9430d0] #AddressSelectType label::before {
-    content: "שמור כתובת כ:" !important;
-    font-size: 13px !important;
-    font-weight: 800 !important;
-    color: #e31e24 !important;
-    text-transform: none !important;
-}
-
-
-/* =========================================================
-   חלק 16ד: שדה טלפון - PHONE & COUNTRY PICKER
-   ========================================================= */
-
-/* 1. עיצוב מכולת הטלפון */
-[data-v-bd9430d0] #AddressInputContactPhoneNumber .v-field {
-    display: flex !important;
-    align-items: center !important;
-    direction: ltr !important; /* טלפון תמיד משמאל לימין */
-}
-
-/* 2. סידור הקידומת (+972) והפרדה */
-[data-v-bd9430d0] .v-field__prepend-inner .tw-flex {
-    margin-left: 0 !important;
-    padding-right: 10px !important;
-}
-
-[data-v-bd9430d0] .tw-bg-\[\#ccc\].tw-w-\[1px\] {
-    background-color: #e31e24 !important; /* קו הפרדה אדום */
-    height: 20px !important;
-}
-
-/* 3. יישור טקסט בתוך שדה הטלפון */
-[data-v-bd9430d0] input#contactPhoneNumber {
-    text-align: left !important;
-    padding-left: 8px !important;
-    font-weight: 700 !important;
-}
-
-
-/* =========================================================
-   חלק 16ה: כפתור שמירה - THE RED MASTER BUTTON
-   ========================================================= */
-
-/* 1. הפוטר הלבן - הפיכה לשקיפות קריסטלית */
-[data-v-bd9430d0] .tw-absolute.tw-bottom-0.tw-w-full.tw-bg-white {
-    background: rgba(255, 255, 255, 0.75) !important;
-    backdrop-filter: blur(25px) !important;
-    -webkit-backdrop-filter: blur(25px) !important;
-    border-top: 1px solid rgba(255, 255, 255, 0.5) !important;
-    padding-bottom: 30px !important; /* מרווח בטיחות מלמטה */
-}
-
-/* 2. כפתור השמירה - אדום מעלה המשלוחים */
-[data-v-bd9430d0] button.v-btn--size-x-large {
-    background: linear-gradient(135deg, #e31e24 0%, #b31419 100%) !important;
-    border-radius: 18px !important;
-    height: 56px !important;
-    box-shadow: 0 10px 25px rgba(227, 30, 36, 0.3) !important;
-    transition: all 0.3s ease !important;
-}
-
-[data-v-bd9430d0] button.v-btn--size-x-large .v-btn__content {
-    font-size: 18px !important;
-    font-weight: 900 !important;
-    color: #ffffff !important;
-}
-
-[data-v-bd9430d0] button.v-btn--size-x-large:active {
-    transform: scale(0.97) !important;
-}
 
 
 /* =========================================================
@@ -2247,137 +1944,9 @@ div[style*="box-shadow: rgba(0, 0, 0, 0.05) 0px 0px 24px 5px;"] {
    חתכו את התמונה ל-128px בתוך מסגרת של 173px. הוחלפו ע"י "חלק 40: MH Cards".
    ========================================================= */
 /* =========================================================
-   חלק 21א: הדר הוספת כתובת - טיפול שורש קריסטלי
-   מטרה: מעבר מלבן אטום לזכוכית, תרגום ועיצוב כפתור חזור
+   חלקים 21א (הדר הוספת כתובת) ו-21ב (שדה חיפוש כתובת) — הוסרו.
+   הוחלף במלואו ע"י "חלק 44: MH AddrEditor" בסוף הקובץ (22.9.2026). ההיסטוריה ב-git.
    ========================================================= */
-
-/* 1. מכולת ההדר הראשית - הפיכה ל-Liquid Glass */
-html body .tw-flex.tw-h-\[56px\].tw-bg-white.tw-shadow-\[0px_1px_2px_0px_rgba\(28\2c 32\2c 40\2c 0\.05\)\] {
-    background: rgba(255, 255, 255, 0.45) !important; /* שקיפות מותאמת להדר */
-    backdrop-filter: blur(40px) saturate(210%) !important;
-    -webkit-backdrop-filter: blur(40px) saturate(210%) !important;
-    border-bottom: 1.5px solid rgba(227, 30, 36, 0.15) !important; /* קו הפרדה אדום דק */
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04) !important;
-    padding-inline-start: 12px !important;
-}
-
-/* 2. תרגום ועיצוב הכותרת (Add new address -> הוספת כתובת חדשה) */
-html body .tw-h-\[56px\] span.tw-text-\[16px\].tw-font-medium {
-    font-size: 0 !important; /* העלמת המקור */
-}
-
-html body .tw-h-\[56px\] span.tw-text-\[16px\].tw-font-medium::before {
-    content: "הוספת כתובת חדשה" !important;
-    font-size: 17px !important;
-    font-weight: 900 !important;
-    color: #1a1a1a !important;
-    visibility: visible !important;
-    letter-spacing: -0.3px !important;
-}
-
-/* 3. עיצוב כפתור החזור (Back Button) */
-/* צביעת ה-SVG המובנה לאדום QLED באמצעות Filter */
-html body .tw-h-\[56px\] .tw-w-8.tw-h-8 img[alt="Back"] {
-    filter: brightness(0) saturate(100%) invert(18%) sepia(88%) saturate(5427%) hue-rotate(352deg) brightness(91%) contrast(92%) !important;
-    transform: scale(0.9) !important;
-    transition: transform 0.2s ease !important;
-}
-
-html body .tw-h-\[56px\] .tw-w-8.tw-h-8:active img {
-    transform: scale(0.75) !important; /* אפקט לחיצה tactile */
-}
-
-/* 4. מרכוז אופטי של התוכן בתוך ההדר */
-html body .tw-h-\[56px\].tw-flex-shrink-0 {
-    display: flex !important;
-    align-items: center !important;
-    justify-content: flex-start !important;
-    gap: 12px !important;
-}
-
-/* 5. ניקוי צלליות Tailwind מקוריות */
-html body .tw-shadow-\[0px_1px_2px_0px_rgba\(28\2c 32\2c 40\2c 0\.05\)\] {
-    box-shadow: none !important;
-}
-
-/* =========================================================
-   חלק 21ב: שדה חיפוש כתובת - טיפול שורש קריסטלי
-   מטרה: תרגום לוקאלי, עיצוב קפסולת זכוכית ואייקון QLED
-   ========================================================= */
-
-/* 1. המכולה החיצונית - יצירת מרחב נשימה */
-html body .tw-px-4.tw-pt-4.tw-pb-\[10px\] {
-    background: transparent !important;
-    padding-bottom: 20px !important;
-}
-
-/* 2. הקפסולה המרכזית (The Search Chassis) */
-html body .location-search-custom-height .v-field {
-    background: rgba(255, 255, 255, 0.7) !important; /* זכוכית לבנה קריסטלית */
-    backdrop-filter: blur(30px) saturate(210%) !important;
-    -webkit-backdrop-filter: blur(30px) saturate(210%) !important;
-    
-    border: 1.5px solid rgba(227, 30, 36, 0.1) !important; /* מסגרת אדומה "רפאים" */
-    border-radius: 24px !important; /* צורת קפסולה מודרנית */
-    
-    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.04) !important;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
-}
-
-/* אפקט פוקוס - כשהמשתמש מתחיל להקליד */
-html body .location-search-custom-height .v-field--focused {
-    background: #ffffff !important;
-    border-color: #e31e24 !important; /* הדגשת אדום מותג */
-    box-shadow: 0 15px 40px rgba(227, 30, 36, 0.1) !important;
-}
-
-/* 3. הזרקת תרגום Placeholder (Search for area... -> חפש אזור...) */
-html body .location-search-custom-height input#search::placeholder {
-    color: transparent !important; /* העלמת האנגלית */
-}
-
-html body .location-search-custom-height .v-field__field::before {
-    content: "חפש אזור, רחוב או כתובת..." !important;
-    position: absolute !important;
-    right: 16px !important;
-    top: 50% !important;
-    transform: translateY(-50%) !important;
-    font-size: 15px !important;
-    font-weight: 500 !important;
-    color: rgba(0, 0, 0, 0.4) !important;
-    pointer-events: none !important;
-    visibility: visible !important;
-}
-
-/* העלמת התרגום בזמן הקלדה */
-html body .location-search-custom-height .v-field--has-subsettings .v-field__field::before,
-html body .location-search-custom-height .v-field--dirty .v-field__field::before {
-    display: none !important;
-}
-
-/* 4. עיצוב אייקון החיפוש (זכוכית מגדלת) - צביעה לאדום QLED */
-html body .location-search-custom-height .search-icon-mobile {
-    filter: brightness(0) saturate(100%) invert(18%) sepia(88%) saturate(5427%) hue-rotate(352deg) brightness(91%) contrast(92%) !important;
-    width: 22px !important;
-    height: 22px !important;
-    margin-left: 8px !important;
-    opacity: 0.8 !important;
-}
-
-/* 5. ניקוי שכבות המערכת של Vuetify (החוק הלוגי) */
-html body .location-search-custom-height .v-field__overlay,
-html body .location-search-custom-height .v-field__outline,
-html body .location-search-custom-height .v-card__underlay {
-    display: none !important;
-}
-
-/* 6. תיקון הטקסט המוזן - יישור לימין (RTL) */
-html body .location-search-custom-height input#search {
-    text-align: right !important;
-    padding-right: 16px !important;
-    font-weight: 700 !important;
-    color: #1a1a1a !important;
-}
 
 /* =========================================================
    חלקי 22א–22ח (דף המוצר: שלד, הדר, זהות, טופס, פוטר, תמונה, סליידר, תיקונים) — הוסרו ב-7.9.2026.
@@ -2385,188 +1954,10 @@ html body .location-search-custom-height input#search {
    בסוף הקובץ. ההיסטוריה ב-git.
    ========================================================= */
 
-/* ==========================================================================
-   חלק 23: עיצוב כירורגי לדף "הוספת כתובת" - Red & White Liquid Glass
-   SCOPE: [data-v-4b9952fb] (Vue Scoped Component)
-   ========================================================================== */
-
-/* --- 1. מחיקת עיצוב ה-Material משדות הקלט (Inputs) והחלת קפסולות נקיות --- */
-[data-v-4b9952fb] .v-field {
-    background-color: #f7f7f7 !important;
-    border-radius: 12px !important;
-    box-shadow: none !important;
-    border: 1px solid transparent !important;
-    transition: all 0.3s ease !important;
-}
-
-/* העלמת הקווים התחתונים המובנים של Vuetify */
-[data-v-4b9952fb] .v-field__outline,
-[data-v-4b9952fb] .v-field__outline::before,
-[data-v-4b9952fb] .v-field__outline::after {
-    display: none !important;
-}
-
-/* מסגרת אדומה קלה כשהשדה פעיל/בפוקוס */
-[data-v-4b9952fb] .v-field--focused,
-[data-v-4b9952fb] .v-field--active {
-    background-color: #ffffff !important;
-    border-color: #e31e24 !important;
-    box-shadow: 0 0 0 3px rgba(227, 30, 36, 0.1) !important;
-}
-
-/* --- 2. תיקון הרסני לשדה הטלפון (שבירת ה-RTL המובנה) --- */
-/* אנחנו מכריחים את כל המכולה של הטלפון לפעול משמאל לימין */
-[data-v-4b9952fb] #AddressInputContactPhoneNumber,
-[data-v-4b9952fb] #AddressInputContactPhoneNumber .v-field,
-[data-v-4b9952fb] #AddressInputContactPhoneNumber .v-input__control {
-    direction: ltr !important;
-}
-
-/* יישור הטקסט של המספר עצמו לשמאל */
-[data-v-4b9952fb] #AddressInputContactPhoneNumber input[type="tel"] {
-    direction: ltr !important;
-    text-align: left !important;
-    padding-left: 12px !important;
-}
-
-/* --- 3. כפתורי "Save address as" (בית/משרד/אחרים - Chips) --- */
-/* עיצוב בסיסי לכל הצ'יפים */
-[data-v-4b9952fb] #AddressSelectType .v-chip {
-    background-color: #ffffff !important;
-    border: 1px solid #e0e0e0 !important;
-    color: #555555 !important;
-    border-radius: 12px !important;
-    font-weight: 500 !important;
-    transition: all 0.2s ease !important;
-}
-
-/* עיצוב אדום מותגי לצ'יפ הפעיל (לפי המחלקה text-primary שהמערכת מזריקה) */
-[data-v-4b9952fb] #AddressSelectType .v-chip.text-primary {
-    border-color: #e31e24 !important;
-    background-color: rgba(227, 30, 36, 0.05) !important;
-    color: #e31e24 !important;
-}
-
-/* צביעת האייקון בצ'יפ הפעיל */
-[data-v-4b9952fb] #AddressSelectType .v-chip.text-primary svg path {
-    fill: #e31e24 !important;
-}
-
-/* --- 4. אזור כפתור השמירה התחתון (Liquid Glass Wrapper) --- */
-/* הופך את המכולה שעוטפת את הכפתור בתחתית לזכוכית מטושטשת כדי לא להסתיר את התוכן בגלילה */
-div[data-v-4b9952fb].tw-absolute.tw-bottom-0 {
-    background: rgba(255, 255, 255, 0.85) !important;
-    backdrop-filter: blur(20px) !important;
-    -webkit-backdrop-filter: blur(20px) !important;
-    border-top: 1px solid rgba(255, 255, 255, 0.5) !important;
-    padding-bottom: 24px !important;
-}
-
-/* שדרוג כפתור "שמור כתובת" - צבע מותג ומרכוז */
-div[data-v-4b9952fb].tw-absolute.tw-bottom-0 button {
-    background: linear-gradient(135deg, #e31e24 0%, #b3161b 100%) !important;
-    color: #ffffff !important;
-    border-radius: 30px !important;
-    height: 56px !important;
-    font-size: 1.1rem !important;
-    font-weight: 800 !important;
-    letter-spacing: 0 !important;
-    box-shadow: 0 8px 25px rgba(227, 30, 36, 0.3) !important;
-    border: none !important;
-    margin: 0 auto !important; /* מרכוז מוחלט ביחס למכולה שלו */
-    max-width: 460px !important; 
-}
-
-/* --- 5. עידון כפתור "אתר אותי" במפה --- */
-[data-v-4b9952fb] #CurrentLocationButton {
-    color: #e31e24 !important;
-    border-radius: 30px !important;
-}
-
-[data-v-4b9952fb] #CurrentLocationButton .v-icon {
-    color: #e31e24 !important;
-}
-
-/* =========================================
-   PART 23B: Map Elements & Address Button Fix
-   Scope: [data-v-4b9952fb] / #CurrentLocationButton
-   ========================================= */
-
-/* 1. כפתור "שמור כתובת" (הקונטיינר והכפתור עצמו) */
-div[data-v-4b9952fb].tw-bottom-0.tw-bg-white {
-    /* אפקט זכוכית יוקרתי לקונטיינר התחתון */
-    background: rgba(255, 255, 255, 0.85) !important;
-    backdrop-filter: blur(24px) !important;
-    -webkit-backdrop-filter: blur(24px) !important;
-    border-top: 1px solid rgba(255, 255, 255, 0.5) !important;
-    
-    /* תיקון מרכוז מוחלט */
-    left: 0 !important;
-    right: 0 !important;
-    margin: 0 auto !important;
-    box-shadow: 0 -4px 30px rgba(0, 0, 0, 0.05) !important;
-}
-
-div[data-v-4b9952fb].tw-bottom-0.tw-bg-white button.v-btn {
-    /* עיצוב כפתור המותג */
-    background: #e31e24 !important; /* אדום מעלה המשלוחים */
-    color: #ffffff !important;
-    border-radius: 12px !important;
-    margin: 0 auto !important;
-    display: flex !important;
-    justify-content: center !important;
-    box-shadow: 0 8px 24px rgba(227, 30, 36, 0.3) !important; /* הילת צל אדומה */
-}
-
-/* 2. כפתור "אתר אותי" */
-button#CurrentLocationButton {
-    /* תיקון מרכוז וביטול סטייה שמאלה */
-    position: absolute !important;
-    left: 0 !important;
-    right: 0 !important;
-    margin: 0 auto !important;
-    width: max-content !important;
-    transform: translateY(-5px) !important; /* ביטול תזוזת X, שמירה על Y */
-    
-    /* עיצוב זכוכית ואדום */
-    background: rgba(255, 255, 255, 0.9) !important;
-    backdrop-filter: blur(20px) !important;
-    -webkit-backdrop-filter: blur(20px) !important;
-    border: 1px solid rgba(255, 255, 255, 0.6) !important;
-    color: #e31e24 !important;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1) !important;
-    border-radius: 50px !important; /* צורת גלולה */
-}
-
-/* צביעת האייקון בתוך כפתור אתר אותי */
-button#CurrentLocationButton i.v-icon,
-button#CurrentLocationButton svg {
-    color: #e31e24 !important;
-    fill: #e31e24 !important;
-}
-
-/* 3. טולטיפ "הזז את הסיכה" */
-div[data-v-4b9952fb].tw-top-1\/2.tw-left-1\/2 {
-    /* תיקון מרכוז */
-    left: 0 !important;
-    right: 0 !important;
-    margin: 0 auto !important;
-    width: max-content !important;
-    transform: translateY(-100%) !important; /* ביטול תזוזת X */
-}
-
-/* הבועה עצמה */
-div[data-v-4b9952fb].tw-top-1\/2.tw-left-1\/2 .tw-bg-\[\#212121\] {
-    background: #e31e24 !important; /* צבע המותג במקום אפור כהה */
-    color: #ffffff !important;
-    box-shadow: 0 4px 12px rgba(227, 30, 36, 0.3) !important;
-    border-radius: 8px !important;
-}
-
-/* המשולש (חץ) שיוצא מהבועה למטה */
-div[data-v-4b9952fb].tw-top-1\/2.tw-left-1\/2 .tw-border-t-\[\#212121\] {
-    border-top-color: #e31e24 !important;
-}
+/* =========================================================
+   חלק 23 (הוספת כתובת — data-v-4b9952fb, hash שכבר לא קיים בבילד) — הוסר.
+   הוחלף במלואו ע"י "חלק 44: MH AddrEditor" בסוף הקובץ (22.9.2026). ההיסטוריה ב-git.
+   ========================================================= */
 
 /* =========================================================
    חלק 26: דף חיפוש - LIQUID GLASS SEARCH PAGE
@@ -2834,178 +2225,9 @@ div[data-v-4b9952fb].tw-top-1\/2.tw-left-1\/2 .tw-border-t-\[\#212121\] {
 }
 
 /* =========================================================
-   חלק 28: דף הוספת/עריכת כתובת - LIQUID GLASS OVERHAUL
-   Scope: #locationConfirm, #addAddressForm, [data-v-d055d74b]
-   Date: 2026-03-14
+   חלק 28 (דף הוספת/עריכת כתובת — OVERHAUL) — הוסר.
+   הוחלף במלואו ע"י "חלק 44: MH AddrEditor" בסוף הקובץ (22.9.2026). ההיסטוריה ב-git.
    ========================================================= */
-/* 1. כפתור "שמור כתובת" - שחור → אדום QLED */
-[data-v-d055d74b] button.tw-bg-black,
-[data-v-d055d74b] button[class*="tw-bg-black"],
-#addAddressForm ~ div button.v-btn {
-    background: linear-gradient(135deg, #e31e24 0%, #b3161b 100%) !important;
-    color: #ffffff !important;
-    border-radius: 18px !important;
-    height: 58px !important;
-    font-size: 17px !important;
-    font-weight: 900 !important;
-    box-shadow: 0 10px 30px rgba(227, 30, 36, 0.3) !important;
-    border: none !important;
-    text-transform: none !important;
-}
-[data-v-d055d74b] button.tw-bg-black:active,
-#addAddressForm ~ div button.v-btn:active {
-    transform: scale(0.97) !important;
-}
-/* 2. פוטר כפתור שמירה - Liquid Glass */
-[data-v-d055d74b].tw-absolute.tw-bottom-0.tw-bg-white {
-    background: rgba(255, 255, 255, 0.75) !important;
-    backdrop-filter: blur(30px) saturate(200%) !important;
-    -webkit-backdrop-filter: blur(30px) saturate(200%) !important;
-    border-top: 1px solid rgba(255, 255, 255, 0.5) !important;
-    box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.06) !important;
-}
-/* 3. תרגום "SAVE ADDRESS AS" → "שמור כתובת כ:" */
-#AddressSelectType label[style*="font-family"] {
-    font-size: 0 !important;
-}
-#AddressSelectType label[style*="font-family"]::before {
-    content: "שמור כתובת כ:" !important;
-    font-size: 13px !important;
-    font-weight: 800 !important;
-    color: #e31e24 !important;
-    text-transform: none !important;
-    visibility: visible !important;
-}
-/* 4. שדות טופס - קפסולות Liquid Glass */
-#addAddressForm .v-field--variant-underlined,
-#locationConfirm .v-field--variant-underlined {
-    background: rgba(245, 245, 245, 0.6) !important;
-    border-radius: 16px !important;
-    padding: 12px 16px !important;
-    border: 1px solid transparent !important;
-    transition: all 0.3s ease !important;
-    margin-bottom: 8px !important;
-}
-#addAddressForm .v-field--focused.v-field--variant-underlined,
-#locationConfirm .v-field--focused.v-field--variant-underlined {
-    background: #ffffff !important;
-    border: 1px solid rgba(227, 30, 36, 0.3) !important;
-    box-shadow: 0 4px 15px rgba(227, 30, 36, 0.08) !important;
-}
-/* הסתרת קו תחתון של Vuetify */
-#addAddressForm .v-field__outline,
-#locationConfirm .v-field__outline {
-    display: none !important;
-}
-/* 5. צ'יפים (בית/משרד/אחרים) - אדום מותג */
-#AddressSelectType .v-chip.text-primary {
-    border-color: #e31e24 !important;
-    background-color: rgba(227, 30, 36, 0.05) !important;
-    color: #e31e24 !important;
-}
-#AddressSelectType .v-chip {
-    background: #ffffff !important;
-    border: 1.5px solid #e0e0e0 !important;
-    border-radius: 12px !important;
-    font-weight: 600 !important;
-    transition: all 0.2s ease !important;
-    margin-left: 8px !important;
-}
-#AddressSelectType .v-chip__overlay,
-#AddressSelectType .v-chip__underlay {
-    display: none !important;
-}
-/* 6. שדה טלפון - ריווח ותיקון */
-#addAddressForm #AddressInputContactPhoneNumber .v-field {
-    direction: ltr !important;
-    display: flex !important;
-    align-items: center !important;
-}
-#addAddressForm #AddressInputContactPhoneNumber input[type="tel"] {
-    direction: ltr !important;
-    text-align: left !important;
-    padding-left: 12px !important;
-    font-weight: 700 !important;
-    letter-spacing: 0.5px !important;
-}
-#addAddressForm .tw-bg-\[\#ccc\] {
-    background-color: rgba(227, 30, 36, 0.3) !important;
-    height: 20px !important;
-}
-/* 7. בועת "הזז את הסיכה" - אדום מותג */
-#locationConfirm .tw-bg-\[\#212121\].tw-rounded-lg {
-    background: rgba(227, 30, 36, 0.9) !important;
-    backdrop-filter: blur(10px) !important;
-    -webkit-backdrop-filter: blur(10px) !important;
-    border: 1px solid rgba(255, 255, 255, 0.2) !important;
-    border-radius: 12px !important;
-    box-shadow: 0 6px 20px rgba(227, 30, 36, 0.25) !important;
-}
-#locationConfirm .tw-border-t-\[\#212121\] {
-    border-top-color: rgba(227, 30, 36, 0.9) !important;
-}
-/* 8. כפתור "אתר אותי" */
-#locationConfirm #CurrentLocationButton {
-    background: rgba(255, 255, 255, 0.9) !important;
-    backdrop-filter: blur(15px) !important;
-    -webkit-backdrop-filter: blur(15px) !important;
-    border: 1px solid rgba(255, 255, 255, 0.6) !important;
-    color: #e31e24 !important;
-    border-radius: 50px !important;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1) !important;
-}
-#locationConfirm #CurrentLocationButton .v-icon {
-    color: #e31e24 !important;
-}
-/* 9. הדר "עריכת פרטי כתובת / הוסף כתובת חדשה" */
-.tw-h-\[56px\].tw-bg-white {
-    background: rgba(255, 255, 255, 0.5) !important;
-    backdrop-filter: blur(35px) saturate(200%) !important;
-    -webkit-backdrop-filter: blur(35px) saturate(200%) !important;
-    border-bottom: 1.5px solid rgba(227, 30, 36, 0.1) !important;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04) !important;
-}
-/* כפתור חזור באדום */
-.tw-h-\[56px\] img[alt="Back"] {
-    filter: brightness(0) saturate(100%) invert(18%) sepia(88%) saturate(5427%) hue-rotate(352deg) brightness(91%) contrast(92%) !important;
-}
-/* 10. רקע הטופס - Liquid Glass */
-#locationConfirm {
-    background: transparent !important;
-}
-.tw-flex-shrink-0.tw-z-10.tw-bg-white {
-    background: rgba(255, 255, 255, 0.5) !important;
-    backdrop-filter: blur(30px) saturate(180%) !important;
-    -webkit-backdrop-filter: blur(30px) saturate(180%) !important;
-}
-/* 11. אזור פרטי הכתובת (שם רחוב + עיר) */
-#locationConfirm .tw-px-4.tw-pt-3.tw-pb-3 {
-    background: rgba(255, 255, 255, 0.5) !important;
-    backdrop-filter: blur(15px) !important;
-    -webkit-backdrop-filter: blur(15px) !important;
-    border-radius: 20px !important;
-    margin: 10px 16px !important;
-    border: 1px solid rgba(0, 0, 0, 0.04) !important;
-}
-/* אייקון מיקום ליד שם הרחוב - אדום */
-#locationConfirm h2 img {
-    filter: brightness(0) saturate(100%) invert(18%) sepia(88%) saturate(5427%) hue-rotate(352deg) brightness(91%) contrast(92%) !important;
-}
-/* 12. פס "עיגול" למעלה (drag handle) */
-#locationConfirm .tw-bg-\[\#e5e5e5\] {
-    background: rgba(227, 30, 36, 0.2) !important;
-    width: 50px !important;
-    border-radius: 20px !important;
-}
-/* 13. ניקוי שכבות מערכת */
-#addAddressForm .v-field__overlay,
-#addAddressForm .v-btn__overlay,
-#addAddressForm .v-btn__underlay,
-#locationConfirm .v-btn__overlay,
-#locationConfirm .v-btn__underlay,
-#locationConfirm .v-card__underlay {
-    display: none !important;
-}
 
 /* =========================================================
    חלק 26: דף "צור קשר" - LIQUID GLASS PREMIUM
@@ -3508,473 +2730,9 @@ html body .v-overlay__content.v-bottom-sheet__content:has(.v-card.tw-pt-0.tw-bor
 }
 
 /* =========================================================
-   חלק 29: דף הוספת/עריכת כתובת - LIQUID GLASS V2
-   תאריך: 2026-04-27 (גרסה מתוקנת)
-   Scope: .v-bottom-sheet__content:has(#addAddressForm)
-   הסקופ הזה ייחודי לחלוטין לפופאפ הזה (1 התאמה בלבד באתר)
-
-   חלק זה מטפל ב:
-   1. רקע מגניב במקום אפור משעמם
-   2. כפתור "שמור כתובת" - אדום מותגי + מרכוז
-   3. ביטול הפס האפור המציק בין שדה החיפוש לטופס
+   חלקים 29, 29.1, "Fix: Search Results Container Collapse", 26 (תוצאות חיפוש כתובת) ו-27 (עיצוב פרימיום לתוצאות) — הוסרו.
+   הוחלף במלואו ע"י "חלק 44: MH AddrEditor" בסוף הקובץ (22.9.2026). ההיסטוריה ב-git.
    ========================================================= */
-
-/* 1. הכרטיס הראשי של הפופאפ - רקע גרדיאנט עדין במקום לבן אטום */
-.v-bottom-sheet__content:has(#addAddressForm) > .v-card {
-    background: linear-gradient(180deg, #ffffff 0%, #fefafa 50%, #fff5f5 100%) !important;
-    background-color: transparent !important;
-}
-
-/* 2. ביטול שכבת underlay של הכרטיס */
-.v-bottom-sheet__content:has(#addAddressForm) > .v-card > .v-card__underlay,
-.v-bottom-sheet__content:has(#addAddressForm) > .v-card > .v-card__loader {
-    display: none !important;
-}
-
-/* 3. אזור התוכן הפנימי (v-card-text) - הפיכה לשקוף */
-.v-bottom-sheet__content:has(#addAddressForm) .v-card-text {
-    background: transparent !important;
-    background-color: transparent !important;
-}
-
-/* 4. ביטול רקע אפור של מכולת הטופס + כל המכולות הפנימיות */
-.v-bottom-sheet__content:has(#addAddressForm) .tw-px-4.tw-pt-3.tw-pb-3,
-.v-bottom-sheet__content:has(#addAddressForm) .tw-flex.tw-flex-col.tw-items-center.tw-justify-center,
-.v-bottom-sheet__content:has(#addAddressForm) #locationConfirm {
-    background: transparent !important;
-    background-color: transparent !important;
-    border: none !important;
-    box-shadow: none !important;
-}
-
-/* 5. הפס האפור מתחת לשדה החיפוש - הסתרה אגרסיבית */
-.v-bottom-sheet__content:has(#addAddressForm) .tw-bg-white,
-.v-bottom-sheet__content:has(#addAddressForm) .tw-bg-\[\#f7f7f7\],
-.v-bottom-sheet__content:has(#addAddressForm) .tw-bg-\[\#f5f5f5\],
-.v-bottom-sheet__content:has(#addAddressForm) .tw-bg-gray-100,
-.v-bottom-sheet__content:has(#addAddressForm) .tw-bg-gray-50 {
-    background-color: transparent !important;
-}
-
-/* 6. פוטר כפתור השמירה - Liquid Glass במקום לבן אטום */
-.v-bottom-sheet__content:has(#addAddressForm) .tw-absolute.tw-bottom-0 {
-    background: rgba(255, 255, 255, 0.85) !important;
-    background-color: rgba(255, 255, 255, 0.85) !important;
-    backdrop-filter: blur(30px) saturate(200%) !important;
-    -webkit-backdrop-filter: blur(30px) saturate(200%) !important;
-    border-top: 1px solid rgba(255, 255, 255, 0.6) !important;
-    box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.06) !important;
-    padding: 16px 20px 24px 20px !important;
-    display: flex !important;
-    justify-content: center !important;
-    align-items: center !important;
-    left: 0 !important;
-    right: 0 !important;
-    margin: 0 auto !important;
-    width: 100% !important;
-}
-
-/* 7. כפתור "שמור כתובת" - אדום מותגי + מרכוז + רוחב מלא */
-.v-bottom-sheet__content:has(#addAddressForm) .tw-absolute.tw-bottom-0 button.v-btn,
-.v-bottom-sheet__content:has(#addAddressForm) .tw-absolute.tw-bottom-0 .v-btn {
-    background: linear-gradient(135deg, #e31e24 0%, #b3161b 100%) !important;
-    background-color: #e31e24 !important;
-    color: #ffffff !important;
-    border-radius: 18px !important;
-    height: 58px !important;
-    width: 100% !important;
-    max-width: 460px !important;
-    margin: 0 auto !important;
-    border: 1px solid rgba(255, 255, 255, 0.2) !important;
-    box-shadow: 0 10px 30px rgba(227, 30, 36, 0.3) !important;
-    text-transform: none !important;
-    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
-    display: flex !important;
-    justify-content: center !important;
-    align-items: center !important;
-}
-
-/* 8. טקסט הכפתור - לבן ובולט */
-.v-bottom-sheet__content:has(#addAddressForm) .tw-absolute.tw-bottom-0 button .v-btn__content,
-.v-bottom-sheet__content:has(#addAddressForm) .tw-absolute.tw-bottom-0 button span {
-    color: #ffffff !important;
-    font-size: 18px !important;
-    font-weight: 900 !important;
-    letter-spacing: 0.5px !important;
-}
-
-/* 9. אפקט לחיצה טקטילי */
-.v-bottom-sheet__content:has(#addAddressForm) .tw-absolute.tw-bottom-0 button.v-btn:active {
-    transform: scale(0.97) !important;
-    box-shadow: 0 4px 15px rgba(227, 30, 36, 0.2) !important;
-}
-
-/* 10. ניקוי שכבות overlay של Vuetify בכפתור */
-.v-bottom-sheet__content:has(#addAddressForm) .tw-absolute.tw-bottom-0 button .v-btn__overlay,
-.v-bottom-sheet__content:has(#addAddressForm) .tw-absolute.tw-bottom-0 button .v-btn__underlay {
-    display: none !important;
-}
-
-/* =========================================================
-   חלק 29.1: שיפורי טופס כתובת - כפתורים, טלפון, מדינה
-   תאריך: 2026-04-27
-   Scope: .v-bottom-sheet__content:has(#addAddressForm)
-
-   טיפול ב:
-   1. כפתורי "בית/משרד/אחרים" - הוצאה מ-slider לפריסת flex רגילה
-   2. עיצוב פרימיום לכפתורים האלה
-   3. הסתרת שדה "מדינה" לחלוטין (JS ממלא Israel אוטומטית)
-   4. תיקון דגל ישראל בשדה הטלפון
-   ========================================================= */
-
-/* === 1. הסתרת שדה "מדינה" לחלוטין === */
-.v-bottom-sheet__content:has(#addAddressForm) #AddressInputAddressCountry,
-.v-bottom-sheet__content:has(#addAddressForm) .v-input:has(#country),
-.v-bottom-sheet__content:has(#addAddressForm) #country-label,
-.v-bottom-sheet__content:has(#addAddressForm) #country-messages {
-    display: none !important;
-    visibility: hidden !important;
-    height: 0 !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    overflow: hidden !important;
-}
-
-/* === 2. כפתורי "בית/משרד/אחרים" - שחרור מה-slider === */
-
-/* המכולה החיצונית של ה-slider - הסרת ה-overflow שגורם לחיתוך */
-.v-bottom-sheet__content:has(#addAddressForm) #AddressSelectType .v-slide-group,
-.v-bottom-sheet__content:has(#addAddressForm) #AddressSelectType .v-slide-group__container {
-    overflow: visible !important;
-    contain: none !important;
-}
-
-/* התוכן של ה-slider - הפיכה ל-flex רגיל עם wrap */
-.v-bottom-sheet__content:has(#addAddressForm) #AddressSelectType .v-slide-group__content {
-    display: flex !important;
-    flex-wrap: wrap !important;
-    justify-content: center !important;
-    gap: 10px !important;
-    transform: none !important;
-    width: 100% !important;
-    padding: 8px 16px !important;
-}
-
-/* הסתרת חיצי הניווט של ה-slider (אם יש) */
-.v-bottom-sheet__content:has(#addAddressForm) #AddressSelectType .v-slide-group__prev,
-.v-bottom-sheet__content:has(#addAddressForm) #AddressSelectType .v-slide-group__next {
-    display: none !important;
-}
-
-/* === 3. עיצוב הכפתורים עצמם (chips) === */
-.v-bottom-sheet__content:has(#addAddressForm) #AddressSelectType .v-chip {
-    background: rgba(255, 255, 255, 0.85) !important;
-    backdrop-filter: blur(10px) !important;
-    -webkit-backdrop-filter: blur(10px) !important;
-    border: 1.5px solid rgba(227, 30, 36, 0.2) !important;
-    border-radius: 14px !important;
-    padding: 8px 16px !important;
-    height: 42px !important;
-    margin: 0 !important;
-    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04) !important;
-    cursor: pointer !important;
-    opacity: 1 !important;
-}
-
-/* טקסט הכפתור */
-.v-bottom-sheet__content:has(#addAddressForm) #AddressSelectType .v-chip span.tw-font-semibold {
-    color: #1a1a1a !important;
-    font-weight: 800 !important;
-    font-size: 14px !important;
-}
-
-/* אייקון הכפתור */
-.v-bottom-sheet__content:has(#addAddressForm) #AddressSelectType .v-chip .v-img__img {
-    filter: brightness(0) saturate(100%) invert(18%) sepia(88%) saturate(5427%) hue-rotate(352deg) brightness(91%) contrast(92%) !important;
-    opacity: 0.7 !important;
-}
-
-/* כפתור פעיל - אדום מותגי */
-.v-bottom-sheet__content:has(#addAddressForm) #AddressSelectType .v-chip.text-primary,
-.v-bottom-sheet__content:has(#addAddressForm) #AddressSelectType .v-chip[aria-selected="true"] {
-    background: linear-gradient(135deg, rgba(227, 30, 36, 0.08) 0%, rgba(227, 30, 36, 0.03) 100%) !important;
-    border-color: #e31e24 !important;
-    box-shadow: 0 6px 18px rgba(227, 30, 36, 0.15) !important;
-    transform: translateY(-2px) !important;
-}
-
-.v-bottom-sheet__content:has(#addAddressForm) #AddressSelectType .v-chip.text-primary span,
-.v-bottom-sheet__content:has(#addAddressForm) #AddressSelectType .v-chip[aria-selected="true"] span {
-    color: #e31e24 !important;
-}
-
-.v-bottom-sheet__content:has(#addAddressForm) #AddressSelectType .v-chip.text-primary .v-img__img,
-.v-bottom-sheet__content:has(#addAddressForm) #AddressSelectType .v-chip[aria-selected="true"] .v-img__img {
-    opacity: 1 !important;
-}
-
-/* אפקט לחיצה */
-.v-bottom-sheet__content:has(#addAddressForm) #AddressSelectType .v-chip:active {
-    transform: scale(0.95) !important;
-}
-
-/* ניקוי שכבות overlay */
-.v-bottom-sheet__content:has(#addAddressForm) #AddressSelectType .v-chip__overlay,
-.v-bottom-sheet__content:has(#addAddressForm) #AddressSelectType .v-chip__underlay {
-    display: none !important;
-}
-
-/* ביטול ה-disabled וה-opacity-50 שמאפסים את הכפתור הראשון */
-.v-bottom-sheet__content:has(#addAddressForm) #AddressSelectType .v-chip.v-chip--disabled,
-.v-bottom-sheet__content:has(#addAddressForm) #AddressSelectType .v-chip.tw-opacity-50 {
-    opacity: 1 !important;
-    pointer-events: auto !important;
-    cursor: pointer !important;
-}
-
-/* === 4. תיקון דגל ישראל בשדה הטלפון === */
-
-/* הגדלה ויישור של הדגל */
-.v-bottom-sheet__content:has(#addAddressForm) #AddressInputContactPhoneNumber .v-img,
-.v-bottom-sheet__content:has(#addAddressForm) #AddressInputContactPhoneNumber img[alt*="flag"],
-.v-bottom-sheet__content:has(#addAddressForm) #AddressInputContactPhoneNumber img[src*="flag"] {
-    width: 28px !important;
-    height: 20px !important;
-    min-width: 28px !important;
-    border-radius: 4px !important;
-    object-fit: cover !important;
-    transform: none !important;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
-}
-
-/* תיקון מכולת הדגל */
-.v-bottom-sheet__content:has(#addAddressForm) #AddressInputContactPhoneNumber .v-field__prepend-inner {
-    display: flex !important;
-    align-items: center !important;
-    gap: 8px !important;
-}
-
-/* ============================================================ */
-/* === Fix: Search Results Container Collapse + Layout Polish === */
-/* === Date: 2026-04-29 === */
-/* ============================================================ */
-/* בעיה: מסך "בחירת מיקום" - תוצאות החיפוש קרסו לגובה 16px במקום
-   להתפרס מ-top:147px עד תחתית המסך. הילדים גלשו אל מחוץ לאב.
-   הסיבה לא אותרה ישירות (אין כלל שלנו שמשפיע על height של .search-results),
-   אבל הפתרון: להכריח flex-column על האב כדי שהוא יתפוס את כל הגובה הזמין.
-
-   בנוסף: צמצום רווחים בין הקופסאות הפנימיות, והסתרת "כתובות שמורות"
-   בזמן שיש תוצאות חיפוש פעילות (כדי לא להעמיס מידע מיותר).
-*/
-
-/* --- חלק 1: תיקון הקריסה --- */
-html body .search-results.tw-bg-white.tw-fixed.tw-inset-x-0 {
-  display: flex !important;
-  flex-direction: column !important;
-  min-height: calc(100vh - 147px) !important;
-}
-
-html body .search-results.tw-bg-white.tw-fixed.tw-inset-x-0 > div {
-  flex-shrink: 0 !important;
-}
-
-html body .search-results.tw-bg-white.tw-fixed.tw-inset-x-0 .v-card.results-list {
-  flex: 1 1 auto !important;
-  min-height: 0 !important;
-}
-
-/* --- חלק 2: צמצום רווחים בין הקופסאות הפנימיות --- */
-html body .search-results.tw-bg-white.tw-fixed.tw-inset-x-0 > div.tw-px-4 {
-  margin-top: 8px !important;
-  margin-bottom: 8px !important;
-}
-
-/* --- חלק 3: הסתרת "כתובות שמורות" בזמן חיפוש פעיל --- */
-/* הבלוק הזה משתמש ב-:has() כדי לזהות אם יש תוצאות חיפוש פעילות
-   (קיומו של תוצאה אחת לפחות בתוך .results-list עם .tw-cursor-pointer).
-   רק אז - מסתירים את הכותרת "כתובות שמורות" וכרטיסי הכתובות שמתחתיה.
-   ברגע שהמשתמש מוחק את החיפוש - התוצאות נעלמות, ה-:has() לא תופס,
-   ו"כתובות שמורות" חוזרת אוטומטית. */
-html body .search-results.tw-bg-white.tw-fixed.tw-inset-x-0:has(.results-list .tw-cursor-pointer) > div.tw-px-4.tw-mb-4.tw-mt-4 {
-  display: none !important;
-}
-
-/* === End: Search Results Fix | 2026-04-29 === */
-
-/* =========================================================
-   חלק 26: תיקוני תוצאות חיפוש כתובת - מסך "הוספת כתובת חדשה"
-   תאריך: 2026-05-01
-   מטרה: 4 תיקונים מאומתים על מסך הוספת כתובת:
-     1. החזרת רקע לבן + blur לתוצאות (היה שקוף)
-     2. תיקון line-height של כותרות (אותיות עברית נחתכו)
-     3. שיפור קריאות תיאור התוצאה
-     4. הסרת קווי הפרדה בין תוצאות
-     5. צמצום הרווח הענק בין שדה החיפוש לתוצאות
-   סקופ: רק במסך עם #addAddressForm כדי לא לפגוע במסכים אחרים
-   ========================================================= */
-
-/* 1. החזרת רקע לבן ל-search-results (חלק 12ד דורס אותו לשקוף) */
-html body .v-bottom-sheet__content:has(#addAddressForm) .search-results.tw-bg-white {
-    background-color: rgba(255, 255, 255, 0.97) !important;
-    backdrop-filter: blur(20px) saturate(150%) !important;
-    -webkit-backdrop-filter: blur(20px) saturate(150%) !important;
-}
-
-/* 2. תיקון line-height של כותרת תוצאה - מונע חיתוך אותיות עברית */
-html body .v-bottom-sheet__content:has(#addAddressForm) .search-results .v-card.results-list .tw-cursor-pointer span.tw-line-clamp-1 {
-    line-height: 1.4 !important;
-    height: auto !important;
-}
-
-/* 3. שיפור קריאות התיאור (היה אפור דהוי) */
-html body .v-bottom-sheet__content:has(#addAddressForm) .search-results .v-card.results-list .tw-cursor-pointer p.tw-line-clamp-2 {
-    color: #4a5568 !important;
-    line-height: 1.4 !important;
-}
-
-/* 4. הסתרת קווי ההפרדה הדקים בין תוצאות חיפוש */
-html body .v-bottom-sheet__content:has(#addAddressForm) .search-results .tw-cursor-pointer > div.tw-absolute.tw-bottom-0 {
-    display: none !important;
-}
-
-/* 5. צמצום הרווח בין שדה החיפוש לתוצאות (היה ~98px, יורד ל-~10px) */
-html body .v-bottom-sheet__content:has(#addAddressForm) .search-results.tw-bg-white.tw-fixed {
-    margin-top: -88px !important;
-}
-
-/* =========================================================
-   חלק 27: עיצוב פרימיום לתוצאות חיפוש - Liquid Glass V2
-   תאריך: 2026-05-01
-   מטרה: עיצוב פרימיום של תוצאות חיפוש כתובת במסך "הוספת כתובת חדשה":
-     - זכוכית נוזלית עם blur עמוק ואדום מותג עדין
-     - אריחי זכוכית בודדים לכל תוצאה (זכוכית בתוך זכוכית)
-     - אנימציות כניסה מדורגות + לחיצה טקטילית
-     - סיכת מיקום אדומה זוהרת
-     - פס מותגי אדום עליון כידית
-   סקופ: רק במסך עם #addAddressForm כדי לא לפגוע במסכים אחרים
-   ========================================================= */
-
-/* 1. הקופסה הראשית - זכוכית נוזלית עם נוכחות אדומה עדינה */
-html body .v-bottom-sheet__content:has(#addAddressForm) .search-results.tw-bg-white.tw-fixed {
-  background: rgba(255, 255, 255, 0.85) !important;
-  backdrop-filter: blur(50px) saturate(220%) !important;
-  -webkit-backdrop-filter: blur(50px) saturate(220%) !important;
-  border: 1px solid rgba(227, 30, 36, 0.08) !important;
-  border-radius: 28px 28px 0 0 !important;
-  box-shadow:
-    0 -20px 60px rgba(0, 0, 0, 0.06),
-    0 -2px 0 rgba(227, 30, 36, 0.05),
-    inset 0 1px 0 rgba(255, 255, 255, 0.9) !important;
-  margin-top: -88px !important;
-  overflow: hidden !important;
-}
-
-/* 2. רשימת התוצאות הפנימית - שקופה לחלוטין כדי לראות את הזכוכית של האב */
-html body .v-bottom-sheet__content:has(#addAddressForm) .search-results .v-card.results-list {
-  background: transparent !important;
-  box-shadow: none !important;
-  padding: 24px 4px 8px 4px !important;
-}
-
-/* 3. כל תוצאה בודדת - אריח זכוכית פרימיום */
-html body .v-bottom-sheet__content:has(#addAddressForm) .search-results .v-card.results-list .tw-cursor-pointer {
-  background: rgba(255, 255, 255, 0.6) !important;
-  backdrop-filter: blur(20px) !important;
-  -webkit-backdrop-filter: blur(20px) !important;
-  border: 1px solid rgba(255, 255, 255, 0.5) !important;
-  border-radius: 18px !important;
-  margin: 6px 12px !important;
-  padding: 14px 16px !important;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.03) !important;
-  transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
-  position: relative !important;
-  overflow: hidden !important;
-}
-
-/* 4. אפקט hover/active - זוהר אדום עדין */
-html body .v-bottom-sheet__content:has(#addAddressForm) .search-results .v-card.results-list .tw-cursor-pointer:active {
-  background: rgba(255, 255, 255, 0.95) !important;
-  border-color: rgba(227, 30, 36, 0.3) !important;
-  box-shadow:
-    0 8px 24px rgba(227, 30, 36, 0.12),
-    0 0 0 3px rgba(227, 30, 36, 0.06) !important;
-  transform: scale(0.98) translateY(-1px) !important;
-}
-
-/* 5. כותרת תוצאה - דגש מותגי */
-html body .v-bottom-sheet__content:has(#addAddressForm) .search-results .tw-cursor-pointer span.tw-line-clamp-1 {
-  line-height: 1.4 !important;
-  height: auto !important;
-  font-weight: 800 !important;
-  font-size: 15px !important;
-  color: #1a1a1a !important;
-  letter-spacing: -0.2px !important;
-}
-
-/* 6. תיאור תוצאה - קריא ועדין */
-html body .v-bottom-sheet__content:has(#addAddressForm) .search-results .tw-cursor-pointer p.tw-line-clamp-2 {
-  color: #4a5568 !important;
-  line-height: 1.45 !important;
-  font-size: 12.5px !important;
-  font-weight: 500 !important;
-  margin-top: 3px !important;
-}
-
-/* 7. אייקון המיקום (סיכה) - אדום מותג זוהר */
-html body .v-bottom-sheet__content:has(#addAddressForm) .search-results .tw-cursor-pointer svg path,
-html body .v-bottom-sheet__content:has(#addAddressForm) .search-results .tw-cursor-pointer img {
-  filter: brightness(0) saturate(100%) invert(18%) sepia(88%) saturate(5427%) hue-rotate(352deg) brightness(91%) contrast(92%) drop-shadow(0 2px 4px rgba(227, 30, 36, 0.2)) !important;
-  transition: transform 0.3s ease !important;
-}
-
-/* אייקון מתעורר בלחיצה */
-html body .v-bottom-sheet__content:has(#addAddressForm) .search-results .tw-cursor-pointer:active svg,
-html body .v-bottom-sheet__content:has(#addAddressForm) .search-results .tw-cursor-pointer:active img {
-  transform: scale(1.15) !important;
-}
-
-/* 8. הסתרת קווי ההפרדה הישנים */
-html body .v-bottom-sheet__content:has(#addAddressForm) .search-results .tw-cursor-pointer > div.tw-absolute.tw-bottom-0 {
-  display: none !important;
-}
-
-/* 9. אנימציית כניסה - תוצאות נכנסות בגלים */
-@keyframes mh-fade-in-up {
-  from {
-    opacity: 0;
-    transform: translateY(12px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-html body .v-bottom-sheet__content:has(#addAddressForm) .search-results .tw-cursor-pointer {
-  animation: mh-fade-in-up 0.4s cubic-bezier(0.4, 0, 0.2, 1) backwards !important;
-}
-
-html body .v-bottom-sheet__content:has(#addAddressForm) .search-results .tw-cursor-pointer:nth-child(1) { animation-delay: 0.05s !important; }
-html body .v-bottom-sheet__content:has(#addAddressForm) .search-results .tw-cursor-pointer:nth-child(2) { animation-delay: 0.10s !important; }
-html body .v-bottom-sheet__content:has(#addAddressForm) .search-results .tw-cursor-pointer:nth-child(3) { animation-delay: 0.15s !important; }
-html body .v-bottom-sheet__content:has(#addAddressForm) .search-results .tw-cursor-pointer:nth-child(4) { animation-delay: 0.20s !important; }
-html body .v-bottom-sheet__content:has(#addAddressForm) .search-results .tw-cursor-pointer:nth-child(5) { animation-delay: 0.25s !important; }
-
-/* 10. פס מותגי אדום עליון - "ידית" של bottom-sheet בצבעי המותג */
-html body .v-bottom-sheet__content:has(#addAddressForm) .search-results.tw-bg-white.tw-fixed::before {
-  content: '' !important;
-  position: absolute !important;
-  top: 12px !important;
-  left: 50% !important;
-  transform: translateX(-50%) !important;
-  width: 40px !important;
-  height: 4px !important;
-  background: linear-gradient(135deg, #e31e24 0%, #b3161b 100%) !important;
-  border-radius: 4px !important;
-  box-shadow: 0 2px 8px rgba(227, 30, 36, 0.3) !important;
-  z-index: 10 !important;
-}
 
 /* =========================================================
    חלק 30 (2026-05-01, טאבים וכרטיס מסעדה בדף החיפוש) — הוסר ב-6.9.2026.
@@ -6862,3 +5620,449 @@ html body .mh-fullname-error .v-field {
     border-radius: 12px !important;
 }
 /* mh-fullname-v1 */
+
+/* =========================================================
+   חלק 44: מסך הוספת/עריכת כתובת — MH AddrEditor v1.0.0 | 2026-09-22 — Liquid Glass + אדום QLED
+   הבעלים היחיד של המסך: הדר, שדה החיפוש, רשימת התוצאות, המפה, הטופס והפוטר —
+   בחלונית במובייל (.scheme-address-editor) ובמגירה בדסקטופ (.v-navigation-drawer .address-panel-swap).
+   מחליף במלואם את חלקים 12ד, 12ה, 16א–16ה, 21א, 21ב, 23, 28, 29, 29.1,
+   "Fix: Search Results Container Collapse", 26 (תוצאות חיפוש) ו-27 (עיצוב פרימיום לתוצאות).
+   מה היה שבור (נמדד בחלונית החיה, 22.9): רשימת התוצאות קיבלה margin-top:-88px וכיסתה את
+   שדה החיפוש ואת ה-× שלו ("אי אפשר לצאת"), overflow:hidden על הרשימה ("לא מחליק"),
+   min-height/flex שנכתבו למסך אחר, פס אדום דקורטיבי, וכללים על hash-ים של Vue שכבר
+   לא קיימים בבילד (data-v-bd9430d0 / 4b9952fb / d055d74b / 3b7172a6 — 0 התאמות).
+   עקרון: לא נוגעים במיקום שמחשבת Hyperzod (top של התוצאות = תחתית שדה החיפוש, inline).
+   התוצאות שמוזרקות ע"י MH Streets (custom-footer.js) מסומנות ב-.mh-st-tag.
+   ========================================================= */
+/* 0. ניטרול הכלל הגנרי של הגיליון (.v-bottom-sheet__content .v-card { padding:24px 20px; radius 32 })
+      שנכנס לכל כרטיס פנימי במסך: רשימת התוצאות, #locationConfirm, שדה החיפוש */
+html body .v-bottom-sheet__content > .v-card.scheme-address-editor,
+html body .scheme-address-editor,
+html body .scheme-address-editor .v-card,
+html body .v-navigation-drawer .address-panel-swap .v-card {
+    padding: 0 !important;
+    border-radius: 0 !important;
+    border-top: 0 !important;
+    box-shadow: none !important;
+    background: #fff !important;
+    /* הכרטיסים הם אבות של רשימת התוצאות (position:fixed): backdrop-filter/filter/transform
+       הופכים אב ל-containing block, וה-top שמחשבת Hyperzod נמדד ממנו במקום מהמסך (הבאג הישן) */
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+    filter: none !important;
+    transform: none !important;
+}
+html body .v-bottom-sheet__content > .v-card.scheme-address-editor {
+    border-radius: 22px 22px 0 0 !important;
+    overflow: hidden !important;
+}
+html body .scheme-address-editor .v-card__loader,
+html body .scheme-address-editor .v-card__underlay,
+html body .v-navigation-drawer .address-panel-swap .v-card__underlay {
+    display: none !important;
+}
+
+/* 1. הדר: לבן-קריסטלי, כותרת, חץ חזרה אדום.
+      בלי backdrop-filter/filter/transform כאן! ההדר הוא אב של רשימת התוצאות (position:fixed),
+      וכל אחד מהם הופך אותו ל-containing block — ואז ה-top שמחשבת Hyperzod נמדד מההדר במקום מהמסך. */
+html body .scheme-address-editor .scheme-address-editor__header {
+    background: rgba(255, 255, 255, 0.96) !important;
+    border-bottom: 1px solid rgba(227, 30, 36, 0.12) !important;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05) !important;
+}
+html body .scheme-address-editor .scheme-address-editor__header > .tw-h-\[56px\] {
+    background: transparent !important;
+    padding: 0 10px !important;
+    gap: 6px !important;
+}
+html body .scheme-address-editor .scheme-address-editor__header .tw-h-\[56px\] span.tw-truncate {
+    font-size: 17px !important;
+    font-weight: 800 !important;
+    color: #111 !important;
+    letter-spacing: -0.2px !important;
+}
+html body .scheme-address-editor .scheme-address-editor__header img[alt="Back"] {
+    width: 28px !important;
+    height: 28px !important;
+    filter: invert(20%) sepia(96%) saturate(5600%) hue-rotate(350deg) brightness(88%) !important;
+}
+
+/* 2. שדה החיפוש: קפסולה לבנה, מיקוד אדום, × כפתור עגול ברור */
+html body .scheme-address-editor .scheme-address-editor__header > .tw-px-4 {
+    padding: 6px 14px 12px !important;
+    background: transparent !important;
+}
+html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) .scheme-location-master .l-search {
+    background: transparent !important;
+    box-shadow: none !important;
+}
+html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) .scheme-location-master .v-text-field .v-field {
+    height: 50px !important;
+    min-height: 50px !important;
+    border-radius: 999px !important;
+    background: #fff !important;
+    border: 1.5px solid rgba(0, 0, 0, 0.09) !important;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05) !important;
+    padding-inline: 14px !important;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease !important;
+}
+html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) .scheme-location-master .v-field--focused {
+    border-color: #e31e24 !important;
+    box-shadow: 0 0 0 4px rgba(227, 30, 36, 0.10) !important;
+}
+html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) .scheme-location-master .v-field__outline,
+html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) .scheme-location-master .v-field__overlay {
+    display: none !important;
+}
+html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) .scheme-location-master input#search {
+    font-size: 16px !important;
+    font-weight: 600 !important;
+    color: #111 !important;
+    padding: 0 !important;
+    min-height: 46px !important;
+}
+html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) .scheme-location-master input#search::placeholder {
+    color: #8a8f98 !important;
+    font-weight: 500 !important;
+}
+html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) .scheme-location-master .search-icon-mobile {
+    width: 36px !important;
+    height: 36px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border-radius: 999px !important;
+    cursor: pointer !important;
+    flex: none !important;
+}
+html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) .scheme-location-master .scheme-colorable-icon--close {
+    background: rgba(227, 30, 36, 0.08) !important;
+}
+html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) .scheme-location-master .search-icon-mobile img {
+    width: 18px !important;
+    height: 18px !important;
+    filter: invert(20%) sepia(96%) saturate(5600%) hue-rotate(350deg) brightness(88%) !important;
+}
+
+/* 3. רשימת התוצאות: זכוכית לבנה מלוא הרוחב, גלילה טבעית, בלי חפיפה על השדה */
+html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) .scheme-location-master .search-results {
+    background: rgba(255, 255, 255, 0.97) !important;
+    -webkit-backdrop-filter: blur(20px) !important;
+    backdrop-filter: blur(20px) !important;
+    margin: 0 !important;
+    padding: 6px 0 120px !important;
+    border-top: 1px solid rgba(0, 0, 0, 0.06) !important;
+    box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.04) !important;
+    min-height: 0 !important;
+    display: block !important;
+}
+html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) .scheme-location-master .search-results.tw-fixed {
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    overscroll-behavior: contain !important;
+}
+html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) .scheme-location-master .search-results::before {
+    content: none !important;
+    display: none !important;
+}
+html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) .scheme-location-results-heading {
+    display: block !important;
+    margin: 8px 18px 4px !important;
+    font-size: 12px !important;
+    font-weight: 800 !important;
+    letter-spacing: 0.3px !important;
+    color: #8a8f98 !important;
+}
+html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) .scheme-location-master .results-list {
+    background: transparent !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    padding: 0 8px !important;
+    margin: 0 !important;
+}
+html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) .scheme-location-master .search-results.tw-fixed .results-list {
+    max-height: none !important;
+    height: auto !important;
+    overflow: visible !important;
+}
+html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) .scheme-location-result {
+    padding: 13px 12px !important;
+    gap: 12px !important;
+    border-radius: 14px !important;
+    margin: 2px 0 !important;
+    background: transparent !important;
+    animation: none !important;
+    transition: background-color 0.15s ease !important;
+}
+html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) .scheme-location-result:active {
+    background: rgba(227, 30, 36, 0.06) !important;
+}
+@media (hover: hover) {
+    html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) .scheme-location-result:hover {
+        background: rgba(0, 0, 0, 0.035) !important;
+    }
+}
+html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) .scheme-location-result > div.tw-absolute.tw-bottom-0 {
+    display: none !important;
+}
+html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) .scheme-location-result__title {
+    font-size: 15px !important;
+    font-weight: 800 !important;
+    line-height: 1.3 !important;
+    color: #111 !important;
+}
+html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) .scheme-location-result__address {
+    font-size: 13px !important;
+    line-height: 1.4 !important;
+    color: #6b7280 !important;
+    margin-top: 2px !important;
+}
+html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) .scheme-location-result .scheme-colorable-icon--map-pin {
+    width: 20px !important;
+    height: 20px !important;
+    margin-top: 2px !important;
+    opacity: 0.9 !important;
+}
+/* תג של תוצאה מוזרקת (MH Streets): מוסתר בכותרת, מוצג כגלולה בשורת המשנה */
+html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) .scheme-location-result__title .mh-st-tag {
+    display: none !important;
+}
+html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) .scheme-location-result__address .mh-st-tag {
+    display: inline-block !important;
+    margin-inline-start: 6px !important;
+    padding: 2px 8px !important;
+    border-radius: 999px !important;
+    background: #fff5f5 !important;
+    color: #c8151b !important;
+    font-size: 11px !important;
+    font-weight: 800 !important;
+    vertical-align: middle !important;
+}
+/* "לא נמצאו תוצאות": טקסט + רמז */
+html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) .scheme-location-master .search-results > div:not(.results-list) > p {
+    margin: 10px 18px !important;
+    font-size: 14px !important;
+    font-weight: 600 !important;
+    color: #374151 !important;
+    line-height: 1.45 !important;
+}
+html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) .scheme-location-master .search-results > div:not(.results-list) > p::after {
+    content: 'לא מוצאים את הרחוב? נסו לכתוב רק את שם הרחוב, או הזיזו את הסיכה במפה למיקום המדויק.';
+    display: block !important;
+    margin-top: 6px !important;
+    font-size: 13px !important;
+    font-weight: 500 !important;
+    color: #8a8f98 !important;
+}
+
+/* 4. המפה: פינות מעוגלות בתוך השוליים, בועת ההנחיה אדומה, "אתר אותי" גלולה לבנה */
+html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) #locationConfirm {
+    padding: 0 !important;
+    background: transparent !important;
+}
+html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) #locationConfirm > .tw-overflow-hidden.tw-h-\[346px\] {
+    height: min(46vh, 346px) !important;
+    margin: 10px 14px 0 !important;
+    width: auto !important;
+    border-radius: 20px !important;
+    overflow: hidden !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08) !important;
+}
+html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) #locationConfirm .tw-bg-\[\#212121\] {
+    background: linear-gradient(135deg, #ff3b41 0%, #c8151b 100%) !important;
+    border-radius: 999px !important;
+    padding: 8px 14px !important;
+    box-shadow: 0 6px 18px rgba(227, 30, 36, 0.35) !important;
+}
+html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) #locationConfirm .tw-border-t-\[8px\] {
+    border-top-color: #c8151b !important;
+}
+html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) #CurrentLocationButton {
+    border-radius: 999px !important;
+    background: rgba(255, 255, 255, 0.94) !important;
+    -webkit-backdrop-filter: blur(12px) !important;
+    backdrop-filter: blur(12px) !important;
+    color: #c8151b !important;
+    font-weight: 800 !important;
+    height: 42px !important;
+    padding: 0 16px !important;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.14) !important;
+}
+html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) #CurrentLocationButton .v-icon {
+    color: #e31e24 !important;
+}
+html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) #CurrentLocationButton .v-btn__overlay,
+html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) #CurrentLocationButton .v-btn__underlay {
+    display: none !important;
+}
+
+/* 5. ידית + כותרת הכתובת */
+html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) #locationConfirm > .tw-rounded-t-\[20px\] {
+    background: transparent !important;
+    padding: 10px 0 2px !important;
+}
+html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) #locationConfirm .tw-bg-\[\#e5e5e5\] {
+    background: rgba(0, 0, 0, 0.12) !important;
+    width: 40px !important;
+}
+html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) #locationConfirm h2 {
+    font-size: 19px !important;
+    font-weight: 900 !important;
+    color: #111 !important;
+}
+html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) #locationConfirm h2 img {
+    width: 16px !important;
+    filter: invert(20%) sepia(96%) saturate(5600%) hue-rotate(350deg) brightness(88%) !important;
+}
+html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) #locationConfirm p.line-clamp-2 {
+    color: #6b7280 !important;
+    font-size: 14px !important;
+}
+html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) #addAddressForm > .tw-border-b {
+    border-color: rgba(0, 0, 0, 0.06) !important;
+    margin-bottom: 18px !important;
+}
+
+/* 6. הטופס: קפסולות אפורות-בהירות, מיקוד אדום, בלי קווים תחתונים; שדה המדינה מוסתר (מולא מראש) */
+html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) #addAddressForm .v-field {
+    background: #f5f5f7 !important;
+    border-radius: 14px !important;
+    border: 1.5px solid transparent !important;
+    padding: 0 14px !important;
+    min-height: 54px !important;
+    box-shadow: none !important;
+    transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease !important;
+}
+html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) #addAddressForm .v-field--focused {
+    background: #fff !important;
+    border-color: #e31e24 !important;
+    box-shadow: 0 0 0 4px rgba(227, 30, 36, 0.10) !important;
+}
+html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) #addAddressForm .v-field__outline,
+html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) #addAddressForm .v-field__overlay,
+html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) #addAddressForm .v-field__loader {
+    display: none !important;
+}
+html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) #addAddressForm .v-field-label {
+    font-size: 14px !important;
+    font-weight: 600 !important;
+    color: #8a8f98 !important;
+}
+html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) #addAddressForm input,
+html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) #addAddressForm textarea {
+    font-size: 16px !important;
+    font-weight: 600 !important;
+    color: #111 !important;
+}
+html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) #addAddressForm .v-input__details {
+    padding-inline: 8px !important;
+}
+html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) #AddressInputBuilding,
+html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) #AddressInputLandmark,
+html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) #AddressInputContactPhoneNumber,
+html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) #AddressInputContactName {
+    margin: 0 0 12px !important;
+}
+html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) #AddressInputCountry {
+    display: none !important;
+}
+/* טלפון: הדגל + הקידומת + המספר בקפסולה אחת */
+html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) #AddressInputContactPhoneNumber #login-input {
+    display: flex !important;
+    align-items: stretch !important;
+    background: #f5f5f7 !important;
+    border-radius: 14px !important;
+    border: 1.5px solid transparent !important;
+    margin: 0 !important;
+    transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease !important;
+}
+html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) #AddressInputContactPhoneNumber #login-input:focus-within {
+    background: #fff !important;
+    border-color: #e31e24 !important;
+    box-shadow: 0 0 0 4px rgba(227, 30, 36, 0.10) !important;
+}
+html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) #AddressInputContactPhoneNumber .v-field,
+html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) #AddressInputContactPhoneNumber .v-field--focused {
+    background: transparent !important;
+    border-color: transparent !important;
+    box-shadow: none !important;
+}
+html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) #AddressInputContactPhoneNumber .country-select-toggle {
+    display: flex !important;
+    align-items: center !important;
+    height: 54px !important;
+    padding: 0 10px !important;
+}
+/* "לשמור את הכתובת בתור": גלולות, הנבחרת אדומה */
+html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) #AddressSelectType label {
+    font-size: 12px !important;
+    font-weight: 800 !important;
+    color: #8a8f98 !important;
+    letter-spacing: 0.3px !important;
+    text-transform: none !important;
+}
+html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) #AddressSelectType .v-slide-group__prev,
+html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) #AddressSelectType .v-slide-group__next {
+    display: none !important;
+}
+html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) #AddressSelectType .v-slide-group__content {
+    gap: 8px !important;
+}
+html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) #AddressSelectType .v-chip {
+    height: 40px !important;
+    border-radius: 999px !important;
+    background: #fff !important;
+    border: 1.5px solid rgba(0, 0, 0, 0.10) !important;
+    color: #111 !important;
+    font-weight: 700 !important;
+    padding: 0 16px !important;
+    box-shadow: none !important;
+    margin: 0 !important;
+}
+html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) #AddressSelectType .v-chip--selected,
+html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) #AddressSelectType .v-chip.text-primary,
+html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) #AddressSelectType .v-chip[aria-selected="true"] {
+    background: #fff5f5 !important;
+    border-color: #e31e24 !important;
+    color: #c8151b !important;
+}
+html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) #AddressSelectType .v-chip__overlay,
+html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) #AddressSelectType .v-chip__underlay {
+    display: none !important;
+}
+
+/* 7. פוטר וכפתור "שמור כתובת": אדום QLED — ההשקעה האדומה היחידה במסך */
+html body .scheme-address-editor .scheme-address-editor__mobile-footer {
+    background: linear-gradient(to top, #fff 70%, rgba(255, 255, 255, 0)) !important;
+    padding: 14px 16px calc(14px + env(safe-area-inset-bottom)) !important;
+}
+html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) .scheme-address-editor__submit,
+html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) .v-btn.v-btn--block.v-btn--size-x-large,
+html body .v-navigation-drawer:has(.address-panel-swap) .v-btn.v-btn--block.v-btn--size-x-large {
+    background: linear-gradient(135deg, #ff3b41 0%, #c8151b 100%) !important;
+    color: #fff !important;
+    border-radius: 18px !important;
+    height: 56px !important;
+    font-size: 17px !important;
+    font-weight: 900 !important;
+    letter-spacing: 0.2px !important;
+    box-shadow: 0 10px 26px rgba(227, 30, 36, 0.32) !important;
+    transition: transform 0.12s ease, box-shadow 0.2s ease !important;
+}
+html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) .scheme-address-editor__submit:active,
+html body .v-navigation-drawer:has(.address-panel-swap) .v-btn.v-btn--block.v-btn--size-x-large:active {
+    transform: scale(0.985) !important;
+    box-shadow: 0 4px 12px rgba(227, 30, 36, 0.25) !important;
+}
+html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) .scheme-address-editor__submit .v-btn__overlay,
+html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) .scheme-address-editor__submit .v-btn__underlay,
+html body .v-navigation-drawer:has(.address-panel-swap) .v-btn.v-btn--block.v-btn--size-x-large .v-btn__overlay,
+html body .v-navigation-drawer:has(.address-panel-swap) .v-btn.v-btn--block.v-btn--size-x-large .v-btn__underlay {
+    display: none !important;
+}
+@media (prefers-reduced-motion: reduce) {
+    html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) .scheme-location-result,
+    html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) .scheme-address-editor__submit,
+    html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) #addAddressForm .v-field { transition: none !important; }
+}
+/* mh-addreditor-v1 */
