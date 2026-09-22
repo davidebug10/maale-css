@@ -3577,7 +3577,7 @@ log('פעיל');
 })();
 
 /* ============================================================
-   רחובות של מעלה אדומים שגוגל לא מכיר — MH Streets  |  v1.0.1 | 2026-09-22
+   רחובות של מעלה אדומים שגוגל לא מכיר — MH Streets  |  v1.0.2 | 2026-09-22 (v1.0.2: ניסוחים לבקשת דוד — placeholder 'כתובת בגוש אדומים', תג 'רחוב חדש · אשרו את המיקום במפה')
    הבעיה (לקוח אמיתי, 22.9): "הפסנתר" ו"הר הלבונה" לא נמצאו בחיפוש הכתובת. חיפוש
    הכתובות של Hyperzod עובר דרך Google Places (השרת שלהם, /store/v1/places/search),
    ול-Google פשוט אין את הרחובות החדשים של מעלה אדומים (נבדק גם Mapbox ו-OSM: אין).
@@ -3603,7 +3603,7 @@ log('פעיל');
   'use strict';
   if (window.__MH_STREETS__) { return; }
   window.__MH_STREETS__ = true;
-  var VERSION = '1.0.1', CITY = 'מעלה אדומים', MAX = 3;
+  var VERSION = '1.0.2', CITY = 'מעלה אדומים', MAX = 3;
   /* [שם רחוב לתצוגה, lat, lng] — מקור: GovMap 22.9.2026 (146 רחובות; 4 שאין להם מיקום בשום מפה: הזוגן, החורן, החלמונית, השרון) */
   var STREETS = [
   ["אבני החושן",31.775122,35.301897],
@@ -3805,7 +3805,7 @@ log('פעיל');
     var s = m.street, label = s.name + (m.num ? ' ' + m.num : '');
     var placeName = label + ', ' + CITY + ', ישראל';
     return {
-      address: label + ', ' + CITY + ' <span class="mh-st-tag">מהמפה הממשלתית · דייקו את הסיכה</span>',
+      address: label + ', ' + CITY + ' <span class="mh-st-tag">רחוב חדש · אשרו את המיקום במפה</span>',
       place_id: 'mh-street:' + label,
       mapbox_data: {
         id: 'mh.' + label, type: 'Feature', place_type: ['address'], text: label, place_name: placeName,
@@ -3889,7 +3889,7 @@ log('פעיל');
   function placeholder() {
     var els = document.querySelectorAll('.scheme-location-master input#search');
     for (var i = 0; i < els.length; i++) {
-      if (/^Search for area/i.test(els[i].placeholder || '')) { els[i].placeholder = 'רחוב ומספר בית, למשל הפסנתר 8'; }
+      if (/^Search for area/i.test(els[i].placeholder || '')) { els[i].placeholder = 'כתובת בגוש אדומים'; }
     }
   }
   var tries = 0;
