@@ -1595,145 +1595,9 @@ a[href^="tel:"] svg path {
 
 
 /* =========================================================
-   חלק 12 המאוחד: תפריט אפשרויות כתובת - התיקון הסופי
-   מטרה: עיצוב Liquid Glass עם הגנת Scoping למניעת זליגה למוצרים
-   עדכון 2026-04-27: הוחלף הסקופ מ-:has(.tw-cursor-pointer) ל-:has(.v-card-title span.tw-leading-[16px])
-   הסיבה: הסקופ הישן דלף למודאלים אחרים (דף "בחירת מיקום", מודאל ההתחברות באנדרואיד)
+   חלק 12 המאוחד (תפריט אפשרויות כתובת, הזרקת טקסט ב-::before) — הוסר 23.9.2026.
+   הוחלף ע"י "חלק 46: MH Addresses" (עיצוב) + MH Lang v1.3.0 (תרגום הטקסטים). ההיסטוריה ב-git.
    ========================================================= */
-
-/* 1. מכולה חיצונית ומרכוז - מופעל רק כשיש אפשרויות בחירה (has cursor-pointer) */
-.v-overlay__content.v-bottom-sheet__content:has(.v-card-title span.tw-leading-\[16px\]) {
-    left: 0 !important;
-    right: 0 !important;
-    margin: 0 auto !important;
-    max-width: 460px !important;
-    bottom: 16px !important;
-    padding: 0 12px !important;
-    display: flex !important;
-    justify-content: center !important;
-}
-
-/* 2. כרטיס הזכוכית הראשי - הגנה מפני דפים אטומים */
-.v-overlay__content.v-bottom-sheet__content:has(.v-card-title span.tw-leading-\[16px\]) .v-card {
-    background: rgba(255, 255, 255, 0.8) !important;
-    backdrop-filter: blur(45px) saturate(210%) !important;
-    -webkit-backdrop-filter: blur(45px) saturate(210%) !important;
-    border-radius: 32px !important;
-    border: 1px solid rgba(255, 255, 255, 0.6) !important;
-    box-shadow: 0 -15px 50px rgba(0, 0, 0, 0.12) !important;
-    overflow: hidden !important;
-    width: 100% !important;
-}
-
-/* --- 3. ניקוי כותרת וחיסול ה"דיבוק" (Header Nuke) --- */
-
-/* איפוס הכותרת רק בחלונית הכתובות */
-.v-overlay__content.v-bottom-sheet__content:has(.v-card-title span.tw-leading-\[16px\]) .v-card-title {
-    display: flex !important;
-    justify-content: center !important;
-    align-items: center !important;
-    min-height: 64px !important;
-    position: relative !important;
-    padding: 0 !important;
-}
-
-/* העלמת הטקסט המקורי "Address options" - רק כאן! */
-.v-overlay__content.v-bottom-sheet__content:has(.v-card-title span.tw-leading-\[16px\]) .v-card-title span,
-.v-overlay__content.v-bottom-sheet__content:has(.v-card-title span.tw-leading-\[16px\]) .v-card-title .tw-text-base {
-    font-size: 0 !important;
-    color: transparent !important;
-    visibility: hidden !important;
-}
-
-/* הזרקת הכותרת העברית - מוגן מפני זליגה לדף המוצר */
-.v-overlay__content.v-bottom-sheet__content:has(.v-card-title span.tw-leading-\[16px\]) .v-card-title::after {
-    content: "אפשרויות כתובת" !important;
-    position: absolute !important;
-    left: 50% !important;
-    top: 50% !important;
-    transform: translate(-50%, -50%) !important;
-    font-size: 17px !important;
-    font-weight: 900 !important;
-    color: #1A1A1A !important;
-    visibility: visible !important;
-    width: max-content !important;
-    z-index: 1 !important;
-}
-
-/* --- 4. טיפול בכפתור ה-X והתוכן --- */
-
-.v-overlay__content.v-bottom-sheet__content:has(.v-card-title span.tw-leading-\[16px\]) .v-card-title button.v-btn--icon {
-    position: absolute !important;
-    left: 12px !important;
-    z-index: 5 !important;
-    background: rgba(255, 255, 255, 0.9) !important;
-    border: 1px solid rgba(227, 30, 36, 0.1) !important;
-    width: 36px !important;
-    height: 36px !important;
-    border-radius: 50% !important;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
-}
-
-/* צביעת ה-X באדום QLED */
-.v-overlay__content.v-bottom-sheet__content:has(.v-card-title span.tw-leading-\[16px\]) .v-btn--icon .v-img__img {
-    filter: brightness(0) saturate(100%) invert(18%) sepia(88%) saturate(5427%) hue-rotate(352deg) brightness(91%) contrast(92%) !important;
-}
-
-/* --- 5. שורות הפעולה (עריכה ומחיקה) --- */
-
-/* מחיקת האנגלית והזרקת עברית */
-.v-overlay__content.v-bottom-sheet__content:has(.v-card-title span.tw-leading-\[16px\]) .tw-cursor-pointer span.tw-font-medium {
-    font-size: 0 !important;
-    color: transparent !important;
-    display: block !important;
-    position: relative !important;
-}
-
-.v-overlay__content.v-bottom-sheet__content:has(.v-card-title span.tw-leading-\[16px\]) .tw-cursor-pointer:first-of-type span.tw-font-medium::before {
-    content: "עריכת פרטי כתובת" !important;
-    font-size: 15px !important;
-    color: #1A1A1A !important;
-    visibility: visible !important;
-    font-weight: 700 !important;
-}
-
-.v-overlay__content.v-bottom-sheet__content:has(.v-card-title span.tw-leading-\[16px\]) .tw-cursor-pointer:last-of-type span.tw-font-medium::before {
-    content: "מחיקת כתובת מהרשימה" !important;
-    font-size: 15px !important;
-    color: #e31e24 !important;
-    visibility: visible !important;
-    font-weight: 700 !important;
-}
-
-/* עיצוב המכולה הפנימית של השורות */
-.v-overlay__content.v-bottom-sheet__content:has(.v-card-title span.tw-leading-\[16px\]) .tw-border.tw-border-\[\#00000014\] {
-    background: rgba(255, 255, 255, 0.4) !important;
-    border-radius: 24px !important;
-    border: 1px solid rgba(0, 0, 0, 0.05) !important;
-    margin: 8px 12px !important;
-    padding: 4px 0 !important;
-}
-
-.v-overlay__content.v-bottom-sheet__content:has(.v-card-title span.tw-leading-\[16px\]) .tw-cursor-pointer {
-    height: 56px !important;
-    padding: 0 16px !important;
-    display: flex !important;
-    align-items: center !important;
-}
-
-/* אייקוני פעולה באדום */
-.v-overlay__content.v-bottom-sheet__content:has(.v-card-title span.tw-leading-\[16px\]) .v-icon, 
-.v-overlay__content.v-bottom-sheet__content:has(.v-card-title span.tw-leading-\[16px\]) .tw-w-5.tw-h-5 {
-    color: #e31e24 !important;
-    opacity: 0.8 !important;
-}
-
-/* ניקוי שאריות */
-.v-overlay__content.v-bottom-sheet__content:has(.v-card-title span.tw-leading-\[16px\]) hr.v-divider,
-.v-overlay__content.v-bottom-sheet__content:has(.v-card-title span.tw-leading-\[16px\]) .v-btn__overlay,
-.v-overlay__content.v-bottom-sheet__content:has(.v-card-title span.tw-leading-\[16px\]) .v-btn__underlay {
-    display: none !important;
-}
 
 /* =========================================================
    חלק 12ג: עיצוב מחדש לכפתור הסגירה (The X Button)
@@ -6419,6 +6283,23 @@ html body .v-bottom-sheet__content > .v-card.tw-rounded-t-xl:has(> .tw-px-4.tw-p
     color: #111 !important;
 }
 html body .v-bottom-sheet__content > .v-card.tw-rounded-t-xl:has(> .tw-px-4.tw-pb-8 > .tw-border.tw-rounded-xl > .tw-h-\[44px\].tw-cursor-pointer) > hr {
+    display: none !important;
+}
+html body .v-bottom-sheet__content > .v-card.tw-rounded-t-xl:has(> .tw-px-4.tw-pb-8 > .tw-border.tw-rounded-xl > .tw-h-\[44px\].tw-cursor-pointer) > .v-card-title .v-btn {
+    width: 36px !important;
+    height: 36px !important;
+    border-radius: 999px !important;
+    background: #f5f5f7 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+html body .v-bottom-sheet__content > .v-card.tw-rounded-t-xl:has(> .tw-px-4.tw-pb-8 > .tw-border.tw-rounded-xl > .tw-h-\[44px\].tw-cursor-pointer) > .v-card-title .v-btn img {
+    width: 22px !important;
+    height: 22px !important;
+}
+html body .v-bottom-sheet__content > .v-card.tw-rounded-t-xl:has(> .tw-px-4.tw-pb-8 > .tw-border.tw-rounded-xl > .tw-h-\[44px\].tw-cursor-pointer) > .v-card-title .v-btn__overlay,
+html body .v-bottom-sheet__content > .v-card.tw-rounded-t-xl:has(> .tw-px-4.tw-pb-8 > .tw-border.tw-rounded-xl > .tw-h-\[44px\].tw-cursor-pointer) > .v-card-title .v-btn__underlay {
     display: none !important;
 }
 html body .v-bottom-sheet__content > .v-card.tw-rounded-t-xl > .tw-px-4.tw-pb-8 > .tw-border.tw-rounded-xl:has(> .tw-h-\[44px\].tw-cursor-pointer) {
