@@ -4048,3 +4048,51 @@ log('פעיל');
   window.MH_WA = { version: VERSION, apply: apply, stats: function () { return JSON.parse(JSON.stringify(stats)); } };
   /* mh-whatsapp-v1 */
 })();
+
+/* ============================================================
+   טלפון בטופס הכתובת: ישראל תמיד — MH ILPhone  |  v1.0.0 | 2026-09-23
+   בקשת דוד: בשדה הטלפון של הוספת/עריכת כתובת, ישראל (+972) היא ברירת המחדל ותפריט המדינות
+   לא נפתח בכלל. Hyperzod פותחת את הבורר על המדינה הראשונה ברשימה (אנדורה, +376) לאורחים.
+   איך: מאתרים ברשימת המדינות של הבורר (.country-select-dropdown li) את "Israel" ולוחצים עליה
+   דרך המאזין של Vue (li.click()) — כך הקידומת האמיתית של הטופס משתנה, לא רק התצוגה. רץ רק
+   כשהדגל הנוכחי אינו ישראל, ורק בתוך #AddressInputContactPhoneNumber. הנעילה של התפריט (בלי
+   חץ, בלי לחיצה, הרשימה מוסתרת) היא ב-CSS בחלק 44.
+   נכשל-פתוח: אין רשימה/אין ישראל → כלום. בדיקה: window.MH_ILPHONE.stats()
+   ============================================================ */
+(function () {
+  'use strict';
+  if (window.__MH_ILPHONE__) { return; }
+  window.__MH_ILPHONE__ = true;
+  var VERSION = '1.0.0', ROOT = '#AddressInputContactPhoneNumber', WANT = 'israel';
+  var stats = { version: VERSION, scans: 0, selected: 0, alreadyIL: 0, noList: 0, last: null };
+  function currentIsIsrael(cs) {
+    var img = cs.querySelector('.country-select-toggle img');
+    var alt = (img && (img.getAttribute('alt') || '')).toLowerCase();
+    if (alt) { return alt === WANT; }
+    var dial = cs.parentNode && cs.parentNode.parentNode && cs.parentNode.parentNode.querySelector('.v-field__prepend-inner');
+    return !!(dial && /\+972/.test(dial.textContent));
+  }
+  function sync() {
+    stats.scans++;
+    var pickers = document.querySelectorAll(ROOT + ' .country-select');
+    for (var i = 0; i < pickers.length; i++) {
+      var cs = pickers[i];
+      if (currentIsIsrael(cs)) { if (!cs.__mhIL) { cs.__mhIL = true; stats.alreadyIL++; } continue; }
+      var items = cs.querySelectorAll('.country-select-dropdown li');
+      if (!items.length) { stats.noList++; continue; }
+      var hit = null;
+      for (var j = 0; j < items.length; j++) {
+        var name = items[j].querySelector('strong'); var code = items[j].querySelector('span');
+        if ((name && name.textContent.trim().toLowerCase() === WANT) || (code && code.textContent.trim() === '+972' && name && /israel/i.test(name.textContent))) { hit = items[j]; break; }
+      }
+      if (!hit) { continue; }
+      try { hit.click(); stats.selected++; stats.last = new Date().toISOString(); } catch (e) { console.warn('[MH ILPhone]', e); }
+    }
+  }
+  var pend = false;
+  function schedule() { if (pend) { return; } pend = true; setTimeout(function () { pend = false; try { sync(); } catch (e) {} }, 200); }
+  try { new MutationObserver(schedule).observe(document.documentElement, { subtree: true, childList: true }); } catch (e) {}
+  schedule();
+  window.MH_ILPHONE = { version: VERSION, sync: sync, stats: function () { return JSON.parse(JSON.stringify(stats)); } };
+  /* mh-ilphone-v1 */
+})();
