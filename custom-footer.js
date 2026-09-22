@@ -3910,3 +3910,135 @@ log('פעיל');
   window.MH_STREETS = { version: VERSION, find: find, parse: parse, mapboxFeature: mapboxFeature, stats: function () { return JSON.parse(JSON.stringify(stats)); } };
   /* mh-streets-v1 */
 })();
+
+/* ============================================================
+   בועת וואטסאפ צפה — MH WhatsApp  |  v1.0.0 | 2026-09-22
+   בקשת דוד: בועה קטנה עם סמל וואטסאפ בדף הבית ובדפי העסקים, שלא מתנגשת בכלום.
+   מה הבלוק עושה: יוצר <a id="mh-wa"> אחד (העיצוב בחלק 45), ומדליק/מכבה .mh-wa-on לפי:
+     - מסלול: דף הבית (/, /he, /he/home) — אחרי 1.2 שניות; דף עסק (/he/m/<slug>/<id>) —
+       רק אחרי שהלקוח גלל ~160px בתוך .merchant-page (לא מכסה את ההירו). כל דף אחר
+       (צ'ק-אאוט, חיפוש, עמוד מוצר, כתובות, דפי מידע) — מוסתר.
+     - שכבות: כל חלונית (.v-overlay--active: פופאפ מוצר, עגלה, כתובת) או מגירה פעילה
+       (.v-navigation-drawer--active) — מוסתר, וחוזר כשנסגרו.
+     - גובה: מעל סרגל הניווט התחתון (#MultiVendorBottomNav) כשהוא מוצג, אחרת 20px —
+       נמדד מה-DOM ומוזרם ל-CSS דרך --mh-wa-bottom. כפתור "המשך לתשלום" של Hyperzod
+       בדף עסק יושב במרכז (x 109–280 ב-390px) — הבועה בשמאל לא נוגעת בו.
+   המספר: business_phone מה-boot של Hyperzod (מה שדוד מעדכן בהגדרות), עם גיבוי קבוע.
+   נכשל-פתוח: כל שגיאה = אין בועה. בדיקה: window.MH_WA.stats()
+   ============================================================ */
+(function () {
+  'use strict';
+  if (window.__MH_WA__) { return; }
+  window.__MH_WA__ = true;
+  var VERSION = '1.0.0', FALLBACK = '972555190064';
+  var TEXT = 'שלום, אשמח לעזרה עם הזמנה במעלה המשלוחים';
+  var HOME = /^\/(he\/?(home\/?)?)?$/, MERCHANT = /^\/he\/m\/[^\/]+\/[0-9a-f]{20,}\/?$/;
+  var SCROLL_MIN = 160, NAV_GAP = 12, BASE_BOTTOM = 20;
+  var SVG = '<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 3C8.8 3 3 8.7 3 15.7c0 2.5.7 4.9 2.1 7L3 29l6.5-2c2 1.1 4.2 1.6 6.5 1.6 7.2 0 13-5.7 13-12.8S23.2 3 16 3zm0 23.3c-2 0-4-.5-5.7-1.6l-.4-.2-3.9 1.2 1.2-3.7-.3-.4a10.3 10.3 0 0 1-1.7-5.9C5.2 10 10 5.2 16 5.2S26.8 10 26.8 15.7 22 26.3 16 26.3zm5.9-7.8c-.3-.2-1.9-.9-2.2-1-.3-.1-.5-.2-.7.2-.2.3-.8 1-1 1.2-.2.2-.4.2-.7.1-.3-.2-1.4-.5-2.6-1.6-1-.9-1.6-1.9-1.8-2.2-.2-.3 0-.5.1-.7l.5-.6.3-.5c.1-.2.1-.4 0-.6l-1-2.4c-.3-.6-.5-.5-.7-.5h-.6c-.2 0-.6.1-.9.4-.3.3-1.2 1.1-1.2 2.8s1.2 3.3 1.4 3.5c.2.2 2.4 3.6 5.8 5 .8.3 1.4.5 1.9.7.8.3 1.5.2 2.1.1.6-.1 1.9-.8 2.2-1.5.3-.7.3-1.4.2-1.5l-.6-.4z"/></svg>';
+  var stats = { version: VERSION, route: null, shown: false, reason: '', coverBy: null, scrolled: false, bottom: BASE_BOTTOM, phone: null, toggles: 0 };
+  var el = null, scrolledEnough = false, homeTimer = null, homeReady = false, scrollHost = null;
+
+  function phone() {
+    try {
+      var app = document.getElementById('app');
+      var st = app && app.__vue_app__ && app.__vue_app__.config.globalProperties.$store;
+      var b = st && st.getters.getBootSettings;
+      var p = b && b.general_settings && b.general_settings.business_details && b.general_settings.business_details.business_phone;
+      var d = String(p || '').replace(/\D/g, '');
+      if (/^0\d{8,9}$/.test(d)) { d = '972' + d.slice(1); }
+      if (/^972\d{8,9}$/.test(d)) { return d; }
+    } catch (e) {}
+    return FALLBACK;
+  }
+  function ensure() {
+    if (el && el.isConnected) { return el; }
+    el = document.getElementById('mh-wa');
+    if (!el) {
+      el = document.createElement('a');
+      el.id = 'mh-wa';
+      el.setAttribute('aria-label', 'דברו איתנו בוואטסאפ');
+      el.setAttribute('title', 'דברו איתנו בוואטסאפ');
+      el.setAttribute('rel', 'noopener');
+      if (!window.ReactNativeWebView) { el.setAttribute('target', '_blank'); }
+      el.innerHTML = SVG;
+      document.body.appendChild(el);
+    }
+    var num = phone();
+    if (stats.phone !== num) { stats.phone = num; el.href = 'https://wa.me/' + num + '?text=' + encodeURIComponent(TEXT); }
+    return el;
+  }
+  function route() {
+    var p = location.pathname.replace(/\/+$/, '') || '/';
+    if (HOME.test(p) || p === '/he') { return 'home'; }
+    if (MERCHANT.test(p)) { return 'merchant'; }
+    return null;
+  }
+  /* חלונית/מגירה שבאמת על המסך (Vuetify משאירה מגירות "פעילות" מחוץ למסך ובכיתה --active) */
+  function visibleOnScreen(node) {
+    if (!node) { return false; }
+    var cs = getComputedStyle(node);
+    if (cs.display === 'none' || cs.visibility === 'hidden' || parseFloat(cs.opacity) === 0) { return false; }
+    var r = node.getBoundingClientRect();
+    return r.width > 20 && r.height > 20 && r.right > 0 && r.left < window.innerWidth && r.bottom > 0 && r.top < window.innerHeight;
+  }
+  function covered() {
+    var list = document.querySelectorAll('.v-overlay--active .v-overlay__content, .v-navigation-drawer--active');
+    for (var i = 0; i < list.length; i++) {
+      if (visibleOnScreen(list[i])) { stats.coverBy = (list[i].className || '').toString().slice(0, 60); return true; }
+    }
+    stats.coverBy = null;
+    return false;
+  }
+  function navBottom() {
+    var nav = document.getElementById('MultiVendorBottomNav');
+    if (!nav) { return BASE_BOTTOM; }
+    var r = nav.getBoundingClientRect(), cs = getComputedStyle(nav);
+    if (cs.display === 'none' || cs.visibility === 'hidden' || r.height < 10 || r.top >= window.innerHeight) { return BASE_BOTTOM; }
+    return Math.round(window.innerHeight - r.top) + NAV_GAP;
+  }
+  /* דף עסק גולל בתוך .merchant-page במובייל ובחלון בדסקטופ — מאזינים לשניהם */
+  function bindScroll(r) {
+    var host = r === 'merchant' ? document.querySelector('.merchant-page') : null;
+    if (host === scrollHost) { return; }
+    if (scrollHost) { scrollHost.removeEventListener('scroll', onScroll); }
+    scrollHost = host;
+    scrolledEnough = false;
+    if (host) { host.addEventListener('scroll', onScroll, { passive: true }); onScroll(); }
+  }
+  window.addEventListener('scroll', onScroll, { passive: true });
+  function onScroll() {
+    if (scrolledEnough || route() !== 'merchant') { return; }
+    var y = Math.max(scrollHost ? scrollHost.scrollTop : 0, window.scrollY || document.documentElement.scrollTop || 0);
+    if (y >= SCROLL_MIN) { scrolledEnough = true; stats.scrolled = true; apply(); }
+  }
+  function apply() {
+    try {
+      var r = route(); stats.route = r;
+      if (r === 'home' && !homeReady && !homeTimer) { homeTimer = setTimeout(function () { homeReady = true; homeTimer = null; apply(); }, 1200); }
+      if (r !== 'home') { homeReady = false; if (homeTimer) { clearTimeout(homeTimer); homeTimer = null; } }
+      bindScroll(r);
+      var show = false, why = 'route';
+      if (r === 'home') { show = homeReady; why = homeReady ? 'home' : 'home-delay'; }
+      else if (r === 'merchant') { show = scrolledEnough; why = scrolledEnough ? 'merchant-scrolled' : 'merchant-top'; }
+      if (show && covered()) { show = false; why = 'covered'; }
+      var node = ensure();
+      var b = navBottom(); if (b !== stats.bottom) { stats.bottom = b; node.style.setProperty('--mh-wa-bottom', b + 'px'); }
+      if (node.classList.contains('mh-wa-on') !== show) { node.classList.toggle('mh-wa-on', show); stats.toggles++; }
+      stats.shown = show; stats.reason = why;
+    } catch (e) { console.warn('[MH WhatsApp]', e); }
+  }
+  var pend = false;
+  function schedule() { if (pend) { return; } pend = true; setTimeout(function () { pend = false; apply(); }, 200); }
+  var lastPath = location.pathname;
+  /* מסלול: בדיקה כל 400ms (SPA); מצב כללי: כל 1.5 שניות כרשת ביטחון (apply זול — כמה מדידות) */
+  setInterval(function () { if (location.pathname !== lastPath) { lastPath = location.pathname; scrolledEnough = false; apply(); } }, 400);
+  setInterval(apply, 1500);
+  window.addEventListener('popstate', schedule);
+  window.addEventListener('resize', schedule);
+  /* חלוניות של Vuetify נוספות בתוך .v-overlay-container (לא ישירות ל-body) ומגירות משנות class —
+     לכן subtree + class, עם דחיסה ל-200ms */
+  try { new MutationObserver(schedule).observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ['class'] }); } catch (e) {}
+  apply();
+  window.MH_WA = { version: VERSION, apply: apply, stats: function () { return JSON.parse(JSON.stringify(stats)); } };
+  /* mh-whatsapp-v1 */
+})();
