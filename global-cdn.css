@@ -3894,16 +3894,7 @@ html body span.review img {
   .product-popup .mhq-vq { transition:none; }
 }
 
-/* ==========================================================================
-   תיאור החנות בראש דף המרצ'נט (Custom Text / storefront_message) — 2.9.2026
-   דוד רוצה שלוש שורות: אלרגנים / כשרות / "התמונות להמחשה בלבד". הטקסט נשמר
-   עם שורות חדשות (\n), אבל הבועה ב-Hyperzod היא white-space:normal ומקפלת
-   אותן לשורה אחת. pre-line = שורה חדשה בטקסט הופכת לשורה חדשה על המסך.
-   ========================================================================== */
-.merchant-page #merchant-header-v3 div.tw-inline-block.tw-font-semibold.tw-text-sm {
-  white-space: pre-line !important;
-  text-align: right !important;
-}
+/* תיאור החנות בראש דף המרצ'נט (2.9.2026) — עבר לחלק 47 MH MerchantHead (בסוף הקובץ), pre-line נשמר שם. */
 
 /* ==========================================================================
    iOS זום בפוקוס על שדה החיפוש (3.9.2026) — הסיבה: Safari/Chrome ב-iPhone
@@ -6465,3 +6456,338 @@ html body .v-bottom-sheet__content > .v-card.tw-rounded-t-xl > .tw-px-4.tw-pb-8 
     }
 }
 /* mh-addresses-v1 */
+
+/* =========================================================
+   חלק 47: ראש דף עסק — MH MerchantHead v1.0.0 | 2026-09-23
+   הבעלים היחיד של החלק העליון בדפי העסקים: #merchant-header-v3 (כיסוי, לוגו, שם, כתובת,
+   מרחק, תיאור), .merchant-cover-warning / .scheme-merchant-order-warning (תג "הפתיחה הבאה"),
+   .merchant-floating-actions (חזרה/סינון/חיפוש), .merchant-cover-header (כותרת בגלילה, מובייל)
+   ו-#MerchantStickyHeader (כותרת דביקה, דסקטופ).
+   מה היה: Hyperzod מצפים לתמונת כיסוי שאין — נשאר מלבן לבן ריק, הלוגו צף באמצעו, ותג
+   "הפתיחה הבאה" נחת ממש על הלוגו. עכשיו: כיסוי בגרדיאנט QLED אדום (אם תוגדר תמונת כיסוי —
+   היא ממלאת אותו עם וילון כהה לקריאות), לוגו "סקוויקל" בטבעת לבנה שחופף את תחתית הכיסוי,
+   שם גדול, כתובת, גלולת מרחק, ותיאור (אלרגנים/כשרות) בכרטיס רך. התג = גלולת זכוכית כהה עם
+   נקודה ענברית, צפה על הכיסוי בין כפתורי הניווט ללוגו — לעולם לא נוגעת בלוגו, גם באפליקציה
+   (הגובה כולל --native-status-bar-height בדיוק כמו הכפתורים של Hyperzod).
+   מובייל = .merchant-page.merchant-mobile-view ; דסקטופ = .merchant-page:not(.merchant-mobile-view)
+   (בדסקטופ אין div כיסוי בכלל — הרצועה נבנית מ-::before של #merchant-header-v3, והתג המלא-רוחב
+   הענברי הופך לאותה גלולה מעל הרצועה). לא נוגע ב-.cover-scrolled (Hyperzod משקיפים את הכפתורים
+   כשהכותרת הלבנה מופיעה) ולא ב-opacity של הכותרת (מונפש מהגלילה).
+   ========================================================= */
+/* ---------- מובייל ---------- */
+html body .merchant-page.merchant-mobile-view #merchant-header-v3 {
+    padding-top: 0 !important;
+    background: #fff !important;
+    box-shadow: none !important;
+}
+/* הכיסוי: ה-div עם מחלקות aspect של Hyperzod (ריק אצלנו, או עם <img> אם תוגדר תמונה) */
+html body .merchant-page.merchant-mobile-view #merchant-header-v3 > div[class*="aspect"] {
+    position: relative !important;
+    overflow: hidden !important;
+    margin: 0 !important;
+    width: 100% !important;
+    aspect-ratio: auto !important;
+    height: calc(176px + var(--native-status-bar-height, 0px)) !important;
+    border-radius: 0 0 28px 28px !important;
+    background:
+        radial-gradient(120% 90% at 85% 0%, rgba(255, 255, 255, 0.30) 0%, rgba(255, 255, 255, 0) 55%),
+        radial-gradient(90% 80% at 10% 100%, rgba(0, 0, 0, 0.30) 0%, rgba(0, 0, 0, 0) 60%),
+        linear-gradient(135deg, #ff3b41 0%, #c8151b 100%) !important;
+}
+html body .merchant-page.merchant-mobile-view #merchant-header-v3 > div[class*="aspect"] img {
+    display: block !important;
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+}
+html body .merchant-page.merchant-mobile-view #merchant-header-v3 > div[class*="aspect"]:has(img)::after {
+    content: '' !important;
+    position: absolute !important;
+    inset: 0 !important;
+    pointer-events: none !important;
+    background: linear-gradient(180deg, rgba(0, 0, 0, 0.30) 0%, rgba(0, 0, 0, 0) 45%, rgba(0, 0, 0, 0.32) 100%) !important;
+}
+/* המעטפת מתחת לכיסוי: הלוגו נכנס לזרימה וחופף את הכיסוי ב-44px */
+html body .merchant-page.merchant-mobile-view #merchant-header-v3 > .tw-px-3 {
+    padding: 0 16px 8px !important;
+}
+html body .merchant-page.merchant-mobile-view #merchant-header-v3 > .tw-px-3 > .tw-flex {
+    margin-top: 0 !important;
+}
+html body .merchant-page.merchant-mobile-view #merchant-header-v3 .merchant-header-img {
+    position: relative !important;
+    top: auto !important;
+    z-index: 2 !important;
+    margin: -44px 0 0 !important;
+    width: 88px !important;
+    height: 88px !important;
+    box-sizing: border-box !important;
+    border-radius: 24px !important;
+    border: 3px solid #fff !important;
+    background: #fff !important;
+    box-shadow: 0 10px 26px rgba(200, 21, 27, 0.22), 0 2px 6px rgba(0, 0, 0, 0.14) !important;
+}
+html body .merchant-page.merchant-mobile-view #merchant-header-v3 .merchant-header-img img {
+    border-radius: 20px !important;
+    object-fit: cover !important;
+}
+html body .merchant-page.merchant-mobile-view #merchant-header-v3 h1.store-name {
+    margin-top: 10px !important;
+    font-size: 22px !important;
+    line-height: 1.2 !important;
+    font-weight: 800 !important;
+    letter-spacing: -0.01em !important;
+    color: #111 !important;
+    text-transform: none !important;
+}
+html body .merchant-page.merchant-mobile-view #merchant-header-v3 #MerchantAddress {
+    margin-top: 4px !important;
+    font-size: 13px !important;
+    font-weight: 500 !important;
+    color: #6b7280 !important;
+    text-transform: none !important;
+}
+html body .merchant-page.merchant-mobile-view #merchant-header-v3 > .tw-px-3 > .tw-flex.tw-items-center.tw-gap-2 > div {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    background: #f5f5f7 !important;
+    border-radius: 999px !important;
+    padding: 5px 12px !important;
+    font-size: 12.5px !important;
+    font-weight: 700 !important;
+    color: #374151 !important;
+}
+/* שורת המטא: מרחק, דירוג (כוכב) וכל ילד אחר — אותה גלולה */
+html body .merchant-page.merchant-mobile-view #merchant-header-v3 #MerchantDistance img {
+    margin: 0 !important;
+    width: 13px !important;
+    opacity: 0.8 !important;
+}
+html body .merchant-page.merchant-mobile-view #merchant-header-v3 #MerchantDistance span {
+    margin: 0 !important;
+    top: 0 !important;
+}
+/* תיאור העסק (אלרגנים / כשרות / "התמונות להמחשה") — שלוש שורות בכרטיס רך, לא גלולה */
+html body .merchant-page.merchant-mobile-view #merchant-header-v3 div.tw-w-full.tw-border.tw-text-center {
+    white-space: pre-line !important;
+    margin: 12px 0 2px !important;
+    padding: 10px 14px !important;
+    border-radius: 16px !important;
+    border: 1px solid #ececef !important;
+    background: #fafafa !important;
+    font-size: 13px !important;
+    font-weight: 500 !important;
+    line-height: 1.55 !important;
+    color: #4b5563 !important;
+}
+/* התג ("הפתיחה הבאה…"): מתחת לשורת הכפתורים (8–48), מעל הלוגו (מתחיל ב-132) */
+html body .merchant-page.merchant-mobile-view .merchant-cover-warning {
+    top: calc(var(--native-status-bar-height, 0px) + 60px) !important;
+    left: 0 !important;
+    right: 0 !important;
+    padding: 0 16px !important;
+    z-index: 7 !important;
+}
+html body .merchant-page.merchant-mobile-view .merchant-cover-warning .scheme-merchant-order-warning {
+    margin: 0 !important;
+    padding: 0 14px !important;
+    min-height: 34px !important;
+    max-width: 100% !important;
+    border-radius: 999px !important;
+    border: 1px solid rgba(255, 255, 255, 0.22) !important;
+    background: rgba(24, 24, 27, 0.58) !important;
+    -webkit-backdrop-filter: blur(12px) saturate(140%) !important;
+    backdrop-filter: blur(12px) saturate(140%) !important;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.20) !important;
+}
+html body .merchant-page.merchant-mobile-view .merchant-cover-warning .scheme-merchant-order-warning > div {
+    padding: 0 !important;
+    gap: 8px !important;
+}
+html body .merchant-page.merchant-mobile-view .merchant-cover-warning .scheme-merchant-order-warning__text {
+    max-width: calc(100vw - 64px) !important;
+    color: #fff !important;
+    font-size: 12.5px !important;
+    font-weight: 700 !important;
+    line-height: 34px !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+}
+html body .merchant-page.merchant-mobile-view .merchant-cover-warning .scheme-merchant-order-warning__text::before {
+    content: '' !important;
+    display: inline-block !important;
+    width: 8px !important;
+    height: 8px !important;
+    border-radius: 50% !important;
+    background: #ffb020 !important;
+    box-shadow: 0 0 0 3px rgba(255, 176, 32, 0.28) !important;
+    margin-inline-end: 8px !important;
+    vertical-align: 1px !important;
+}
+/* כפתורי חזרה/סינון/חיפוש מעל הכיסוי: זכוכית לבנה (בגלילה Hyperzod משקיפים אותם — לא נוגעים) */
+html body .merchant-page.merchant-mobile-view .merchant-floating-actions:not(.cover-scrolled) .merchant-floating-btn {
+    background: rgba(255, 255, 255, 0.90) !important;
+    -webkit-backdrop-filter: blur(10px) saturate(150%) !important;
+    backdrop-filter: blur(10px) saturate(150%) !important;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18), 0 0 0 1px rgba(255, 255, 255, 0.35) !important;
+}
+/* הכותרת שמופיעה בגלילה: זכוכית לבנה */
+html body .merchant-page.merchant-mobile-view .merchant-cover-header {
+    background: rgba(255, 255, 255, 0.84) !important;
+    -webkit-backdrop-filter: blur(18px) saturate(160%) !important;
+    backdrop-filter: blur(18px) saturate(160%) !important;
+    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.06) !important;
+}
+html body .merchant-page.merchant-mobile-view .merchant-cover-header__name {
+    font-weight: 700 !important;
+    color: #111 !important;
+}
+
+/* ---------- דסקטופ ---------- */
+html body .merchant-page:not(.merchant-mobile-view) #merchant-header-v3 {
+    position: relative !important;
+    margin-top: 81px !important;   /* 65 סרגל עליון + 16 */
+    padding-top: 232px !important; /* 200 רצועה + 32 */
+    background: #fff !important;
+    box-shadow: none !important;
+}
+html body .merchant-page:not(.merchant-mobile-view) #merchant-header-v3::before {
+    content: '' !important;
+    position: absolute !important;
+    top: 0 !important;
+    left: 20px !important;
+    right: 20px !important;
+    height: 200px !important;
+    border-radius: 28px !important;
+    background:
+        radial-gradient(70% 120% at 90% 0%, rgba(255, 255, 255, 0.30) 0%, rgba(255, 255, 255, 0) 55%),
+        radial-gradient(60% 100% at 8% 100%, rgba(0, 0, 0, 0.30) 0%, rgba(0, 0, 0, 0) 60%),
+        linear-gradient(135deg, #ff3b41 0%, #c8151b 100%) !important;
+}
+html body .merchant-page:not(.merchant-mobile-view) #merchant-header-v3 .merchant-header-img {
+    margin-top: -96px !important; /* חופף את הרצועה ב-60px */
+    width: 120px !important;
+    height: 120px !important;
+    box-sizing: border-box !important;
+    border-radius: 30px !important;
+    border: 4px solid #fff !important;
+    background: #fff !important;
+    box-shadow: 0 14px 34px rgba(200, 21, 27, 0.22), 0 2px 8px rgba(0, 0, 0, 0.14) !important;
+}
+html body .merchant-page:not(.merchant-mobile-view) #merchant-header-v3 .merchant-header-img img {
+    border-radius: 24px !important;
+    object-fit: cover !important;
+}
+html body .merchant-page:not(.merchant-mobile-view) #merchant-header-v3 .header-content .tw-relative {
+    margin-top: 0 !important;
+    margin-inline-start: 148px !important;
+}
+html body .merchant-page:not(.merchant-mobile-view) #merchant-header-v3 h1.store-name {
+    font-size: 28px !important;
+    line-height: 1.2 !important;
+    font-weight: 800 !important;
+    letter-spacing: -0.01em !important;
+    color: #111 !important;
+    text-transform: none !important;
+}
+html body .merchant-page:not(.merchant-mobile-view) #merchant-header-v3 #MerchantAddress {
+    margin-top: 4px !important;
+    font-size: 14px !important;
+    font-weight: 500 !important;
+    color: #6b7280 !important;
+    text-transform: none !important;
+}
+html body .merchant-page:not(.merchant-mobile-view) #merchant-header-v3 > .tw-px-5 > .tw-flex.tw-items-center.tw-gap-2 {
+    margin-inline-start: 148px !important;
+    margin-top: 10px !important;
+}
+html body .merchant-page:not(.merchant-mobile-view) #merchant-header-v3 > .tw-px-5 > .tw-flex.tw-items-center.tw-gap-2 > div {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    background: #f5f5f7 !important;
+    border-radius: 999px !important;
+    padding: 6px 14px !important;
+    font-size: 13px !important;
+    font-weight: 700 !important;
+    color: #374151 !important;
+}
+html body .merchant-page:not(.merchant-mobile-view) #merchant-header-v3 #MerchantDistance img {
+    margin: 0 !important;
+    width: 13px !important;
+    opacity: 0.8 !important;
+}
+html body .merchant-page:not(.merchant-mobile-view) #merchant-header-v3 #MerchantDistance span {
+    margin: 0 !important;
+    top: 0 !important;
+}
+/* תיאור העסק בדסקטופ (היה בבלוק "תיאור החנות בראש דף המרצ'נט" — pre-line נשמר) */
+html body .merchant-page:not(.merchant-mobile-view) #merchant-header-v3 div.tw-inline-block.tw-font-semibold.tw-text-sm {
+    white-space: pre-line !important;
+    text-align: right !important;
+    margin: 12px 148px 4px 0 !important;
+    padding: 10px 14px !important;
+    border-radius: 16px !important;
+    border: 1px solid #ececef !important;
+    background: #fafafa !important;
+    font-size: 13.5px !important;
+    font-weight: 500 !important;
+    line-height: 1.55 !important;
+    color: #4b5563 !important;
+}
+/* התג בדסקטופ: מפס ענברי מלא-רוחב לגלולת זכוכית כהה מעל הרצועה */
+html body .merchant-page:not(.merchant-mobile-view) > .scheme-merchant-order-warning {
+    position: absolute !important;
+    top: 40px !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    width: fit-content !important;
+    max-width: calc(100% - 80px) !important;
+    margin: 0 !important;
+    padding: 0 18px !important;
+    min-height: 40px !important;
+    display: flex !important;
+    align-items: center !important;
+    z-index: 8 !important;
+    border-radius: 999px !important;
+    border: 1px solid rgba(255, 255, 255, 0.22) !important;
+    background: rgba(24, 24, 27, 0.58) !important;
+    -webkit-backdrop-filter: blur(12px) saturate(140%) !important;
+    backdrop-filter: blur(12px) saturate(140%) !important;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.20) !important;
+}
+html body .merchant-page:not(.merchant-mobile-view) > .scheme-merchant-order-warning > div {
+    padding: 0 !important;
+    gap: 8px !important;
+}
+html body .merchant-page:not(.merchant-mobile-view) > .scheme-merchant-order-warning .scheme-merchant-order-warning__text {
+    color: #fff !important;
+    font-size: 14px !important;
+    font-weight: 700 !important;
+    line-height: 40px !important;
+    white-space: nowrap !important;
+}
+html body .merchant-page:not(.merchant-mobile-view) > .scheme-merchant-order-warning .scheme-merchant-order-warning__text::before {
+    content: '' !important;
+    display: inline-block !important;
+    width: 9px !important;
+    height: 9px !important;
+    border-radius: 50% !important;
+    background: #ffb020 !important;
+    box-shadow: 0 0 0 3px rgba(255, 176, 32, 0.28) !important;
+    margin-inline-end: 9px !important;
+    vertical-align: 1px !important;
+}
+/* הכותרת הדביקה בגלילה (דסקטופ): זכוכית לבנה */
+html body .merchant-page:not(.merchant-mobile-view) #MerchantStickyHeader {
+    background: rgba(255, 255, 255, 0.86) !important;
+    -webkit-backdrop-filter: blur(18px) saturate(160%) !important;
+    backdrop-filter: blur(18px) saturate(160%) !important;
+    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.06), 0 8px 24px rgba(0, 0, 0, 0.06) !important;
+}
+@media (prefers-reduced-motion: reduce) {
+    html body .merchant-page .merchant-header-img { transition: none !important; }
+}
+/* mh-merchanthead-v1 */

@@ -52,6 +52,7 @@
 | שם מלא בטופס ההרשמה (רמז + שגיאה) | "חלק 43: MH FullName" | + JS `MH FullName`. סקופ `#firstName` בטופס ההרשמה (שדה השם היחיד; Hyperzod שולחת `last_name:null`). דורש 2 מילים של 2+ אותיות, חוסם "הרשמה"/Enter ב-capture לפני Vue. הסיבה: Grow דוחה שם של מילה אחת (10.9). בדיקה: scratchpad `signup/test-fullname.mjs` (מוק; הטופס החי לא נגיש ב-headless) |
 | בועת וואטסאפ צפה (דף הבית + דפי עסק) | "חלק 45: MH WhatsApp" | + JS `MH WhatsApp` (יוצר `#mh-wa`, מדליק `.mh-wa-on`). קטנה (44/48px), שמאל-תחתון, מעל סרגל הניווט התחתון (`--mh-wa-bottom` מה-JS). מוסתרת בכל חלונית/מגירה שעל המסך, בעמוד מוצר, בחיפוש ובצ'ק-אאוט; בדף עסק מופיעה רק אחרי גלילה של 160px. המספר מ-`business_phone` ב-boot |
 | מסך "ניהול כתובות" (`/he/profile/address`): הדר, כפתור "הוסף כתובת חדשה", כרטיסי הכתובות, תפריט 3 הנקודות | "חלק 46: MH Addresses" | + `MH Lang` v1.3.0 (Active/Phone:/Address options/Edit/Delete). עוגן `#addresses` (id של הרכיב Addresses-setting), ההדר תחת `.scheme-profile-page:has(#addresses)`, חלונית האפשרויות לפי מבנה (שתי שורות 44px בתיבה מעוגלת). הדף דורש התחברות — ה-DOM שוחזר מהתבנית (ראו מלכודות) |
+| ראש דף עסק (מובייל + דסקטופ): כיסוי, לוגו, שם, כתובת, שורת מרחק/דירוג, תיאור (אלרגנים/כשרות), תג "הפתיחה הבאה", כפתורי חזרה/סינון/חיפוש, הכותרת בגלילה, הכותרת הדביקה בדסקטופ | "חלק 47: MH MerchantHead" (בסוף הקובץ) | CSS בלבד. הבלוק הישן "תיאור החנות בראש דף המרצ'נט" (pre-line) נבלע בו. |
 | סרגל ניווט תחתון | "חלק 31" | |
 
 ### 1.2 בלוקי ה-JS ב-`custom-footer.js`
@@ -165,10 +166,9 @@ c.close();
 
 ### 5.3 CSS של Hyperzod למוקים
 ```bash
-curl -s https://www.maalehamishlohim.co.il/he/home | grep -o 'href="[^"]*\.css[^"]*"'   # vendor-vuetify-*.css, index-*.css (שמות משתנים בכל build)
-curl -s <vendor url> -o tools/hz/vendor.css; curl -s <index url> -o tools/hz/index.css
+sh tools/fetch-hz-css.sh   # vendor.css + index.css (מה-HTML) + non-critical.css + merchant-search.css (chunks עצלים, השמות בתוך index-*.js)
 ```
-במוק: `<link rel=stylesheet href="/hz/vendor.css">`, `<link … href="/hz/index.css">`, `<style>@import url("/maale/global-cdn.css");</style>`, ובסוף `<script src="/maale/custom-footer.js">`. ב-`index.css` יש גם כללי `[data-color-scheme]` (ערכת צבעים של Hyperzod, לא פעילה אצלנו) — לא מטעה.
+במוק: `<link rel=stylesheet href="/hz/vendor.css">`, `<link … href="/hz/index.css">`, ולדף עסק גם `/hz/non-critical.css` (שם `.merchant-header-img{position:absolute}`) ו-`/hz/merchant-search.css` (הכפתורים הצפים) — בלעדיהם המוק שקרן, `<style>@import url("/maale/global-cdn.css");</style>`, ובסוף `<script src="/maale/custom-footer.js">`. ב-`index.css` יש גם כללי `[data-color-scheme]` (ערכת צבעים של Hyperzod, לא פעילה אצלנו) — לא מטעה.
 
 ### 5.4 `test-template.mjs` — שלד בדיקה
 שרת סטטי (`/maale/*` מהריפו, `/hz/*` מ-`tools/hz`, השאר מהתיקייה), פתיחת כרום, `ok(name, cond, extra)`, צילומים, מובייל+דסקטופ, `process.exit(fail?1:0)`. מעתיקים לתיקיית עבודה ומוסיפים אסרטים.
@@ -202,6 +202,7 @@ avconvert --source in.mp4 --preset Preset1920x1080 --output <business>-hero.mp4 
 - הדר עליון של העסק (חיפוש/סינון/שם/חזרה) 53px. מתחתיו `#mobileStickyHeader.tw-sticky` (top 53px) → `#ProductCategoriesNav` (מקבל `tw-border-b-2` רק לפני הגלילה) → `#ProductCategoriesSlider.swiper` → `.swiper-slide.product-category-item` → `a.scrollactive-item` (`is-active` = הקטגוריה הנוכחית, מנוהל ע"י vue-scrollactive; `swiper-slide-active` הוא רק הסלייד שבמרכז — לא "נבחר").
 - קטגוריות מוצרים: `view_type` של הקטגוריה קובע רינדור: `grid` (`.product-cards.merchant-grid-view`, `.product-card-basic`), `card` = קרוסלה (`.product-card-slider`), `list` (`.product-horizontal-cards.merchant-list-view`). כותרת קטגוריה: `.prod-sec-title`. כרטיס מוצר בקרוסלה: `.v-card.product-card-slider` עם `.product-image` (v-img עצלה).
 - הירו של העסק: בלוק Custom HTML של דוד (`#mh-hero-<slug>`), סרטון H.264 מהריפו.
+- **ראש הדף (23.9, חלק 47):** במובייל `.merchant-page.merchant-mobile-view` מכיל: `.merchant-cover-header` (fixed, 54px, opacity inline 0→1 לפי הגלילה, `--visible` מ-scrollTop>40) → `.merchant-floating-actions` (fixed, top calc(var(--native-status-bar-height)+8px), z 9999; `.merchant-floating-btn` 40px: חזרה בימין, סינון+חיפוש בשמאל; מקבל `.cover-scrolled` בגלילה — Hyperzod משקיפים אותם) → `.merchant-cover-warning` (absolute, top inline = var+56px) > `.scheme-merchant-order-warning` > `__text` ("הפתיחה הבאה …", קיים רק כשהעסק סגור) → `.page-builder-section-surface.CoverWithProfilePicture--<n>` > `#merchant-header-v3` (padding-top 50) > div הכיסוי (מחלקות `aspect`, **ריק** — אין תמונת כיסוי בשום עסק; אם תוגדר יהיה בו `<img>`) + `.tw-px-3` > `.tw-flex.tw-flex-col.tw-mt-[-110px]` > `.merchant-header-img` (80px, `position:absolute` מ-non-critical.css, mt -85) + `.v-card.header-content` (`h1.store-name`, `#MerchantAddress`) → שורת מטא `.tw-flex.tw-items-center.tw-gap-2` (`#MerchantDistance`, דירוג כוכב אם יש) → תיאור `div.tw-w-full.tw-border.tw-rounded-full` (טקסט עם \n). בדסקטופ (`:not(.merchant-mobile-view)`): **אין** div כיסוי ואין כפתורים צפים; התג הוא ילד ישיר של `.merchant-page` (`tw-mt-[65px]`, פס מלא-רוחב), `#MerchantStickyHeader` (fixed, display:none עד הגלילה: לוגו 67, שם, חיפוש, עגלה), `#merchant-header-v3.tw-mt-[210px]` > `.tw-px-5` > לוגו 120 absolute בימין (mt -135) + בלוק השם `sm:tw-ms-[130px]`, ותיאור `div.tw-inline-block.tw-font-semibold.tw-text-sm`. השוליים העליונים של הילד הראשון **מתמזגים** עם `.merchant-page` (אין padding) — לכן top של הדף = margin של הילד הראשון בזרימה.
 
 ### 6.3 פופאפ מוצר (`.product-popup`, בתוך bottom-sheet)
 `.product-popup.v-card` → `.v-card-title` (כפתור חזרה + שם) → `.v-card-text.custom-scroll` (הגלילה) → `.product-image-slider.v-carousel` → `.v-carousel-item` → `.v-img.image` (הריבוע הלבן = v-card פנימי) · `#productInfo` (`.product-category-name`, `.product-name`, `.product-price`, `#ProductDescription`) · `hr.v-divider` · `form#ProductPopupForm` → קבוצות: `.addon-heading h2` (+ `.tw-text-xs` "נדרש") + `.scheme-product-options-card > .v-list > .v-list-item` (רדיו `.v-radio`, צ'קבוקס `.v-checkbox-btn`; מחיר תוספת ב-`.tw-w-full > .tw-mt-1.5`) · כפתור "להראות יותר" `button.text-primary.tw-ms-3` · פוטר `.v-card-actions#add_to_cart_hide_from_mobile_app` (`button.add-btn`, `.product-quantity-control`, `.increment-btn/.decrement-btn`, `input#quantity`).
@@ -261,6 +262,9 @@ avconvert --source in.mp4 --preset Preset1920x1080 --output <business>-hero.mp4 
 | רוחב `100vw` של קרוסלת התמונה | תמונה גולשת 16px מהקצה | `width:auto` על `.product-image-slider` |
 | `line-clamp` של Hyperzod | שמות ארוכים נחתכים | `-webkit-line-clamp: unset` בסקופ |
 | `[TRUNCATED]`/`{}` מה-MCP | פלט ארוך/אסינכרוני | לשמור ב-`window.__rep` ולקרוא בפרוסות |
+| CSS של דף עסק ב-chunks עצלים (23.9) | במוק הכפתורים הצפים נכנסו לזרימה (40px) והכיסוי "ירד" ב-40 — בדיקות עברו על מוק שקרן | `tools/fetch-hz-css.sh` מביא גם non-critical + merchant-search; לזהות chunk חסר: `[...document.styleSheets]` עם `cssRules` שמכילים את הסלקטור |
+| תג "הפתיחה הבאה" על הלוגו (23.9) | Hyperzod ממקמים את התג ב-top 56 והלוגו מתחיל ב-78 → חפיפה בכל עסק סגור | חלק 47: התג ב-top var+60 על הכיסוי, הלוגו בזרימה (relative, mt -44) מתחיל ב-132 — פער 36px גם עם סרגל סטטוס של האפליקציה |
+| `transition: background .25s` על הכפתורים הצפים | מדידה מיד אחרי הוספת `.cover-scrolled` מחזירה צבע ביניים | להמתין 600ms לפני getComputedStyle |
 
 ---
 
