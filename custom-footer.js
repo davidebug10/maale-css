@@ -2845,6 +2845,202 @@ log('פעיל');
 })();
 
 /* ============================================================
+   מגבלת בחירה בקבוצת תוספות — MH OptLimit  |  v1.0.0 | 2026-09-23
+   הבעיה: המסעדן מגדיר בקבוצה "מינימום-מקסימום" (enable_range + max_quantity, למשל "עד 3 טעמים"),
+   אבל הפופאפ של Hyperzod לא מציג את המגבלה ולא אוכף אותה — אפשר היה להוסיף לעגלה 5 טעמים (אומת 23.9).
+   מה הבלוק עושה (רק בחנויות שב-MERCHANTS):
+   1. קורא את נתוני המוצר מהתשובה של getById (עוטף XHR/fetch — קריאה בלבד, לא משנה בקשה או תשובה).
+   2. בכל קבוצה מוגבלת מוסיף לכותרת תג .mh-lim ("עד 3" → "2 מתוך 3"), ובמלאה מסמן .mh-lim-full
+      על הקבוצה ו-.mh-lim-off על האופציות שלא נבחרו (העיצוב בחלק 22ט).
+   3. חוסם לחיצה שמוסיפה בחירה מעבר למקסימום (click ב-capture על window, לפני Vue) ומציג הודעה.
+      קבוצה של "עד 1": לחיצה על אופציה אחרת מחליפה את הבחירה.
+   4. חוסם "הוספה" אם בכל זאת יש קבוצה מעבר למקסימום.
+   הספירה לא נשענת רק על ה-DOM: "הראה פחות" מסיר מה-DOM אופציות מסומנות, ולכן נשמר מצב לכל אופציה
+   לפי שמה, מתאפס בכל פתיחת פופאפ. לא נוגע בקבוצות של רבעי הפיצה (mhq). נכשל-פתוח.
+   בדיקה: window.MH_OPTLIMIT.stats()
+   ============================================================ */
+(function () {
+  'use strict';
+  if (window.__MH_OPTLIMIT__) { return; }
+  window.__MH_OPTLIMIT__ = true;
+  var VERSION = '1.0.0';
+  // חנויות שבהן המגבלה פעילה (מזהה מרצ'נט). קצפת — בקשת דוד 23.9
+  var MERCHANTS = ['6ab287b1e54067b606008892'];
+  var stats = { version: VERSION, products: 0, groups: 0, blocked: 0, swapped: 0, addBlocked: 0, lastProduct: '' };
+  var PRODUCTS = {};          // שם מוצר → { merchant, groups: [...] }
+  var session = { key: '', sel: {} };  // מצב הבחירות של הפופאפ הפתוח: sel[groupIndex][label] = true/false
+
+  function norm(s) { return String(s || '').replace(/\s+/g, ' ').trim(); }
+
+  function remember(url, text) {
+    try {
+      if (!/\/catalog\/products\/getById/.test(url)) return;
+      var d = (JSON.parse(text) || {}).data;
+      if (!d || !d.name || !d.product_options) return;
+      var m = /[?&]merchant_id=([0-9a-f]+)/.exec(url);
+      PRODUCTS[norm(d.name)] = { merchant: d.merchant_id || (m && m[1]) || '', groups: d.product_options };
+      stats.products = Object.keys(PRODUCTS).length;
+      schedule();
+    } catch (e) { /* נכשל-פתוח */ }
+  }
+  try {
+    var xo = XMLHttpRequest.prototype.open;
+    XMLHttpRequest.prototype.open = function (method, url) {
+      try {
+        var u = String(url || '');
+        if (/getById/.test(u)) {
+          var x = this;
+          x.addEventListener('load', function () { try { if (x.responseType === '' || x.responseType === 'text') remember(u, x.responseText); else if (x.responseType === 'json') remember(u, JSON.stringify(x.response)); } catch (e) {} });
+        }
+      } catch (e) {}
+      return xo.apply(this, arguments);
+    };
+    if (window.fetch) {
+      var fo = window.fetch;
+      window.fetch = function (input) {
+        var p = fo.apply(this, arguments);
+        try {
+          var u = String((input && input.url) || input || '');
+          if (/getById/.test(u)) p.then(function (r) { try { r.clone().text().then(function (t) { remember(u, t); }); } catch (e) {} });
+        } catch (e) {}
+        return p;
+      };
+    }
+  } catch (e) { console.warn('[MH OptLimit] no capture:', e); }
+
+  function headingTitle(h) {
+    var h2 = h.querySelector('h2'); if (!h2) return '';
+    var t = '';
+    for (var i = 0; i < h2.childNodes.length; i++) { if (h2.childNodes[i].nodeType === 3) t += h2.childNodes[i].textContent; }
+    return norm(t);
+  }
+  function rowLabel(r) { var t = r.querySelector('.v-list-item-title'); return norm(t ? t.textContent : ''); }
+  function rowOn(r) { return !!r.querySelector('.v-selection-control--dirty, input:checked'); }
+
+  // מחזיר את הקבוצות המוגבלות בפופאפ הפתוח: [{grp, max, min, sel}]
+  function scan() {
+    var popup = document.querySelector('.product-popup');
+    var form = popup && popup.querySelector('#ProductPopupForm');
+    if (!form) { session.key = ''; return []; }
+    var nameEl = popup.querySelector('.product-name');
+    var name = norm(nameEl ? nameEl.textContent : '');
+    var prod = PRODUCTS[name];
+    if (!prod || MERCHANTS.indexOf(prod.merchant) < 0) return [];
+    if (session.key !== name) { session = { key: name, sel: {} }; stats.lastProduct = name; }
+    var heads = form.querySelectorAll('.addon-heading');
+    var used = {}, out = [];
+    for (var i = 0; i < heads.length; i++) {
+      var h = heads[i], grp = h.parentElement;
+      if (!grp || grp.querySelector('[class*="mhq"]')) continue;
+      var title = headingTitle(h), rule = null, skip = used[title] || 0;
+      for (var j = 0; j < prod.groups.length; j++) {
+        if (norm(prod.groups[j].option_name) === title) { if (skip-- === 0) { rule = prod.groups[j]; break; } }
+      }
+      used[title] = (used[title] || 0) + 1;
+      var max = rule ? +rule.max_quantity || 0 : 0;
+      var total = rule && rule.options ? rule.options.length : 0;
+      if (!rule || rule.selection_type !== 'multiple' || !rule.enable_range || max < 1 || max >= total) {
+        if (grp.classList.contains('mh-lim-grp')) clear(grp);
+        continue;
+      }
+      var sel = session.sel[i] || (session.sel[i] = {});
+      var rows = grp.querySelectorAll('.v-list-item');
+      for (var k = 0; k < rows.length; k++) { var l = rowLabel(rows[k]); if (l) sel[l] = rowOn(rows[k]); }
+      out.push({ grp: grp, head: h, idx: i, max: max, min: +rule.min_quantity || 0, sel: sel, rows: rows });
+    }
+    return out;
+  }
+  function count(g) { var n = 0; for (var k in g.sel) if (g.sel[k]) n++; return n; }
+  function clear(grp) {
+    grp.classList.remove('mh-lim-grp', 'mh-lim-full');
+    var c = grp.querySelector('.mh-lim'); if (c) c.remove();
+    var off = grp.querySelectorAll('.mh-lim-off'); for (var i = 0; i < off.length; i++) off[i].classList.remove('mh-lim-off');
+  }
+  function chipText(n, g) {
+    if (g.max === 1) return n ? 'נבחר' : 'בחירה אחת';
+    if (!n) return (g.min === g.max ? 'בחרו ' : 'עד ') + g.max;
+    return n + ' מתוך ' + g.max;
+  }
+  function paint(g) {
+    var n = count(g), full = n >= g.max;
+    if (!g.grp.classList.contains('mh-lim-grp')) g.grp.classList.add('mh-lim-grp');
+    if (g.grp.classList.contains('mh-lim-full') !== full) g.grp.classList.toggle('mh-lim-full', full);
+    var chip = g.head.querySelector('.mh-lim');
+    if (!chip) { chip = document.createElement('span'); chip.className = 'mh-lim'; g.head.appendChild(chip); }
+    var t = chipText(n, g); if (chip.textContent !== t) chip.textContent = t;
+    for (var k = 0; k < g.rows.length; k++) {
+      var off = full && g.max > 1 && !rowOn(g.rows[k]);
+      if (g.rows[k].classList.contains('mh-lim-off') !== off) g.rows[k].classList.toggle('mh-lim-off', off);
+    }
+  }
+  function sync() { var gs = scan(); for (var i = 0; i < gs.length; i++) paint(gs[i]); stats.groups = gs.length; return gs; }
+
+  var noteTimer = null;
+  function note(g, msg) {
+    try {
+      var el = g.head.querySelector('.mh-lim-note');
+      if (!el) { el = document.createElement('div'); el.className = 'mh-lim-note'; el.setAttribute('role', 'alert'); g.head.appendChild(el); }
+      el.textContent = msg;
+      el.classList.remove('mh-lim-note--on'); void el.offsetWidth; el.classList.add('mh-lim-note--on');
+      clearTimeout(noteTimer);
+      noteTimer = setTimeout(function () { try { el.remove(); } catch (e) {} }, 3200);
+    } catch (e) {}
+  }
+  function stop(e) { e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation(); }
+
+  var swapping = false;
+  function onClick(e) {
+    try {
+      if (swapping) return;
+      var t = e.target; if (!t || !t.closest) return;
+      // "הוספה" עם קבוצה מעבר למקסימום
+      var add = t.closest('.product-popup button.add-btn');
+      if (add) {
+        var gs0 = sync();
+        for (var a = 0; a < gs0.length; a++) {
+          if (count(gs0[a]) > gs0[a].max) {
+            stop(e); stats.addBlocked++;
+            note(gs0[a], 'בחרתם יותר מ-' + gs0[a].max + '. בטלו ' + (count(gs0[a]) - gs0[a].max) + ' כדי להמשיך.');
+            try { gs0[a].head.scrollIntoView({ block: 'center', behavior: 'smooth' }); } catch (x) {}
+            return;
+          }
+        }
+        return;
+      }
+      var row = t.closest('.product-popup .v-list-item');
+      if (!row) return;
+      var grp = row.closest('.mh-lim-grp'); if (!grp) return;
+      var gs = sync(), g = null;
+      for (var i = 0; i < gs.length; i++) if (gs[i].grp === grp) g = gs[i];
+      if (!g || rowOn(row) || count(g) < g.max) return;
+      if (g.max === 1) {
+        // עד 1: מחליפים — מבטלים את הבחירה הקודמת (אם היא על המסך) ונותנים ללחיצה להמשיך
+        var prev = null;
+        for (var k = 0; k < g.rows.length; k++) if (g.rows[k] !== row && rowOn(g.rows[k])) prev = g.rows[k];
+        var inp = prev && prev.querySelector('input');
+        if (inp) { swapping = true; try { inp.click(); } finally { swapping = false; } stats.swapped++; schedule(); return; }
+      }
+      stop(e); stats.blocked++;
+      note(g, g.max === 1 ? 'אפשר לבחור רק אחד. בטלו את הבחירה כדי להחליף.' : 'אפשר לבחור עד ' + g.max + '. כדי להחליף, בטלו קודם בחירה אחרת.');
+    } catch (err) { /* נכשל-פתוח */ }
+  }
+
+  var pending = false;
+  function schedule() {
+    if (pending) return; pending = true;
+    setTimeout(function () { pending = false; try { sync(); } catch (e) { /* נכשל-פתוח */ } }, 40);
+  }
+  try {
+    window.addEventListener('click', onClick, true);
+    document.addEventListener('change', schedule, true);
+    new MutationObserver(schedule).observe(document.documentElement, { subtree: true, childList: true, attributes: true, attributeFilter: ['class'] });
+    schedule();
+  } catch (e) { console.warn('[MH OptLimit] disabled:', e); }
+  window.MH_OPTLIMIT = { version: VERSION, sync: sync, stats: function () { return Object.assign({}, stats); } };
+})();
+/* mh-optlimit-v1 */
+
+/* ============================================================
    סרגל הקטגוריות בדף העסק — MH CatNav  |  v1.0.0 | 2026-09-07
    ה-CSS (חלק 33 ב-global-cdn.css) מרחיב את הגלולות; Swiper מדד את רוחב הפריטים לפני שה-CSS מה-CDN
    נטען, ולכן בלי update() הפריטים האחרונים עלולים להיות לא נגישים בגלילה. הבלוק קורא

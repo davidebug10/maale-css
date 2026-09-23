@@ -4236,7 +4236,7 @@ html body main#MultiVendorSearch .tab-item-product h6.text-h6 {
 /* mh-search-v1 */
 
 /* =========================================================
-   חלק 22ט: רשימת האופציות בפופאפ המוצר — MH Options v1.0.0 | 2026-09-07
+   חלק 22ט: רשימת האופציות בפופאפ המוצר — MH Options v1.1.0 | 2026-09-23 (§8 מגבלת בחירה)
    מחליף (הוסרו): 22א §2 הדר דביק שקוף · 22ב §2–4 (כותרות קבוצות, אריחי זכוכית, "תכשיט") ·
    22ג+ד §2–4, §6 (קילוף מעטפת, אריחים, אפקט בחירה, צביעת V, underlay) · 22ח FIX 2 (padding/checkbox).
    סקופ: html body .product-popup בלבד (לא נוגע ב-mhq — רבעי הפיצה — ולא בשום מודאל אחר).
@@ -4429,7 +4429,59 @@ html body .product-popup .v-selection-control--disabled * {
     cursor: pointer !important;
     opacity: 1 !important;
 }
+
+/* 8. מגבלת בחירה בקבוצה (23.9, JS: MH OptLimit) — תג "עד 3" / "2 מתוך 3" בכותרת, אופציות שלא נבחרו
+      מעומעמות כשהקבוצה מלאה, והודעה קצרה כשמנסים לעבור את המקסימום. המחלקות נוספות רק בחנויות
+      שב-MERCHANTS של הבלוק. */
+html body .product-popup .mh-lim-grp > .addon-heading {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    align-items: center !important;
+    column-gap: 8px !important;
+    row-gap: 6px !important;
+}
+html body .product-popup .mh-lim-grp > .addon-heading > h2 {
+    flex: 0 1 auto !important;
+    min-width: 0 !important;
+}
+html body .product-popup .mh-lim-grp > .addon-heading > .mh-lim {
+    display: inline-flex !important;
+    align-items: center !important;
+    flex: 0 0 auto !important;
+    background: #f1f2f4 !important;
+    color: #374151 !important;
+    border-radius: 999px !important;
+    padding: 3px 9px !important;
+    font-size: 11px !important;
+    font-weight: 800 !important;
+    line-height: 1.2 !important;
+    white-space: nowrap !important;
+    transition: background .2s ease, color .2s ease !important;
+}
+html body .product-popup .mh-lim-grp.mh-lim-full > .addon-heading > .mh-lim {
+    background: linear-gradient(135deg, #ff3b41 0%, #c8151b 100%) !important;
+    color: #ffffff !important;
+}
+html body .product-popup .mh-lim-grp > .addon-heading > .mh-lim-note {
+    flex: 1 0 100% !important;
+    color: #c8151b !important;
+    font-size: 13px !important;
+    font-weight: 700 !important;
+    line-height: 1.35 !important;
+}
+html body .product-popup .mh-lim-grp > .addon-heading > .mh-lim-note--on {
+    animation: mh-lim-shake .35s ease !important;
+}
+@keyframes mh-lim-shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-4px); }
+    75% { transform: translateX(4px); }
+}
+html body .product-popup .mh-lim-grp .scheme-product-options-card .v-list-item.mh-lim-off {
+    opacity: .45 !important;
+}
 /* mh-options-v1 */
+/* mh-optlimit-css-v1 */
 
 /* =========================================================
    חלק 22י: דף מוצר (הפופאפ) — MH Product v1.0.0 | 2026-09-07 — Liquid Glass + אדום QLED
