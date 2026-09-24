@@ -7038,3 +7038,164 @@ html body #FeaturedMerchants a.featured-merchant-card h4 {
     html body #FeaturedMerchants a.featured-merchant-card .image::after { transition: none !important; }
 }
 /* mh-featured-v1 */
+
+/* =========================================================
+   חלק 49: חלונית "עוד אחד עם אותן תוספות?" — MH Repeat v1.0.0 | 2026-09-24
+   הבעלים היחיד של #app-cart-addon-confirm / #AddonsConfirmation (רכיב cart-item-addon-confirm של Hyperzod):
+   נפתחת כשלוחצים + על מוצר עם תוספות שכבר בעגלה. הטקסטים מתורגמים ב-JS "MH Repeat" (הבלוק גם מוריד את
+   הפסיק שאחרי כל תוספת). מה היה: שם המוצר בתיבה אפורה, "הבחירות הקודמות שלך" מיושר שמאלה, רשימת תוספות
+   כטקסט עם פסיקים, וכפתורים "בחירה"/"חזור" (תרגום שגוי של I'll choose / Repeat). עכשיו: ידית גרירה, שם
+   המוצר ככותרת, שאלה ברורה, התוספות כגלולות, "כן, אותו דבר" (אדום QLED, בימין) ו"לבחור מחדש" (מסגרת).
+   ========================================================= */
+html body #app-cart-addon-confirm .v-overlay__content {
+    border-radius: 28px 28px 0 0 !important;
+    overflow: visible !important;
+}
+html body #AddonsConfirmation {
+    background: transparent !important;
+    border-radius: 28px 28px 0 0 !important;
+}
+html body #AddonsConfirmation > .v-card {
+    position: relative !important;
+    background: #fff !important;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+    border: 0 !important;
+    border-radius: 28px 28px 0 0 !important;
+    box-shadow: 0 -12px 40px rgba(0, 0, 0, 0.14) !important;
+    padding: 26px 20px calc(18px + env(safe-area-inset-bottom, 0px)) !important;
+}
+/* ידית גרירה */
+html body #AddonsConfirmation > .v-card::before {
+    content: '' !important;
+    position: absolute !important;
+    top: 10px !important;
+    left: 50% !important;
+    width: 40px !important;
+    height: 5px !important;
+    margin-left: -20px !important;
+    border-radius: 999px !important;
+    background: #d1d5db !important;
+}
+html body #AddonsConfirmation .v-card__loader { display: none !important; }
+/* שם המוצר = כותרת */
+html body #AddonsConfirmation .v-card-title.product-name {
+    background: transparent !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    font-size: 19px !important;
+    line-height: 1.25 !important;
+    font-weight: 800 !important;
+    letter-spacing: -0.01em !important;
+    color: #111 !important;
+    white-space: normal !important;
+    text-align: start !important;
+}
+html body #AddonsConfirmation .v-card-text {
+    padding: 0 !important;
+    font-size: 14px !important;
+}
+/* השאלה */
+html body #AddonsConfirmation .v-card-text > .text-subtitle-2 {
+    margin: 8px 0 12px !important;
+    text-align: start !important;
+    font-size: 14px !important;
+    line-height: 1.4 !important;
+    font-weight: 600 !important;
+    letter-spacing: 0 !important;
+    color: #6b7280 !important;
+}
+/* התוספות כגלולות */
+html body #AddonsConfirmation .product-addons {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 8px !important;
+}
+html body #AddonsConfirmation .product-addons > span { display: contents !important; }
+html body #AddonsConfirmation .product-addons > span > span,
+html body #AddonsConfirmation .product-addons > p {
+    display: inline-flex !important;
+    align-items: center !important;
+    margin: 0 !important;
+    padding: 6px 12px !important;
+    border-radius: 999px !important;
+    background: #f5f5f7 !important;
+    border: 1px solid #ececef !important;
+    font-size: 13px !important;
+    line-height: 1.3 !important;
+    font-weight: 700 !important;
+    color: #1f2937 !important;
+}
+/* הערת המוצר (product_instruction) */
+html body #AddonsConfirmation .product-addons > .tw-mt-2 {
+    flex: 1 0 100% !important;
+    margin: 4px 0 0 !important;
+    color: #374151 !important;
+}
+html body #AddonsConfirmation .product-addons > .tw-mt-2 p { margin: 2px 0 0 !important; font-style: normal !important; color: #6b7280 !important; }
+/* "אזל מהמלאי" ליד הכפתורים */
+html body #AddonsConfirmation .v-card-text > .tw-mt-3 {
+    margin: 10px 0 0 !important;
+    font-size: 13px !important;
+    font-weight: 700 !important;
+    color: #c8151b !important;
+}
+/* הכפתורים: "כן, אותו דבר" בימין (ראשי), "לבחור מחדש" בשמאל */
+html body #AddonsConfirmation .v-card-actions {
+    margin: 0 !important;
+    padding: 18px 0 0 !important;
+    min-height: 0 !important;
+}
+html body #AddonsConfirmation .v-card-actions .v-row {
+    margin: 0 !important;
+    gap: 10px !important;
+    flex-wrap: nowrap !important;
+}
+html body #AddonsConfirmation .v-card-actions .v-col {
+    flex: 1 1 0 !important;
+    max-width: none !important;
+    padding: 0 !important;
+}
+html body #AddonsConfirmation .v-card-actions .v-col:has(.repeat-ntn) { order: -1 !important; }
+html body #AddonsConfirmation .v-card-actions .v-btn {
+    height: 52px !important;
+    min-height: 52px !important;
+    border-radius: 999px !important;
+    font-size: 15px !important;
+    font-weight: 800 !important;
+    letter-spacing: 0 !important;
+    text-transform: none !important;
+    -webkit-tap-highlight-color: transparent !important;
+}
+html body #AddonsConfirmation .v-card-actions .v-btn .v-btn__overlay { opacity: 0 !important; }
+html body #AddonsConfirmation .v-card-actions .repeat-ntn {
+    background: linear-gradient(135deg, #ff3b41 0%, #c8151b 100%) !important;
+    color: #fff !important;
+    box-shadow: 0 8px 20px rgba(227, 30, 36, 0.30) !important;
+}
+html body #AddonsConfirmation .v-card-actions .repeat-ntn:active { transform: scale(0.97) !important; }
+html body #AddonsConfirmation .v-card-actions .repeat-ntn.v-btn--disabled {
+    background: #e5e7eb !important;
+    background-color: #e5e7eb !important;
+    background-image: none !important;
+    opacity: 1 !important;
+    color: #9ca3af !important;
+    box-shadow: none !important;
+    opacity: 1 !important;
+}
+html body #AddonsConfirmation .v-card-actions .chose-btn {
+    background: #fff !important;
+    color: #c8151b !important;
+    border: 1.5px solid rgba(200, 21, 27, 0.35) !important;
+    font-weight: 700 !important;
+}
+html body #AddonsConfirmation .v-card-actions .chose-btn:active { background: #fff5f5 !important; }
+@media (hover: hover) {
+    html body #AddonsConfirmation .v-card-actions .chose-btn:hover { background: #fff5f5 !important; border-color: #c8151b !important; }
+    html body #AddonsConfirmation .v-card-actions .repeat-ntn:hover { box-shadow: 0 12px 26px rgba(227, 30, 36, 0.38) !important; }
+}
+@media (min-width: 960px) {
+    html body #app-cart-addon-confirm .v-overlay__content { max-width: 520px !important; }
+    html body #AddonsConfirmation > .v-card { padding: 28px 28px 24px !important; }
+}
+/* mh-repeat-v1 */

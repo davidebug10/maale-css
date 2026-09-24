@@ -4283,3 +4283,51 @@ log('פעיל');
   window.MH_ILPHONE = { version: VERSION, sync: sync, stats: function () { return JSON.parse(JSON.stringify(stats)); } };
   /* mh-ilphone-v1 */
 })();
+
+/* ============================================================
+   חלונית "עוד אחד עם אותן תוספות?" — MH Repeat  |  v1.0.0 | 2026-09-24
+   הרכיב cart-item-addon-confirm של Hyperzod (#AddonsConfirmation) נפתח כשלוחצים + על מוצר עם תוספות
+   שכבר בעגלה. חבילת השפה תרגמה "Repeat" ל"חזור" ו-"I'll choose" ל"בחירה" — הלקוח לא מבין מה קורה.
+   הבלוק מחליף את הטקסטים (רק בתוך #AddonsConfirmation) ומוריד את הפסיק שאחרי כל תוספת
+   (Hyperzod מרנדרים "שם, " לכל אופציה — העיצוב בחלק 49 הופך כל אחת לגלולה).
+   נכשל-פתוח. בדיקה: window.MH_REPEAT.stats()
+   ============================================================ */
+(function () {
+  'use strict';
+  if (window.__MH_REPEAT__) { return; }
+  window.__MH_REPEAT__ = true;
+  var VERSION = '1.0.0', ROOT = '#AddonsConfirmation';
+  var TEXT = [
+    { sel: '.v-card-text > .text-subtitle-2', from: ['הבחירות הקודמות שלך', 'Your previous choices'], to: 'להוסיף עוד אחד עם אותן תוספות?' },
+    { sel: '.repeat-ntn .v-btn__content', from: ['חזור', 'Repeat'], to: 'כן, אותו דבר' },
+    { sel: '.chose-btn .v-btn__content', from: ['בחירה', "I'll choose", 'Choose'], to: 'לבחור מחדש' },
+    { sel: '.product-addons > p', from: ['No customizations added'], to: 'בלי תוספות' }
+  ];
+  var stats = { version: VERSION, applied: 0, trimmed: 0, seen: 0 };
+  function apply() {
+    try {
+      var root = document.querySelector(ROOT);
+      if (!root) { return; }
+      stats.seen++;
+      for (var i = 0; i < TEXT.length; i++) {
+        var els = root.querySelectorAll(TEXT[i].sel);
+        for (var j = 0; j < els.length; j++) {
+          var t = (els[j].textContent || '').trim();
+          if (TEXT[i].from.indexOf(t) >= 0) { els[j].textContent = TEXT[i].to; stats.applied++; }
+        }
+      }
+      var opts = root.querySelectorAll('.product-addons > span > span');
+      for (var k = 0; k < opts.length; k++) {
+        var s = opts[k].textContent || '';
+        var c = s.replace(/[\s,،]+$/, '').trim();
+        if (c !== s) { opts[k].textContent = c; stats.trimmed++; }
+      }
+    } catch (e) { /* נכשל-פתוח */ }
+  }
+  var pend = false;
+  function schedule() { if (pend) { return; } pend = true; setTimeout(function () { pend = false; apply(); }, 60); }
+  try { new MutationObserver(schedule).observe(document.documentElement, { childList: true, subtree: true, characterData: true }); } catch (e) {}
+  apply();
+  window.MH_REPEAT = { version: VERSION, apply: apply, stats: function () { return JSON.parse(JSON.stringify(stats)); } };
+  /* mh-repeat-v1 */
+})();
