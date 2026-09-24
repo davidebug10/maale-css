@@ -4114,7 +4114,7 @@ log('פעיל');
 })();
 
 /* ============================================================
-   בועת וואטסאפ צפה — MH WhatsApp  |  v1.0.0 | 2026-09-22
+   בועת וואטסאפ צפה — MH WhatsApp  |  v1.0.1 | 2026-09-24
    בקשת דוד: בועה קטנה עם סמל וואטסאפ בדף הבית ובדפי העסקים, שלא מתנגשת בכלום.
    מה הבלוק עושה: יוצר <a id="mh-wa"> אחד (העיצוב בחלק 45), ומדליק/מכבה .mh-wa-on לפי:
      - מסלול: דף הבית (/, /he, /he/home) — אחרי 1.2 שניות; דף עסק (/he/m/<slug>/<id>) —
@@ -4125,14 +4125,14 @@ log('פעיל');
      - גובה: מעל סרגל הניווט התחתון (#MultiVendorBottomNav) כשהוא מוצג, אחרת 20px —
        נמדד מה-DOM ומוזרם ל-CSS דרך --mh-wa-bottom. כפתור "המשך לתשלום" של Hyperzod
        בדף עסק יושב במרכז (x 109–280 ב-390px) — הבועה בשמאל לא נוגעת בו.
-   המספר: business_phone מה-boot של Hyperzod (מה שדוד מעדכן בהגדרות), עם גיבוי קבוע.
+   המספר: קבוע בקוד (NUMBER) — לא נקרא מה-boot של Hyperzod (v1.0.1, ראו הערה ליד phone()).
    נכשל-פתוח: כל שגיאה = אין בועה. בדיקה: window.MH_WA.stats()
    ============================================================ */
 (function () {
   'use strict';
   if (window.__MH_WA__) { return; }
   window.__MH_WA__ = true;
-  var VERSION = '1.0.0', FALLBACK = '972555190064';
+  var VERSION = '1.0.1', NUMBER = '972555190064';
   var TEXT = 'שלום, אשמח לעזרה עם הזמנה במעלה המשלוחים';
   var HOME = /^\/(he\/?(home\/?)?)?$/, MERCHANT = /^\/he\/m\/[^\/]+\/[0-9a-f]{20,}\/?$/;
   var SCROLL_MIN = 160, NAV_GAP = 12, BASE_BOTTOM = 20;
@@ -4140,18 +4140,9 @@ log('פעיל');
   var stats = { version: VERSION, route: null, shown: false, reason: '', coverBy: null, scrolled: false, bottom: BASE_BOTTOM, phone: null, toggles: 0 };
   var el = null, scrolledEnough = false, homeTimer = null, homeReady = false, scrollHost = null;
 
-  function phone() {
-    try {
-      var app = document.getElementById('app');
-      var st = app && app.__vue_app__ && app.__vue_app__.config.globalProperties.$store;
-      var b = st && st.getters.getBootSettings;
-      var p = b && b.general_settings && b.general_settings.business_details && b.general_settings.business_details.business_phone;
-      var d = String(p || '').replace(/\D/g, '');
-      if (/^0\d{8,9}$/.test(d)) { d = '972' + d.slice(1); }
-      if (/^972\d{8,9}$/.test(d)) { return d; }
-    } catch (e) {}
-    return FALLBACK;
-  }
+  /* v1.0.1 (24.9): המספר קבוע בקוד. קודם נקרא business_phone מה-boot של Hyperzod — ומכשיר עם boot ישן
+     (האפליקציה שומרת אותו) שלח לקוחה למספר הישן. שינוי מספר = עריכת NUMBER כאן. */
+  function phone() { return NUMBER; }
   function ensure() {
     if (el && el.isConnected) { return el; }
     el = document.getElementById('mh-wa');
