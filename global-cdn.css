@@ -7040,7 +7040,7 @@ html body #FeaturedMerchants a.featured-merchant-card h4 {
 /* mh-featured-v1 */
 
 /* =========================================================
-   חלק 49: חלונית "עוד אחד עם אותן תוספות?" — MH Repeat v1.0.0 | 2026-09-24
+   חלק 49: חלונית "עוד אחד עם אותן תוספות?" — MH Repeat v1.0.1 | 2026-09-25 (v1.0.0: 24.9)
    הבעלים היחיד של #app-cart-addon-confirm / #AddonsConfirmation (רכיב cart-item-addon-confirm של Hyperzod):
    נפתחת כשלוחצים + על מוצר עם תוספות שכבר בעגלה. הטקסטים מתורגמים ב-JS "MH Repeat" (הבלוק גם מוריד את
    הפסיק שאחרי כל תוספת). מה היה: שם המוצר בתיבה אפורה, "הבחירות הקודמות שלך" מיושר שמאלה, רשימת תוספות
@@ -7126,13 +7126,7 @@ html body #AddonsConfirmation .product-addons > p {
     font-weight: 700 !important;
     color: #1f2937 !important;
 }
-/* הערת המוצר (product_instruction) */
-html body #AddonsConfirmation .product-addons > .tw-mt-2 {
-    flex: 1 0 100% !important;
-    margin: 4px 0 0 !important;
-    color: #374151 !important;
-}
-html body #AddonsConfirmation .product-addons > .tw-mt-2 p { margin: 2px 0 0 !important; font-style: normal !important; color: #6b7280 !important; }
+/* "הערה למוצר" (product_instruction): כובה ב-25.9 בכל המוצרים (היה רק על סכו"ם חד"פ בחומוס אדומים) — אין עיצוב. */
 /* "אזל מהמלאי" ליד הכפתורים */
 html body #AddonsConfirmation .v-card-text > .tw-mt-3 {
     margin: 10px 0 0 !important;
