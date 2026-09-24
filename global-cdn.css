@@ -6845,3 +6845,196 @@ html body .merchant-page:not(.merchant-mobile-view) #MerchantStickyHeader {
     html body .merchant-page .merchant-header-img { transition: none !important; }
 }
 /* mh-merchanthead-v1 */
+
+/* =========================================================
+   חלק 48: "חנויות מומלצות" בדף הבית — MH Featured v1.0.0 | 2026-09-24
+   הבעלים היחיד של #FeaturedMerchants (הסקשן FeaturedMerchants--<n> של Page Builder): הכותרת, הסליידר,
+   כרטיסי הלוגו (a.featured-merchant-card > .image + h4) והחצים בדסקטופ. עוגן: #FeaturedMerchants בלבד —
+   #merchantCardFeatured חוזר 13 פעמים (id כפול של Hyperzod) ולכן לא משמש כעוגן.
+   מה היה: ריבועי לוגו 100px ברדיוס 12 בלי שום עומק, שם רגיל מתחת, כותרת קטנה.
+   עכשיו: "אריחי אפליקציה" — סקוויקל 98px (144 בדסקטופ) עם טבעת עדינה, צל רך בשתי שכבות, לחיצה מכווצת
+   (מגע) והרמה+זוהר אדום (עכבר בלבד); שם 13px/700; כותרת 20px/800 עם פס גרדיאנט QLED; הסליידר עם
+   scroll-snap, ריפוד 16 ודהייה עדינה בקצה השמאלי (לרמוז שיש עוד). לא נוגע בגלילה של Hyperzod (overflow-x).
+   ========================================================= */
+html body #FeaturedMerchants {
+    margin-top: 28px !important;
+    margin-bottom: 4px !important;
+    overflow: visible !important;
+}
+/* כותרת + פס אדום */
+html body #FeaturedMerchants > h1 {
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+    margin: 0 0 14px !important;
+    padding: 0 16px !important;
+    font-size: 20px !important;
+    line-height: 1.2 !important;
+    font-weight: 800 !important;
+    letter-spacing: -0.01em !important;
+    color: #111 !important;
+}
+html body #FeaturedMerchants > h1::before {
+    content: '' !important;
+    flex: 0 0 auto !important;
+    width: 6px !important;
+    height: 22px !important;
+    border-radius: 999px !important;
+    background: linear-gradient(180deg, #ff3b41 0%, #c8151b 100%) !important;
+    box-shadow: 0 2px 8px rgba(227, 30, 36, 0.35) !important;
+}
+/* הסליידר */
+html body #FeaturedMerchants .simple-slider {
+    margin: 0 !important;
+}
+html body #FeaturedMerchants .simple-slider-container {
+    -webkit-mask-image: linear-gradient(to left, #000 0, #000 calc(100% - 36px), rgba(0, 0, 0, 0)) !important;
+    mask-image: linear-gradient(to left, #000 0, #000 calc(100% - 36px), rgba(0, 0, 0, 0)) !important;
+}
+html body #FeaturedMerchants .slider-inner-container {
+    display: flex !important;
+    align-items: flex-start !important;
+    gap: 14px !important;
+    padding: 8px 16px 14px !important;
+    scroll-snap-type: x proximity !important;
+    scroll-padding-inline: 16px !important;
+    overscroll-behavior-x: contain !important;
+}
+html body #FeaturedMerchants .slider-inner-container > div {
+    flex: 0 0 auto !important;
+    width: auto !important;
+    scroll-snap-align: start !important;
+}
+/* הכרטיס: שקוף, בלי overlay של Vuetify; האריח הוא התמונה */
+html body #FeaturedMerchants a.featured-merchant-card {
+    display: block !important;
+    width: 98px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    -webkit-tap-highlight-color: transparent !important;
+}
+html body #FeaturedMerchants a.featured-merchant-card .v-card__overlay,
+html body #FeaturedMerchants a.featured-merchant-card .v-card__underlay {
+    display: none !important;
+}
+html body #FeaturedMerchants a.featured-merchant-card .image {
+    position: relative !important;
+    width: 98px !important;
+    height: 98px !important;
+    border-radius: 26px !important;
+    overflow: hidden !important;
+    background: #f5f5f7 !important;
+    box-shadow: 0 10px 24px rgba(17, 17, 17, 0.10), 0 2px 6px rgba(17, 17, 17, 0.06) !important;
+    transition: transform 0.22s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.22s ease !important;
+    will-change: transform !important;
+}
+html body #FeaturedMerchants a.featured-merchant-card .image img {
+    border-radius: 26px !important;
+}
+/* טבעת פנימית עדינה מעל התמונה (לוגואים בהירים לא "נשפכים" לרקע) */
+html body #FeaturedMerchants a.featured-merchant-card .image::after {
+    content: '' !important;
+    position: absolute !important;
+    inset: 0 !important;
+    border-radius: 26px !important;
+    box-shadow: inset 0 0 0 1px rgba(17, 17, 17, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.35) !important;
+    pointer-events: none !important;
+    transition: box-shadow 0.22s ease !important;
+}
+html body #FeaturedMerchants a.featured-merchant-card:active .image {
+    transform: scale(0.95) !important;
+    box-shadow: 0 4px 12px rgba(17, 17, 17, 0.10) !important;
+}
+/* השם */
+html body #FeaturedMerchants a.featured-merchant-card .text {
+    margin: 10px 2px 0 !important;
+    padding: 0 !important;
+}
+html body #FeaturedMerchants a.featured-merchant-card h4 {
+    font-size: 13px !important;
+    line-height: 1.25 !important;
+    font-weight: 700 !important;
+    color: #1f2937 !important;
+    text-transform: none !important;
+    white-space: normal !important;
+    display: -webkit-box !important;
+    -webkit-line-clamp: 2 !important;
+    -webkit-box-orient: vertical !important;
+    overflow: hidden !important;
+    min-height: 2.5em !important;
+}
+/* עכבר בלבד: הרמה + זוהר אדום עדין */
+@media (hover: hover) {
+    html body #FeaturedMerchants a.featured-merchant-card:hover .image {
+        transform: translateY(-4px) !important;
+        box-shadow: 0 16px 34px rgba(227, 30, 36, 0.18), 0 4px 10px rgba(17, 17, 17, 0.08) !important;
+    }
+    html body #FeaturedMerchants a.featured-merchant-card:hover .image::after {
+        box-shadow: inset 0 0 0 2px rgba(227, 30, 36, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.35) !important;
+    }
+    html body #FeaturedMerchants a.featured-merchant-card:hover h4 {
+        color: #c8151b !important;
+    }
+}
+/* דסקטופ: אריחים גדולים, חצים כזכוכית עגולה */
+@media (min-width: 960px) {
+    html body #FeaturedMerchants > h1 {
+        padding: 0 28px !important;
+        font-size: 24px !important;
+    }
+    html body #FeaturedMerchants .simple-slider {
+        margin: 0 !important;
+    }
+    html body #FeaturedMerchants .slider-inner-container {
+        gap: 20px !important;
+        padding: 10px 28px 18px !important;
+        scroll-padding-inline: 28px !important; /* = הריפוד, אחרת ה-snap מזיז את הכרטיס הראשון */
+    }
+    html body #FeaturedMerchants a.featured-merchant-card {
+        width: 144px !important;
+    }
+    html body #FeaturedMerchants a.featured-merchant-card .image {
+        width: 144px !important;
+        height: 144px !important;
+        border-radius: 34px !important;
+    }
+    html body #FeaturedMerchants a.featured-merchant-card .image img,
+    html body #FeaturedMerchants a.featured-merchant-card .image::after {
+        border-radius: 34px !important;
+    }
+    html body #FeaturedMerchants a.featured-merchant-card h4 {
+        font-size: 15px !important;
+    }
+    html body #FeaturedMerchants .simple-slider-controls .v-btn {
+        width: 38px !important;
+        height: 38px !important;
+        min-width: 0 !important;
+        border-radius: 999px !important;
+        background: rgba(255, 255, 255, 0.86) !important;
+        -webkit-backdrop-filter: blur(12px) saturate(150%) !important;
+        backdrop-filter: blur(12px) saturate(150%) !important;
+        box-shadow: 0 6px 16px rgba(17, 17, 17, 0.12), 0 0 0 1px rgba(17, 17, 17, 0.05) !important;
+        color: #c8151b !important;
+    }
+    html body #FeaturedMerchants .simple-slider-controls .v-btn .v-btn__overlay {
+        opacity: 0 !important;
+    }
+    html body #FeaturedMerchants .simple-slider-controls .v-btn .v-icon {
+        color: #c8151b !important;
+        font-size: 22px !important;
+    }
+    @media (hover: hover) {
+        html body #FeaturedMerchants .simple-slider-controls .v-btn:hover {
+            background: #fff !important;
+            box-shadow: 0 10px 22px rgba(227, 30, 36, 0.18), 0 0 0 1px rgba(227, 30, 36, 0.25) !important;
+        }
+    }
+}
+@media (prefers-reduced-motion: reduce) {
+    html body #FeaturedMerchants a.featured-merchant-card .image,
+    html body #FeaturedMerchants a.featured-merchant-card .image::after { transition: none !important; }
+}
+/* mh-featured-v1 */

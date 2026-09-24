@@ -53,6 +53,7 @@
 | בועת וואטסאפ צפה (דף הבית + דפי עסק) | "חלק 45: MH WhatsApp" | + JS `MH WhatsApp` v1.0.1 (יוצר `#mh-wa`, מדליק `.mh-wa-on`; המספר קבוע ב-`NUMBER`, לא מה-boot). קטנה (44/48px), שמאל-תחתון, מעל סרגל הניווט התחתון (`--mh-wa-bottom` מה-JS). מוסתרת בכל חלונית/מגירה שעל המסך, בעמוד מוצר, בחיפוש ובצ'ק-אאוט; בדף עסק מופיעה רק אחרי גלילה של 160px. המספר מ-`business_phone` ב-boot |
 | מסך "ניהול כתובות" (`/he/profile/address`): הדר, כפתור "הוסף כתובת חדשה", כרטיסי הכתובות, תפריט 3 הנקודות | "חלק 46: MH Addresses" | + `MH Lang` v1.3.0 (Active/Phone:/Address options/Edit/Delete). עוגן `#addresses` (id של הרכיב Addresses-setting), ההדר תחת `.scheme-profile-page:has(#addresses)`, חלונית האפשרויות לפי מבנה (שתי שורות 44px בתיבה מעוגלת). הדף דורש התחברות — ה-DOM שוחזר מהתבנית (ראו מלכודות) |
 | ראש דף עסק (מובייל + דסקטופ): כיסוי, לוגו, שם, כתובת, שורת מרחק/דירוג, תיאור (אלרגנים/כשרות), תג "הפתיחה הבאה", כפתורי חזרה/סינון/חיפוש, הכותרת בגלילה, הכותרת הדביקה בדסקטופ | "חלק 47: MH MerchantHead" (בסוף הקובץ) | CSS בלבד. הבלוק הישן "תיאור החנות בראש דף המרצ'נט" (pre-line) נבלע בו. |
+| סקשן "חנויות מומלצות" בדף הבית (`#FeaturedMerchants`): כותרת, סליידר, אריחי הלוגו, חצים בדסקטופ | "חלק 48: MH Featured" (בסוף הקובץ) | CSS בלבד. עוגן `#FeaturedMerchants` — לא `#merchantCardFeatured` (id כפול ×13). |
 | סרגל ניווט תחתון | "חלק 31" | |
 
 ### 1.2 בלוקי ה-JS ב-`custom-footer.js`
@@ -219,6 +220,7 @@ avconvert --source in.mp4 --preset Preset1920x1080 --output <business>-hero.mp4 
 הדר `.scheme-global-search-mobile-header` (`.mobile-search-input`), טאבים `.scheme-global-search-tabs` (`#search-product-tab`, `#search-merchant-tab` — הטקסט "מוצרs/חנותs" הוא באג ריבוי של Hyperzod, מצויר מחדש ב-CSS), תוכן `.tab-item-product` (מונה "N תוצאות", קבוצות `.scheme-global-search-product-group` עם `#SearchedMerchantRating`/`#SearchedMerchantAverageTimeAndDistance` ו-`.slider-inner-container > .tw-py-2 > .product-horizontal-card`) ו-`.tab-item-merchant` (כרטיסי חנויות `.merchant-card-title`, `#merchantDistance`; ריק = "No merchants found." באנגלית).
 
 ### 6.6 דף הבית
+- **"חנויות מומלצות" (24.9):** `.page-builder-section-surface[data-page-builder-section-id]` > `#FeaturedMerchants.FeaturedMerchants--<n>` > `h1` (כן, h1 בכל סקשן) + `.simple-slider` (בדסקטופ `.tw-mx-7` ו-`.simple-slider-controls` עם 2 כפתורי `.v-btn` absolute מעל הסליידר בצד שמאל) > `section#slfeaturedMerchantSlider.simple-slider-container` > `#sl-inner-featuredMerchantSlider.slider-inner-container` (flex, overflow-x auto, gap 20 מ-non-critical.css) > `div` > `div#merchantCardFeatured` (**id כפול** לכל כרטיס) > `a.featured-merchant-card` (במובייל `tw--mx-3 tw-ml-1`: כרטיס 100 בתוך עטיפה 92) > `.image.v-img` (100/200px, `img.v-img__img--cover`) + `.text > h4`. 13 עסקים. snap: `scroll-padding-inline` חייב להיות שווה לריפוד הפנימי, אחרת הכרטיס הראשון "קופץ" 12px.
 הדר `#MultiVendorHeader` / `div[data-v-…].bg-header_bg.tw-sticky` (ה-hash כאן היה יציב עד כה, אבל עדיף עוגנים אחרים), שורת חיפוש `.home-mobile-search-input`, כרטיסי חנויות. הגלילה בתוך `#MultiVendorHome`.
 
 ### 6.7 עגלה
