@@ -1849,13 +1849,21 @@
 })();
 
 /* =========================================================================
-   אכיפת סוג משלוח לפי מיקום — MH Zone Enforcement  |  v1.3.0 | 2026-08-30
+   אכיפת סוג משלוח לפי מיקום — MH Zone Enforcement  |  v1.4.0 | 2026-09-26
    -------------------------------------------------------------------------
    מה זה עושה:
      מסווג את כתובת המסירה של הלקוח מול פוליגון מעלה אדומים (כולל מישור
      אדומים), וכופה את סוג ההזמנה הנכון:
        בתוך העיר  → delivery  (התעריף הזול)
        מחוץ לעיר  → custom_2  (התעריף היקר)
+
+     v1.4.0 — עסק שנמצא מחוץ לעיר (למשל פלאפל בתחנה, כפר אדומים):
+       כל ההזמנות ממנו → custom_2, לא משנה איפה הלקוח.
+     v1.4.0 — רשת ביטחון: הסקריפט לעולם לא מחליף לסוג הזמנה שהעסק לא
+       מציע (accepted_order_types). בלי זה השרת דוחה → מסך לבן בתשלום.
+       עסק לא מזוהה / סוג לא נתמך → לא נוגעים (נכשל פתוח) + אזהרה + מונה.
+       מידע העסק נשמר ב-localStorage (mh_zone_merchants) כי אחרי רענון
+       עמוד התשלום merchantData ריק.
 
      "איסוף עצמי" (pickup) ו"הוצאה לרכב" (custom_1) — הסקריפט לא נוגע בהם
      לעולם. אם הלקוח בוחר באחד מהם, הסקריפט מזהה ומרפה.
@@ -1889,7 +1897,8 @@ if (window.__MH_ZONE__) { return; }
 window.__MH_ZONE__ = true;
 
 var CFG = {
-  VERSION:      '1.3.0',
+  VERSION:      '1.4.0',
+  MLS:          'mh_zone_merchants',   /* מטמון מידע עסקים: מיקום + סוגי הזמנה */
   INSIDE_TYPE:  'delivery',
   OUTSIDE_TYPE: 'custom_2',
   MANAGED:      ['delivery', 'custom_2'],
@@ -1910,7 +1919,8 @@ var CFG = {
 /* קירוב שטוח — מדויק לחלוטין בסקאלה של עיר (קו רוחב ~31.79°) */
 var MLAT = 111320, MLNG = 94640;
 var S = { vSeen:0, vFixed:0, oSeen:0, oFixed:0,
-          uiClicks:0, uiHides:0, uiShows:0, uiSkips:0, errors:0 };
+          uiClicks:0, uiHides:0, uiShows:0, uiSkips:0, errors:0,
+          mOut:0, mUnknown:0, guardSkips:0 };
 var LAST = { zone:null, type:null, addr:null };
 var appliedSig = null, busy = false;
 
@@ -1966,6 +1976,86 @@ function addrById(id) {
   return null;
 }
 
+/* ---------- מידע עסקים (v1.4.0) ---------- */
+
+/* מטמון: { merchantId: { lat, lng, acc:[order types], out:bool, ts } } */
+var MC = {};
+try { MC = JSON.parse(localStorage.getItem(CFG.MLS) || '{}') || {}; } catch(e){ MC = {}; }
+
+function store(){
+  try { var a = document.querySelector('#app'), v = a && a.__vue_app__;
+        return (v && v.config && v.config.globalProperties.$store) || null; }
+  catch(e){ return null; }
+}
+
+/* אובייקט עסק של Hyperzod → רשומת מטמון. merchant_location = GeoJSON [lng,lat];
+   merchant_address_location = [lat,lng]. מחזיר null אם אין מזהה. */
+function merchInfo(d){
+  if (!d || typeof d !== 'object') return null;
+  var id = d.merchant_id || d._id; if (!id) return null;
+  var r = { id: String(id) };
+  var loc = d.merchant_location || d.merchant_address_location, lat, lng;
+  if (loc && Array.isArray(loc.coordinates)) { lng = +loc.coordinates[0]; lat = +loc.coordinates[1]; }
+  else if (Array.isArray(loc)) { lat = +loc[0]; lng = +loc[1]; }
+  if (isFinite(lat) && isFinite(lng) && !(lat===0 && lng===0)) {
+    r.lat = lat; r.lng = lng; r.out = !inPoly(lng, lat, CFG.POLY);
+  }
+  if (Array.isArray(d.accepted_order_types)) r.acc = d.accepted_order_types.slice();
+  return r;
+}
+
+/* קורא את העסקים שהאפליקציה מחזיקה (דף עסק + עגלה) ומעדכן מטמון.
+   מידע חדש דורס ישן — כך שינוי בפאנל נקלט בביקור הבא בדף העסק. */
+function snapMerchants(){
+  var st = store(); if (!st) return;
+  var list = [];
+  try {
+    var M = st.state.Merchant || {}, C = st.state.Cart || {};
+    list.push(M.merchantData);
+    if (Array.isArray(C.cartMerchant)) list = list.concat(C.cartMerchant);
+    if (st.getters) list.push(st.getters.getCartMerchant);
+  } catch(e){ S.errors++; warn('snap', e); return; }
+  var changed = false;
+  list.forEach(function(d){
+    var r = merchInfo(d); if (!r) return;
+    var old = MC[r.id] || {}, nw = {
+      lat: ('lat' in r) ? r.lat : old.lat, lng: ('lng' in r) ? r.lng : old.lng,
+      out: ('out' in r) ? r.out : old.out, acc: r.acc || old.acc };
+    if (JSON.stringify([old.lat,old.lng,old.out,old.acc]) !==
+        JSON.stringify([nw.lat,nw.lng,nw.out,nw.acc])) {
+      nw.ts = Date.now(); MC[r.id] = nw; changed = true;
+      log('🏪 עסק נקלט:', r.id, nw.out ? 'מחוץ לעיר' : 'בתוך העיר', nw.acc);
+    }
+  });
+  if (changed) { try { localStorage.setItem(CFG.MLS, JSON.stringify(MC)); } catch(e){} }
+}
+
+function merchById(id){
+  if (!id) return null;
+  try { snapMerchants(); } catch(e){ S.errors++; }
+  return MC[String(id)] || null;
+}
+
+/* ההחלטה המרכזית. cur = הסוג שהאפליקציה ביקשה.
+   מחזיר את הסיווג; skip=true → לא לשנות את הבקשה. */
+function decide(lat, lng, mid, cur){
+  var c = classify(lat, lng);                         /* לפי כתובת הלקוח */
+  var m = merchById(mid);
+  if (m && m.out === true) {                          /* עסק מחוץ לעיר → תמיד חוץ */
+    c = { zone:'MERCHANT_OUTSIDE', type:CFG.OUTSIDE_TYPE, edge:c.edge }; S.mOut++;
+  }
+  if (c.type === cur) return c;                       /* אין מה לשנות */
+  if (!m || !Array.isArray(m.acc)) {                  /* לא יודעים מה העסק מציע */
+    S.mUnknown++; warn('עסק לא מזוהה — לא משנים את', cur, '| merchant:', mid);
+    c.skip = true; return c;
+  }
+  if (m.acc.indexOf(c.type) === -1) {                 /* העסק לא מציע את הסוג */
+    S.guardSkips++; warn('העסק לא מציע', c.type, '— משאירים', cur, '| merchant:', mid);
+    c.skip = true; return c;
+  }
+  return c;
+}
+
 /* ---------- שכבה 1: רשת (שכבת הכסף) ---------- */
 
 /* cart/validate נושאת גם את סוג ההזמנה וגם את הקואורדינטה, וממנה נגזר
@@ -1983,11 +2073,12 @@ function fixValidate(url) {
   else { var a0 = addrById(aid); if (a0){ lat=a0.lat; lng=a0.lng; } }
   if (!isFinite(lat) || !isFinite(lng)) return url;   /* אין כתובת עדיין */
 
-  var c = classify(lat, lng), rec = addrById(aid);
+  var c = decide(lat, lng, u.searchParams.get('merchant_id'), ot), rec = addrById(aid);
   LAST = { zone:c.zone, type:c.type, addr: rec ? rec.text : null };
   setTimeout(reconcileUI, 60);
 
   if (c.type === ot) { log('✓ validate תקין:', ot, '|', c.zone); return url; }
+  if (c.skip) return url;                             /* רשת ביטחון — לא נוגעים */
   u.searchParams.set('order_type', c.type);
   S.vFixed++;
   log('🔧 validate:', ot, '→', c.type, '|', c.zone);
@@ -2002,10 +2093,12 @@ function fixOrder(body) {
   S.oSeen++;
 
   var a = addrById(o.delivery_address_id);
-  if (!a) { warn('POST: כתובת לא נמצאה — מאלץ', CFG.OUTSIDE_TYPE);
-            o.order_type = CFG.OUTSIDE_TYPE; S.oFixed++; return JSON.stringify(o); }
-  var c = classify(a.lat, a.lng);
+  if (!a) warn('POST: כתובת לא נמצאה — מסווג כחוץ (בכפוף לרשת הביטחון)');
+  /* כתובת חסרה → classify מחזיר UNKNOWN=חוץ (Fail-Closed), אבל decide
+     לא יחליף לסוג שהעסק לא מציע */
+  var c = decide(a ? a.lat : NaN, a ? a.lng : NaN, o.merchant_id, o.order_type);
   if (c.type === o.order_type) { log('✅ POST תקין:', o.order_type, '|', c.zone); return body; }
+  if (c.skip) return body;                            /* רשת ביטחון — לא נוגעים */
   log('🔧 POST:', o.order_type, '→', c.type, '|', c.zone);
   o.order_type = c.type; S.oFixed++;
   return JSON.stringify(o);
@@ -2119,7 +2212,10 @@ function reconcileUI(){
 /* SPA — הבורר נוצר ונהרס בניווט. debounce 200ms. */
 var t = null;
 new MutationObserver(function(){
-  clearTimeout(t); t = setTimeout(reconcileUI, 200);
+  clearTimeout(t); t = setTimeout(function(){
+    try { snapMerchants(); } catch(e){ S.errors++; }   /* v1.4.0: קליטת עסקים למטמון */
+    reconcileUI();
+  }, 200);
 }).observe(document.body, { childList:true, subtree:true });
 
 /* ---------- אבחון ---------- */
@@ -2127,6 +2223,7 @@ window.MH_ZONE = {
   version: CFG.VERSION,
   stats: function(){ console.table(S); console.log('סיווג:', LAST, '| applied:', appliedSig); return S; },
   check: function(lat,lng){ return classify(lat,lng); },
+  merchants: function(){ snapMerchants(); console.table(MC); return MC; },
   reset: function(){ S.uiClicks = 0; appliedSig = null; },
   showAll: function(){
     [].forEach.call(document.querySelectorAll('.custom-radio[value]'), function(r){
