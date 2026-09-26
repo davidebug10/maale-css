@@ -4428,3 +4428,135 @@ log('פעיל');
   window.MH_REPEAT = { version: VERSION, apply: apply, stats: function () { return JSON.parse(JSON.stringify(stats)); } };
   /* mh-repeat-v1 */
 })();
+
+/* ============================================================
+   התוספות שנבחרו לכל מוצר בצ'ק-אאוט — MH CartOpts  |  v1.0.0 | 2026-09-27
+   בקשת דוד: בצ'ק-אאוט מופיע רק "פיצה משפחתית" + "שינוי תוספות", בלי לראות מה נבחר. הבלוק מוסיף
+   מתחת לשם המוצר את התוספות מתוך העגלה של Hyperzod (cart_items[].product_options[].options[].name):
+   גלולות בשתי שורות לכל היותר (נמדד בפועל, מתאים לרוחב), ומעבר לזה "עוד N" שפותח את השאר
+   (העיצוב בחלק 50). בפיצה: "(הכל)" מושמט, "(חצי ימין)" → "½ ימין", "(רבע …)" → "¼ …"; ×N לכמות.
+   שיוך שורה ↔ פריט: לפי הסדר, עם בדיקת שם המוצר בכל שורה (לרכיבים של Hyperzod אין מזהה ב-DOM).
+   אי-התאמה → מוחקים את מה שהוספנו ולא מציגים כלום (נכשל-פתוח). רק ב-#checkout #cartItems. תצוגה בלבד.
+   בדיקה: window.MH_CARTOPTS.stats()
+   ============================================================ */
+(function () {
+  'use strict';
+  if (window.__MH_CARTOPTS__) { return; }
+  window.__MH_CARTOPTS__ = true;
+  var VERSION = '1.0.0', MAX_LINES = 2, FALLBACK = 3, BOX = 'mh-ci-opts';
+  var stats = { version: VERSION, syncs: 0, rows: 0, painted: 0, mismatch: 0, errors: 0 };
+  var open = {};                                     /* "אינדקס|חתימה" → פתוח */
+
+  function store() { try { return document.getElementById('app').__vue_app__.config.globalProperties.$store; } catch (e) { return null; } }
+  function items() { try { var c = store().getters.getCart; return (c && c.cart_items) || null; } catch (e) { return null; } }
+  function norm(s) { return String(s || '').replace(/\s+/g, ' ').trim(); }
+  function label(o) {
+    var n = norm(o && o.name).replace(/\s*\(הכל\)$/, '').replace(/\s*\(חצי ([^)]+)\)$/, ' ½ $1').replace(/\s*\(רבע ([^)]+)\)$/, ' ¼ $1');
+    var q = +(o && (o.quantity || o.option_quantity)) || 1;
+    return q > 1 ? n + ' ×' + q : n;
+  }
+  function clean(root) { var l = root.querySelectorAll('.' + BOX); for (var i = 0; i < l.length; i++) { l[i].remove(); } }
+
+  function paint(box, labels, key) {
+    box.textContent = '';
+    for (var i = 0; i < labels.length; i++) {
+      var s = document.createElement('span');
+      s.className = 'mh-ci-opt'; s.textContent = labels[i]; s.title = labels[i];
+      box.appendChild(s);
+    }
+    var b = document.createElement('button');
+    b.type = 'button'; b.className = 'mh-ci-more mh-ci-off';
+    b.addEventListener('click', function (e) {
+      e.preventDefault(); e.stopPropagation();
+      open[key] = !open[key]; fit(box);
+    });
+    box.appendChild(b);
+    box.setAttribute('data-key', key);
+    fit(box);
+    stats.painted++;
+  }
+  /* כמה שורות תופסים הילדים הגלויים (לפי offsetTop, סובלנות 3px) */
+  function lines(box) {
+    var tops = [], ch = box.children;
+    for (var i = 0; i < ch.length; i++) {
+      if (!ch[i].offsetParent) { continue; }
+      var y = ch[i].offsetTop, seen = false;
+      for (var k = 0; k < tops.length; k++) { if (Math.abs(tops[k] - y) <= 3) { seen = true; break; } }
+      if (!seen) { tops.push(y); }
+    }
+    return tops.length;
+  }
+  /* מקפל לשתי שורות: מסתיר גלולות מהסוף עד שהכול (כולל "עוד N") נכנס */
+  function fit(box) {
+    var key = box.getAttribute('data-key'), chips = box.querySelectorAll('.mh-ci-opt'), btn = box.querySelector('.mh-ci-more');
+    if (!btn) { return; }
+    for (var i = 0; i < chips.length; i++) { chips[i].classList.remove('mh-ci-extra'); }
+    btn.classList.add('mh-ci-off'); box.classList.remove('mh-ci-open');
+    if (open[key]) {
+      box.classList.add('mh-ci-open');
+      if (box.offsetParent && lines(box) <= MAX_LINES) { open[key] = false; return; }   /* אין מה לפתוח */
+      btn.textContent = 'פחות'; btn.setAttribute('aria-expanded', 'true'); btn.classList.remove('mh-ci-off');
+      return;
+    }
+    btn.setAttribute('aria-expanded', 'false');
+    var hidden = 0;
+    if (!box.offsetParent) {                          /* לא מוצג כרגע — לא אפשר למדוד */
+      for (var f = FALLBACK; f < chips.length; f++) { chips[f].classList.add('mh-ci-extra'); hidden++; }
+    } else if (lines(box) > MAX_LINES) {
+      btn.textContent = 'עוד ' + chips.length; btn.classList.remove('mh-ci-off');
+      for (var k = chips.length - 1; k >= 1 && lines(box) > MAX_LINES; k--) { chips[k].classList.add('mh-ci-extra'); hidden++; btn.textContent = 'עוד ' + hidden; }
+    }
+    if (hidden) { btn.textContent = 'עוד ' + hidden; btn.classList.remove('mh-ci-off'); }
+  }
+  function refitAll() { var l = document.querySelectorAll('#checkout #cartItems .' + BOX); for (var i = 0; i < l.length; i++) { try { fit(l[i]); } catch (e) {} } }
+
+  function sync() {
+    try {
+      var wrap = document.querySelector('#checkout #cartItems'); if (!wrap) { return; }
+      stats.syncs++;
+      var rows = wrap.querySelectorAll('.cart-row'), list = items();
+      stats.rows = rows.length;
+      if (!list || rows.length !== list.length) { if (list) { stats.mismatch++; } clean(wrap); return; }
+      for (var i = 0; i < rows.length; i++) {
+        var nameEl = rows[i].querySelector('.product-name');
+        if (!nameEl || norm(nameEl.textContent) !== norm(list[i].product_name)) { stats.mismatch++; clean(wrap); return; }
+      }
+      for (var j = 0; j < rows.length; j++) {
+        var nm = rows[j].querySelector('.product-name'), host = nm.parentElement;
+        var labels = [];
+        (list[j].product_options || []).forEach(function (g) { (g && g.options || []).forEach(function (o) { var t = label(o); if (t) { labels.push(t); } }); });
+        var box = null;
+        for (var k = 0; k < host.children.length; k++) { if (host.children[k].classList.contains(BOX)) { box = host.children[k]; break; } }
+        if (!labels.length) { if (box) { box.remove(); } continue; }
+        var sig = labels.join('|'), key = j + '|' + sig;
+        if (box && box.getAttribute('data-sig') === sig) { if (box.getAttribute('data-w') !== String(host.clientWidth)) { box.setAttribute('data-w', host.clientWidth); fit(box); } continue; }
+        if (!box) { box = document.createElement('div'); box.className = BOX; nm.insertAdjacentElement('afterend', box); }
+        box.setAttribute('data-sig', sig); box.setAttribute('data-w', host.clientWidth);
+        paint(box, labels, key);
+      }
+    } catch (e) { stats.errors++; }
+  }
+
+  var t = null;
+  function schedule() { clearTimeout(t); t = setTimeout(sync, 120); }
+  try {
+    new MutationObserver(function (muts) {
+      if (!document.getElementById('checkout')) { return; }
+      for (var i = 0; i < muts.length; i++) {
+        var n = muts[i].target;
+        if (n && n.classList && (n.classList.contains(BOX) || (n.closest && n.closest('.' + BOX)))) { continue; }  /* השינויים שלנו */
+        schedule(); return;
+      }
+    }).observe(document.body || document.documentElement, { childList: true, subtree: true });
+  } catch (e) {}
+  (function sub(n) {                                  /* שינוי עגלה (כמות/תוספות) → סנכרון */
+    var st = store();
+    if (st && typeof st.subscribe === 'function') { try { st.subscribe(function (m) { if (m && /cart/i.test(m.type)) { schedule(); } }); } catch (e) {} return; }
+    if (n < 40) { setTimeout(function () { sub(n + 1); }, 500); }
+  })(0);
+  window.addEventListener('resize', function () { clearTimeout(t); t = setTimeout(function () { sync(); refitAll(); }, 150); });
+  schedule();
+
+  window.MH_CARTOPTS = { version: VERSION, sync: sync, stats: function () { return JSON.parse(JSON.stringify(stats)); } };
+  /* mh-cartopts-v1 */
+})();

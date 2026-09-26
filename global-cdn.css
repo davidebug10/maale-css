@@ -523,70 +523,7 @@ html body #checkout .v-card__loader {
     display: none !important;
 }
 
-/* =========================================================
-   חלק 8ג: שדה הערות למטבח - SMART GLASS FEEDBACK
-   מטרה: מתן אינדיקציה ויזואלית שההערה נשמרה ללא כפתור
-   ========================================================= */
-
-/* 1. עיצוב בסיס השדה - Liquid Glass */
-html body #message .v-field {
-    background: rgba(255, 255, 255, 0.5) !important;
-    backdrop-filter: blur(10px) !important;
-    -webkit-backdrop-filter: blur(10px) !important;
-    border: 1.2px solid rgba(0, 0, 0, 0.1) !important;
-    border-radius: 12px !important;
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
-    overflow: hidden !important;
-}
-
-/* 2. מצב "הערה נקלטה" - כשמוקלד טקסט (Placeholder נעלם) */
-html body #message .v-field:has(input:not(:placeholder-shown)) {
-    border-color: #e31e24 !important; /* גבול אדום מותג */
-    background: rgba(227, 30, 36, 0.03) !important; /* רקע אדמדם עדין מאוד */
-    box-shadow: 0 4px 12px rgba(227, 30, 36, 0.08) !important;
-}
-
-/* 3. שינוי צבע הטקסט המוקלד לאדום QLED להדגשה */
-html body #message input:not(:placeholder-shown) {
-    color: #e31e24 !important;
-    font-weight: 700 !important;
-}
-
-/* 4. הזרקת אייקון "ההערה נשמרה" (צ'ק) מצד שמאל (LTR בתוך RTL) */
-html body #message .v-field__field::after {
-    content: '\2713 \00a0  נשמר'; /* אייקון צ'ק + טקסט */
-    position: absolute;
-    left: 12px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: #e31e24;
-    font-size: 10px;
-    font-weight: 900;
-    opacity: 0;
-    transition: all 0.3s ease !important;
-    pointer-events: none !important;
-}
-
-/* הצגת האייקון רק כשיש טקסט בשדה */
-html body #message .v-field:has(input:not(:placeholder-shown)) .v-field__field::after {
-    opacity: 1 !important;
-}
-
-/* 5. פינוי מקום לאייקון כדי שהטקסט לא יעלה עליו */
-html body #message .v-field__input {
-    padding-left: 60px !important; /* מרווח עבור ה-נשמר */
-}
-
-/* 6. אפקט פעימה (Pulse) קטן ברגע שמתחילים להקליד */
-@keyframes noteCaptured {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.02); border-color: #e31e24; }
-    100% { transform: scale(1); }
-}
-
-html body #message .v-field:has(input:not(:placeholder-shown)) {
-    animation: noteCaptured 0.4s ease-out;
-}
+/* חלק 8ג (שדה הערות למטבח, #message) — הוחלף ע"י "חלק 50: MH CheckoutCart" בסוף הקובץ (27.9.2026). ההיסטוריה ב-git. */
 
 
 /* =========================================================
@@ -7193,3 +7130,214 @@ html body #AddonsConfirmation .v-card-actions .chose-btn:active { background: #f
     html body #AddonsConfirmation > .v-card { padding: 28px 28px 24px !important; }
 }
 /* mh-repeat-v1 */
+
+/* =========================================================
+   חלק 50: פריטי העגלה + "יש הערה למטבח?" בצ'ק-אאוט — MH CheckoutCart v1.0.0 | 2026-09-27
+   הבעלים היחיד של #checkout #cartItems (שורות המוצרים, "שינוי תוספות", "הוספה פריטים") ושל
+   #checkout #message (הערה למטבח; החליף את חלק 8ג שנכתב לשדה ישן — גבול של Hyperzod סביב גבול
+   של 8ג = "שדה בתוך שדה"). התוספות שנבחרו לכל מוצר (.mh-ci-opts) נוספות ב-JS "MH CartOpts":
+   עד 4 גלולות + "+N" שפותח את השאר, כדי שמוצר עם הרבה תוספות לא יפוצץ את השורה.
+   מצבי השדה מ-Vuetify עצמה (.v-field--focused / .v-field--dirty) — בלי :has על מצב קלט.
+   ========================================================= */
+/* ---------- שורות המוצרים ---------- */
+html body #checkout #cartItems .cart-row + .cart-row {
+    border-top: 1px solid #f1f1f3 !important;
+    padding-top: 6px !important;
+}
+html body #checkout #cartItems .cart-item .v-list-item {
+    align-items: flex-start !important;
+    min-height: 0 !important;
+}
+html body #checkout #cartItems .cart-item .product-image {
+    width: 52px !important;
+    height: 52px !important;
+    border-radius: 12px !important;
+    box-shadow: 0 0 0 1px rgba(17, 17, 17, 0.06) !important;
+}
+html body #checkout #cartItems .cart-item .v-list-item__content > .tw-flex {
+    align-items: flex-start !important;
+}
+html body #checkout #cartItems .cart-item .v-list-item__content > .tw-flex > div:first-child {
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+}
+html body #checkout #cartItems .cart-item .product-name {
+    font-size: 14px !important;
+    line-height: 1.3 !important;
+    font-weight: 700 !important;
+    color: #111 !important;
+    margin-bottom: 2px !important;
+}
+html body #checkout #cartItems .cart-item .product-price {
+    display: flex !important;
+    align-items: center !important;
+    flex-wrap: wrap !important;
+    gap: 2px 10px !important;
+    font-size: 13.5px !important;
+    font-weight: 800 !important;
+    color: #111 !important;
+}
+/* "שינוי תוספות" — אדום המותג במקום הכחול של Hyperzod */
+html body #checkout #cartItems .cart-item .product-price > span.tw-cursor-pointer {
+    margin: 0 !important;
+    color: #c8151b !important;
+    font-size: 12px !important;
+    font-weight: 700 !important;
+    text-decoration: underline !important;
+    text-decoration-color: rgba(200, 21, 27, 0.3) !important;
+    text-underline-offset: 3px !important;
+}
+html body #checkout #cartItems .cart-item .v-list-item__append {
+    align-self: center !important;
+}
+/* ---------- התוספות שנבחרו (JS: MH CartOpts) ---------- */
+html body #checkout #cartItems .mh-ci-opts {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 4px !important;
+    margin: 3px 0 6px !important;
+    max-width: 100% !important;
+}
+html body #checkout #cartItems .mh-ci-opt,
+html body #checkout #cartItems .mh-ci-more {
+    display: inline-flex !important;
+    align-items: center !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    padding: 2px 8px !important;
+    border-radius: 999px !important;
+    font-size: 11.5px !important;
+    line-height: 1.45 !important;
+    font-weight: 600 !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+}
+html body #checkout #cartItems .mh-ci-opt {
+    background: #f5f5f7 !important;
+    color: #4b5563 !important;
+}
+html body #checkout #cartItems .mh-ci-opt.mh-ci-extra,
+html body #checkout #cartItems .mh-ci-more.mh-ci-off { display: none !important; }
+html body #checkout #cartItems .mh-ci-opts.mh-ci-open .mh-ci-opt.mh-ci-extra { display: inline-flex !important; }
+html body #checkout #cartItems .mh-ci-more {
+    border: 0 !important;
+    margin: 0 !important;
+    background: #fff5f5 !important;
+    color: #c8151b !important;
+    font-weight: 800 !important;
+    cursor: pointer !important;
+    font-family: inherit !important;
+    -webkit-tap-highlight-color: transparent !important;
+}
+/* ---------- "הוספה פריטים" ---------- */
+html body #checkout #cartItems > div.tw-cursor-pointer {
+    width: auto !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    height: 36px !important;
+    margin: 8px 0 4px !important;
+    padding: 0 14px !important;
+    border: 1.5px solid #ececef !important;
+    border-radius: 999px !important;
+    background: #fff !important;
+    color: #111 !important;
+    font-size: 13px !important;
+    font-weight: 700 !important;
+    white-space: nowrap !important;
+}
+html body #checkout #cartItems > div.tw-cursor-pointer svg { width: 14px !important; height: 14px !important; color: #c8151b !important; }
+@media (hover: hover) {
+    html body #checkout #cartItems > div.tw-cursor-pointer:hover { border-color: rgba(200, 21, 27, 0.35) !important; }
+}
+/* ---------- "יש הערה למטבח?" ---------- */
+html body #checkout #message {
+    margin: 10px 0 4px !important;
+}
+html body #checkout #message > .v-input {
+    border: 0 !important;
+    border-radius: 0 !important;
+    padding: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+}
+html body #checkout #message .v-input__control { width: 100% !important; }
+html body #checkout #message .v-field {
+    position: relative !important;
+    min-height: 50px !important;
+    padding: 0 !important;
+    padding-inline-start: 42px !important;
+    padding-inline-end: 12px !important;
+    border: 1.5px solid transparent !important;
+    border-radius: 14px !important;
+    background: #f5f5f7 !important;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+    box-shadow: none !important;
+    animation: none !important;
+    transform: none !important;
+    transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease !important;
+}
+html body #checkout #message .v-field__overlay,
+html body #checkout #message .v-field__outline,
+html body #checkout #message .v-field__loader { display: none !important; }
+/* אייקון עיפרון בתחילת השדה (ימין) */
+html body #checkout #message .v-field::before {
+    content: '' !important;
+    position: absolute !important;
+    top: 50% !important;
+    inset-inline-start: 14px !important;
+    width: 18px !important;
+    height: 18px !important;
+    margin-top: -9px !important;
+    background: #9ca3af !important;
+    -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zm17.71-10.21a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z'/%3E%3C/svg%3E") center / contain no-repeat !important;
+    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zm17.71-10.21a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z'/%3E%3C/svg%3E") center / contain no-repeat !important;
+    pointer-events: none !important;
+    transition: background 0.2s ease !important;
+}
+html body #checkout #message .v-field__field { align-items: center !important; }
+html body #checkout #message .v-field__field::after { content: none !important; }
+html body #checkout #message input#messageInput {
+    min-height: 47px !important;
+    padding: 0 !important;
+    font-size: 16px !important;
+    font-weight: 600 !important;
+    color: #111 !important;
+    opacity: 1 !important;
+}
+html body #checkout #message input#messageInput::placeholder {
+    color: #9ca3af !important;
+    font-weight: 500 !important;
+    opacity: 1 !important;
+}
+/* יש טקסט → "✓ נשמר" קטן בסוף השדה */
+html body #checkout #message .v-field.v-field--dirty {
+    background: #fff !important;
+    border-color: rgba(227, 30, 36, 0.35) !important;
+    padding-inline-end: 70px !important;
+}
+html body #checkout #message .v-field.v-field--dirty::before { background: #e31e24 !important; }
+html body #checkout #message .v-field.v-field--dirty::after {
+    content: '✓ נשמר' !important;
+    position: absolute !important;
+    top: 50% !important;
+    inset-inline-end: 10px !important;
+    transform: translateY(-50%) !important;
+    padding: 2px 8px !important;
+    border-radius: 999px !important;
+    background: #fff5f5 !important;
+    color: #c8151b !important;
+    font-size: 11px !important;
+    font-weight: 800 !important;
+    pointer-events: none !important;
+}
+/* פוקוס אחרי "יש טקסט" — כדי שהגבול האדום והטבעת ינצחו גם כשיש כבר טקסט */
+html body #checkout #message .v-field.v-field--focused {
+    background: #fff !important;
+    border-color: #e31e24 !important;
+    box-shadow: 0 0 0 4px rgba(227, 30, 36, 0.10) !important;
+}
+html body #checkout #message .v-field.v-field--focused::before { background: #e31e24 !important; }
+/* mh-checkoutcart-v1 */
