@@ -333,138 +333,7 @@
   setTimeout(init, 1000);
 })();
 
-/* =========================================================
-   Bottom Nav - Sliding Active Indicator (Apple Liquid Glass)
-   תאריך: 2026-05-01
-   מטרה: יצירת אינדיקטור גלולה שמחליק חלק בין הטאבים
-   הערה: ה-CSS של .mh-active-pill מוגדר ב-global-cdn.css
-   ========================================================= */
-(function() {
-  const navId = 'MultiVendorBottomNav';
-
-  function initIndicator() {
-    const pill = document.querySelector('#' + navId + ' .floating-nav-pill');
-    if (!pill) {
-      setTimeout(initIndicator, 1000);
-      return;
-    }
-
-    // אם כבר התחבר - לא ליצור שוב
-    if (pill.dataset.mhSliderAttached === 'yes') return;
-    pill.dataset.mhSliderAttached = 'yes';
-
-    // צור את האינדיקטור
-    let indicator = pill.querySelector('.mh-active-pill');
-    if (!indicator) {
-      indicator = document.createElement('div');
-      indicator.className = 'mh-active-pill';
-      pill.insertBefore(indicator, pill.firstChild);
-    }
-
-    function updatePosition() {
-      const activeBtn = pill.querySelector('.floating-tab-active');
-      if (!activeBtn) {
-        indicator.style.opacity = '0';
-        return;
-      }
-
-      const btnRect = activeBtn.getBoundingClientRect();
-      const pillRect = pill.getBoundingClientRect();
-
-      // RTL: מודדים מהימין
-      const rightOffset = pillRect.right - btnRect.right;
-      const width = btnRect.width;
-
-      indicator.style.right = rightOffset + 'px';
-      indicator.style.width = width + 'px';
-      indicator.style.opacity = '1';
-    }
-
-    updatePosition();
-
-    // עדכון כשהטאב הפעיל מתחלף
-    const observer = new MutationObserver(updatePosition);
-    pill.querySelectorAll('.floating-frosted-btn').forEach(function(btn) {
-      observer.observe(btn, {
-        attributes: true,
-        attributeFilter: ['class']
-      });
-    });
-
-    window.addEventListener('resize', updatePosition);
-  }
-
-  // SPA support
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initIndicator);
-  } else {
-    initIndicator();
-  }
-
-  // Vue SPA navigation - אם הסרגל יוחלף, נחבר מחדש
-  const bodyObserver = new MutationObserver(function() {
-    const pill = document.querySelector('#' + navId + ' .floating-nav-pill');
-    if (pill && pill.dataset.mhSliderAttached !== 'yes') {
-      initIndicator();
-    }
-  });
-  bodyObserver.observe(document.body, { childList: true, subtree: true });
-})();
-
-/* =========================================================
-   Bottom Nav - Material Ripple Animation
-   תאריך: 2026-05-01
-   מטרה: גל אדום שמתפשט מנקודת הלחיצה על כל טאב
-   הערה: ה-keyframes mh-ripple-burst מוגדרים ב-global-cdn.css
-   ========================================================= */
-(function() {
-  const navId = 'MultiVendorBottomNav';
-
-  function rippleHandler(e) {
-    const btn = e.target.closest('#' + navId + ' .floating-frosted-btn');
-    if (!btn) return;
-
-    const pill = document.querySelector('#' + navId + ' .floating-nav-pill');
-    if (!pill) return;
-
-    const btnRect = btn.getBoundingClientRect();
-    const pillRect = pill.getBoundingClientRect();
-
-    let clientX, clientY;
-    if (e.touches && e.touches[0]) {
-      clientX = e.touches[0].clientX;
-      clientY = e.touches[0].clientY;
-    } else {
-      clientX = e.clientX || (btnRect.left + btnRect.width / 2);
-      clientY = e.clientY || (btnRect.top + btnRect.height / 2);
-    }
-
-    const x = clientX - pillRect.left;
-    const y = clientY - pillRect.top;
-    const size = btnRect.width * 1.4;
-
-    const ripple = document.createElement('span');
-    ripple.style.cssText =
-      'position: absolute;' +
-      'width: ' + size + 'px;' +
-      'height: ' + size + 'px;' +
-      'left: ' + (x - size / 2) + 'px;' +
-      'top: ' + (y - size / 2) + 'px;' +
-      'border-radius: 50%;' +
-      'background: radial-gradient(circle, rgba(227,30,36,0.6) 0%, rgba(227,30,36,0.3) 40%, transparent 70%);' +
-      'pointer-events: none;' +
-      'z-index: 50;' +
-      'animation: mh-ripple-burst 0.55s cubic-bezier(0.4, 0, 0.2, 1) forwards;' +
-      'will-change: transform, opacity;';
-
-    pill.appendChild(ripple);
-    setTimeout(function() { ripple.remove(); }, 600);
-  }
-
-  document.addEventListener('pointerdown', rippleHandler, true);
-  document.addEventListener('touchstart', rippleHandler, { capture: true, passive: true });
-  document.addEventListener('mousedown', rippleHandler, true);
-})();
+/* Bottom Nav - Sliding Active Indicator + Material Ripple (1.5.2026) — הוחלפו ע"י הבלוק "MH NavGlass" בסוף הקובץ (28.9.2026). */
 
 /* === Maale: merchant hero video autoplay fix (.mhh-video) | 2026-06-20 === */
 (function () {
@@ -4736,4 +4605,100 @@ log('פעיל');
   scan();
   window.MH_SUKKOT = { version: VERSION, rebuild: scan, replay: function () { try { sessionStorage.removeItem(KEY); } catch (e) {} var h = document.getElementById(ID); if (h) { h.__mhSuk = false; var d = h.querySelector('.mh-suk-deco'); if (d) { d.className = 'mh-suk-deco'; d.removeAttribute('data-w'); } scan(); } }, stats: function () { return JSON.parse(JSON.stringify(stats)); } };
   /* mh-sukkot-v1 */
+})();
+
+/* ============================================================
+   סרגל הניווט התחתון, Liquid Glass — MH NavGlass  |  v1.0.0 | 2026-09-28
+   מחליף את "Bottom Nav - Sliding Active Indicator" ו-"Bottom Nav - Material Ripple" (1.5.2026).
+   יוצר בתוך .floating-nav-pill עדשה אחת (.mh-lens) שיושבת מתחת לטאב הפעיל (.floating-tab-active של
+   Hyperzod) — מיקום ב-CSS vars (--x/--w, נמדד משמאל הקפסולה, תקין ב-RTL), תנועה ב-translate בקפיץ
+   ו"מתיחה נוזלית" (.mh-lens-goo). בלחיצה: העדשה קופצת מיד לטאב שנלחץ (.mh-press לכיווץ), ואחרי 0.9
+   שנייה מסתנכרנת לטאב הפעיל האמיתי (למשל "הזמן שוב" לאורח פותח התחברות בלי לעבור דף → חוזרת ל"בית").
+   העיצוב בחלק 52. לא נוגע בניווט עצמו ולא ברטט (ראו "Selective Anti-Vibrate"). נכשל-פתוח.
+   בדיקה: window.MH_NAVGLASS.stats()
+   ============================================================ */
+(function () {
+  'use strict';
+  if (window.__MH_NAVGLASS__) { return; }
+  window.__MH_NAVGLASS__ = true;
+  var VERSION = '1.0.0', BTN = '#MultiVendorBottomNav .v-btn.footer-btn';
+  var stats = { version: VERSION, syncs: 0, moves: 0, presses: 0, errors: 0 };
+  var pill = null, lens = null, lastX = null, lastW = null, settleT = null, pressAt = 0;
+
+  function ensure() {
+    var p = document.querySelector('#MultiVendorBottomNav .floating-nav-pill');
+    if (!p) { pill = null; return false; }
+    if (p !== pill) { pill = p; lastX = lastW = null; }
+    lens = null;
+    for (var i = 0; i < pill.children.length; i++) {
+      var ch = pill.children[i];
+      if (ch.classList.contains('mh-lens')) { lens = ch; }
+      else if (ch.classList.contains('mh-active-pill')) { ch.remove(); i--; }     /* האינדיקטור הישן (מטמון) */
+    }
+    if (!lens) {
+      lens = document.createElement('span'); lens.className = 'mh-lens mh-lens-off'; lens.setAttribute('aria-hidden', 'true');
+      pill.insertBefore(lens, pill.firstChild); lastX = lastW = null;
+    }
+    return true;
+  }
+  function place(btn, animate) {
+    if (!btn) { lens.classList.add('mh-lens-off'); return; }
+    var pr = pill.getBoundingClientRect(), br = btn.getBoundingClientRect();
+    if (!pr.width || !br.width) { return; }
+    var x = Math.round((br.left - pr.left) * 10) / 10, w = Math.round(br.width * 10) / 10;
+    if (x === lastX && w === lastW) { lens.classList.remove('mh-lens-off'); return; }
+    var instant = lastX === null || !animate;
+    if (instant) { lens.classList.add('mh-lens-instant'); }
+    else { lens.classList.remove('mh-lens-goo'); void lens.offsetWidth; lens.classList.add('mh-lens-goo'); stats.moves++; }
+    lens.style.setProperty('--x', x + 'px'); lens.style.setProperty('--w', w + 'px');
+    lens.classList.remove('mh-lens-off');
+    if (instant) { void lens.offsetWidth; lens.classList.remove('mh-lens-instant'); }
+    lastX = x; lastW = w;
+  }
+  function active() { return pill && pill.querySelector('.v-btn.footer-btn.floating-tab-active'); }
+  function sync(animate) {
+    try { if (!ensure()) { return; } stats.syncs++; place(active(), animate !== false); }
+    catch (e) { stats.errors++; }
+  }
+
+  /* לחיצה: עדשה מיד לטאב, כיווץ קל, ואז סנכרון לאמת */
+  function down(e) {
+    try {
+      var b = e.target && e.target.closest && e.target.closest(BTN);
+      if (!b || !ensure()) { return; }
+      stats.presses++; pressAt = Date.now();
+      b.classList.add('mh-press'); pill.classList.add('mh-pill-press');
+      place(b, true);
+      clearTimeout(settleT); settleT = setTimeout(function () { sync(true); }, 900);
+    } catch (err) { stats.errors++; }
+  }
+  function up() {
+    var wait = Math.max(0, 130 - (Date.now() - pressAt));
+    setTimeout(function () {
+      var l = document.querySelectorAll('#MultiVendorBottomNav .mh-press'); for (var i = 0; i < l.length; i++) { l[i].classList.remove('mh-press'); }
+      if (pill) { pill.classList.remove('mh-pill-press'); }
+    }, wait);
+  }
+  document.addEventListener('pointerdown', down, true);
+  document.addEventListener('pointerup', up, true);
+  document.addEventListener('pointercancel', up, true);
+  window.addEventListener('blur', up);
+
+  var t = null;
+  function schedule() { clearTimeout(t); t = setTimeout(function () { sync(true); }, 60); }
+  try {
+    new MutationObserver(function (muts) {
+      for (var i = 0; i < muts.length; i++) {
+        var n = muts[i].target;
+        if (n && n.classList && n.classList.contains('mh-lens')) { continue; }        /* השינויים שלנו */
+        if (muts[i].type === 'attributes' && !(n.closest && n.closest('#MultiVendorBottomNav'))) { continue; }
+        schedule(); return;
+      }
+    }).observe(document.body || document.documentElement, { childList: true, subtree: true, attributes: true, attributeFilter: ['class'] });
+  } catch (e) {}
+  window.addEventListener('resize', function () { clearTimeout(t); t = setTimeout(function () { sync(false); }, 120); });
+  sync(false);
+
+  window.MH_NAVGLASS = { version: VERSION, sync: sync, stats: function () { return JSON.parse(JSON.stringify(stats)); } };
+  /* mh-navglass-v1 */
 })();

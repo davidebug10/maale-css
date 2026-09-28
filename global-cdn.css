@@ -2905,139 +2905,7 @@ html body.mh-scrolled .home-mobile-search-input .v-field:active img.home-mobile-
     transform: scale(0.85) !important;
 }
 
-/* =========================================================
-   חלק 31: סרגל ניווט תחתון - APPLE LIQUID GLASS V2
-   תאריך: 2026-05-01
-   מטרה: עיצוב מחדש של הסרגל הצף עם אינדיקטור שזז (Apple Liquid Glass)
-   - קפסולה חצי-שקופה עם blur
-   - אינדיקטור גלולה שמחליק חלק בין טאבים (מנוהל ב-custom-footer.js)
-   - אייקון פעיל באדום QLED
-   - אנימציית Material Ripple (מנוהלת ב-custom-footer.js)
-   - ביטול הסתרה אוטומטית בגלילה (כפיית transform 0)
-   ========================================================= */
-
-/* 1. ביטול ההסתרה האוטומטית של הסרגל בגלילה */
-html body navbar#MultiVendorBottomNav.floating-bottom-nav {
-  transform: translateY(0px) !important;
-  bottom: 0 !important;
-}
-
-/* 2. כפיית transform 0 על ה-pill הפנימי (הוא זה שזז בפועל) */
-html body #MultiVendorBottomNav .floating-nav-pill {
-  transform: translateY(0px) !important;
-}
-
-/* 3. הסרת ה-active indicator המובנה (היה באג ב-RTL) */
-html body #MultiVendorBottomNav .floating-nav-active-indicator {
-  display: none !important;
-}
-
-/* 4. הקפסולה הראשית - חצי שקופה עם blur */
-html body #MultiVendorBottomNav .floating-nav-wrapper {
-  padding-bottom: 18px !important;
-}
-
-html body #MultiVendorBottomNav .floating-nav-pill {
-  background: rgba(255, 255, 255, 0.55) !important;
-  backdrop-filter: blur(30px) saturate(180%) !important;
-  -webkit-backdrop-filter: blur(30px) saturate(180%) !important;
-  border: 1px solid rgba(255, 255, 255, 0.6) !important;
-  box-shadow:
-    0 10px 30px rgba(0, 0, 0, 0.08),
-    0 2px 8px rgba(0, 0, 0, 0.04),
-    inset 0 1px 1px rgba(255, 255, 255, 0.7) !important;
-  padding: 5px !important;
-  gap: 0 !important;
-  position: relative !important;
-  overflow: hidden !important;
-}
-
-/* 5. כל כפתור - בסיס, מצב לא-פעיל */
-html body #MultiVendorBottomNav .floating-frosted-btn {
-  position: relative !important;
-  background: transparent !important;
-  border: none !important;
-  border-radius: 999px !important;
-  overflow: hidden !important;
-  transition: transform 0.2s ease !important;
-  z-index: 1 !important;
-}
-
-html body #MultiVendorBottomNav .floating-frosted-btn .nav-label {
-  color: rgba(0, 0, 0, 0.45) !important;
-  font-weight: 600 !important;
-  transition: color 0.4s ease !important;
-}
-
-html body #MultiVendorBottomNav .floating-frosted-btn object {
-  opacity: 0.5 !important;
-  transition: all 0.4s ease !important;
-  filter: grayscale(100%) brightness(0.4) !important;
-}
-
-/* 6. תוכן הכפתור צריך להיות מעל האינדיקטור */
-html body #MultiVendorBottomNav .floating-frosted-btn .v-btn__content {
-  position: relative !important;
-  z-index: 2 !important;
-}
-
-/* 7. ביטול הסטייל הישן של floating-tab-active (האינדיקטור מטפל בזה עכשיו) */
-html body #MultiVendorBottomNav .floating-tab-active {
-  background: transparent !important;
-  box-shadow: none !important;
-  border: none !important;
-  transform: none !important;
-}
-
-/* 8. טקסט ואייקון של הטאב הפעיל - אדום QLED */
-html body #MultiVendorBottomNav .floating-tab-active .nav-label {
-  color: #e31e24 !important;
-  font-weight: 800 !important;
-  text-shadow: 0 0 12px rgba(227, 30, 36, 0.2) !important;
-}
-
-html body #MultiVendorBottomNav .floating-tab-active object {
-  filter: brightness(0) saturate(100%) invert(18%) sepia(88%) saturate(5427%) hue-rotate(352deg) brightness(91%) contrast(92%) !important;
-  opacity: 1 !important;
-}
-
-/* 9. האינדיקטור הזוהר שזז בין טאבים - מוזרק על ידי custom-footer.js */
-.mh-active-pill {
-  position: absolute !important;
-  top: 5px !important;
-  bottom: 5px !important;
-  border-radius: 999px !important;
-  background: linear-gradient(180deg,
-    rgba(255, 255, 255, 0.95) 0%,
-    rgba(255, 255, 255, 0.75) 100%) !important;
-  box-shadow:
-    0 4px 12px rgba(227, 30, 36, 0.15),
-    0 1px 3px rgba(0, 0, 0, 0.08),
-    inset 0 1px 1px rgba(255, 255, 255, 0.9) !important;
-  border: 1px solid rgba(255, 255, 255, 0.8) !important;
-  transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-              width 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
-  pointer-events: none !important;
-  z-index: 0 !important;
-}
-
-/* 10. ניקוי שכבות Vuetify */
-html body #MultiVendorBottomNav .floating-frosted-btn .v-btn__overlay,
-html body #MultiVendorBottomNav .floating-frosted-btn .v-btn__underlay {
-  display: none !important;
-}
-
-/* 11. Keyframes ל-Material Ripple (האירוע מנוהל ב-custom-footer.js) */
-@keyframes mh-ripple-burst {
-  0% {
-    transform: scale(0);
-    opacity: 0.7;
-  }
-  100% {
-    transform: scale(1);
-    opacity: 0;
-  }
-}
+/* חלק 31 (סרגל ניווט תחתון, 1.5.2026) — הוחלף ע"י "חלק 52: MH NavGlass" בסוף הקובץ (28.9.2026). ההיסטוריה ב-git. */
 
 /* =========================================================
    חלק 32: טאב סטטוס הזמנה פעילה - LIVE ORDER STRIP
@@ -3142,18 +3010,7 @@ html body #MultiVendorBottomNav #ongoingOrders .ongoing-order:active {
   transition: transform 0.1s ease !important;
 }
 
-/* =========================================================
-   Android Bottom Nav - Safe Gap Fix
-   תאריך: 2026-06-27
-   מטרה: הרמת הסרגל התחתון כלפי מעלה רק באנדרואיד, כדי שלא
-         יתנגש עם סרגל הניווט המובנה של המערכת (חזור/בית/אחרון).
-   סקופ: html.mh-android-app בלבד - לא נוגע באייפון/בדפדפן.
-   הערה: לא משתמשים ב-env(safe-area-inset-bottom) כי הוא מחזיר
-         0 ברוב מכשירי אנדרואיד WebView (תיעוד רשמי של גוגל).
-   ========================================================= */
-html.mh-android-app .floating-nav-pill {
-    bottom: 28px !important;
-}
+/* Android Bottom Nav - Safe Gap Fix (27.6.2026) — עבר ל"חלק 52: MH NavGlass" בסוף הקובץ. */
 
 /* =========================================================
    חלק 33: דף התחברות/בית - WELCOME PAGE LIQUID GLASS
@@ -7408,3 +7265,167 @@ html body #mh-sukkah-hero .mh-suk-play .mh-suk-fall { animation: mhSukFall var(-
     html body #mh-sukkah-hero .mh-suk-fall { display: none !important; }
 }
 /* mh-sukkot-v1 */
+
+/* =========================================================
+   חלק 52: סרגל הניווט התחתון — MH NavGlass v1.0.0 | 2026-09-28 (Liquid Glass בסגנון App Store)
+   הבעלים היחיד של #MultiVendorBottomNav .floating-nav-pill והטאבים בו (החליף את חלק 31 ואת
+   "Android Bottom Nav - Safe Gap Fix"; רצועת ההזמנה הפעילה מעל הסרגל = חלק 32, לא כאן).
+   מה היה: קפסולה חלבית (blur 30px) עם גלולה לבנה אטומה ותוויות אפורות דהויות; רוב הכללים כוונו ל-
+   .floating-frosted-btn שכבר לא תמיד על הכפתורים. עכשיו:
+   - הקפסולה: זכוכית שקופה באמת — blur קטן + רוויה גבוהה (רואים את התוכן מאחור), שפה מוארת (::before,
+     גבול גרדיאנט עם mask), ברק עליון רך (::after), צל פנימי תחתון שנותן עובי, וצל חיצוני רחב.
+   - "עדשה" (.mh-lens, נוצרת ב-JS "MH NavGlass") — בועת זכוכית בהירה מתחת לטאב הפעיל, שמחליקה
+     בקפיץ (translate) ונמתחת כמו נוזל בזמן התנועה (scale, keyframes mhNavGoo).
+   - לחיצה: הטאב מתכווץ וחוזר בקפיץ, העדשה קופצת מיד לטאב שנלחץ, והקפסולה "נושמת" קלות.
+   - תוויות/אייקונים: כהים עם קו אור דק מתחת (בלי הילה — הילה רחבה יצרה כתמים מעל תמונות צבעוניות),
+     הפעיל באדום QLED.
+   אייקונים הם <object> SVG חיצוני — הצבע רק דרך filter. בלי backdrop-filter → קפסולה לבנה 92%.
+   ========================================================= */
+/* התנהגות: הסרגל לא נעלם בגלילה + האינדיקטור המובנה של Hyperzod (באג RTL) כבוי */
+html body navbar#MultiVendorBottomNav.floating-bottom-nav { transform: translateY(0px) !important; bottom: 0 !important; }
+html body #MultiVendorBottomNav .floating-nav-active-indicator { display: none !important; }
+html body #MultiVendorBottomNav .floating-nav-wrapper { padding-bottom: 18px !important; }
+html.mh-android-app body #MultiVendorBottomNav .floating-nav-pill { bottom: 28px !important; }   /* מעל סרגל המערכת באנדרואיד */
+
+/* ---- הקפסולה ---- */
+html body #MultiVendorBottomNav .floating-nav-pill {
+    position: relative !important;
+    transform: translateY(0px) !important;
+    isolation: isolate !important;
+    overflow: hidden !important;
+    padding: 5px !important;
+    gap: 0 !important;
+    border: 0 !important;
+    border-radius: 999px !important;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.30) 0%, rgba(255, 255, 255, 0.14) 100%) !important;
+    -webkit-backdrop-filter: blur(7px) saturate(175%) brightness(1.1) !important;
+    backdrop-filter: blur(7px) saturate(175%) brightness(1.1) !important;
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.8),
+        inset 0 -1px 0 rgba(255, 255, 255, 0.35),
+        inset 0 -10px 18px -14px rgba(20, 20, 30, 0.22),
+        0 14px 34px -12px rgba(15, 15, 25, 0.32),
+        0 3px 10px rgba(15, 15, 25, 0.08) !important;
+    transition: scale 0.45s cubic-bezier(0.3, 1.5, 0.5, 1) !important;
+}
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+    html body #MultiVendorBottomNav .floating-nav-pill { background: rgba(255, 255, 255, 0.92) !important; }
+}
+/* שפה מוארת — אור מלמעלה-ימין ומלמטה-שמאל, כמו זכוכית עבה */
+html body #MultiVendorBottomNav .floating-nav-pill::before {
+    content: '' !important;
+    position: absolute !important;
+    inset: 0 !important;
+    z-index: 3 !important;
+    padding: 1px !important;
+    border-radius: inherit !important;
+    background: linear-gradient(115deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.35) 22%, rgba(255, 255, 255, 0.08) 48%, rgba(255, 255, 255, 0.3) 78%, rgba(255, 255, 255, 0.85) 100%) !important;
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0) !important;
+    -webkit-mask-composite: xor !important;
+    mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0) !important;
+    pointer-events: none !important;
+}
+/* ברק עליון רך בתוך הזכוכית */
+html body #MultiVendorBottomNav .floating-nav-pill::after {
+    content: '' !important;
+    position: absolute !important;
+    inset: 0 !important;
+    z-index: 0 !important;
+    border-radius: inherit !important;
+    background: radial-gradient(120% 90% at 50% -30%, rgba(255, 255, 255, 0.55) 0%, rgba(255, 255, 255, 0) 60%) !important;
+    pointer-events: none !important;
+}
+html body #MultiVendorBottomNav .floating-nav-pill.mh-pill-press { scale: 0.985 !important; }
+
+/* ---- העדשה (הטאב הפעיל) ---- */
+html body #MultiVendorBottomNav .floating-nav-pill > .mh-lens {
+    position: absolute !important;
+    left: 0 !important;
+    top: 5px !important;
+    bottom: 5px !important;
+    width: var(--w, 80px) !important;
+    translate: var(--x, 0px) 0 !important;
+    z-index: 1 !important;
+    border-radius: 999px !important;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.62) 0%, rgba(255, 255, 255, 0.34) 100%) !important;
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 1),
+        inset 0 0 0 1px rgba(255, 255, 255, 0.7),
+        inset 0 -1px 0 rgba(255, 255, 255, 0.5),
+        inset 0 -6px 12px -8px rgba(227, 30, 36, 0.18),
+        0 8px 18px -8px rgba(227, 30, 36, 0.35),
+        0 2px 6px rgba(15, 15, 25, 0.08) !important;
+    pointer-events: none !important;
+    transition: translate 0.55s cubic-bezier(0.3, 1.32, 0.5, 1), width 0.45s cubic-bezier(0.3, 1.2, 0.5, 1), opacity 0.25s ease !important;
+    will-change: translate, scale !important;
+}
+html body #MultiVendorBottomNav .floating-nav-pill > .mh-lens::after {        /* ברק על העדשה */
+    content: '' !important;
+    position: absolute !important;
+    left: 14% !important;
+    right: 14% !important;
+    top: 2px !important;
+    height: 42% !important;
+    border-radius: 999px !important;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0)) !important;
+    opacity: 0.7 !important;
+}
+html body #MultiVendorBottomNav .floating-nav-pill > .mh-lens.mh-lens-instant { transition: none !important; }
+html body #MultiVendorBottomNav .floating-nav-pill > .mh-lens.mh-lens-off { opacity: 0 !important; }
+html body #MultiVendorBottomNav .floating-nav-pill > .mh-lens.mh-lens-goo { animation: mhNavGoo 0.55s cubic-bezier(0.3, 1.1, 0.5, 1) both !important; }
+@keyframes mhNavGoo {
+    0%   { scale: 1 1; }
+    30%  { scale: 1.16 0.86; }
+    60%  { scale: 0.96 1.05; }
+    100% { scale: 1 1; }
+}
+html body #MultiVendorBottomNav .floating-nav-pill > .mh-active-pill { display: none !important; }   /* האינדיקטור הישן (חלק 31) */
+
+/* ---- הטאבים ---- */
+html body #MultiVendorBottomNav .floating-nav-pill > .v-badge { position: relative !important; z-index: 2 !important; }
+html body #MultiVendorBottomNav .v-btn.footer-btn {
+    background: transparent !important;
+    box-shadow: none !important;
+    border: 0 !important;
+    transform: none !important;
+    -webkit-tap-highlight-color: transparent !important;
+}
+html body #MultiVendorBottomNav .v-btn.footer-btn .v-btn__overlay,
+html body #MultiVendorBottomNav .v-btn.footer-btn .v-btn__underlay { display: none !important; }
+html body #MultiVendorBottomNav .v-btn.footer-btn .v-btn__content {
+    position: relative !important;
+    z-index: 2 !important;
+    transition: scale 0.4s cubic-bezier(0.3, 1.6, 0.5, 1) !important;
+}
+html body #MultiVendorBottomNav .v-btn.footer-btn.mh-press .v-btn__content { scale: 0.88 !important; transition-duration: 0.12s !important; }
+html body #MultiVendorBottomNav .v-btn.footer-btn .nav-label {
+    color: rgba(28, 28, 30, 0.82) !important;
+    font-size: 10.5px !important;
+    font-weight: 600 !important;
+    letter-spacing: 0 !important;
+    text-shadow: 0 1px 1px rgba(255, 255, 255, 0.45) !important;
+    transition: color 0.3s ease !important;
+}
+html body #MultiVendorBottomNav .v-btn.footer-btn object {
+    opacity: 1 !important;
+    filter: brightness(0) invert(11%) drop-shadow(0 1px 1px rgba(255, 255, 255, 0.5)) !important;
+    transition: filter 0.3s ease, scale 0.4s cubic-bezier(0.3, 1.6, 0.5, 1) !important;
+}
+html body #MultiVendorBottomNav .v-btn.footer-btn.floating-tab-active,
+html body #MultiVendorBottomNav .v-btn.footer-btn.floating-tab-active:hover { background: transparent !important; box-shadow: none !important; }
+html body #MultiVendorBottomNav .v-btn.footer-btn.floating-tab-active .nav-label {
+    color: #e31e24 !important;
+    font-weight: 800 !important;
+    text-shadow: 0 1px 1px rgba(255, 255, 255, 0.5) !important;
+}
+html body #MultiVendorBottomNav .v-btn.footer-btn.floating-tab-active object {
+    filter: brightness(0) saturate(100%) invert(18%) sepia(88%) saturate(5427%) hue-rotate(352deg) brightness(91%) contrast(92%) drop-shadow(0 2px 5px rgba(227, 30, 36, 0.3)) !important;
+    scale: 1.06 !important;
+}
+@media (prefers-reduced-motion: reduce) {
+    html body #MultiVendorBottomNav .floating-nav-pill > .mh-lens { transition: translate 0.2s ease, width 0.2s ease !important; }
+    html body #MultiVendorBottomNav .floating-nav-pill > .mh-lens.mh-lens-goo { animation: none !important; }
+    html body #MultiVendorBottomNav .floating-nav-pill,
+    html body #MultiVendorBottomNav .v-btn.footer-btn .v-btn__content { transition: none !important; }
+}
+/* mh-navglass-v1 */
