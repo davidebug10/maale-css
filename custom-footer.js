@@ -4608,96 +4608,145 @@ log('פעיל');
 })();
 
 /* ============================================================
-   סרגל הניווט התחתון, Liquid Glass — MH NavGlass  |  v1.0.0 | 2026-09-28
+   סרגל הניווט התחתון, Liquid Glass — MH NavGlass  |  v1.1.0 | 2026-09-29 (v1.0.0: 28.9)
    מחליף את "Bottom Nav - Sliding Active Indicator" ו-"Bottom Nav - Material Ripple" (1.5.2026).
-   יוצר בתוך .floating-nav-pill עדשה אחת (.mh-lens) שיושבת מתחת לטאב הפעיל (.floating-tab-active של
-   Hyperzod) — מיקום ב-CSS vars (--x/--w, נמדד משמאל הקפסולה, תקין ב-RTL), תנועה ב-translate בקפיץ
-   ו"מתיחה נוזלית" (.mh-lens-goo). בלחיצה: העדשה קופצת מיד לטאב שנלחץ (.mh-press לכיווץ), ואחרי 0.9
-   שנייה מסתנכרנת לטאב הפעיל האמיתי (למשל "הזמן שוב" לאורח פותח התחברות בלי לעבור דף → חוזרת ל"בית").
-   העיצוב בחלק 52. לא נוגע בניווט עצמו ולא ברטט (ראו "Selective Anti-Vibrate"). נכשל-פתוח.
-   בדיקה: window.MH_NAVGLASS.stats()
+   יוצר בתוך .floating-nav-pill עדשה אחת (.mh-lens) מתחת לטאב הפעיל (.floating-tab-active של Hyperzod).
+   v1.1.0 — התנועה נכתבה מחדש אחרי ההקלטה של דוד (קרטוע + עיכוב):
+     - קפיץ פיזי (mass/stiffness/damping) שמחושב ל-keyframes של transform בלבד ומורץ ב-element.animate
+       → רץ על ה-compositor גם כשה-main thread עסוק בטעינת הדף הבא. המתיחה "הנוזלית" נגזרת מהמהירות
+       (scaleX גדל, scaleY קטן) ולא מ-keyframes קבועים. לחיצה באמצע תנועה = קפיץ חדש מהמקום הנוכחי.
+     - רוחב העדשה קבוע (כל הטאבים ברוחב שווה) — אין אנימציית width (layout בכל פריים).
+     - הצופה מאזין רק לסרגל (class) ולגוף הדף רק להחלפת הסרגל (childList, 300ms) — לא מודד layout
+       בכל שינוי בדף.
+     - לחיצה: העדשה זזה מיד ב-pointerdown; אם 300ms אחרי השחרור Hyperzod לא סימנה טאב אחר (אורח
+       ב"הזמן שוב" = חלונית התחברות) — חוזרת בקפיץ לטאב הפעיל האמיתי.
+     - prefers-reduced-motion: מעבר ליניארי קצר בלי מתיחה.
+   העיצוב בחלק 52. לא נוגע בניווט ולא ברטט. נכשל-פתוח. בדיקה: window.MH_NAVGLASS.stats()
    ============================================================ */
 (function () {
   'use strict';
   if (window.__MH_NAVGLASS__) { return; }
   window.__MH_NAVGLASS__ = true;
-  var VERSION = '1.0.0', BTN = '#MultiVendorBottomNav .v-btn.footer-btn';
-  var stats = { version: VERSION, syncs: 0, moves: 0, presses: 0, errors: 0 };
-  var pill = null, lens = null, lastX = null, lastW = null, settleT = null, pressAt = 0;
+  var VERSION = '1.1.0', BTN = '#MultiVendorBottomNav .v-btn.footer-btn';
+  var SPRING = { stiffness: 340, damping: 22, mass: 1, dur: 0.72, fps: 120, stretch: 0.34, squash: 0.15 };
+  var stats = { version: VERSION, syncs: 0, moves: 0, presses: 0, settles: 0, errors: 0, anim: 'waapi' };
+  var pill = null, lens = null, curX = null, curW = null, anim = null, settleT = null, pressed = null;
+  var reduced = false;
+  try { reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) {}
+  var canAnimate = typeof Element !== 'undefined' && typeof Element.prototype.animate === 'function';
+  if (!canAnimate) { stats.anim = 'css'; }
 
   function ensure() {
     var p = document.querySelector('#MultiVendorBottomNav .floating-nav-pill');
     if (!p) { pill = null; return false; }
-    if (p !== pill) { pill = p; lastX = lastW = null; }
+    if (p !== pill) { pill = p; curX = curW = null; anim = null; }
     lens = null;
     for (var i = 0; i < pill.children.length; i++) {
       var ch = pill.children[i];
       if (ch.classList.contains('mh-lens')) { lens = ch; }
-      else if (ch.classList.contains('mh-active-pill')) { ch.remove(); i--; }     /* האינדיקטור הישן (מטמון) */
+      else if (ch.classList.contains('mh-active-pill')) { ch.remove(); i--; }
     }
     if (!lens) {
       lens = document.createElement('span'); lens.className = 'mh-lens mh-lens-off'; lens.setAttribute('aria-hidden', 'true');
-      pill.insertBefore(lens, pill.firstChild); lastX = lastW = null;
+      pill.insertBefore(lens, pill.firstChild); curX = curW = null;
     }
     return true;
   }
-  function place(btn, animate) {
-    if (!btn) { lens.classList.add('mh-lens-off'); return; }
-    var pr = pill.getBoundingClientRect(), br = btn.getBoundingClientRect();
-    if (!pr.width || !br.width) { return; }
-    var x = Math.round((br.left - pr.left) * 10) / 10, w = Math.round(br.width * 10) / 10;
-    if (x === lastX && w === lastW) { lens.classList.remove('mh-lens-off'); return; }
-    var instant = lastX === null || !animate;
-    if (instant) { lens.classList.add('mh-lens-instant'); }
-    else { lens.classList.remove('mh-lens-goo'); void lens.offsetWidth; lens.classList.add('mh-lens-goo'); stats.moves++; }
-    lens.style.setProperty('--x', x + 'px'); lens.style.setProperty('--w', w + 'px');
-    lens.classList.remove('mh-lens-off');
-    if (instant) { void lens.offsetWidth; lens.classList.remove('mh-lens-instant'); }
-    lastX = x; lastW = w;
-  }
   function active() { return pill && pill.querySelector('.v-btn.footer-btn.floating-tab-active'); }
+  function target(btn) {
+    var pr = pill.getBoundingClientRect(), br = btn.getBoundingClientRect();
+    if (!pr.width || !br.width) { return null; }
+    return { x: Math.round((br.left - pr.left) * 10) / 10, w: Math.round(br.width * 10) / 10 };
+  }
+  /* המיקום בפועל כרגע (גם באמצע אנימציה) */
+  function liveX() {
+    try { var m = getComputedStyle(lens).transform; if (m && m !== 'none') { var M = new DOMMatrix(m); return M.m41 - (lens.offsetWidth / 2) * (1 - M.a); } } catch (e) {}   /* מנטרל את המתיחה סביב המרכז */
+    return curX || 0;
+  }
+  /* קפיץ → keyframes של transform בלבד. המתיחה לפי המהירות הרגעית. */
+  function springFrames(from, to) {
+    var s = SPRING, w0 = Math.sqrt(s.stiffness / s.mass), z = s.damping / (2 * Math.sqrt(s.stiffness * s.mass));
+    var wd = w0 * Math.sqrt(1 - z * z), n = Math.round(s.dur * s.fps), d = to - from, frames = [], prev = 0;
+    var vmax = Math.abs(d) * w0 * 0.55 || 1;
+    for (var i = 0; i <= n; i++) {
+      var t = i / s.fps, e = Math.exp(-z * w0 * t);
+      var p = 1 - e * (Math.cos(wd * t) + (z * w0 / wd) * Math.sin(wd * t));
+      var v = i ? (p - prev) * s.fps * d : 0; prev = p;
+      var k = Math.min(1, Math.abs(v) / vmax);
+      var sx = 1 + s.stretch * k, sy = 1 - s.squash * k;
+      frames.push({ transform: 'translateX(' + (from + d * p).toFixed(2) + 'px) scale(' + sx.toFixed(3) + ',' + sy.toFixed(3) + ')', offset: i / n });
+    }
+    frames[n].transform = 'translateX(' + to.toFixed(2) + 'px) scale(1,1)';
+    return frames;
+  }
+  function settle(x) { lens.style.transform = 'translateX(' + x.toFixed(2) + 'px)'; }
+  function moveTo(x, w, animate) {
+    /* אותו יעד כמו התנועה הנוכחית → לא נוגעים (אחרת כל שינוי class בסרגל היה מאתחל את הקפיץ מאמצע הדרך) */
+    if (curX !== null && Math.abs(curX - x) < 0.5 && w === curW) { lens.classList.remove('mh-lens-off'); return; }
+    if (w !== curW) { lens.style.setProperty('width', w + 'px', 'important'); curW = w; }   /* inline !important מנצח את ה-!important של הגיליון */
+    lens.classList.remove('mh-lens-off');
+    var from = curX === null ? x : liveX();
+    if (anim) { try { anim.cancel(); } catch (e) {} anim = null; }
+    if (!animate || curX === null || Math.abs(from - x) < 0.5 || !canAnimate) { settle(x); curX = x; return; }
+    stats.moves++;
+    var fx = x;
+    if (reduced) {
+      anim = lens.animate([{ transform: 'translateX(' + from.toFixed(2) + 'px)' }, { transform: 'translateX(' + x.toFixed(2) + 'px)' }], { duration: 160, easing: 'ease-out', fill: 'forwards' });
+    } else {
+      anim = lens.animate(springFrames(from, x), { duration: SPRING.dur * 1000, easing: 'linear', fill: 'forwards' });
+    }
+    var a = anim;
+    a.onfinish = function () { if (anim === a) { settle(fx); anim = null; } try { a.cancel(); } catch (e) {} };
+    curX = x;
+  }
   function sync(animate) {
-    try { if (!ensure()) { return; } stats.syncs++; place(active(), animate !== false); }
-    catch (e) { stats.errors++; }
+    try {
+      if (!ensure()) { return; }
+      stats.syncs++;
+      var b = active(); if (!b) { lens.classList.add('mh-lens-off'); return; }
+      var t = target(b); if (!t) { return; }
+      if (pressed && pressed !== b && Date.now() - pressed.__mhT < 600) { return; }   /* הלחיצה עדיין קובעת עד ההתייצבות */
+      moveTo(t.x, t.w, animate !== false);
+    } catch (e) { stats.errors++; }
   }
 
-  /* לחיצה: עדשה מיד לטאב, כיווץ קל, ואז סנכרון לאמת */
+  /* לחיצה */
   function down(e) {
     try {
       var b = e.target && e.target.closest && e.target.closest(BTN);
       if (!b || !ensure()) { return; }
-      stats.presses++; pressAt = Date.now();
-      b.classList.add('mh-press'); pill.classList.add('mh-pill-press');
-      place(b, true);
-      clearTimeout(settleT); settleT = setTimeout(function () { sync(true); }, 900);
+      stats.presses++; pressed = b; b.__mhT = Date.now();
+      b.classList.add('mh-press');
+      var t = target(b); if (t) { moveTo(t.x, t.w, true); }
+      clearTimeout(settleT);
     } catch (err) { stats.errors++; }
   }
   function up() {
-    var wait = Math.max(0, 130 - (Date.now() - pressAt));
-    setTimeout(function () {
-      var l = document.querySelectorAll('#MultiVendorBottomNav .mh-press'); for (var i = 0; i < l.length; i++) { l[i].classList.remove('mh-press'); }
-      if (pill) { pill.classList.remove('mh-pill-press'); }
-    }, wait);
+    var l = document.querySelectorAll('#MultiVendorBottomNav .mh-press'); for (var i = 0; i < l.length; i++) { l[i].classList.remove('mh-press'); }
+    clearTimeout(settleT);
+    settleT = setTimeout(function () { pressed = null; stats.settles++; sync(true); }, 300);
   }
   document.addEventListener('pointerdown', down, true);
   document.addEventListener('pointerup', up, true);
   document.addEventListener('pointercancel', up, true);
   window.addEventListener('blur', up);
 
-  var t = null;
-  function schedule() { clearTimeout(t); t = setTimeout(function () { sync(true); }, 60); }
+  /* צופים: הסרגל בלבד (class), ורק החלפה של הסרגל בגוף הדף */
+  var navObs = null, t = null;
+  function watchNav() {
+    var nav = document.getElementById('MultiVendorBottomNav');
+    if (!nav || nav.__mhNavObs) { return; }
+    nav.__mhNavObs = true;
+    try { navObs = new MutationObserver(function () { clearTimeout(t); t = setTimeout(function () { sync(true); }, 40); }); navObs.observe(nav, { attributes: true, attributeFilter: ['class'], subtree: true, childList: true }); } catch (e) {}
+  }
   try {
-    new MutationObserver(function (muts) {
-      for (var i = 0; i < muts.length; i++) {
-        var n = muts[i].target;
-        if (n && n.classList && n.classList.contains('mh-lens')) { continue; }        /* השינויים שלנו */
-        if (muts[i].type === 'attributes' && !(n.closest && n.closest('#MultiVendorBottomNav'))) { continue; }
-        schedule(); return;
-      }
-    }).observe(document.body || document.documentElement, { childList: true, subtree: true, attributes: true, attributeFilter: ['class'] });
+    new MutationObserver(function () {
+      var nav = document.getElementById('MultiVendorBottomNav');
+      if (nav && !nav.__mhNavObs) { watchNav(); sync(false); }
+    }).observe(document.body || document.documentElement, { childList: true, subtree: true });
   } catch (e) {}
-  window.addEventListener('resize', function () { clearTimeout(t); t = setTimeout(function () { sync(false); }, 120); });
-  sync(false);
+  window.addEventListener('resize', function () { clearTimeout(t); t = setTimeout(function () { curX = null; sync(false); }, 120); });
+  watchNav(); sync(false);
 
   window.MH_NAVGLASS = { version: VERSION, sync: sync, stats: function () { return JSON.parse(JSON.stringify(stats)); } };
   /* mh-navglass-v1 */
