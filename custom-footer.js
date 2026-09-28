@@ -4608,7 +4608,7 @@ log('פעיל');
 })();
 
 /* ============================================================
-   סרגל הניווט התחתון, Liquid Glass — MH NavGlass  |  v1.1.0 | 2026-09-29 (v1.0.0: 28.9)
+   סרגל הניווט התחתון, Liquid Glass — MH NavGlass  |  v1.2.0 | 2026-09-29 (v1.1.0: 29.9, v1.0.0: 28.9)
    מחליף את "Bottom Nav - Sliding Active Indicator" ו-"Bottom Nav - Material Ripple" (1.5.2026).
    יוצר בתוך .floating-nav-pill עדשה אחת (.mh-lens) מתחת לטאב הפעיל (.floating-tab-active של Hyperzod).
    v1.1.0 — התנועה נכתבה מחדש אחרי ההקלטה של דוד (קרטוע + עיכוב):
@@ -4621,15 +4621,23 @@ log('פעיל');
      - לחיצה: העדשה זזה מיד ב-pointerdown; אם 300ms אחרי השחרור Hyperzod לא סימנה טאב אחר (אורח
        ב"הזמן שוב" = חלונית התחברות) — חוזרת בקפיץ לטאב הפעיל האמיתי.
      - prefers-reduced-motion: מעבר ליניארי קצר בלי מתיחה.
+   v1.2.0 — אייקונים: מוריד פעם אחת את ה-SVG של כל <object> (CORS *), הופך ל-data: URL ומציב ב---mh-ico
+     + .mh-ico; ה-CSS מצייר אותו כ-mask בצבע מדויק (ה-filter יצא כתום ב-iOS, ו-mask עם כתובת ה-CDN לא
+     מצויר בכלל — לא בספארי ולא בכרום). עד שההורדה מסתיימת / אם נכשלה — נשאר ה-<object>. מתעדכן כש-Hyperzod
+     מחליפה אייקון (data), ובזמן ההורדה של גרסה חדשה נשאר ה-mask הקודם (בלי הבהוב). Vue מוחק את .mh-ico
+     כשהוא כותב מחדש את ה-class של כפתור — לכן נבדק בכל sync.
+     + סוף ללולאה: ב-v1.1.0 כל sync כתב class לעדשה גם בלי שינוי → mutation → sync, 24 פעמים בשנייה בלי מגע
+     (כל אחת עם מדידת layout). עכשיו setCls כותב רק כשיש שינוי, והצופה מתעלם מהעדשה שלנו.
    העיצוב בחלק 52. לא נוגע בניווט ולא ברטט. נכשל-פתוח. בדיקה: window.MH_NAVGLASS.stats()
    ============================================================ */
 (function () {
   'use strict';
   if (window.__MH_NAVGLASS__) { return; }
   window.__MH_NAVGLASS__ = true;
-  var VERSION = '1.1.0', BTN = '#MultiVendorBottomNav .v-btn.footer-btn';
+  var VERSION = '1.2.0', BTN = '#MultiVendorBottomNav .v-btn.footer-btn';
   var SPRING = { stiffness: 340, damping: 22, mass: 1, dur: 0.72, fps: 120, stretch: 0.34, squash: 0.15 };
-  var stats = { version: VERSION, syncs: 0, moves: 0, presses: 0, settles: 0, errors: 0, anim: 'waapi' };
+  var stats = { version: VERSION, syncs: 0, moves: 0, presses: 0, settles: 0, icons: 0, icoFetch: 0, icoFail: 0, errors: 0, anim: 'waapi' };
+  var ICO = {};   /* כתובת SVG → 'url("data:…")' | 'wait' | false */
   var pill = null, lens = null, curX = null, curW = null, anim = null, settleT = null, pressed = null;
   var reduced = false;
   try { reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) {}
@@ -4653,6 +4661,44 @@ log('פעיל');
     return true;
   }
   function active() { return pill && pill.querySelector('.v-btn.footer-btn.floating-tab-active'); }
+  /* כותב class רק כשבאמת משתנה: classList.add/remove כותבים את התכונה גם בלי שינוי → רשומת mutation →
+     הצופה → sync → שוב... (v1.1.0 רץ כך 24 פעמים בשנייה בלי הפסקה, כל פעם עם מדידת layout) */
+  function setCls(el, c, on) { if (el.classList.contains(c) !== on) { el.classList.toggle(c, on); } }
+  /* ה-SVG → data: URL (encodeURIComponent מקודד גם " ו-\ — לא יכול לצאת מ-url("")). נכשל → false */
+  function fetchIco(u) {
+    if (typeof fetch !== 'function') { ICO[u] = false; return; }
+    ICO[u] = 'wait'; stats.icoFetch++;
+    /* no-store חובה: בלי Origin ה-CDN (Cloudflare) מחזיר תשובה בלי Access-Control-Allow-Origin ובלי Vary,
+       ה-<object> טוען כך את אותו SVG, והמטמון של הדפדפן מגיש את העותק הזה גם לבקשת CORS → "Failed to fetch".
+       (מאותה סיבה mask עם כתובת ה-CDN לא מצויר.) */
+    fetch(u, { mode: 'cors', credentials: 'omit', cache: 'no-store' }).then(function (r) {
+      if (!r.ok || !/svg/i.test(r.headers.get('content-type') || '')) { throw new Error('bad svg ' + r.status); }
+      return r.text();
+    }).then(function (t) {
+      t = String(t).trim();
+      if (t.length > 40000 || !/^(<\?xml[^>]*>\s*)?<svg[\s>]/i.test(t)) { throw new Error('not svg'); }
+      ICO[u] = 'url("data:image/svg+xml;charset=utf-8,' + encodeURIComponent(t) + '")';
+      icoSafe();
+    }).catch(function (e) { ICO[u] = false; stats.icoFail++; stats.icoErr = String((e && e.message) || e).slice(0, 80); icoSafe(); });
+  }
+  function icoSafe() { try { icons(); } catch (e) { stats.errors++; } }
+  /* אייקון כ-mask: רק כתובת https נקייה, ורק אחרי שה-data: URL מוכן — אחרת נשאר ה-<object> */
+  function icons() {
+    if (!pill) { return; }
+    var bs = pill.querySelectorAll('.v-btn.footer-btn');
+    for (var i = 0; i < bs.length; i++) {
+      var b = bs[i], o = b.querySelector('object'), u = o && o.getAttribute('data');
+      var ok = !!u && /^https:\/\/[^\s"'()\\]+$/.test(u);
+      if (ok && ICO[u] === undefined) { fetchIco(u); }
+      var d = ok ? ICO[u] : false;
+      if (d === 'wait') { continue; }   /* ה-mask הקודם (אם יש) נשאר עד שהחדש מוכן */
+      if (!d) { if (b.__mhIco) { setCls(b, 'mh-ico', false); b.style.removeProperty('--mh-ico'); b.__mhIco = null; } continue; }
+      /* Vue כותב מחדש את כל ה-class של כפתור כשהמצב שלו משתנה (פעיל/לחוץ) ומוחק את .mh-ico — לכן בודקים גם אותו */
+      if (b.__mhIco === u && b.classList.contains('mh-ico') && b.style.getPropertyValue('--mh-ico')) { continue; }
+      if (b.__mhIco !== u || !b.style.getPropertyValue('--mh-ico')) { b.style.setProperty('--mh-ico', d); stats.icons++; }
+      setCls(b, 'mh-ico', true); b.__mhIco = u;
+    }
+  }
   function target(btn) {
     var pr = pill.getBoundingClientRect(), br = btn.getBoundingClientRect();
     if (!pr.width || !br.width) { return null; }
@@ -4682,9 +4728,9 @@ log('פעיל');
   function settle(x) { lens.style.transform = 'translateX(' + x.toFixed(2) + 'px)'; }
   function moveTo(x, w, animate) {
     /* אותו יעד כמו התנועה הנוכחית → לא נוגעים (אחרת כל שינוי class בסרגל היה מאתחל את הקפיץ מאמצע הדרך) */
-    if (curX !== null && Math.abs(curX - x) < 0.5 && w === curW) { lens.classList.remove('mh-lens-off'); return; }
+    if (curX !== null && Math.abs(curX - x) < 0.5 && w === curW) { setCls(lens, 'mh-lens-off', false); return; }
     if (w !== curW) { lens.style.setProperty('width', w + 'px', 'important'); curW = w; }   /* inline !important מנצח את ה-!important של הגיליון */
-    lens.classList.remove('mh-lens-off');
+    setCls(lens, 'mh-lens-off', false);
     var from = curX === null ? x : liveX();
     if (anim) { try { anim.cancel(); } catch (e) {} anim = null; }
     if (!animate || curX === null || Math.abs(from - x) < 0.5 || !canAnimate) { settle(x); curX = x; return; }
@@ -4702,8 +4748,8 @@ log('פעיל');
   function sync(animate) {
     try {
       if (!ensure()) { return; }
-      stats.syncs++;
-      var b = active(); if (!b) { lens.classList.add('mh-lens-off'); return; }
+      stats.syncs++; icons();
+      var b = active(); if (!b) { setCls(lens, 'mh-lens-off', true); return; }
       var t = target(b); if (!t) { return; }
       if (pressed && pressed !== b && Date.now() - pressed.__mhT < 600) { return; }   /* הלחיצה עדיין קובעת עד ההתייצבות */
       moveTo(t.x, t.w, animate !== false);
@@ -4716,7 +4762,7 @@ log('פעיל');
       var b = e.target && e.target.closest && e.target.closest(BTN);
       if (!b || !ensure()) { return; }
       stats.presses++; pressed = b; b.__mhT = Date.now();
-      b.classList.add('mh-press');
+      setCls(b, 'mh-press', true);
       var t = target(b); if (t) { moveTo(t.x, t.w, true); }
       clearTimeout(settleT);
     } catch (err) { stats.errors++; }
@@ -4737,7 +4783,9 @@ log('פעיל');
     var nav = document.getElementById('MultiVendorBottomNav');
     if (!nav || nav.__mhNavObs) { return; }
     nav.__mhNavObs = true;
-    try { navObs = new MutationObserver(function () { clearTimeout(t); t = setTimeout(function () { sync(true); }, 40); }); navObs.observe(nav, { attributes: true, attributeFilter: ['class'], subtree: true, childList: true }); } catch (e) {}
+    try { navObs = new MutationObserver(function (recs) {
+      for (var i = 0; i < recs.length; i++) { if (recs[i].target !== lens) { clearTimeout(t); t = setTimeout(function () { sync(true); }, 40); return; } }   /* שינוי בעדשה שלנו לא מפעיל sync */
+    }); navObs.observe(nav, { attributes: true, attributeFilter: ['class', 'data'], subtree: true, childList: true }); } catch (e) {}
   }
   try {
     new MutationObserver(function () {
