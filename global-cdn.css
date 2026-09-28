@@ -7267,7 +7267,7 @@ html body #mh-sukkah-hero .mh-suk-play .mh-suk-fall { animation: mhSukFall var(-
 /* mh-sukkot-v1 */
 
 /* =========================================================
-   חלק 52: סרגל הניווט התחתון — MH NavGlass v1.2.0 | 2026-09-29 (v1.1.0: 29.9, v1.0.0: 28.9) — Liquid Glass "מים"
+   חלק 52: סרגל הניווט התחתון — MH NavGlass v1.2.1 | 2026-09-29 (v1.2.0, v1.1.0: 29.9, v1.0.0: 28.9) — Liquid Glass "מים"
    הבעלים היחיד של #MultiVendorBottomNav .floating-nav-pill והטאבים בו (החליף את חלק 31 ואת
    "Android Bottom Nav - Safe Gap Fix"; רצועת ההזמנה הפעילה מעל הסרגל = חלק 32, לא כאן).
    v1.2.0 אחרי צילום מהאייפון של דוד + רינדור ב-WebKit אמיתי (tools/wk-snap):
@@ -7282,8 +7282,9 @@ html body #mh-sukkah-hero .mh-suk-play .mh-suk-fall { animation: mhSukFall var(-
    - אייקונים: ב-iOS שרשרת ה-filter יוצאת כתומה (נמדד: 239,50,23 מול התווית 210,46,51), ו-mask עם כתובת
      של ה-CDN לא מצויר בכלל (לא בספארי ולא בכרום). לכן ה-JS מוריד כל SVG פעם אחת והופך ל-data: URL
      ב---mh-ico; הצבע מדויק: #e31e24 פעיל, #1d1d1f רגיל. בלי JS / אם ההורדה נכשלה — ה-<object> עם ה-filter.
-   - תוויות: Hyperzod מעמעם את הלא-פעילות ל-opacity 0.64 (inline) — מבוטל. הילה לבנה רכה (לא קו מתאר)
-     לקריאות מעל תוכן כהה; על לבן היא בלתי נראית.
+   - תוויות: Hyperzod מעמעם את הלא-פעילות ל-opacity 0.64 (inline) — מבוטל; לא-פעילות #1d1d1f במשקל 700
+     ("אפור על אפור" בגלילה), פעילה גרדיאנט QLED בהיר + זוהר אדום רך. הילה לבנה רכה (לא קו מתאר) לקריאות
+     מעל תוכן כהה; על לבן היא בלתי נראית. overflow גלוי — ב-WebKit האות הראשונה נחתכה.
    - בדיקות: ה-takeSnapshot של WebKit לא מצייר backdrop-filter בכלל (נבדק על קופסה פשוטה) — את הטשטוש
      בודקים בכרום, את כל השאר (אייקונים, צבעים, עדשה, שפה) ב-WebKit.
    תנועה: רק transform, ב-Web Animations ב-JS "MH NavGlass" (קפיץ פיזי + מתיחה לפי המהירות).
@@ -7394,11 +7395,17 @@ html body #MultiVendorBottomNav .v-btn.footer-btn.mh-press .v-btn__content { tra
 html body #MultiVendorBottomNav .v-btn.footer-btn .v-btn__content > div {
     filter: drop-shadow(0 0 2.5px rgba(255, 255, 255, 0.7)) !important;
 }
+/* overflow visible: ב-WebKit (אייפון) הטקסט רחב ב-~1.2px מהקופסה שחושבה לו, ו-overflow:hidden של Hyperzod חתך
+   את האות הראשונה (הימנית) ב"החשבון שלי"/"עגלה"/"הזמן שוב". המשקל נקבע גם ב-font-variation-settings כי Hyperzod
+   נועלת "wght" 600 עם !important (אחרת font-weight לא משפיע על הגופן המשתנה). */
 html body #MultiVendorBottomNav .v-btn.footer-btn .nav-label {
     opacity: 1 !important;
-    color: rgba(29, 29, 31, 0.88) !important;
+    overflow: visible !important;
+    text-overflow: clip !important;
+    color: #1d1d1f !important;
     font-size: 10.5px !important;
-    font-weight: 600 !important;
+    font-weight: 700 !important;
+    font-variation-settings: "wght" 700 !important;
     letter-spacing: 0 !important;
     text-shadow: none !important;
     transition: color 0.25s ease !important;
@@ -7416,12 +7423,30 @@ html body #MultiVendorBottomNav .v-btn.footer-btn.mh-ico .v-btn__content > div::
     flex: 0 0 auto !important;
     width: 22px !important;
     height: 22px !important;
-    background: rgba(29, 29, 31, 0.88) !important;
+    background: #1d1d1f !important;
     -webkit-mask: var(--mh-ico) center / contain no-repeat !important;
     mask: var(--mh-ico) center / contain no-repeat !important;
 }
-html body #MultiVendorBottomNav .v-btn.footer-btn.floating-tab-active .nav-label { color: #e31e24 !important; font-weight: 800 !important; }
-html body #MultiVendorBottomNav .v-btn.footer-btn.mh-ico.floating-tab-active .v-btn__content > div::before { background: #e31e24 !important; }
+/* הטאב הפעיל: אדום QLED בהיר (דוד: #e31e24 "כהה מדי") — גרדיאנט מואר מלמעלה + זוהר אדום רך במקום ההילה הלבנה */
+html body #MultiVendorBottomNav .v-btn.footer-btn.floating-tab-active .nav-label {
+    color: #ff3b41 !important;
+    font-weight: 800 !important;
+    font-variation-settings: "wght" 800 !important;
+}
+@supports ((-webkit-background-clip: text) or (background-clip: text)) {
+    html body #MultiVendorBottomNav .v-btn.footer-btn.floating-tab-active .nav-label {
+        background: linear-gradient(180deg, #ff6a6f 0%, #ff3339 55%, #e8222a 100%) !important;
+        -webkit-background-clip: text !important;
+        background-clip: text !important;
+        -webkit-text-fill-color: transparent !important;
+    }
+}
+html body #MultiVendorBottomNav .v-btn.footer-btn.mh-ico.floating-tab-active .v-btn__content > div::before {
+    background: linear-gradient(180deg, #ff6a6f 0%, #ff3339 55%, #e8222a 100%) !important;
+}
+html body #MultiVendorBottomNav .v-btn.footer-btn.floating-tab-active .v-btn__content > div {
+    filter: drop-shadow(0 0 3.5px rgba(255, 51, 58, 0.42)) !important;
+}
 html body #MultiVendorBottomNav .v-btn.footer-btn.floating-tab-active,
 html body #MultiVendorBottomNav .v-btn.footer-btn.floating-tab-active:hover { background: transparent !important; box-shadow: none !important; }
 @media (prefers-reduced-motion: reduce) {
