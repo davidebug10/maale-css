@@ -4211,7 +4211,7 @@ log('פעיל');
 })();
 
 /* ============================================================
-   בועת וואטסאפ צפה — MH WhatsApp  |  v1.0.1 | 2026-09-24
+   בועת וואטסאפ צפה — MH WhatsApp  |  v1.0.2 | 2026-09-28
    בקשת דוד: בועה קטנה עם סמל וואטסאפ בדף הבית ובדפי העסקים, שלא מתנגשת בכלום.
    מה הבלוק עושה: יוצר <a id="mh-wa"> אחד (העיצוב בחלק 45), ומדליק/מכבה .mh-wa-on לפי:
      - מסלול: דף הבית (/, /he, /he/home) — אחרי 1.2 שניות; דף עסק (/he/m/<slug>/<id>) —
@@ -4223,18 +4223,20 @@ log('פעיל');
        נמדד מה-DOM ומוזרם ל-CSS דרך --mh-wa-bottom. כפתור "המשך לתשלום" של Hyperzod
        בדף עסק יושב במרכז (x 109–280 ב-390px) — הבועה בשמאל לא נוגעת בו.
    המספר: קבוע בקוד (NUMBER) — לא נקרא מה-boot של Hyperzod (v1.0.1, ראו הערה ליד phone()).
+   באפליקציה (v1.0.2): כל קישור וואטסאפ (הבועה, "דברו איתנו") נפתח דרך openNativeExternalWebview
+   של Hyperzod — ראו הערה ליד המאזין בסוף הבלוק.
    נכשל-פתוח: כל שגיאה = אין בועה. בדיקה: window.MH_WA.stats()
    ============================================================ */
 (function () {
   'use strict';
   if (window.__MH_WA__) { return; }
   window.__MH_WA__ = true;
-  var VERSION = '1.0.1', NUMBER = '972555190064';
+  var VERSION = '1.0.2', NUMBER = '972555190064';
   var TEXT = 'שלום, אשמח לעזרה עם הזמנה במעלה המשלוחים';
   var HOME = /^\/(he\/?(home\/?)?)?$/, MERCHANT = /^\/he\/m\/[^\/]+\/[0-9a-f]{20,}\/?$/;
   var SCROLL_MIN = 160, NAV_GAP = 12, BASE_BOTTOM = 20;
   var SVG = '<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 3C8.8 3 3 8.7 3 15.7c0 2.5.7 4.9 2.1 7L3 29l6.5-2c2 1.1 4.2 1.6 6.5 1.6 7.2 0 13-5.7 13-12.8S23.2 3 16 3zm0 23.3c-2 0-4-.5-5.7-1.6l-.4-.2-3.9 1.2 1.2-3.7-.3-.4a10.3 10.3 0 0 1-1.7-5.9C5.2 10 10 5.2 16 5.2S26.8 10 26.8 15.7 22 26.3 16 26.3zm5.9-7.8c-.3-.2-1.9-.9-2.2-1-.3-.1-.5-.2-.7.2-.2.3-.8 1-1 1.2-.2.2-.4.2-.7.1-.3-.2-1.4-.5-2.6-1.6-1-.9-1.6-1.9-1.8-2.2-.2-.3 0-.5.1-.7l.5-.6.3-.5c.1-.2.1-.4 0-.6l-1-2.4c-.3-.6-.5-.5-.7-.5h-.6c-.2 0-.6.1-.9.4-.3.3-1.2 1.1-1.2 2.8s1.2 3.3 1.4 3.5c.2.2 2.4 3.6 5.8 5 .8.3 1.4.5 1.9.7.8.3 1.5.2 2.1.1.6-.1 1.9-.8 2.2-1.5.3-.7.3-1.4.2-1.5l-.6-.4z"/></svg>';
-  var stats = { version: VERSION, route: null, shown: false, reason: '', coverBy: null, scrolled: false, bottom: BASE_BOTTOM, phone: null, toggles: 0 };
+  var stats = { version: VERSION, route: null, shown: false, reason: '', coverBy: null, scrolled: false, bottom: BASE_BOTTOM, phone: null, toggles: 0, nativeOpens: 0 };
   var el = null, scrolledEnough = false, homeTimer = null, homeReady = false, scrollHost = null;
 
   /* v1.0.1 (24.9): המספר קבוע בקוד. קודם נקרא business_phone מה-boot של Hyperzod — ומכשיר עם boot ישן
@@ -4249,7 +4251,7 @@ log('פעיל');
       el.setAttribute('aria-label', 'דברו איתנו בוואטסאפ');
       el.setAttribute('title', 'דברו איתנו בוואטסאפ');
       el.setAttribute('rel', 'noopener');
-      if (!window.ReactNativeWebView) { el.setAttribute('target', '_blank'); }
+      el.setAttribute('target', '_blank');   /* v1.0.2: גם באפליקציה — Hyperzod מעבירה _blank לדפדפן החיצוני */
       el.innerHTML = SVG;
       document.body.appendChild(el);
     }
@@ -4329,6 +4331,27 @@ log('פעיל');
      לכן subtree + class, עם דחיסה ל-200ms */
   try { new MutationObserver(schedule).observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ['class'] }); } catch (e) {}
   apply();
+  /* v1.0.2 (28.9): באפליקציה (Android/iOS) קישור וואטסאפ שנפתח בתוך ה-WebView → wa.me מפנה ל-whatsapp://
+     → "Something Went Wrong" (net::ERR_UNKNOWN_URL_SCHEME, דווח מ-OnePlus). v1.0.0 הסיר בכוונה target=_blank
+     באפליקציה, וזו הייתה הטעות. עכשיו, רק באפליקציה, כל קישור http(s) לוואטסאפ — גם בדף "דברו איתנו" שאין
+     בו target — נשלח ל-window.openNativeExternalWebview(url, true, {isExternalBrowser:true}): בדיוק מה ש-Hyperzod
+     עושה בעצמה לכל קישור _blank באפליקציה (attachExternalLinkHandlers), ומה שדף ה-Maintenance עושה מאז 22.8
+     (ריפו maale-maint-html, platform-detection.md §9.5). הלקחים משם: target=_blank לבד לא עושה כלום באנדרואיד;
+     wa.me בתוך ה-WebView תמיד נכשל; ואסור לשלוח ל-ReactNativeWebView.postMessage שום הודעה משלנו — ה-onMessage
+     של האפליקציה מריץ JSON.parse בלי הגנה והודעה לא מוכרת מקריסה אותה. לכן קוראים רק לפונקציה של Hyperzod.
+     המאזין על window ב-capture — רץ לפני המאזין של Hyperzod על document, כך שנשלחת הודעה אחת בלבד.
+     אין הפונקציה → לא נוגעים (target=_blank והמאזין של Hyperzod). */
+  var WA_LINK = /^https?:\/\/(wa\.me|api\.whatsapp\.com|chat\.whatsapp\.com)\//i;
+  window.addEventListener('click', function (e) {
+    try {
+      if (!window.ReactNativeWebView || typeof window.openNativeExternalWebview !== 'function') { return; }
+      var a = e.target && e.target.closest && e.target.closest('a[href]');
+      if (!a || !WA_LINK.test(a.href || '')) { return; }
+      e.preventDefault(); e.stopImmediatePropagation();
+      window.openNativeExternalWebview(a.href, true, { isExternalBrowser: true });
+      stats.nativeOpens++;
+    } catch (err) { /* נכשל-פתוח: הדפדפן ימשיך כרגיל */ }
+  }, true);
   window.MH_WA = { version: VERSION, apply: apply, stats: function () { return JSON.parse(JSON.stringify(stats)); } };
   /* mh-whatsapp-v1 */
 })();
