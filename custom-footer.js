@@ -3521,24 +3521,29 @@ log('פעיל');
 })();
 
 /* ============================================================
-   מחרוזות שאין להן תרגום בחבילת השפה — MH Lang  |  v1.3.0 | 2026-09-23 (v1.2.0: 22.9, v1.1.0: 10.9)
+   מחרוזות שאין להן תרגום בחבילת השפה — MH Lang  |  v1.4.0 | 2026-09-29 (v1.3.0: 23.9, v1.2.0: 22.9, v1.1.0: 10.9)
    Hyperzod מציירת טקסטים עם ברירת מחדל באנגלית כשמפתח חסר בחבילה:
    getLug().common.customizable || "Customizable". המפתח common.customizable לא קיים
    בחבילה של האתר (88 מפתחות ב-common, נבדק 10.9), ולכן התג בכרטיס המוצר באנגלית.
    הבלוק מחליף טקסט בלבד, רק באלמנטים ברשימה, רק כשהטקסט שווה בדיוק למחרוזת האנגלית.
+   v1.4.0: שדה "Save as" (סוג כתובת "אחרים") — label קשיח באנגלית ב-chunk confirm_location. ההחלפה נוגעת
+     רק בצומת הטקסט: בתוך ה-label של Vuetify יש הערת-עוגן של Vue (<!---->), ו-textContent= היה מוחק אותה.
    נכשל-פתוח. בדיקה: window.MH_LANG.stats()
    ============================================================ */
 (function () {
   'use strict';
   if (window.__MH_LANG__) { return; }
   window.__MH_LANG__ = true;
-  var VERSION = '1.3.0';
+  var VERSION = '1.4.0';
   /* סלקטור → { אנגלית: עברית } */
   var MAP = [
     { sel: '.product-customizable-tag', text: { 'Customizable': 'ניתן להתאמה' } },
     /* מסך הוספת כתובת (22.9): כותרת רשימת התוצאות ותווית סוג הכתובת */
     { sel: '.scheme-location-results-heading', text: { 'Search Results': 'תוצאות חיפוש' } },
     { sel: '#AddressSelectType label', text: { 'Save address as': 'לשמור את הכתובת בתור', 'SAVE ADDRESS AS': 'לשמור את הכתובת בתור' } },
+    /* (29.9) השדה שנפתח ב"אחרים": שתי התוויות של Vuetify — במנוחה (#OtherType-label) והצפה (בתוך .v-field__outline) */
+    /* \n = שבירת שורה בתווית במנוחה (white-space: pre-line בחלק 44); בתווית הצפה היא נהיית רווח */
+    { sel: '[data-ref="OtherType"] .v-field-label', text: { 'Save as': 'אחר - מה הכתובת הזאת בשבילך?\n(לדוגמא - הבית של משה)' } },
     /* מסך "ניהול כתובות" (23.9): תג הכתובת הפעילה, טעינה, וחלונית "אפשרויות כתובת" (מחרוזות קשיחות באנגלית בקוד של Hyperzod) */
     { sel: '#addresses .scheme-status-badge', text: { 'Active': 'פעילה' } },
     { sel: '#addresses p.tw-mt-4', text: { 'Loading Addresses...': 'טוען כתובות...' } },
@@ -3552,6 +3557,15 @@ log('פעיל');
     { sel: '#addresses div.tw-font-inter.tw-text-xs', from: 'Phone:', to: 'טלפון:' }
   ];
   var stats = { version: VERSION, replaced: 0, scans: 0 };
+  /* מחליף את צומת הטקסט היחיד (ולא את כל התוכן) — הערות-עוגן של Vue בתוך האלמנט נשארות במקומן */
+  function setText(el, he) {
+    var t = null, n = 0;
+    for (var c = el.firstChild; c; c = c.nextSibling) {
+      if (c.nodeType === 3 && c.nodeValue.trim()) { t = c; n++; }
+      else if (c.nodeType === 1) { n = 2; break; }
+    }
+    if (n === 1) { t.nodeValue = he; } else { el.textContent = he; }
+  }
   function sync() {
     stats.scans++;
     for (var i = 0; i < MAP.length; i++) {
@@ -3559,7 +3573,7 @@ log('פעיל');
       for (var j = 0; j < els.length; j++) {
         var t = (els[j].textContent || '').trim();
         var he = MAP[i].text[t];
-        if (he && els[j].textContent !== he) { els[j].textContent = he; stats.replaced++; }
+        if (he && els[j].textContent !== he) { setText(els[j], he); stats.replaced++; }
       }
     }
     for (var k = 0; k < PREFIX.length; k++) {

@@ -27,6 +27,7 @@ final class Runner: NSObject, WKNavigationDelegate {
       ucc.addUserScript(WKUserScript(source: js, injectionTime: .atDocumentEnd, forMainFrameOnly: true))
     }
     conf.userContentController = ucc
+    conf.websiteDataStore = .nonPersistent()   /* בלי מטמון מריצה קודמת — אחרת נטען CSS ישן (max-age=600 של GitHub Pages) */
     let finish = { [self] in
       web = WKWebView(frame: NSRect(x: 0, y: 0, width: w, height: h), configuration: conf)
       web.customUserAgent = cfg.ua ?? "Mozilla/5.0 (iPhone; CPU iPhone OS 18_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.6 Mobile/15E148 Safari/604.1"
