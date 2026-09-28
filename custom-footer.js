@@ -4560,3 +4560,157 @@ log('פעיל');
   window.MH_CARTOPTS = { version: VERSION, sync: sync, stats: function () { return JSON.parse(JSON.stringify(stats)); } };
   /* mh-cartopts-v1 */
 })();
+
+/* ============================================================
+   הירו סוכות בדף הבית — MH Sukkot  |  v1.0.0 | 2026-09-28 (עונתי — להסיר אחרי החג)
+   בונה בתוך #mh-sukkah-hero .mh-suk-deco את הסוכה (SVG לפי הרוחב בפועל): סכך עלי דקל + קורת במבוק,
+   עמודי עץ, שרשרת נורות, ונויי סוכה בצדדים. העיצוב והאנימציות בחלק 51.
+   אנימציית כניסה פעם אחת בכל ביקור (sessionStorage), רק כשההירו נראה על המסך (IntersectionObserver);
+   בביקור חוזר באותו סשן — מצב סטטי עם נדנוד עדין. פעיל רק אם הסקשן של דוד עם id="mh-sukkah-hero" קיים.
+   נכשל-פתוח: כל שגיאה = הירו רגיל בלי קישוטים. בדיקה: window.MH_SUKKOT.stats()
+   ============================================================ */
+(function () {
+  'use strict';
+  if (window.__MH_SUKKOT__) { return; }
+  window.__MH_SUKKOT__ = true;
+  var VERSION = '1.0.0', ID = 'mh-sukkah-hero', KEY = 'mh_suk_played', NS = 'http://www.w3.org/2000/svg';
+  var stats = { version: VERSION, builds: 0, played: 0, static: 0, width: 0, leaves: 0, errors: 0 };
+  var LEAF_COLORS = ['#2f6b2f', '#3b7d34', '#4a8f3c', '#5aa04a', '#6fb356', '#86a845', '#a8a24f', '#c2a25a'];
+
+  function rnd(seed) { return function () { seed |= 0; seed = seed + 0x6D2B79F5 | 0; var t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+  function el(tag, attrs, parent) { var e = document.createElementNS(NS, tag); for (var k in attrs) { e.setAttribute(k, attrs[k]); } if (parent) { parent.appendChild(e); } return e; }
+  function leafPath(L, W) { return 'M0,0 C' + W + ',' + (L * 0.28) + ' ' + (W * 0.55) + ',' + (L * 0.82) + ' 0,' + L + ' C' + (-W * 0.55) + ',' + (L * 0.82) + ' ' + (-W) + ',' + (L * 0.28) + ' 0,0 Z'; }
+  function played() { try { return sessionStorage.getItem(KEY) === '1'; } catch (e) { return false; } }
+  function markPlayed() { try { sessionStorage.setItem(KEY, '1'); } catch (e) {} }
+
+  function build(hero) {
+    var deco = hero.querySelector('.mh-suk-deco'), box = hero.querySelector('.mh-hero-box');
+    if (!deco || !box) { return; }
+    var w = Math.round(box.clientWidth), h = Math.round(box.clientHeight);
+    if (!w || !h) { return; }
+    if (deco.getAttribute('data-w') === String(w) && deco.firstChild) { return; }
+    deco.setAttribute('data-w', w); deco.textContent = ''; stats.builds++; stats.width = w;
+    var R = rnd(1987 + w), mobile = w < 700;
+    var band = Math.round(Math.max(66, Math.min(h * 0.19, 118)));        /* גובה הסכך */
+    var svg = el('svg', { width: w, height: h, viewBox: '0 0 ' + w + ' ' + h, 'class': 'mh-suk-svg' }, deco);
+    var defs = el('defs', {}, svg);
+    var wood = el('linearGradient', { id: 'mhSukWood', x1: '0', y1: '0', x2: '1', y2: '0' }, defs);
+    el('stop', { offset: '0', 'stop-color': '#6b4a26' }, wood); el('stop', { offset: '0.5', 'stop-color': '#a57a45' }, wood); el('stop', { offset: '1', 'stop-color': '#5c3f20' }, wood);
+    var bamboo = el('linearGradient', { id: 'mhSukBamboo', x1: '0', y1: '0', x2: '0', y2: '1' }, defs);
+    el('stop', { offset: '0', 'stop-color': '#e2c48a' }, bamboo); el('stop', { offset: '0.55', 'stop-color': '#c49a57' }, bamboo); el('stop', { offset: '1', 'stop-color': '#8d6a36' }, bamboo);
+    var glow = el('radialGradient', { id: 'mhSukBulbGlow' }, defs);
+    el('stop', { offset: '0', 'stop-color': '#fff', 'stop-opacity': '0.9' }, glow); el('stop', { offset: '0.35', 'stop-color': '#ffd27a', 'stop-opacity': '0.55' }, glow); el('stop', { offset: '1', 'stop-color': '#ffb347', 'stop-opacity': '0' }, glow);
+
+    /* עמודי עץ בצדדים */
+    var pw = mobile ? 10 : 14;
+    [0, w - pw].forEach(function (x) { var g = el('g', { 'class': 'mh-suk-post' }, svg); g.style.transformOrigin = (x + pw / 2) + 'px 0px'; el('rect', { x: x, y: 0, width: pw, height: h, fill: 'url(#mhSukWood)', opacity: '0.95' }, g); el('rect', { x: x + (x ? 0 : pw - 2), y: 0, width: 2, height: h, fill: 'rgba(0,0,0,0.25)' }, g); });
+
+    /* קורת במבוק */
+    var beamY = Math.round(band * 0.34), beamH = mobile ? 9 : 12;
+    var beam = el('g', { 'class': 'mh-suk-beam' }, svg);
+    el('rect', { x: 0, y: beamY, width: w, height: beamH, rx: beamH / 2, fill: 'url(#mhSukBamboo)' }, beam);
+    for (var nx = 40 + R() * 30; nx < w; nx += 70 + R() * 40) { el('rect', { x: Math.round(nx), y: beamY, width: 3, height: beamH, fill: 'rgba(90,60,25,0.55)' }, beam); }
+
+    /* סכך: שתי שכבות של עלי דקל */
+    var leaves = el('g', { 'class': 'mh-suk-leaves' }, svg), n = 0;
+    [[0.62, 0.18, 0], [1, 0.26, 1]].forEach(function (layer) {
+      var scale = layer[0], step = (mobile ? 13 : 16) / (layer[2] ? 1 : 1.4);
+      for (var x = -10; x < w + 10; x += step * (0.7 + R() * 0.6)) {
+        var L = band * (0.55 + R() * 0.55) * scale + (layer[2] ? 10 : 0), W = L * (0.1 + R() * 0.05);
+        var rot = (R() - 0.5) * 70, y = beamY - 4 - R() * band * 0.35;
+        var col = LEAF_COLORS[Math.floor(R() * LEAF_COLORS.length)];
+        var outer = el('g', { transform: 'translate(' + x.toFixed(1) + ',' + y.toFixed(1) + ')' }, leaves);
+        var g = el('g', { 'class': 'mh-suk-leaf' }, outer);
+        g.style.setProperty('--r', rot.toFixed(1) + 'deg');
+        g.style.setProperty('--d', (0.15 + (layer[2] ? 0.35 : 0) + (x / w) * 0.9 + R() * 0.25).toFixed(2) + 's');
+        el('path', { d: leafPath(L, W), fill: col, opacity: layer[2] ? '1' : '0.85' }, g);
+        el('path', { d: 'M0,0 L0,' + (L * 0.96).toFixed(1), stroke: 'rgba(20,45,15,0.45)', 'stroke-width': '1', fill: 'none' }, g);
+        n++;
+      }
+    });
+    stats.leaves = n;
+
+    /* שרשרת נורות — קשת רדודה מתחת לסכך */
+    var lightsY = band - 6, sag = mobile ? 16 : 24, bulbs = mobile ? 9 : 16;
+    var wire = el('path', { d: 'M' + pw + ',' + lightsY + ' Q' + (w / 2) + ',' + (lightsY + sag * 2) + ' ' + (w - pw) + ',' + lightsY, stroke: 'rgba(40,30,15,0.8)', 'stroke-width': '1.4', fill: 'none', 'class': 'mh-suk-string' }, svg);
+    wire.style.setProperty('--d', '0.9s');
+    var BULB = ['#ffcf5a', '#ff6b5a', '#8fdc6a', '#6ab8ff', '#ffcf5a', '#ff9f43'];
+    for (var i = 0; i < bulbs; i++) {
+      var t = (i + 0.5) / bulbs, bx = pw + t * (w - 2 * pw), by = lightsY + sag * 2 * 2 * t * (1 - t) + 4;
+      var bg = el('g', { 'class': 'mh-suk-bulb' }, svg);
+      bg.style.setProperty('--d', (1 + i * 0.09).toFixed(2) + 's'); bg.style.setProperty('--gd', (R() * 2).toFixed(2) + 's'); bg.style.setProperty('--gw', (2 + R() * 1.6).toFixed(2) + 's');
+      el('circle', { cx: bx.toFixed(1), cy: (by + 3).toFixed(1), r: mobile ? 11 : 14, fill: 'url(#mhSukBulbGlow)' }, bg);
+      el('ellipse', { cx: bx.toFixed(1), cy: (by + 3).toFixed(1), rx: mobile ? 3.4 : 4.2, ry: mobile ? 4.6 : 5.6, fill: BULB[i % BULB.length] }, bg);
+      el('rect', { x: (bx - 2).toFixed(1), y: (by - 3).toFixed(1), width: 4, height: 3, fill: '#3a2f22' }, bg);
+    }
+
+    /* נויי סוכה — רק בצדדים */
+    var ORN = mobile ? [[0.1, 0.23, 'pomegranate'], [0.24, 0.13, 'etrog'], [0.78, 0.15, 'star'], [0.91, 0.25, 'lantern']]
+                     : [[0.06, 0.26, 'pomegranate'], [0.15, 0.16, 'etrog'], [0.26, 0.24, 'star'], [0.74, 0.2, 'lantern'], [0.85, 0.14, 'pomegranate'], [0.94, 0.27, 'etrog']];
+    ORN.forEach(function (o, k) {
+      var ox = pw + o[0] * (w - 2 * pw), len = o[1] * h, s = mobile ? 1 : 1.3;
+      var g = el('g', { 'class': 'mh-suk-orn' }, svg);
+      g.style.setProperty('--d', (0.8 + k * 0.18).toFixed(2) + 's'); g.style.setProperty('--sw', (5.5 + R() * 3).toFixed(2) + 's'); g.style.setProperty('--sd', (R() * -4).toFixed(2) + 's');
+      el('line', { x1: ox, y1: beamY + beamH / 2, x2: ox, y2: beamY + len, stroke: 'rgba(245,230,200,0.85)', 'stroke-width': '1.2' }, g);
+      var cy = beamY + len, gg = el('g', { transform: 'translate(' + ox.toFixed(1) + ',' + cy.toFixed(1) + ') scale(' + s + ')' }, g);
+      if (o[2] === 'pomegranate') {
+        el('circle', { cx: 0, cy: 13, r: 11, fill: '#c0212b' }, gg); el('circle', { cx: -3.5, cy: 9.5, r: 3.5, fill: 'rgba(255,255,255,0.28)' }, gg);
+        el('path', { d: 'M-4,3 L-3,-1 L-1,2 L0,-2 L1,2 L3,-1 L4,3 Z', fill: '#8e1a20' }, gg);
+      } else if (o[2] === 'etrog') {
+        el('ellipse', { cx: 0, cy: 14, rx: 8.5, ry: 12.5, fill: '#e8c93a' }, gg); el('ellipse', { cx: -2.5, cy: 10, rx: 2.4, ry: 4, fill: 'rgba(255,255,255,0.35)' }, gg);
+        el('path', { d: 'M0,1 L0,-1 M-1.5,27 L0,29 L1.5,27', stroke: '#6d7f2a', 'stroke-width': '1.6', fill: 'none' }, gg);
+      } else if (o[2] === 'star') {
+        el('path', { d: 'M0,2 L3.2,9.6 L11.4,10.2 L5.2,15.6 L7.1,23.6 L0,19.3 L-7.1,23.6 L-5.2,15.6 L-11.4,10.2 L-3.2,9.6 Z', fill: '#f5c542', stroke: '#c9951f', 'stroke-width': '0.8' }, gg);
+      } else {
+        el('rect', { x: -7, y: 2, width: 14, height: 3, rx: 1, fill: '#3a2f22' }, gg);
+        el('rect', { x: -8, y: 5, width: 16, height: 20, rx: 6, fill: '#e3542a' }, gg);
+        el('rect', { x: -8, y: 12, width: 16, height: 2, fill: 'rgba(255,220,150,0.7)' }, gg); el('rect', { x: -8, y: 18, width: 16, height: 2, fill: 'rgba(255,220,150,0.7)' }, gg);
+        el('rect', { x: -7, y: 25, width: 14, height: 3, rx: 1, fill: '#3a2f22' }, gg);
+      }
+    });
+    return { band: band };
+  }
+
+  /* עלים מרחפים — רק בכניסה הראשונה */
+  function falling(hero) {
+    var deco = hero.querySelector('.mh-suk-deco'), box = hero.querySelector('.mh-hero-box');
+    var w = box.clientWidth, h = box.clientHeight, R = rnd(42), count = w < 700 ? 7 : 11, made = [];
+    for (var i = 0; i < count; i++) {
+      var d = document.createElement('div'); d.className = 'mh-suk-fall';
+      var x = 20 + R() * (w - 60), col = LEAF_COLORS[Math.floor(R() * LEAF_COLORS.length)];
+      d.style.left = x.toFixed(0) + 'px';
+      d.style.setProperty('--d', (1.1 + i * 0.35 + R() * 0.3).toFixed(2) + 's');
+      d.style.setProperty('--fd', (3.8 + R() * 2).toFixed(2) + 's');
+      d.style.setProperty('--x1', ((R() - 0.5) * 80).toFixed(0) + 'px'); d.style.setProperty('--x2', ((R() - 0.5) * 120).toFixed(0) + 'px');
+      d.style.setProperty('--h', h + 'px');
+      d.innerHTML = '<svg width="22" height="34" viewBox="-11 0 22 34"><path d="' + leafPath(32, 5.5) + '" fill="' + col + '"/><path d="M0,0 L0,30" stroke="rgba(20,45,15,0.45)" stroke-width="1"/></svg>';
+      deco.appendChild(d); made.push(d);
+    }
+    setTimeout(function () { made.forEach(function (n) { try { n.remove(); } catch (e) {} }); }, 11000);
+  }
+
+  var io = null;
+  function setup(hero) {
+    if (hero.__mhSuk) { build(hero); return; }
+    hero.__mhSuk = true;
+    build(hero);
+    var deco = hero.querySelector('.mh-suk-deco'); if (!deco) { return; }
+    if (played()) { deco.classList.add('mh-suk-static'); stats.static++; return; }
+    var go = function () {
+      if (deco.classList.contains('mh-suk-play')) { return; }
+      deco.classList.add('mh-suk-play'); markPlayed(); stats.played++;
+      try { falling(hero); } catch (e) { stats.errors++; }
+    };
+    if ('IntersectionObserver' in window) {
+      io = new IntersectionObserver(function (es) { for (var i = 0; i < es.length; i++) { if (es[i].isIntersecting && es[i].intersectionRatio >= 0.3) { go(); io.disconnect(); } } }, { threshold: [0, 0.3, 0.6] });
+      io.observe(hero);
+    } else { go(); }
+  }
+  function scan() { try { var hero = document.getElementById(ID); if (hero) { setup(hero); } } catch (e) { stats.errors++; } }
+  var t = null;
+  try { new MutationObserver(function () { clearTimeout(t); t = setTimeout(scan, 150); }).observe(document.body || document.documentElement, { childList: true, subtree: true }); } catch (e) {}
+  window.addEventListener('resize', function () { clearTimeout(t); t = setTimeout(scan, 200); });
+  scan();
+  window.MH_SUKKOT = { version: VERSION, rebuild: scan, replay: function () { try { sessionStorage.removeItem(KEY); } catch (e) {} var h = document.getElementById(ID); if (h) { h.__mhSuk = false; var d = h.querySelector('.mh-suk-deco'); if (d) { d.className = 'mh-suk-deco'; d.removeAttribute('data-w'); } scan(); } }, stats: function () { return JSON.parse(JSON.stringify(stats)); } };
+  /* mh-sukkot-v1 */
+})();
