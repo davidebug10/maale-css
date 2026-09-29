@@ -193,7 +193,7 @@ sh tools/fetch-hz-css.sh   # vendor.css + index.css (מה-HTML) + non-critical.c
 ```bash
 avconvert --source in.mp4 --preset Preset1920x1080 --output <business>-hero.mp4 --replace
 ```
-בדיקה שהיציאה תקינה: סדר התיבות חייב להיות `ftyp, moov, mdat` (moov לפני mdat), והקודק `avc1` ולא `hvc1`. 30MB HEVC → ~9.6MB H.264 (מחניודה, 9.9.2026).
+בדיקה שהיציאה תקינה: סדר התיבות חייב להיות `ftyp, moov, mdat` (moov לפני mdat), והקודק `avc1` ולא `hvc1`. 30MB HEVC → ~9.6MB H.264 (מחניודה, 9.9.2026). שמות: `falafel-hero.mp4` = פלאפל בתחנה **כפר אדומים**; `falafel-mishor-hero.mp4` = פלאפל בתחנה **מישור אדומים** (עסק אחר עם אותו שם, 29.9). פריימים לכתיבת הקופי: לפתוח את הקובץ ב-`file://` בכרום ללא ראש ולעשות seek — שרת http בלי תמיכה ב-Range לא מאפשר seek וכל ה"פריימים" יוצאים הפריים הראשון.
 
 ### 5.8 `wk-snap.swift` — WebKit (המנוע של ספארי) בלי Xcode
 `swiftc -O tools/wk-snap.swift -o /tmp/wk-snap && /tmp/wk-snap steps.json` — WKWebView אמיתי ברוחב 390 עם UA של אייפון: חסימת כתובות (`block`, regex של content blocker — בלי `|`), הזרקת CSS/JS מקומיים (`injectCss`/`injectJs` — כך בודקים את הקבצים המקומיים על האתר החי), צעדי JS (`print` מדפיס את התוצאה; **לא** מחכה ל-Promise) וצילומים (`clip` ב-CSS px, יוצא פי 4). מטמון נקי בכל ריצה (`nonPersistent`) — אחרת GitHub Pages (max-age 600) מחזיר CSS ישן. מה **לא**: `backdrop-filter` (לא מצויר בצילום — טשטוש בודקים בכרום), והצעד הראשון לפעמים לפני טעינת הפונט (רווחים בין אותיות). שיטת ה-QA של חלק 52: אותו דף, אותם 6 רקעים (לבן/אפור/כהה/פסים/תמונה/הדף האמיתי) בשני המנועים + מדדים מספריים (קפיצת בהירות בשפה, עדשה מול גוף, צבע האייקון, ניגודיות תוויות, כמה מהפסים עובר).
