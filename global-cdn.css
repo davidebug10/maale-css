@@ -7466,10 +7466,12 @@ html body #MultiVendorBottomNav .v-btn.footer-btn.floating-tab-active:hover { ba
 /* mh-navglass-v1 */
 
 /* =========================================================
-   חלק 53: אזהרת כתובת משלוח בצ'ק-אאוט — MH AddrWarn v1.0.0 | 2026-10-01
+   חלק 53: אזהרת כתובת משלוח בצ'ק-אאוט — MH AddrWarn v1.1.0 | 2026-10-01
    הכרטיס #mh-addrwarn נוצר ע"י JS "MH AddrWarn" מעל רכיב הכתובת (.address-card) — בפוטר הצף במובייל
    (.place-order) ובעמוד בדסקטופ. שלושה מצבים: --none (אין כתובת), --set (כתובת נבחרה), --default
    (הכתובת = נקודת ברירת המחדל של החנות, "הנחלים 61") = אדום מלא. בעלים יחיד; לא נוגע בשום רכיב אחר.
+   v1.1.0: אחרי שנבחרה כתובת — מינימום (שורה דקה / פס אדום קומפקטי): ב-v1.0.0 הכרטיס הגביה את הפוטר הצף
+   והסתיר את האשראי. ריפוד תחתון ל-#checkout בגובה הכרטיס (html.mh-aw-on, ה-JS מודד).
    ========================================================= */
 html body #mh-addrwarn {
     display: flex !important;
@@ -7536,6 +7538,36 @@ html body #mh-addrwarn.mh-aw--default .mh-aw-act { color: #fff !important; }
 /* במובייל, מעל כפתור "בחר כתובת" (שיש לו ריפוד 16px של Hyperzod) — מיושר לכפתור */
 html body .place-order #mh-addrwarn.mh-aw--none { margin: 4px 16px -6px !important; }
 @media (hover: hover) { html body #mh-addrwarn:hover { filter: brightness(0.98) !important; } }
-/* חירום (1.10): אחרי שנבחרה כתובת הכרטיס הגביה את הפוטר הצף והסתיר את אמצעי התשלום — מוסתר עד התיקון */
-html body .place-order #mh-addrwarn:not(.mh-aw--none) { display: none !important; }
+/* ב. כתובת נבחרה: שורה דקה אחת, בלי קופסה */
+html body #mh-addrwarn.mh-aw--set {
+    align-items: center !important;
+    gap: 6px !important;
+    margin: 0 !important;
+    padding: 0 6px !important;
+    background: transparent !important;
+    border: 0 !important;
+    box-shadow: none !important;
+}
+html body #mh-addrwarn.mh-aw--set .mh-aw-ico {
+    flex: 0 0 16px !important;
+    width: 16px !important;
+    height: 16px !important;
+    margin: 0 !important;
+    font-size: 11px !important;
+    line-height: 16px !important;
+}
+html body #mh-addrwarn .mh-aw-line {
+    color: #c8151b !important;
+    font-size: 12px !important;
+    font-weight: 700 !important;
+    line-height: 1.35 !important;
+}
+/* ג. ברירת המחדל: פס אדום קומפקטי */
+html body #mh-addrwarn.mh-aw--default { align-items: center !important; padding: 7px 10px !important; border-radius: 12px !important; margin: 0 !important; }
+html body #mh-addrwarn.mh-aw--default .mh-aw-ico { flex-basis: 20px !important; width: 20px !important; height: 20px !important; font-size: 13px !important; line-height: 20px !important; margin: 0 !important; }
+html body #mh-addrwarn.mh-aw--default .mh-aw-line { color: #fff !important; }
+html body #mh-addrwarn.mh-aw--default strong.mh-aw-line { font-weight: 900 !important; font-size: 12.5px !important; }
+html body #mh-addrwarn.mh-aw--default .mh-aw-body { gap: 0 !important; }
+/* הפוטר הצף לא שומר מקום לגובה שלו — מוסיפים לדף בדיוק את גובה הכרטיס */
+html.mh-aw-on body #checkout { padding-bottom: var(--mh-aw-pad, 0px) !important; }
 /* mh-addrwarn-v1 */

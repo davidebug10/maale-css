@@ -4815,14 +4815,17 @@ log('פעיל');
 })();
 
 /* ============================================================
-   אזהרת כתובת משלוח בצ'ק-אאוט — MH AddrWarn  |  v1.0.0 | 2026-10-01
+   אזהרת כתובת משלוח בצ'ק-אאוט — MH AddrWarn  |  v1.1.0 | 2026-10-01 (v1.0.0 באותו יום)
    הבעיה (דוד, 1.10): לכל מבקר חדש המיקום הוא נקודת ברירת המחדל של החנות (getDefaultLocation →
    "הנחלים 61, מעלה אדומים"), ומסך "הוספת כתובת" נפתח על הנקודה הזאת — לקוחות שומרים אותה ומזמינים
    לכתובת הלא נכונה. בנוסף Hyperzod בוחרת לבד את הכתובת השמורה הקרובה למיקום הנוכחי.
    מה עושה: מעל רכיב הכתובת בצ'ק-אאוט (.address-card — כפתור "בחר כתובת" או הכתובת שנבחרה) כרטיס אזהרה:
      א. אין כתובת נבחרת  → "בדקו היטב את כתובת המשלוח" + הנחיה + "משלוח לכתובת לא נכונה עלול להתבטל".
-     ב. נבחרה כתובת      → "המשלוח יגיע אל: <הכתובת>" + אותה אזהרה + "החלפה".
-     ג. הכתובת בטווח 60 מ' מנקודת ברירת המחדל → גרסה חמורה באדום מלא.
+     ב. נבחרה כתובת      → שורה דקה אחת בלבד (הכתובת כבר מוצגת בשורה של Hyperzod מתחת — בלי כפילות).
+     ג. הכתובת בטווח 60 מ' מנקודת ברירת המחדל → פס אדום קומפקטי (עד 2 שורות).
+     v1.1.0 (דוד, 1.10): ב-v1.0.0 הכרטיס הגביה את הפוטר הצף והסתיר את אמצעי התשלום (אשראי). עכשיו מצבים
+     ב/ג מינימליים, וכשהכרטיס בתוך פוטר fixed — לדף נוסף ריפוד תחתון בגובה הכרטיס (html.mh-aw-on +
+     --mh-aw-pad על #checkout), כך ששום דבר לא נשאר מתחת לפוטר.
    לחיצה על הכרטיס = לחיצה על רכיב הכתובת של Hyperzod (פותח את רשימת הכתובות). טקסט בלבד: לא משנה מה
    נבחר, לא חוסם הזמנה, לא נוגע במחיר. רק למחובר + סוג הזמנה שדורש כתובת. העיצוב בחלק 53.
    נכשל-פתוח. בדיקה: window.MH_ADDRWARN.stats()
@@ -4831,8 +4834,8 @@ log('פעיל');
   'use strict';
   if (window.__MH_ADDRWARN__) { return; }
   window.__MH_ADDRWARN__ = true;
-  var VERSION = '1.0.0', ID = 'mh-addrwarn', RADIUS = 60;
-  var stats = { version: VERSION, syncs: 0, renders: 0, state: 'none', errors: 0 };
+  var VERSION = '1.1.0', ID = 'mh-addrwarn', RADIUS = 60;
+  var stats = { version: VERSION, syncs: 0, renders: 0, state: 'none', pad: 0, errors: 0 };
   var lastKey = '';
   function store() { try { return document.getElementById('app').__vue_app__.config.globalProperties.$store; } catch (e) { return null; } }
   function num(v) { v = parseFloat(v); return isFinite(v) ? v : null; }
@@ -4872,7 +4875,14 @@ log('פעיל');
     return false;
   }
   function el(tag, cls, txt) { var e = document.createElement(tag); if (cls) { e.className = cls; } if (txt) { e.textContent = txt; } return e; }
-  function remove() { var w = document.getElementById(ID); if (w) { w.remove(); } lastKey = ''; stats.state = 'none'; }
+  /* הכרטיס בתוך פוטר fixed (מובייל) מגביה אותו — מוסיפים לדף ריפוד תחתון בדיוק בגובה הכרטיס */
+  function pad(w) {
+    var root = document.documentElement, fixed = false, p = w && w.parentElement;
+    while (p && p !== document.body) { if (getComputedStyle(p).position === 'fixed') { fixed = true; break; } p = p.parentElement; }
+    if (fixed) { root.style.setProperty('--mh-aw-pad', (w.offsetHeight + 8) + 'px'); if (!root.classList.contains('mh-aw-on')) { root.classList.add('mh-aw-on'); } stats.pad = w.offsetHeight + 8; }
+    else if (root.classList.contains('mh-aw-on')) { root.classList.remove('mh-aw-on'); stats.pad = 0; }
+  }
+  function remove() { var w = document.getElementById(ID); if (w) { w.remove(); } pad(null); lastKey = ''; stats.state = 'none'; }
   function render(state, addr, a) {
     var w = document.getElementById(ID);
     if (!w) {
@@ -4889,16 +4899,13 @@ log('פעיל');
       b.appendChild(el('strong', 'mh-aw-title', 'בדקו היטב את כתובת המשלוח'));
       b.appendChild(el('span', 'mh-aw-text', 'חפשו ובחרו את הרחוב ומספר הבית המדויקים שלכם. משלוח לכתובת לא נכונה עלול להתבטל.'));
     } else if (state === 'default') {
-      b.appendChild(el('strong', 'mh-aw-title', 'רגע! זו כתובת ברירת המחדל של האתר'));
-      b.appendChild(el('span', 'mh-aw-text', addr + ' מופיעה אוטומטית לכל מי שעוד לא בחר כתובת. לא גרים שם? החליפו כתובת לפני ההזמנה — משלוח לכתובת לא נכונה עלול להתבטל.'));
-      b.appendChild(el('span', 'mh-aw-act', 'החלפת כתובת ›'));
+      b.appendChild(el('strong', 'mh-aw-line', 'זו כתובת ברירת המחדל של האתר!'));
+      b.appendChild(el('span', 'mh-aw-line', 'לא גרים שם? החליפו — המשלוח עלול להתבטל'));
     } else {
-      var t = b.appendChild(el('strong', 'mh-aw-title', 'המשלוח יגיע אל: '));
-      t.appendChild(el('span', 'mh-aw-addr', addr));
-      b.appendChild(el('span', 'mh-aw-text', 'ודאו שזו הכתובת הנכונה. משלוח לכתובת לא נכונה עלול להתבטל.'));
-      b.appendChild(el('span', 'mh-aw-act', 'החלפה ›'));
+      b.appendChild(el('span', 'mh-aw-line', 'ודאו שהכתובת נכונה · משלוח לכתובת לא נכונה עלול להתבטל'));
     }
     if (w.nextSibling !== a || w.parentNode !== a.parentNode) { a.parentNode.insertBefore(w, a); }
+    pad(w);
     stats.renders++; stats.state = state;
   }
   function sync() {
