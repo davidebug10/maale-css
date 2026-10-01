@@ -7536,4 +7536,6 @@ html body #mh-addrwarn.mh-aw--default .mh-aw-act { color: #fff !important; }
 /* במובייל, מעל כפתור "בחר כתובת" (שיש לו ריפוד 16px של Hyperzod) — מיושר לכפתור */
 html body .place-order #mh-addrwarn.mh-aw--none { margin: 4px 16px -6px !important; }
 @media (hover: hover) { html body #mh-addrwarn:hover { filter: brightness(0.98) !important; } }
+/* חירום (1.10): אחרי שנבחרה כתובת הכרטיס הגביה את הפוטר הצף והסתיר את אמצעי התשלום — מוסתר עד התיקון */
+html body .place-order #mh-addrwarn:not(.mh-aw--none) { display: none !important; }
 /* mh-addrwarn-v1 */
