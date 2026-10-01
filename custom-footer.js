@@ -4813,3 +4813,130 @@ log('פעיל');
   window.MH_NAVGLASS = { version: VERSION, sync: sync, stats: function () { return JSON.parse(JSON.stringify(stats)); } };
   /* mh-navglass-v1 */
 })();
+
+/* ============================================================
+   אזהרת כתובת משלוח בצ'ק-אאוט — MH AddrWarn  |  v1.0.0 | 2026-10-01
+   הבעיה (דוד, 1.10): לכל מבקר חדש המיקום הוא נקודת ברירת המחדל של החנות (getDefaultLocation →
+   "הנחלים 61, מעלה אדומים"), ומסך "הוספת כתובת" נפתח על הנקודה הזאת — לקוחות שומרים אותה ומזמינים
+   לכתובת הלא נכונה. בנוסף Hyperzod בוחרת לבד את הכתובת השמורה הקרובה למיקום הנוכחי.
+   מה עושה: מעל רכיב הכתובת בצ'ק-אאוט (.address-card — כפתור "בחר כתובת" או הכתובת שנבחרה) כרטיס אזהרה:
+     א. אין כתובת נבחרת  → "בדקו היטב את כתובת המשלוח" + הנחיה + "משלוח לכתובת לא נכונה עלול להתבטל".
+     ב. נבחרה כתובת      → "המשלוח יגיע אל: <הכתובת>" + אותה אזהרה + "החלפה".
+     ג. הכתובת בטווח 60 מ' מנקודת ברירת המחדל → גרסה חמורה באדום מלא.
+   לחיצה על הכרטיס = לחיצה על רכיב הכתובת של Hyperzod (פותח את רשימת הכתובות). טקסט בלבד: לא משנה מה
+   נבחר, לא חוסם הזמנה, לא נוגע במחיר. רק למחובר + סוג הזמנה שדורש כתובת. העיצוב בחלק 53.
+   נכשל-פתוח. בדיקה: window.MH_ADDRWARN.stats()
+   ============================================================ */
+(function () {
+  'use strict';
+  if (window.__MH_ADDRWARN__) { return; }
+  window.__MH_ADDRWARN__ = true;
+  var VERSION = '1.0.0', ID = 'mh-addrwarn', RADIUS = 60;
+  var stats = { version: VERSION, syncs: 0, renders: 0, state: 'none', errors: 0 };
+  var lastKey = '';
+  function store() { try { return document.getElementById('app').__vue_app__.config.globalProperties.$store; } catch (e) { return null; } }
+  function num(v) { v = parseFloat(v); return isFinite(v) ? v : null; }
+  /* [lat, lng] מכל צורה שהכתובת מגיעה בה */
+  function coords(a) {
+    if (!a || typeof a !== 'object') { return null; }
+    var l = a.location, c = l && l.coordinates;
+    var cand = [[a.latitude, a.longitude], [a.lat, a.lng], l && [l.latitude, l.longitude], l && [l.lat, l.lng], c && c.length === 2 && [c[1], c[0]]];
+    for (var i = 0; i < cand.length; i++) {
+      if (!cand[i]) { continue; }
+      var la = num(cand[i][0]), ln = num(cand[i][1]);
+      if (la !== null && ln !== null && Math.abs(la) <= 90 && Math.abs(ln) <= 180) { return [la, ln]; }
+    }
+    return null;
+  }
+  function meters(p, q) {
+    var R = 6371000, r = Math.PI / 180, dLa = (q[0] - p[0]) * r, dLn = (q[1] - p[1]) * r;
+    var h = Math.sin(dLa / 2) * Math.sin(dLa / 2) + Math.cos(p[0] * r) * Math.cos(q[0] * r) * Math.sin(dLn / 2) * Math.sin(dLn / 2);
+    return 2 * R * Math.asin(Math.min(1, Math.sqrt(h)));
+  }
+  /* רכיב הכתובת של Hyperzod: העוטף .address-card (לא ה-v-card הפנימי #AddressCard) */
+  function anchor() {
+    var els = document.querySelectorAll('.address-card');
+    for (var i = 0; i < els.length; i++) {
+      var el = els[i];
+      if (el.id === 'AddressCard' || !el.offsetParent) { continue; }
+      if (el.querySelector('.add-address-btn') || el.querySelector('#AddressCard')) { return el; }
+    }
+    return null;
+  }
+  function addressRequired(S) {
+    try {
+      var t = S.getters.getOrderType, list = S.getters.getBootSettings.order_types_tenant || [];
+      if (t === 'pick_drop') { return false; }
+      for (var i = 0; i < list.length; i++) { if (list[i].order_type === t) { return !!list[i].requires_address; } }
+    } catch (e) {}
+    return false;
+  }
+  function el(tag, cls, txt) { var e = document.createElement(tag); if (cls) { e.className = cls; } if (txt) { e.textContent = txt; } return e; }
+  function remove() { var w = document.getElementById(ID); if (w) { w.remove(); } lastKey = ''; stats.state = 'none'; }
+  function render(state, addr, a) {
+    var w = document.getElementById(ID);
+    if (!w) {
+      w = el('div'); w.id = ID; w.setAttribute('role', 'alert');
+      w.addEventListener('click', function () {   /* פותח את בחירת הכתובת של Hyperzod */
+        try { var r = anchor(); var t = r && (r.querySelector('.add-address-btn') || r.querySelector('#AddressCard .address')); if (t) { t.click(); } } catch (e) {}
+      });
+    }
+    w.className = 'mh-aw mh-aw--' + state;
+    w.textContent = '';
+    w.appendChild(el('span', 'mh-aw-ico', '!')).setAttribute('aria-hidden', 'true');
+    var b = w.appendChild(el('div', 'mh-aw-body'));
+    if (state === 'none') {
+      b.appendChild(el('strong', 'mh-aw-title', 'בדקו היטב את כתובת המשלוח'));
+      b.appendChild(el('span', 'mh-aw-text', 'חפשו ובחרו את הרחוב ומספר הבית המדויקים שלכם. משלוח לכתובת לא נכונה עלול להתבטל.'));
+    } else if (state === 'default') {
+      b.appendChild(el('strong', 'mh-aw-title', 'רגע! זו כתובת ברירת המחדל של האתר'));
+      b.appendChild(el('span', 'mh-aw-text', addr + ' מופיעה אוטומטית לכל מי שעוד לא בחר כתובת. לא גרים שם? החליפו כתובת לפני ההזמנה — משלוח לכתובת לא נכונה עלול להתבטל.'));
+      b.appendChild(el('span', 'mh-aw-act', 'החלפת כתובת ›'));
+    } else {
+      var t = b.appendChild(el('strong', 'mh-aw-title', 'המשלוח יגיע אל: '));
+      t.appendChild(el('span', 'mh-aw-addr', addr));
+      b.appendChild(el('span', 'mh-aw-text', 'ודאו שזו הכתובת הנכונה. משלוח לכתובת לא נכונה עלול להתבטל.'));
+      b.appendChild(el('span', 'mh-aw-act', 'החלפה ›'));
+    }
+    if (w.nextSibling !== a || w.parentNode !== a.parentNode) { a.parentNode.insertBefore(w, a); }
+    stats.renders++; stats.state = state;
+  }
+  function sync() {
+    try {
+      stats.syncs++;
+      if (!/\/checkout/.test(location.pathname)) { if (lastKey) { remove(); } return; }
+      var S = store(), a = anchor();
+      var F = window.MH_ADDRWARN_FAKE || null;   /* בדיקות בלבד (מוק בכרום ללא ראש); באתר לא קיים */
+      var G = { loggedIn: F && 'loggedIn' in F ? F.loggedIn : S && S.getters.isLoggedIn, delivery: F && 'delivery' in F ? F.delivery : S && S.getters.getDeliveryAddress, def: F && 'def' in F ? F.def : S && S.getters.getDefaultLocation };
+      if (!S || !a || !G.loggedIn || !addressRequired(S)) { if (lastKey) { remove(); } return; }
+      var d = a.querySelector('.add-address-btn') ? null : G.delivery;
+      var state = 'none', addr = '';
+      if (d) {
+        addr = String(d.address || '').trim() || 'הכתובת שנבחרה';
+        state = 'set';
+        var def = G.def, dl = def && def.enabled !== false && def.default_location, p = coords(d);
+        if (dl && p && meters(p, [num(dl.lat), num(dl.lng)]) <= RADIUS) { state = 'default'; }
+      }
+      var key = state + '|' + addr;
+      var w = document.getElementById(ID);
+      if (key === lastKey && w && w.nextSibling === a) { return; }
+      lastKey = key; render(state, addr, a);
+    } catch (e) { stats.errors++; }
+  }
+  var pending = null;
+  function schedule() { if (pending) { return; } pending = setTimeout(function () { pending = null; sync(); }, 150); }
+  try {
+    new MutationObserver(function (recs) {
+      for (var i = 0; i < recs.length; i++) { var t = recs[i].target; if (t && t.id !== ID && !(t.closest && t.closest('#' + ID))) { schedule(); return; } }
+    }).observe(document.body || document.documentElement, { childList: true, subtree: true });
+    var hook = setInterval(function () {   /* מנוי ל-Vuex כשהוא מוכן: שינוי כתובת/סוג הזמנה/התחברות */
+      var S = store(); if (!S || typeof S.subscribe !== 'function') { return; }
+      clearInterval(hook);
+      S.subscribe(function (m) { if (/address|ordertype|login|logged|location/i.test(m.type || '')) { schedule(); } });
+    }, 500);
+    setTimeout(function () { clearInterval(hook); }, 30000);
+  } catch (e) { stats.errors++; }
+  schedule();
+  window.MH_ADDRWARN = { version: VERSION, sync: sync, stats: function () { return JSON.parse(JSON.stringify(stats)); } };
+  /* mh-addrwarn-v1 */
+})();

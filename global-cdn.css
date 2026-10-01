@@ -7464,3 +7464,76 @@ html body #MultiVendorBottomNav .v-btn.footer-btn.floating-tab-active:hover { ba
     html body #MultiVendorBottomNav .v-btn.footer-btn .v-btn__content { transition: none !important; }
 }
 /* mh-navglass-v1 */
+
+/* =========================================================
+   חלק 53: אזהרת כתובת משלוח בצ'ק-אאוט — MH AddrWarn v1.0.0 | 2026-10-01
+   הכרטיס #mh-addrwarn נוצר ע"י JS "MH AddrWarn" מעל רכיב הכתובת (.address-card) — בפוטר הצף במובייל
+   (.place-order) ובעמוד בדסקטופ. שלושה מצבים: --none (אין כתובת), --set (כתובת נבחרה), --default
+   (הכתובת = נקודת ברירת המחדל של החנות, "הנחלים 61") = אדום מלא. בעלים יחיד; לא נוגע בשום רכיב אחר.
+   ========================================================= */
+html body #mh-addrwarn {
+    display: flex !important;
+    align-items: flex-start !important;
+    gap: 10px !important;
+    direction: rtl !important;
+    text-align: right !important;
+    margin: 2px 0 0 !important;
+    padding: 10px 12px !important;
+    border-radius: 16px !important;
+    background: #fff4f4 !important;
+    border: 1.5px solid rgba(227, 30, 36, 0.38) !important;
+    box-shadow: 0 6px 16px -10px rgba(200, 21, 27, 0.45) !important;
+    cursor: pointer !important;
+    -webkit-tap-highlight-color: transparent !important;
+    font-family: inherit !important;
+}
+html body #mh-addrwarn .mh-aw-ico {
+    flex: 0 0 24px !important;
+    width: 24px !important;
+    height: 24px !important;
+    margin-top: 1px !important;
+    border-radius: 999px !important;
+    background: linear-gradient(135deg, #ff3b41 0%, #c8151b 100%) !important;
+    color: #fff !important;
+    font-size: 15px !important;
+    font-weight: 900 !important;
+    line-height: 24px !important;
+    text-align: center !important;
+}
+html body #mh-addrwarn .mh-aw-body { display: flex !important; flex-direction: column !important; gap: 2px !important; min-width: 0 !important; flex: 1 1 auto !important; }
+html body #mh-addrwarn .mh-aw-title {
+    color: #c8151b !important;
+    font-size: 14px !important;
+    font-weight: 800 !important;
+    line-height: 1.3 !important;
+}
+html body #mh-addrwarn .mh-aw-addr { color: #111 !important; font-weight: 900 !important; }
+html body #mh-addrwarn .mh-aw-text {
+    color: #4a1416 !important;
+    font-size: 12.5px !important;
+    font-weight: 600 !important;
+    line-height: 1.4 !important;
+}
+html body #mh-addrwarn .mh-aw-act {
+    align-self: flex-start !important;
+    margin-top: 2px !important;
+    color: #c8151b !important;
+    font-size: 12.5px !important;
+    font-weight: 800 !important;
+    text-decoration: underline !important;
+    text-underline-offset: 3px !important;
+}
+/* ברירת המחדל: חמור — אדום מלא */
+html body #mh-addrwarn.mh-aw--default {
+    background: linear-gradient(135deg, #ff3b41 0%, #c8151b 100%) !important;
+    border-color: transparent !important;
+    box-shadow: 0 10px 24px -10px rgba(200, 21, 27, 0.7) !important;
+}
+html body #mh-addrwarn.mh-aw--default .mh-aw-ico { background: #fff !important; color: #c8151b !important; }
+html body #mh-addrwarn.mh-aw--default .mh-aw-title,
+html body #mh-addrwarn.mh-aw--default .mh-aw-text,
+html body #mh-addrwarn.mh-aw--default .mh-aw-act { color: #fff !important; }
+/* במובייל, מעל כפתור "בחר כתובת" (שיש לו ריפוד 16px של Hyperzod) — מיושר לכפתור */
+html body .place-order #mh-addrwarn.mh-aw--none { margin: 4px 16px -6px !important; }
+@media (hover: hover) { html body #mh-addrwarn:hover { filter: brightness(0.98) !important; } }
+/* mh-addrwarn-v1 */
