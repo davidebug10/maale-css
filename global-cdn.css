@@ -7210,72 +7210,7 @@ html body #checkout #message .v-field.v-field--focused {
 html body #checkout #message .v-field.v-field--focused::before { background: #e31e24 !important; }
 /* mh-checkoutcart-v1 */
 
-/* =========================================================
-   חלק 51: הירו סוכות בדף הבית — MH Sukkot v1.0.0 | 2026-09-28 (עונתי — להסיר אחרי החג)
-   הבעלים היחיד של #mh-sukkah-hero (סקשן Custom Code בדף הבית שדוד מדביק; בסקשן יש רק תוכן).
-   הסרטון נראה "מתוך סוכה": סכך של עלי דקל וקורת במבוק למעלה, עמודי עץ בצדדים, שרשרת נורות חמות
-   ונויי סוכה (רימון, אתרוג, כוכב, פנס) בצדדים — לא על הפנים של השליח. ה-SVG נבנה ב-JS "MH Sukkot"
-   לפי הרוחב בפועל. בפעם הראשונה בכל ביקור (.mh-suk-play): העלים נופלים לסכך אחד-אחד, הנויים יורדים
-   ומתנדנדים, הנורות נדלקות, וכמה עלים בודדים מרחפים על הסרטון. אחר כך (.mh-suk-static) רק נדנוד
-   ונצנוץ עדינים. בלי JS = ההירו הרגיל בלי קישוטים. prefers-reduced-motion = בלי תנועה בכלל.
-   אחרי החג: דוד מדביק חזרה את הקוד המקורי (#mh-home-hero) — החלק הזה פשוט לא תופס כלום.
-   ========================================================= */
-html body #mh-sukkah-hero { direction: rtl !important; width: 100% !important; margin: 0 0 18px !important; padding: 0 !important; background: #1a120a !important; border-radius: 18px !important; overflow: hidden !important; }
-html body #mh-sukkah-hero .mh-hero-box { position: relative !important; width: 100% !important; height: clamp(380px, 115vw, 620px) !important; overflow: hidden !important; isolation: isolate !important; }
-html body #mh-sukkah-hero .mh-hero-video { position: absolute !important; inset: 0 !important; width: 100% !important; height: 100% !important; max-width: none !important; object-fit: cover !important; object-position: center 22% !important; display: block !important; z-index: 1 !important; pointer-events: none !important; }
-/* בדסקטופ הסרטון (אנכי) נחתך גבוה — מורידים את המסגור כדי שהסכך והנורות לא יעברו על הפנים */
-@media (min-width: 900px) { html body #mh-sukkah-hero .mh-hero-video { object-position: center 15% !important; } }
-/* אור חם של נורות מלמעלה */
-html body #mh-sukkah-hero .mh-hero-box::after { content: '' !important; position: absolute !important; inset: 0 !important; z-index: 2 !important; pointer-events: none !important; background: radial-gradient(120% 45% at 50% 0%, rgba(255, 184, 77, 0.22) 0%, rgba(255, 184, 77, 0) 70%) !important; }
-html body #mh-sukkah-hero .mh-suk-deco { position: absolute !important; inset: 0 !important; z-index: 3 !important; pointer-events: none !important; overflow: hidden !important; }
-html body #mh-sukkah-hero .mh-suk-deco svg { position: absolute !important; left: 0 !important; top: 0 !important; display: block !important; overflow: visible !important; }
-html body #mh-sukkah-hero .mh-hero-text { position: absolute !important; left: 0 !important; right: 0 !important; bottom: 0 !important; z-index: 4 !important; padding: 64px 26px 24px !important; color: #fff !important; text-align: right !important; background: linear-gradient(to top, rgba(12, 8, 4, 0.9) 0%, rgba(12, 8, 4, 0.5) 55%, rgba(12, 8, 4, 0) 100%) !important; }
-html body #mh-sukkah-hero .mh-hero-kicker { display: inline-flex !important; align-items: center !important; gap: 6px !important; color: #ffd58a !important; font-size: clamp(11px, 2.2vw, 13px) !important; font-weight: 800 !important; letter-spacing: 1px !important; margin: 0 0 8px !important; }
-html body #mh-sukkah-hero .mh-hero-title { color: #fff !important; font-size: clamp(24px, 5.4vw, 40px) !important; font-weight: 900 !important; line-height: 1.12 !important; margin: 0 0 8px !important; text-shadow: 0 2px 12px rgba(0, 0, 0, 0.65) !important; }
-html body #mh-sukkah-hero .mh-hero-p { color: rgba(255, 255, 255, 0.95) !important; font-size: clamp(13px, 2.6vw, 17px) !important; font-weight: 600 !important; line-height: 1.45 !important; margin: 0 !important; max-width: 620px !important; text-shadow: 0 1px 8px rgba(0, 0, 0, 0.6) !important; }
-html body #mh-sukkah-hero .mh-hero-p2 { margin-top: 8px !important; font-weight: 700 !important; }
-html body #mh-sukkah-hero .mh-hero-line { width: 64px !important; height: 3px !important; border-radius: 999px !important; background: linear-gradient(90deg, #e31e24 0%, #ffb347 55%, #5aa04a 100%) !important; margin: 14px 0 0 !important; box-shadow: 0 0 14px rgba(255, 179, 71, 0.6) !important; }
-@media (min-width: 900px) { html body #mh-sukkah-hero .mh-hero-text { padding: 80px 44px 32px !important; } }
-
-/* ---- חלקי ה-SVG (נבנים ב-JS) ---- */
-html body #mh-sukkah-hero .mh-suk-leaf { transform-box: fill-box !important; transform-origin: 50% 0 !important; transform: rotate(var(--r, 0deg)) !important; }
-html body #mh-sukkah-hero .mh-suk-orn { transform-box: fill-box !important; transform-origin: 50% 0 !important; animation: mhSukSway var(--sw, 7s) ease-in-out var(--sd, 0s) infinite alternate !important; }
-html body #mh-sukkah-hero .mh-suk-bulb { transform-box: fill-box !important; transform-origin: 50% 50% !important; animation: mhSukGlow var(--gw, 2.6s) ease-in-out var(--gd, 0s) infinite alternate !important; }
-html body #mh-sukkah-hero .mh-suk-fall { position: absolute !important; top: 0 !important; width: 22px !important; height: 34px !important; opacity: 0 !important; pointer-events: none !important; }
-/* פעם ראשונה בביקור */
-html body #mh-sukkah-hero .mh-suk-play .mh-suk-beam { animation: mhSukBeam 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) both !important; }
-html body #mh-sukkah-hero .mh-suk-play .mh-suk-leaf { animation: mhSukLeafIn 0.9s cubic-bezier(0.22, 1.2, 0.36, 1) var(--d, 0s) both !important; }
-html body #mh-sukkah-hero .mh-suk-play .mh-suk-post { animation: mhSukPost 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) both !important; }
-html body #mh-sukkah-hero .mh-suk-play .mh-suk-string { animation: mhSukFade 0.5s ease var(--d, 0s) both !important; }
-html body #mh-sukkah-hero .mh-suk-play .mh-suk-orn { animation: mhSukDrop 1.3s cubic-bezier(0.3, 1.5, 0.5, 1) var(--d, 0s) both, mhSukSway var(--sw, 7s) ease-in-out calc(var(--d, 0s) + 1.3s) infinite alternate !important; }
-html body #mh-sukkah-hero .mh-suk-play .mh-suk-bulb { animation: mhSukPop 0.45s cubic-bezier(0.3, 1.6, 0.5, 1) var(--d, 0s) both, mhSukGlow var(--gw, 2.6s) ease-in-out calc(var(--d, 0s) + 0.45s) infinite alternate !important; }
-html body #mh-sukkah-hero .mh-suk-play .mh-suk-fall { animation: mhSukFall var(--fd, 4.5s) cubic-bezier(0.45, 0.05, 0.55, 0.95) var(--d, 0s) forwards !important; }
-@keyframes mhSukBeam { from { transform: translateY(-40px); opacity: 0; } to { transform: none; opacity: 1; } }
-@keyframes mhSukPost { from { transform: scaleY(0); } to { transform: scaleY(1); } }
-@keyframes mhSukFade { from { opacity: 0; } to { opacity: 1; } }
-@keyframes mhSukLeafIn {
-    0%   { transform: translateY(-160%) rotate(calc(var(--r, 0deg) - 35deg)); opacity: 0; }
-    35%  { opacity: 1; }
-    75%  { transform: translateY(5%) rotate(calc(var(--r, 0deg) + 4deg)); }
-    100% { transform: translateY(0) rotate(var(--r, 0deg)); opacity: 1; }
-}
-@keyframes mhSukDrop { 0% { transform: translateY(-120%) rotate(0deg); opacity: 0; } 30% { opacity: 1; } 60% { transform: translateY(0) rotate(8deg); } 80% { transform: rotate(-4deg); } 100% { transform: rotate(0deg); opacity: 1; } }
-@keyframes mhSukSway { from { transform: rotate(-3deg); } to { transform: rotate(3deg); } }
-@keyframes mhSukPop { 0% { transform: scale(0); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
-@keyframes mhSukGlow { from { opacity: 0.72; } to { opacity: 1; } }
-@keyframes mhSukFall {
-    0%   { opacity: 0; transform: translate(0, 0) rotate(0deg); }
-    12%  { opacity: 1; }
-    50%  { transform: translate(var(--x1, 30px), calc(var(--h, 400px) * 0.32)) rotate(160deg); }
-    85%  { opacity: 0.9; }
-    100% { opacity: 0; transform: translate(var(--x2, -20px), calc(var(--h, 400px) * 0.6)) rotate(340deg); }
-}
-@media (prefers-reduced-motion: reduce) {
-    html body #mh-sukkah-hero .mh-suk-deco *,
-    html body #mh-sukkah-hero .mh-suk-play * { animation: none !important; }
-    html body #mh-sukkah-hero .mh-suk-fall { display: none !important; }
-}
-/* mh-sukkot-v1 */
+/* חלק 51 (הירו סוכות, 28.9) — הוסר אחרי החג (4.10.2026); הוחלף ע"י "חלק 54: MH HomeHero" בסוף הקובץ. ההיסטוריה ב-git. */
 
 /* =========================================================
    חלק 52: סרגל הניווט התחתון — MH NavGlass v1.2.1 | 2026-09-29 (v1.2.0, v1.1.0: 29.9, v1.0.0: 28.9) — Liquid Glass "מים"
@@ -7571,3 +7506,47 @@ html body #mh-addrwarn.mh-aw--default .mh-aw-body { gap: 0 !important; }
 /* הפוטר הצף לא שומר מקום לגובה שלו — מוסיפים לדף בדיוק את גובה הכרטיס */
 html.mh-aw-on body #checkout { padding-bottom: var(--mh-aw-pad, 0px) !important; }
 /* mh-addrwarn-v1 */
+
+/* =========================================================
+   חלק 54: הירו דף הבית (כל השנה) — MH HomeHero v1.0.0 | 2026-10-04
+   הבעלים היחיד של #mh-home-hero (סקשן Custom Code בדף הבית; בסקשן רק תוכן — העיצוב כאן).
+   החליף את חלק 51 (סוכות). #mh-sukkah-hero = אותו סקשן לפני שדוד מדביק את הקוד החדש — מקבל אותו
+   עיצוב (בלי הקישוטים) כדי שלא יהיה רגע של הירו שבור; אפשר למחוק אותו מהסלקטורים אחרי ההדבקה.
+   שליח בשקיעה → אווירה חמה; זהות האתר: תווית זכוכית עם נקודת "חי" אדומה, "אצלך בדלת." בגרדיאנט QLED,
+   קו QLED זוהר. כניסה עדינה של הטקסט בטעינה (רק transform/opacity); prefers-reduced-motion = בלי.
+   ========================================================= */
+html body :is(#mh-home-hero, #mh-sukkah-hero) { direction: rtl !important; width: 100% !important; margin: 0 0 18px !important; padding: 0 !important; background: #120c08 !important; border-radius: 22px !important; overflow: hidden !important; box-shadow: 0 18px 40px -22px rgba(60, 25, 10, 0.55) !important; }
+html body :is(#mh-home-hero, #mh-sukkah-hero) .mh-hero-box { position: relative !important; width: 100% !important; height: clamp(380px, 112vw, 620px) !important; overflow: hidden !important; isolation: isolate !important; }
+html body :is(#mh-home-hero, #mh-sukkah-hero) .mh-hero-video { position: absolute !important; inset: 0 !important; width: 100% !important; height: 100% !important; max-width: none !important; object-fit: cover !important; object-position: center 22% !important; display: block !important; z-index: 1 !important; pointer-events: none !important; }
+@media (min-width: 900px) { html body :is(#mh-home-hero, #mh-sukkah-hero) .mh-hero-video { object-position: center 15% !important; } }
+html body #mh-sukkah-hero .mh-suk-deco { display: none !important; }   /* שאריות SVG אם נשארו במטמון */
+html body :is(#mh-home-hero, #mh-sukkah-hero) .mh-hero-text { position: absolute !important; left: 0 !important; right: 0 !important; bottom: 0 !important; z-index: 3 !important; padding: 72px 24px 24px !important; color: #fff !important; text-align: right !important; background: linear-gradient(to top, rgba(14, 8, 4, 0.92) 0%, rgba(14, 8, 4, 0.55) 52%, rgba(14, 8, 4, 0) 100%) !important; }
+html body :is(#mh-home-hero, #mh-sukkah-hero) .mh-hero-kicker {
+    display: inline-flex !important; align-items: center !important; gap: 8px !important;
+    margin: 0 0 12px !important; padding: 6px 13px 6px 12px !important; border-radius: 999px !important;
+    color: #fff !important; font-size: clamp(11.5px, 2.4vw, 13px) !important; font-weight: 800 !important; letter-spacing: 0.3px !important;
+    background: rgba(255, 255, 255, 0.14) !important; border: 1px solid rgba(255, 255, 255, 0.28) !important;
+    -webkit-backdrop-filter: blur(12px) saturate(160%) !important; backdrop-filter: blur(12px) saturate(160%) !important;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35) !important;
+}
+html body #mh-home-hero .mh-hero-dot { position: relative !important; display: inline-block !important; flex: 0 0 8px !important; width: 8px !important; height: 8px !important; border-radius: 999px !important; background: #ff3b41 !important; box-shadow: 0 0 0 0 rgba(255, 59, 65, 0.6) !important; animation: mhHomeDot 2s ease-out infinite !important; }
+html body :is(#mh-home-hero, #mh-sukkah-hero) .mh-hero-title { color: #fff !important; font-size: clamp(26px, 6vw, 44px) !important; font-weight: 900 !important; line-height: 1.1 !important; letter-spacing: -0.3px !important; margin: 0 0 10px !important; text-shadow: 0 2px 14px rgba(0, 0, 0, 0.55) !important; }
+html body #mh-home-hero .mh-hero-accent { color: #ff4d52 !important; text-shadow: none !important; white-space: nowrap !important; }   /* "אצלך בדלת." לא נשבר באמצע */
+@supports ((-webkit-background-clip: text) or (background-clip: text)) {
+    html body #mh-home-hero .mh-hero-accent { background: linear-gradient(135deg, #ff7a7e 0%, #ff3b41 45%, #e31e24 100%) !important; -webkit-background-clip: text !important; background-clip: text !important; -webkit-text-fill-color: transparent !important; filter: drop-shadow(0 2px 10px rgba(227, 30, 36, 0.45)) !important; }
+}
+html body :is(#mh-home-hero, #mh-sukkah-hero) .mh-hero-p { color: rgba(255, 255, 255, 0.95) !important; font-size: clamp(14px, 3vw, 18px) !important; font-weight: 700 !important; line-height: 1.45 !important; margin: 0 !important; max-width: 620px !important; text-shadow: 0 1px 8px rgba(0, 0, 0, 0.6) !important; }
+html body :is(#mh-home-hero, #mh-sukkah-hero) .mh-hero-p2 { margin-top: 6px !important; }
+html body :is(#mh-home-hero, #mh-sukkah-hero) .mh-hero-line { width: 64px !important; height: 3px !important; border-radius: 999px !important; background: linear-gradient(90deg, #ff3b41 0%, #c8151b 100%) !important; margin: 16px 0 0 !important; box-shadow: 0 0 16px rgba(255, 59, 65, 0.7) !important; }
+@media (min-width: 900px) { html body :is(#mh-home-hero, #mh-sukkah-hero) .mh-hero-text { padding: 96px 48px 36px !important; } }
+/* כניסה עדינה בטעינה */
+html body #mh-home-hero .mh-hero-text > * { animation: mhHomeIn 0.75s cubic-bezier(0.2, 0.8, 0.2, 1) both !important; }
+html body #mh-home-hero .mh-hero-text > :nth-child(2) { animation-delay: 0.08s !important; }
+html body #mh-home-hero .mh-hero-text > :nth-child(3) { animation-delay: 0.16s !important; }
+html body #mh-home-hero .mh-hero-text > :nth-child(4) { animation-delay: 0.24s !important; }
+@keyframes mhHomeIn { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+@keyframes mhHomeDot { 0% { box-shadow: 0 0 0 0 rgba(255, 59, 65, 0.6); } 70% { box-shadow: 0 0 0 8px rgba(255, 59, 65, 0); } 100% { box-shadow: 0 0 0 0 rgba(255, 59, 65, 0); } }
+@media (prefers-reduced-motion: reduce) {
+    html body #mh-home-hero .mh-hero-text > *, html body #mh-home-hero .mh-hero-dot { animation: none !important; }
+}
+/* mh-homehero-v1 */
