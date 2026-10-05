@@ -1718,7 +1718,7 @@
 })();
 
 /* =========================================================================
-   אכיפת סוג משלוח לפי מיקום — MH Zone Enforcement  |  v1.4.0 | 2026-09-26
+   אכיפת סוג משלוח לפי מיקום — MH Zone Enforcement  |  v1.5.0 | 2026-10-05 (v1.4.0: 26.9)
    -------------------------------------------------------------------------
    מה זה עושה:
      מסווג את כתובת המסירה של הלקוח מול פוליגון מעלה אדומים (כולל מישור
@@ -1733,6 +1733,12 @@
        עסק לא מזוהה / סוג לא נתמך → לא נוגעים (נכשל פתוח) + אזהרה + מונה.
        מידע העסק נשמר ב-localStorage (mh_zone_merchants) כי אחרי רענון
        עמוד התשלום merchantData ריק.
+
+     v1.5.0 — כמה אזורים (ZONES): מעלה אדומים (כולל מישור אדומים) וכפר אדומים
+       (כולל נופי פרת, אזור החילזון ותחנת הדלק בצומת). הכלל: לקוח ועסק באותו אזור →
+       delivery ("משלוח בתוך העיר"); כל השאר → custom_2 ("משלוח מחוץ לעיר").
+       עסק בלי מיקום בפאנל → custom_2 (נכשל סגור: בספק משלמים יותר, לא פחות).
+       השמות של סוגי ההזמנה לא משנים כלום — הקוד עובד רק עם המזהים.
 
      "איסוף עצמי" (pickup) ו"הוצאה לרכב" (custom_1) — הסקריפט לא נוגע בהם
      לעולם. אם הלקוח בוחר באחד מהם, הסקריפט מזהה ומרפה.
@@ -1766,7 +1772,7 @@ if (window.__MH_ZONE__) { return; }
 window.__MH_ZONE__ = true;
 
 var CFG = {
-  VERSION:      '1.4.0',
+  VERSION:      '1.5.0',
   MLS:          'mh_zone_merchants',   /* מטמון מידע עסקים: מיקום + סוגי הזמנה */
   INSIDE_TYPE:  'delivery',
   OUTSIDE_TYPE: 'custom_2',
@@ -1782,8 +1788,18 @@ var CFG = {
     [35.3300,31.8090],[35.3550,31.8120],[35.3750,31.8020],[35.3780,31.7860],
     [35.3450,31.7800],[35.3200,31.7760],[35.3150,31.7620],[35.2960,31.7510],
     [35.2820,31.7620]
+  ],
+  /* כפר אדומים — מכויל מול ה-reverse geocode של Hyperzod (רשת 374 נקודות, 5.10): כל נקודה שגוגל קורא לה
+     "כפר אדומים" + נופי פרת + החילזון (וופל בוס, טוסטראק) + תחנת הדלק בצומת (פלאפל בתחנה). אלון בחוץ.
+     לא חופף לפוליגון מעלה אדומים (הקצה הצפוני שלו ~31.811 באזור הצומת). */
+  KA_POLY: [
+    [35.3185,31.8290],[35.3335,31.8290],[35.3335,31.8315],[35.3455,31.8315],[35.3455,31.8215],
+    [35.3515,31.8215],[35.3515,31.8140],[35.3440,31.8140],[35.3440,31.8160],[35.3065,31.8160],
+    [35.3065,31.8212],[35.3125,31.8237],[35.3155,31.8262]
   ]
 };
+/* האזורים. סדר חשוב רק אם יחפפו (לא חופפים). */
+CFG.ZONES = [ { id:'MA', poly:CFG.POLY }, { id:'KA', poly:CFG.KA_POLY } ];
 
 /* קירוב שטוח — מדויק לחלוטין בסקאלה של עיר (קו רוחב ~31.79°) */
 var MLAT = 111320, MLNG = 94640;
@@ -1821,13 +1837,22 @@ function edgeDist(lng, lat, p) {
   return best;
 }
 
-/* סיווג. קואורדינטה חסרה או לא תקינה → OUTSIDE (Fail-Closed) */
+function okCoord(lat, lng){ return isFinite(lat) && isFinite(lng) && !(lat===0 && lng===0); }
+/* באיזה אזור הנקודה: 'MA' / 'KA' / null (מחוץ לכל האזורים) */
+function zoneOf(lat, lng){
+  if (!okCoord(lat, lng)) return null;
+  for (var i=0;i<CFG.ZONES.length;i++) if (inPoly(lng, lat, CFG.ZONES[i].poly)) return CFG.ZONES[i].id;
+  return null;
+}
+/* סיווג כתובת לקוח. קואורדינטה חסרה או לא תקינה → UNKNOWN (Fail-Closed) */
 function classify(lat, lng) {
-  if (!isFinite(lat) || !isFinite(lng) || (lat===0 && lng===0))
-    return { zone:'UNKNOWN', type:CFG.OUTSIDE_TYPE, edge:null };
-  var ins = inPoly(lng, lat, CFG.POLY), d = Math.round(edgeDist(lng, lat, CFG.POLY));
-  if (d < CFG.EDGE_WARN_M) warn('קרוב לגבול ('+d+' מ׳):', lat, lng, ins?'בפנים':'בחוץ');
-  return { zone: ins?'INSIDE':'OUTSIDE', type: ins?CFG.INSIDE_TYPE:CFG.OUTSIDE_TYPE, edge:d };
+  if (!okCoord(lat, lng)) return { zone:'UNKNOWN', cz:null, type:CFG.OUTSIDE_TYPE, edge:null };
+  var cz = zoneOf(lat, lng), d = Infinity;
+  CFG.ZONES.forEach(function(z){ d = Math.min(d, edgeDist(lng, lat, z.poly)); });
+  d = Math.round(d);
+  if (d < CFG.EDGE_WARN_M) warn('קרוב לגבול ('+d+' מ׳):', lat, lng, cz || 'מחוץ לאזורים');
+  /* בלי עסק ידוע: התנהגות v1.4 — בתוך מעלה אדומים = delivery */
+  return { zone: cz || 'OUTSIDE', cz: cz, type: cz==='MA' ? CFG.INSIDE_TYPE : CFG.OUTSIDE_TYPE, edge:d };
 }
 
 /* שליפת קואורדינטה לפי מזהה כתובת מתוך vuex */
@@ -1867,7 +1892,7 @@ function merchInfo(d){
   if (loc && Array.isArray(loc.coordinates)) { lng = +loc.coordinates[0]; lat = +loc.coordinates[1]; }
   else if (Array.isArray(loc)) { lat = +loc[0]; lng = +loc[1]; }
   if (isFinite(lat) && isFinite(lng) && !(lat===0 && lng===0)) {
-    r.lat = lat; r.lng = lng; r.out = !inPoly(lng, lat, CFG.POLY);
+    r.lat = lat; r.lng = lng; r.out = zoneOf(lat, lng) !== 'MA';   /* out נשמר לתאימות; ההחלטה לפי zoneOf */
   }
   if (Array.isArray(d.accepted_order_types)) r.acc = d.accepted_order_types.slice();
   return r;
@@ -1910,17 +1935,29 @@ function merchById(id){
 function decide(lat, lng, mid, cur){
   var c = classify(lat, lng);                         /* לפי כתובת הלקוח */
   var m = merchById(mid);
-  if (m && m.out === true) {                          /* עסק מחוץ לעיר → תמיד חוץ */
-    c = { zone:'MERCHANT_OUTSIDE', type:CFG.OUTSIDE_TYPE, edge:c.edge }; S.mOut++;
+  if (m) {
+    var mz = okCoord(m.lat, m.lng) ? zoneOf(m.lat, m.lng) : undefined;
+    if (mz === undefined) {                           /* עסק בלי מיקום → חוץ (נכשל סגור) */
+      c = { zone:'MERCHANT_NO_LOCATION', cz:c.cz, type:CFG.OUTSIDE_TYPE, edge:c.edge }; S.mOut++;
+    } else if (c.cz && c.cz === mz) {                 /* אותו אזור → בתוך העיר */
+      c = { zone:'SAME_'+mz, cz:c.cz, type:CFG.INSIDE_TYPE, edge:c.edge };
+    } else {                                          /* אזורים שונים / עסק מחוץ לאזורים → חוץ */
+      c = { zone:(mz ? 'MERCHANT_'+mz : 'MERCHANT_OUTSIDE')+'_CUSTOMER_'+(c.cz||'OUT'), cz:c.cz, type:CFG.OUTSIDE_TYPE, edge:c.edge };
+      if (mz !== 'MA') S.mOut++;
+    }
   }
-  if (c.type === cur) return c;                       /* אין מה לשנות */
   if (!m || !Array.isArray(m.acc)) {                  /* לא יודעים מה העסק מציע */
+    if (c.type === cur) return c;
     S.mUnknown++; warn('עסק לא מזוהה — לא משנים את', cur, '| merchant:', mid);
     c.skip = true; return c;
   }
-  if (m.acc.indexOf(c.type) === -1) {                 /* העסק לא מציע את הסוג */
-    S.guardSkips++; warn('העסק לא מציע', c.type, '— משאירים', cur, '| merchant:', mid);
-    c.skip = true; return c;
+  if (m.acc.indexOf(c.type) === -1) {                 /* העסק לא מציע את הסוג הרצוי */
+    /* v1.5: משאירים את מה שהאפליקציה ביקשה אם העסק מציע אותו; אחרת "מחוץ לעיר" אם מוצע.
+       (מקרה: לקוח בכפר אדומים בעסק שעוד אין לו delivery, והאפליקציה זוכרת delivery מעסק קודם) */
+    var alt = m.acc.indexOf(cur) !== -1 ? cur : (m.acc.indexOf(CFG.OUTSIDE_TYPE) !== -1 ? CFG.OUTSIDE_TYPE : null);
+    S.guardSkips++; warn('העסק לא מציע', c.type, '→', alt || cur, '| merchant:', mid);
+    if (!alt || alt === cur) { c.skip = true; return c; }
+    c = { zone:c.zone+'_FALLBACK', cz:c.cz, type:alt, edge:c.edge };
   }
   return c;
 }
@@ -2092,6 +2129,8 @@ window.MH_ZONE = {
   version: CFG.VERSION,
   stats: function(){ console.table(S); console.log('סיווג:', LAST, '| applied:', appliedSig); return S; },
   check: function(lat,lng){ return classify(lat,lng); },
+  zone: function(lat,lng){ return zoneOf(lat,lng); },
+  decide: function(lat,lng,mid,cur){ return decide(lat,lng,mid,cur); },
   merchants: function(){ snapMerchants(); console.table(MC); return MC; },
   reset: function(){ S.uiClicks = 0; appliedSig = null; },
   showAll: function(){
@@ -2102,16 +2141,18 @@ window.MH_ZONE = {
     console.log('[MH-ZONE] כל האופציות הוחזרו');
   },
   test: function(){
-    [['מרכז מעלה אדומים',31.7715,35.2986,'INSIDE'],
-     ['מצפה נבו',31.7927,35.3029,'INSIDE'],
-     ['מישור אדומים',31.7936,35.3337,'INSIDE'],
-     ['כפר אדומים',31.8272,35.3372,'OUTSIDE'],
-     ['אלון',31.8334,35.3536,'OUTSIDE'],
-     ['נופי פרת',31.8235,35.3199,'OUTSIDE'],
-     ['הר הצופים',31.7931,35.2449,'OUTSIDE']]
+    [['מרכז מעלה אדומים',31.7715,35.2986,'MA'],
+     ['מצפה נבו',31.7927,35.3029,'MA'],
+     ['מישור אדומים',31.7936,35.3337,'MA'],
+     ['כפר אדומים — המייסדים',31.8272,35.3372,'KA'],
+     ['נופי פרת',31.8200,35.3110,'KA'],
+     ['כפר אדומים — החילזון',31.8201,35.3491,'KA'],
+     ['כפר אדומים — תחנת הדלק בצומת',31.8153,35.3496,'KA'],
+     ['אלון',31.8334,35.3536,null],
+     ['הר הצופים',31.7931,35.2449,null]]
     .forEach(function(x){
-      var r = classify(x[1],x[2]);
-      console.log((r.zone===x[3]?'✅':'❌ שגוי!'), x[0], '→', r.zone);
+      var z = zoneOf(x[1],x[2]);
+      console.log((z===x[3]?'✅':'❌ שגוי!'), x[0], '→', z);
     });
   }
 };
