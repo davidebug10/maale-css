@@ -2811,10 +2811,15 @@ log('פעיל');
 })();
 
 /* ============================================================
-   מגבלת בחירה בקבוצת תוספות — MH OptLimit  |  v1.0.0 | 2026-09-23
+   מגבלת בחירה בקבוצת תוספות — MH OptLimit  |  v1.1.0 | 2026-10-05 (v1.0.0: 23.9)
    הבעיה: המסעדן מגדיר בקבוצה "מינימום-מקסימום" (enable_range + max_quantity, למשל "עד 3 טעמים"),
    אבל הפופאפ של Hyperzod לא מציג את המגבלה ולא אוכף אותה — אפשר היה להוסיף לעגלה 5 טעמים (אומת 23.9).
-   מה הבלוק עושה (רק בחנויות שב-MERCHANTS):
+   v1.1.0 (דוד, 5.10): **בכל החנויות, אוטומטית** — בלי רשימת חנויות. כל קבוצה שהמסעדן הגדיר לה "אפשר טווח"
+   (selection_type=multiple + enable_range + max_quantity קטן ממספר האופציות) נאכפת. נבדק 5.10: 139 קבוצות
+   ב-8 חנויות (קצפת, שניצל 20 טעמים, השיפודיה, Pasta Basta, טוסטראק, שיבולת השרון, מפגש השייח, רולדין).
+   הנתונים מותאמים לחנות שבכתובת (/m/<slug>/<id>) כדי ששם מוצר זהה בחנות אחרת לא יבלבל.
+   + תיקון: לחיצה ישירה על עיגול ה-checkbox עקפה את המגבלה (input:checked מסומן לפני הלחיצה) — עכשיו לפי מחלקת Vuetify.
+   מה הבלוק עושה:
    1. קורא את נתוני המוצר מהתשובה של getById (עוטף XHR/fetch — קריאה בלבד, לא משנה בקשה או תשובה).
    2. בכל קבוצה מוגבלת מוסיף לכותרת תג .mh-lim ("עד 3" → "2 מתוך 3"), ובמלאה מסמן .mh-lim-full
       על הקבוצה ו-.mh-lim-off על האופציות שלא נבחרו (העיצוב בחלק 22ט).
@@ -2829,9 +2834,7 @@ log('פעיל');
   'use strict';
   if (window.__MH_OPTLIMIT__) { return; }
   window.__MH_OPTLIMIT__ = true;
-  var VERSION = '1.0.0';
-  // חנויות שבהן המגבלה פעילה (מזהה מרצ'נט). קצפת — בקשת דוד 23.9
-  var MERCHANTS = ['6ab287b1e54067b606008892'];
+  var VERSION = '1.1.0';
   var stats = { version: VERSION, products: 0, groups: 0, blocked: 0, swapped: 0, addBlocked: 0, lastProduct: '' };
   var PRODUCTS = {};          // שם מוצר → { merchant, groups: [...] }
   var session = { key: '', sel: {} };  // מצב הבחירות של הפופאפ הפתוח: sel[groupIndex][label] = true/false
@@ -2881,7 +2884,9 @@ log('פעיל');
     return norm(t);
   }
   function rowLabel(r) { var t = r.querySelector('.v-list-item-title'); return norm(t ? t.textContent : ''); }
-  function rowOn(r) { return !!r.querySelector('.v-selection-control--dirty, input:checked'); }
+  /* מצב "נבחר" רק לפי המחלקה של Vuetify: בלחיצה ישירה על ה-checkbox הדפדפן מסמן input:checked *לפני* שהלחיצה
+     מגיעה אלינו, ואז הבחירה ה-(max+1) נראתה כ"ביטול" ועברה (באג של v1.0.0). המחלקה מתעדכנת רק אחרי Vue. */
+  function rowOn(r) { return !!r.querySelector('.v-selection-control--dirty'); }
 
   // מחזיר את הקבוצות המוגבלות בפופאפ הפתוח: [{grp, max, min, sel}]
   function scan() {
@@ -2891,13 +2896,15 @@ log('פעיל');
     var nameEl = popup.querySelector('.product-name');
     var name = norm(nameEl ? nameEl.textContent : '');
     var prod = PRODUCTS[name];
-    if (!prod || MERCHANTS.indexOf(prod.merchant) < 0) return [];
+    var cur = (/\/m\/[^/]+\/([0-9a-f]{24})/.exec(location.pathname) || [])[1];
+    if (!prod || (cur && prod.merchant && prod.merchant !== cur)) return [];
     if (session.key !== name) { session = { key: name, sel: {} }; stats.lastProduct = name; }
     var heads = form.querySelectorAll('.addon-heading');
     var used = {}, out = [];
     for (var i = 0; i < heads.length; i++) {
       var h = heads[i], grp = h.parentElement;
-      if (!grp || grp.querySelector('[class*="mhq"]')) continue;
+      if (!grp) continue;
+      if (grp.querySelector('[class*="mhq"]')) { if (grp.classList.contains('mh-lim-grp')) clear(grp); continue; }   /* רבעי פיצה — לא נוגעים, ומנקים סימון ישן */
       var title = headingTitle(h), rule = null, skip = used[title] || 0;
       for (var j = 0; j < prod.groups.length; j++) {
         if (norm(prod.groups[j].option_name) === title) { if (skip-- === 0) { rule = prod.groups[j]; break; } }
