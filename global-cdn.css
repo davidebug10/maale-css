@@ -5333,7 +5333,8 @@ html body .v-bottom-sheet__content > .v-card.scheme-address-editor,
 html body .v-card.scheme-address-editor,
 html body .v-card.scheme-address-editor .v-card,
 html body .v-navigation-drawer .address-panel-swap .v-card,
-html body .scheme-location-search .scheme-location-master .v-card {
+html body .scheme-location-search .scheme-location-master .v-card,
+html body .v-bottom-sheet__content > #locationConfirm {
     padding: 0 !important;
     border-radius: 0 !important;
     border-top: 0 !important;
@@ -5346,7 +5347,8 @@ html body .scheme-location-search .scheme-location-master .v-card {
     filter: none !important;
     transform: none !important;
 }
-html body .v-bottom-sheet__content > .v-card.scheme-address-editor {
+html body .v-bottom-sheet__content > .v-card.scheme-address-editor,
+html body .v-bottom-sheet__content > #locationConfirm {
     border-radius: 22px 22px 0 0 !important;
     overflow: hidden !important;
 }
@@ -5359,7 +5361,8 @@ html body .v-navigation-drawer .address-panel-swap .v-card__underlay {
 /* 1. הדר: לבן-קריסטלי, כותרת, חץ חזרה אדום.
       בלי backdrop-filter/filter/transform כאן! ההדר הוא אב של רשימת התוצאות (position:fixed),
       וכל אחד מהם הופך אותו ל-containing block — ואז ה-top שמחשבת Hyperzod נמדד מההדר במקום מהמסך. */
-html body .scheme-address-editor .scheme-address-editor__header {
+html body .scheme-address-editor .scheme-address-editor__header,
+html body .v-bottom-sheet__content > #locationConfirm > .tw-shrink-0.tw-border-b {
     background: rgba(255, 255, 255, 0.96) !important;
     border-bottom: 1px solid rgba(227, 30, 36, 0.12) !important;
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05) !important;
@@ -5369,13 +5372,15 @@ html body .scheme-address-editor .scheme-address-editor__header > .tw-h-\[56px\]
     padding: 0 10px !important;
     gap: 6px !important;
 }
-html body .scheme-address-editor .scheme-address-editor__header .tw-h-\[56px\] span.tw-truncate {
+html body .scheme-address-editor .scheme-address-editor__header .tw-h-\[56px\] span.tw-truncate,
+html body .v-bottom-sheet__content > #locationConfirm #SearchLocationBackBtn + span {
     font-size: 17px !important;
     font-weight: 800 !important;
     color: #111 !important;
     letter-spacing: -0.2px !important;
 }
-html body .scheme-address-editor .scheme-address-editor__header img[alt="Back"] {
+html body .scheme-address-editor .scheme-address-editor__header img[alt="Back"],
+html body .v-bottom-sheet__content > #locationConfirm #SearchLocationBackBtn img {
     width: 28px !important;
     height: 28px !important;
     filter: invert(20%) sepia(96%) saturate(5600%) hue-rotate(350deg) brightness(88%) !important;
@@ -5562,16 +5567,19 @@ html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) 
     overflow: hidden !important;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08) !important;
 }
-html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) #locationConfirm .tw-bg-\[\#212121\] {
+html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) #locationConfirm .tw-bg-\[\#212121\],
+html body .v-bottom-sheet__content > #locationConfirm .tw-bg-\[\#212121\] {
     background: linear-gradient(135deg, #ff3b41 0%, #c8151b 100%) !important;
     border-radius: 999px !important;
     padding: 8px 14px !important;
     box-shadow: 0 6px 18px rgba(227, 30, 36, 0.35) !important;
 }
-html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) #locationConfirm .tw-border-t-\[8px\] {
+html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) #locationConfirm .tw-border-t-\[8px\],
+html body .v-bottom-sheet__content > #locationConfirm .tw-border-t-\[8px\] {
     border-top-color: #c8151b !important;
 }
-html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) #CurrentLocationButton {
+html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) #CurrentLocationButton,
+html body .v-bottom-sheet__content > #locationConfirm #CurrentLocationButton {
     border-radius: 999px !important;
     background: rgba(255, 255, 255, 0.94) !important;
     -webkit-backdrop-filter: blur(12px) !important;
@@ -5582,12 +5590,35 @@ html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) 
     padding: 0 16px !important;
     box-shadow: 0 6px 18px rgba(0, 0, 0, 0.14) !important;
 }
-html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) #CurrentLocationButton .v-icon {
+html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) #CurrentLocationButton .v-icon,
+html body .v-bottom-sheet__content > #locationConfirm #CurrentLocationButton .v-icon {
     color: #e31e24 !important;
 }
 html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) #CurrentLocationButton .v-btn__overlay,
-html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) #CurrentLocationButton .v-btn__underlay {
+html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) #CurrentLocationButton .v-btn__underlay,
+html body .v-bottom-sheet__content > #locationConfirm #CurrentLocationButton .v-btn__overlay,
+html body .v-bottom-sheet__content > #locationConfirm #CurrentLocationButton .v-btn__underlay {
     display: none !important;
+}
+
+/* 4ב. מסך "אישור מקום" (6.10) — אחרי בחירת תוצאה במודאל "בחר את המיקום שלך" (sidePanel locationConfirm):
+      #locationConfirm יושב ישר בגיליון, עם הדר "חזרה לחיפוש" (MH Lang), מפה גמישה, פאנל כתובת וכפתור #ConfirmLocationBtn.
+      הצבעים/הבועה/"אתר אותי"/הכותרת/הכפתור — אותם כללים של המסך הזה למעלה ולמטה; כאן רק הפריסה. */
+html body .v-bottom-sheet__content > #locationConfirm > .tw-shrink-0.tw-border-b {
+    min-height: 56px !important;
+    padding: 0 10px !important;
+    gap: 6px !important;
+}
+html body .v-bottom-sheet__content > #locationConfirm > .tw-overflow-hidden.tw-flex-1 {
+    margin: 12px 14px 0 !important;
+    width: auto !important;
+    border-radius: 20px !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08) !important;
+}
+html body .v-bottom-sheet__content > #locationConfirm > .tw-px-4.tw-pt-4 {
+    background: transparent !important;
+    box-shadow: none !important;
+    padding: 16px 18px calc(14px + env(safe-area-inset-bottom)) !important;
 }
 
 /* 5. ידית + כותרת הכתובת */
@@ -5599,16 +5630,19 @@ html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) 
     background: rgba(0, 0, 0, 0.12) !important;
     width: 40px !important;
 }
-html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) #locationConfirm h2 {
+html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) #locationConfirm h2,
+html body .v-bottom-sheet__content > #locationConfirm h2 {
     font-size: 19px !important;
     font-weight: 900 !important;
     color: #111 !important;
 }
-html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) #locationConfirm h2 img {
+html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) #locationConfirm h2 img,
+html body .v-bottom-sheet__content > #locationConfirm h2 img {
     width: 16px !important;
     filter: invert(20%) sepia(96%) saturate(5600%) hue-rotate(350deg) brightness(88%) !important;
 }
-html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) #locationConfirm p.line-clamp-2 {
+html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) #locationConfirm p.line-clamp-2,
+html body .v-bottom-sheet__content > #locationConfirm p.line-clamp-2 {
     color: #6b7280 !important;
     font-size: 14px !important;
 }
@@ -5826,7 +5860,8 @@ html body .scheme-address-editor .scheme-address-editor__mobile-footer {
 }
 html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) .scheme-address-editor__submit,
 html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) .v-btn.v-btn--block.v-btn--size-x-large,
-html body .v-navigation-drawer:has(.address-panel-swap) .v-btn.v-btn--block.v-btn--size-x-large {
+html body .v-navigation-drawer:has(.address-panel-swap) .v-btn.v-btn--block.v-btn--size-x-large,
+html body .v-bottom-sheet__content > #locationConfirm #ConfirmLocationBtn {
     background: linear-gradient(135deg, #ff3b41 0%, #c8151b 100%) !important;
     color: #fff !important;
     border-radius: 18px !important;
@@ -5837,15 +5872,24 @@ html body .v-navigation-drawer:has(.address-panel-swap) .v-btn.v-btn--block.v-bt
     box-shadow: 0 10px 26px rgba(227, 30, 36, 0.32) !important;
     transition: transform 0.12s ease, box-shadow 0.2s ease !important;
 }
+html body .v-bottom-sheet__content > #locationConfirm #ConfirmLocationBtn .v-btn__content {
+    /* ב"אישור מקום" ל-span הפנימי יש 500/14px משלו (נמדד 6.10), כך שהמשקל של הכפתור לא עובר בירושה */
+    font-size: 17px !important;
+    font-weight: 900 !important;
+    letter-spacing: 0.2px !important;
+}
 html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) .scheme-address-editor__submit:active,
-html body .v-navigation-drawer:has(.address-panel-swap) .v-btn.v-btn--block.v-btn--size-x-large:active {
+html body .v-navigation-drawer:has(.address-panel-swap) .v-btn.v-btn--block.v-btn--size-x-large:active,
+html body .v-bottom-sheet__content > #locationConfirm #ConfirmLocationBtn:active {
     transform: scale(0.985) !important;
     box-shadow: 0 4px 12px rgba(227, 30, 36, 0.25) !important;
 }
 html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) .scheme-address-editor__submit .v-btn__overlay,
 html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) .scheme-address-editor__submit .v-btn__underlay,
 html body .v-navigation-drawer:has(.address-panel-swap) .v-btn.v-btn--block.v-btn--size-x-large .v-btn__overlay,
-html body .v-navigation-drawer:has(.address-panel-swap) .v-btn.v-btn--block.v-btn--size-x-large .v-btn__underlay {
+html body .v-navigation-drawer:has(.address-panel-swap) .v-btn.v-btn--block.v-btn--size-x-large .v-btn__underlay,
+html body .v-bottom-sheet__content > #locationConfirm #ConfirmLocationBtn .v-btn__overlay,
+html body .v-bottom-sheet__content > #locationConfirm #ConfirmLocationBtn .v-btn__underlay {
     display: none !important;
 }
 @media (prefers-reduced-motion: reduce) {

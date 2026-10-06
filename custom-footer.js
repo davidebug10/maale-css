@@ -3569,7 +3569,7 @@ log('פעיל');
 })();
 
 /* ============================================================
-   מחרוזות שאין להן תרגום בחבילת השפה — MH Lang  |  v1.4.0 | 2026-09-29 (v1.3.0: 23.9, v1.2.0: 22.9, v1.1.0: 10.9)
+   מחרוזות שאין להן תרגום בחבילת השפה — MH Lang  |  v1.5.0 | 2026-10-06 (v1.4.0: 29.9, v1.3.0: 23.9, v1.2.0: 22.9, v1.1.0: 10.9)
    Hyperzod מציירת טקסטים עם ברירת מחדל באנגלית כשמפתח חסר בחבילה:
    getLug().common.customizable || "Customizable". המפתח common.customizable לא קיים
    בחבילה של האתר (88 מפתחות ב-common, נבדק 10.9), ולכן התג בכרטיס המוצר באנגלית.
@@ -3582,12 +3582,14 @@ log('פעיל');
   'use strict';
   if (window.__MH_LANG__) { return; }
   window.__MH_LANG__ = true;
-  var VERSION = '1.4.0';
+  var VERSION = '1.5.0';
   /* סלקטור → { אנגלית: עברית } */
   var MAP = [
     { sel: '.product-customizable-tag', text: { 'Customizable': 'ניתן להתאמה' } },
     /* מסך הוספת כתובת (22.9): כותרת רשימת התוצאות ותווית סוג הכתובת */
     { sel: '.scheme-location-results-heading', text: { 'Search Results': 'תוצאות חיפוש' } },
+    /* (6.10) מסך "אישור מקום" אחרי בחירת תוצאה במודאל המיקום: כפתור החזרה לחיפוש (מחרוזת קשיחה באנגלית) */
+    { sel: '#SearchLocationBackBtn + span', text: { 'Search Location': 'חזרה לחיפוש' } },
     { sel: '#AddressSelectType label', text: { 'Save address as': 'לשמור את הכתובת בתור', 'SAVE ADDRESS AS': 'לשמור את הכתובת בתור' } },
     /* (29.9) השדה שנפתח ב"אחרים": שתי התוויות של Vuetify — במנוחה (#OtherType-label) והצפה (בתוך .v-field__outline) */
     /* \n = שבירת שורה בתווית במנוחה (white-space: pre-line בחלק 44); בתווית הצפה היא נהיית רווח */
