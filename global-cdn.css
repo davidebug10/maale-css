@@ -1430,16 +1430,8 @@ a[href^="tel:"] svg path {
 
 /* --- 12ב: תרגומים והזרקת תוכן (Localization Injection) --- */
 
-/* תרגום Placeholder בשדה החיפוש */
-#mobileLocationSearch .v-field__input::placeholder { color: transparent !important; }
-#mobileLocationSearch .v-field__input::before {
-    content: "חפש אזור, רחוב או כתובת..." !important;
-    position: absolute !important;
-    font-size: 14px !important;
-    color: rgba(0,0,0,0.4) !important;
-    pointer-events: none !important;
-    right: 45px !important; /* התאמה לאייקון החיפוש */
-}
+/* "תרגום Placeholder בשדה החיפוש" הוסר 6.10.2026: הוא הפך את ה-placeholder לשקוף, וה-::before על input
+   לא מצויר בדפדפנים — כך שהשדה היה ריק. ה-placeholder של Hyperzod כבר בעברית ("הזן כתובת"); השדה בבעלות חלק 44. */
 
 /* תרגום כותרת "Recent Searches" - תיקון הסלקטור השבור */
 #mobileLocationSearch .tw-font-inter.tw-font-semibold.tw-text-gray-900 { font-size: 0 !important; }
@@ -1452,7 +1444,7 @@ a[href^="tel:"] svg path {
 }
 
 /* העלמת הכפילות באנגלית מתחת לחיפושים */
-#mobileLocationSearch h3.tw-font-inter { display: none !important; }
+#mobileLocationSearch h3.tw-font-inter:not(.scheme-location-results-heading) { display: none !important; } /* 6.10: כותרת "תוצאות חיפוש" (מתורגמת ע"י MH Lang) מוצגת — חלק 44 */
 
 /* תיקון תווית "Phone:" בכתובות שמורות */
 #mobileLocationSearch .tw-text-gray-500 { font-size: 0 !important; }
@@ -1483,7 +1475,7 @@ a[href^="tel:"] svg path {
 }
 
 /* --- 12ד: כרטיסי כתובות וחיפושים (Floating Glass Islands) --- */
-#mobileLocationSearch .tw-bg-white.tw-border, 
+#mobileLocationSearch .tw-bg-white.tw-border:not(.scheme-location-results-list), /* 6.10: רשימת התוצאות בבעלות חלק 44 */
 #mobileLocationSearch .tw-p-4.tw-bg-white {
     background: rgba(255, 255, 255, 0.75) !important;
     backdrop-filter: blur(45px) saturate(210%) !important;
@@ -1503,15 +1495,7 @@ a[href^="tel:"] svg path {
     border-radius: 12px !important;
 }
 
-/* --- 12ה: שורת החיפוש (Holy Field Implementation) --- */
-#mobileLocationSearch .v-field {
-    border-radius: 12px !important;
-    border: 1px solid rgba(227, 30, 36, 0.2) !important;
-}
-
-#mobileLocationSearch .v-field--focused {
-    border: 1px solid #e31e24 !important; /* דגש אדום עדין במיקוד */
-}
+/* --- 12ה: שורת החיפוש — הוסר 6.10.2026; השדה ורשימת התוצאות במודאל בבעלות "חלק 44: MH AddrEditor" --- */
 
 /* --- 12ו: דף הבית (Merchant & Product Cards) --- */
 .merchant-card {  /* 10.9.2026: .product-card-basic הוסר מהסלקטור — כרטיסי המוצר החדשים שקופים בכוונה (חלק 40) */
@@ -1909,9 +1893,12 @@ div[style*="box-shadow: rgba(0, 0, 0, 0.05) 0px 0px 24px 5px;"] {
    Scope: v-bottom-sheet that contains "בחירת כתובת למשלוח"
    Selector: .v-bottom-sheet__content:has(.location-search-custom-height.dashed-border)
    Date: 2026-03-14 | Updated: 2026-04-27 (narrowed scope to prevent leak into "בחירת מיקום" modal)
+   6.10.2026: שדה החיפוש של מודאל "בחר את המיקום שלך" נושא גם הוא .location-search-custom-height.dashed-border,
+   כך שהחלק הזה דלף אליו (blur על כרטיס החיפוש → רשימת התוצאות נמעכה ל-16px, "לא רואים תוצאות").
+   :not(:has(.scheme-location-search)) מוציא את המודאל; את השדה והתוצאות שם מעצב חלק 44.
    ========================================================= */
 /* 1. The Glass Card */
-.v-bottom-sheet__content:has(.location-search-custom-height.dashed-border) .v-card {
+.v-bottom-sheet__content:has(.location-search-custom-height.dashed-border):not(:has(.scheme-location-search)) .v-card {
     background: rgba(255, 255, 255, 0.8) !important;
     backdrop-filter: blur(50px) saturate(220%) !important;
     -webkit-backdrop-filter: blur(50px) saturate(220%) !important;
@@ -1923,21 +1910,21 @@ div[style*="box-shadow: rgba(0, 0, 0, 0.05) 0px 0px 24px 5px;"] {
     overflow: visible !important;
 }
 /* 2. Kill v-card layers */
-.v-bottom-sheet__content:has(.location-search-custom-height.dashed-border) .v-card__underlay,
-.v-bottom-sheet__content:has(.location-search-custom-height.dashed-border) .v-card__loader,
-.v-bottom-sheet__content:has(.location-search-custom-height.dashed-border) .v-card .v-card__underlay,
-.v-bottom-sheet__content:has(.location-search-custom-height.dashed-border) .v-field__overlay {
+.v-bottom-sheet__content:has(.location-search-custom-height.dashed-border):not(:has(.scheme-location-search)) .v-card__underlay,
+.v-bottom-sheet__content:has(.location-search-custom-height.dashed-border):not(:has(.scheme-location-search)) .v-card__loader,
+.v-bottom-sheet__content:has(.location-search-custom-height.dashed-border):not(:has(.scheme-location-search)) .v-card .v-card__underlay,
+.v-bottom-sheet__content:has(.location-search-custom-height.dashed-border):not(:has(.scheme-location-search)) .v-field__overlay {
     display: none !important;
 }
 /* 3. Title - fix broken text + QLED styling */
-.v-bottom-sheet__content:has(.location-search-custom-height.dashed-border) .v-card-title {
+.v-bottom-sheet__content:has(.location-search-custom-height.dashed-border):not(:has(.scheme-location-search)) .v-card-title {
     padding: 0 0 16px 0 !important;
     border-bottom: none !important;
     display: flex !important;
     justify-content: center !important;
     align-items: center !important;
 }
-.v-bottom-sheet__content:has(.location-search-custom-height.dashed-border) .v-card-title div:first-child {
+.v-bottom-sheet__content:has(.location-search-custom-height.dashed-border):not(:has(.scheme-location-search)) .v-card-title div:first-child {
     font-size: 19px !important;
     font-weight: 900 !important;
     color: #1a1a1a !important;
@@ -1947,11 +1934,11 @@ div[style*="box-shadow: rgba(0, 0, 0, 0.05) 0px 0px 24px 5px;"] {
     white-space: normal !important;
 }
 /* 4. Hide the divider line */
-.v-bottom-sheet__content:has(.location-search-custom-height.dashed-border) hr.v-divider {
+.v-bottom-sheet__content:has(.location-search-custom-height.dashed-border):not(:has(.scheme-location-search)) hr.v-divider {
     display: none !important;
 }
 /* 5. Search field - Crystal Capsule */
-.v-bottom-sheet__content:has(.location-search-custom-height.dashed-border) .location-search-custom-height .v-field {
+.v-bottom-sheet__content:has(.location-search-custom-height.dashed-border):not(:has(.scheme-location-search)) .location-search-custom-height .v-field {
     background: rgba(255, 255, 255, 0.7) !important;
     backdrop-filter: blur(20px) !important;
     -webkit-backdrop-filter: blur(20px) !important;
@@ -1960,49 +1947,49 @@ div[style*="box-shadow: rgba(0, 0, 0, 0.05) 0px 0px 24px 5px;"] {
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.05) !important;
     transition: all 0.3s ease !important;
 }
-.v-bottom-sheet__content:has(.location-search-custom-height.dashed-border) .location-search-custom-height .v-field--focused {
+.v-bottom-sheet__content:has(.location-search-custom-height.dashed-border):not(:has(.scheme-location-search)) .location-search-custom-height .v-field--focused {
     background: #ffffff !important;
     border-color: #e31e24 !important;
     box-shadow: 0 10px 30px rgba(227, 30, 36, 0.1) !important;
 }
 /* Search field cleanup */
-.v-bottom-sheet__content:has(.location-search-custom-height.dashed-border) .v-field__outline,
-.v-bottom-sheet__content:has(.location-search-custom-height.dashed-border) .l-search .v-card__underlay {
+.v-bottom-sheet__content:has(.location-search-custom-height.dashed-border):not(:has(.scheme-location-search)) .v-field__outline,
+.v-bottom-sheet__content:has(.location-search-custom-height.dashed-border):not(:has(.scheme-location-search)) .l-search .v-card__underlay {
     display: none !important;
 }
 /* Search field background card */
-.v-bottom-sheet__content:has(.location-search-custom-height.dashed-border) .l-search {
+.v-bottom-sheet__content:has(.location-search-custom-height.dashed-border):not(:has(.scheme-location-search)) .l-search {
     background: transparent !important;
     box-shadow: none !important;
 }
 /* Search icon - QLED red */
-.v-bottom-sheet__content:has(.location-search-custom-height.dashed-border) .search-icon-mobile {
+.v-bottom-sheet__content:has(.location-search-custom-height.dashed-border):not(:has(.scheme-location-search)) .search-icon-mobile {
     filter: brightness(0) saturate(100%) invert(18%) sepia(88%) saturate(5427%) hue-rotate(352deg) brightness(91%) contrast(92%) !important;
     opacity: 0.7 !important;
 }
 /* Back arrow icon - QLED red */
-.v-bottom-sheet__content:has(.location-search-custom-height.dashed-border) .v-icon {
+.v-bottom-sheet__content:has(.location-search-custom-height.dashed-border):not(:has(.scheme-location-search)) .v-icon {
     color: #e31e24 !important;
 }
 /* Placeholder text */
-.v-bottom-sheet__content:has(.location-search-custom-height.dashed-border) input::placeholder {
+.v-bottom-sheet__content:has(.location-search-custom-height.dashed-border):not(:has(.scheme-location-search)) input::placeholder {
     color: rgba(0, 0, 0, 0.35) !important;
     font-weight: 500 !important;
 }
 /* Input text */
-.v-bottom-sheet__content:has(.location-search-custom-height.dashed-border) input {
+.v-bottom-sheet__content:has(.location-search-custom-height.dashed-border):not(:has(.scheme-location-search)) input {
     font-weight: 700 !important;
     color: #1a1a1a !important;
 }
 /* 6. The "-או-" separator text */
-.v-bottom-sheet__content:has(.location-search-custom-height.dashed-border) p.tw-text-center.tw-my-4 {
+.v-bottom-sheet__content:has(.location-search-custom-height.dashed-border):not(:has(.scheme-location-search)) p.tw-text-center.tw-my-4 {
     color: #bbb !important;
     font-weight: 600 !important;
     font-size: 13px !important;
     margin: 20px 0 !important;
 }
 /* 7. "סמן על המפה" button - Crystal QLED */
-.v-bottom-sheet__content:has(.location-search-custom-height.dashed-border) a.v-btn {
+.v-bottom-sheet__content:has(.location-search-custom-height.dashed-border):not(:has(.scheme-location-search)) a.v-btn {
     background: linear-gradient(135deg, #e31e24 0%, #b3161b 100%) !important;
     color: #ffffff !important;
     border-radius: 18px !important;
@@ -2015,13 +2002,13 @@ div[style*="box-shadow: rgba(0, 0, 0, 0.05) 0px 0px 24px 5px;"] {
     border: 1px solid rgba(255, 255, 255, 0.2) !important;
     transition: all 0.3s ease !important;
 }
-.v-bottom-sheet__content:has(.location-search-custom-height.dashed-border) a.v-btn:active {
+.v-bottom-sheet__content:has(.location-search-custom-height.dashed-border):not(:has(.scheme-location-search)) a.v-btn:active {
     transform: scale(0.97) !important;
     box-shadow: 0 4px 15px rgba(227, 30, 36, 0.2) !important;
 }
 /* Kill button overlays */
-.v-bottom-sheet__content:has(.location-search-custom-height.dashed-border) a.v-btn .v-btn__overlay,
-.v-bottom-sheet__content:has(.location-search-custom-height.dashed-border) a.v-btn .v-btn__underlay {
+.v-bottom-sheet__content:has(.location-search-custom-height.dashed-border):not(:has(.scheme-location-search)) a.v-btn .v-btn__overlay,
+.v-bottom-sheet__content:has(.location-search-custom-height.dashed-border):not(:has(.scheme-location-search)) a.v-btn .v-btn__underlay {
     display: none !important;
 }
 
@@ -5323,7 +5310,7 @@ html body .mh-fullname-error .v-field {
 /* mh-fullname-v1 */
 
 /* =========================================================
-   חלק 44: מסך הוספת/עריכת כתובת — MH AddrEditor v1.0.4 | 2026-09-29 (v1.0.1: שדה הטלפון LTR; v1.0.2: ישראל קבועה — תפריט המדינות נעול, ראו MH ILPhone; v1.0.4: תווית "אחר" בשתי שורות) — Liquid Glass + אדום QLED
+   חלק 44: מסך הוספת/עריכת כתובת + מודאל "בחר את המיקום שלך" — MH AddrEditor v1.0.5 | 2026-10-06 (v1.0.1: שדה הטלפון LTR; v1.0.2: ישראל קבועה — תפריט המדינות נעול, ראו MH ILPhone; v1.0.4: תווית "אחר" בשתי שורות) — Liquid Glass + אדום QLED
    הבעלים היחיד של המסך: הדר, שדה החיפוש, רשימת התוצאות, המפה, הטופס והפוטר —
    בחלונית במובייל (.scheme-address-editor) ובמגירה בדסקטופ (.v-navigation-drawer .address-panel-swap).
    מחליף במלואם את חלקים 12ד, 12ה, 16א–16ה, 21א, 21ב, 23, 28, 29, 29.1,
@@ -5332,6 +5319,9 @@ html body .mh-fullname-error .v-field {
    שדה החיפוש ואת ה-× שלו ("אי אפשר לצאת"), overflow:hidden על הרשימה ("לא מחליק"),
    min-height/flex שנכתבו למסך אחר, פס אדום דקורטיבי, וכללים על hash-ים של Vue שכבר
    לא קיימים בבילד (data-v-bd9430d0 / 4b9952fb / d055d74b / 3b7172a6 — 0 התאמות).
+   v1.0.5 (6.10): גם מודאל "בחר את המיקום שלך" (#mobileLocationSearch.scheme-location-search, sidePanel searchModal) —
+   אותו רכיב location-master. שם הכלל הגנרי של הגיליון + חלק 27 שמו blur על כרטיס החיפוש, והרשימה נמעכה ל-16px
+   ("מחפשים ולא רואים תוצאות"). כללי .scheme-location-* כאן חלים גם עליו; החלק של השדה ב-12ב/12ה הוסר.
    עקרון: לא נוגעים במיקום שמחשבת Hyperzod (top של התוצאות = תחתית שדה החיפוש, inline).
    התוצאות שמוזרקות ע"י MH Streets (custom-footer.js) מסומנות ב-.mh-st-tag.
    ========================================================= */
@@ -5342,7 +5332,8 @@ html body .mh-fullname-error .v-field {
 html body .v-bottom-sheet__content > .v-card.scheme-address-editor,
 html body .v-card.scheme-address-editor,
 html body .v-card.scheme-address-editor .v-card,
-html body .v-navigation-drawer .address-panel-swap .v-card {
+html body .v-navigation-drawer .address-panel-swap .v-card,
+html body .scheme-location-search .scheme-location-master .v-card {
     padding: 0 !important;
     border-radius: 0 !important;
     border-top: 0 !important;
@@ -5395,11 +5386,11 @@ html body .scheme-address-editor .scheme-address-editor__header > .tw-px-4 {
     padding: 6px 14px 12px !important;
     background: transparent !important;
 }
-html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) .scheme-location-master .l-search {
+html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap, .scheme-location-search) .scheme-location-master .l-search {
     background: transparent !important;
     box-shadow: none !important;
 }
-html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) .scheme-location-master .v-text-field .v-field {
+html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap, .scheme-location-search) .scheme-location-master .v-text-field .v-field {
     height: 50px !important;
     min-height: 50px !important;
     border-radius: 999px !important;
@@ -5409,26 +5400,26 @@ html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) 
     padding-inline: 14px !important;
     transition: border-color 0.2s ease, box-shadow 0.2s ease !important;
 }
-html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) .scheme-location-master .v-field--focused {
+html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap, .scheme-location-search) .scheme-location-master .v-field--focused {
     border-color: #e31e24 !important;
     box-shadow: 0 0 0 4px rgba(227, 30, 36, 0.10) !important;
 }
-html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) .scheme-location-master .v-field__outline,
-html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) .scheme-location-master .v-field__overlay {
+html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap, .scheme-location-search) .scheme-location-master .v-field__outline,
+html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap, .scheme-location-search) .scheme-location-master .v-field__overlay {
     display: none !important;
 }
-html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) .scheme-location-master input#search {
+html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap, .scheme-location-search) .scheme-location-master input#search {
     font-size: 16px !important;
     font-weight: 600 !important;
     color: #111 !important;
     padding: 0 !important;
     min-height: 46px !important;
 }
-html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) .scheme-location-master input#search::placeholder {
+html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap, .scheme-location-search) .scheme-location-master input#search::placeholder {
     color: #8a8f98 !important;
     font-weight: 500 !important;
 }
-html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) .scheme-location-master .search-icon-mobile {
+html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap, .scheme-location-search) .scheme-location-master .search-icon-mobile {
     width: 36px !important;
     height: 36px !important;
     display: flex !important;
@@ -5438,17 +5429,17 @@ html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) 
     cursor: pointer !important;
     flex: none !important;
 }
-html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) .scheme-location-master .scheme-colorable-icon--close {
+html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap, .scheme-location-search) .scheme-location-master .scheme-colorable-icon--close {
     background: rgba(227, 30, 36, 0.08) !important;
 }
-html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) .scheme-location-master .search-icon-mobile img {
+html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap, .scheme-location-search) .scheme-location-master .search-icon-mobile img {
     width: 18px !important;
     height: 18px !important;
     filter: invert(20%) sepia(96%) saturate(5600%) hue-rotate(350deg) brightness(88%) !important;
 }
 
 /* 3. רשימת התוצאות: זכוכית לבנה מלוא הרוחב, גלילה טבעית, בלי חפיפה על השדה */
-html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) .scheme-location-master .search-results {
+html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap, .scheme-location-search) .scheme-location-master .search-results {
     background: rgba(255, 255, 255, 0.97) !important;
     -webkit-backdrop-filter: blur(20px) !important;
     backdrop-filter: blur(20px) !important;
@@ -5459,16 +5450,16 @@ html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) 
     min-height: 0 !important;
     display: block !important;
 }
-html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) .scheme-location-master .search-results.tw-fixed {
+html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap, .scheme-location-search) .scheme-location-master .search-results.tw-fixed {
     overflow-y: auto !important;
     -webkit-overflow-scrolling: touch !important;
     overscroll-behavior: contain !important;
 }
-html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) .scheme-location-master .search-results::before {
+html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap, .scheme-location-search) .scheme-location-master .search-results::before {
     content: none !important;
     display: none !important;
 }
-html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) .scheme-location-results-heading {
+html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap, .scheme-location-search) .scheme-location-results-heading {
     display: block !important;
     margin: 8px 18px 4px !important;
     font-size: 12px !important;
@@ -5476,19 +5467,19 @@ html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) 
     letter-spacing: 0.3px !important;
     color: #8a8f98 !important;
 }
-html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) .scheme-location-master .results-list {
+html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap, .scheme-location-search) .scheme-location-master .results-list {
     background: transparent !important;
     box-shadow: none !important;
     border-radius: 0 !important;
     padding: 0 8px !important;
     margin: 0 !important;
 }
-html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) .scheme-location-master .search-results.tw-fixed .results-list {
+html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap, .scheme-location-search) .scheme-location-master .search-results.tw-fixed .results-list {
     max-height: none !important;
     height: auto !important;
     overflow: visible !important;
 }
-html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) .scheme-location-result {
+html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap, .scheme-location-search) .scheme-location-result {
     padding: 13px 12px !important;
     gap: 12px !important;
     border-radius: 14px !important;
@@ -5497,40 +5488,40 @@ html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) 
     animation: none !important;
     transition: background-color 0.15s ease !important;
 }
-html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) .scheme-location-result:active {
+html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap, .scheme-location-search) .scheme-location-result:active {
     background: rgba(227, 30, 36, 0.06) !important;
 }
 @media (hover: hover) {
-    html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) .scheme-location-result:hover {
+    html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap, .scheme-location-search) .scheme-location-result:hover {
         background: rgba(0, 0, 0, 0.035) !important;
     }
 }
-html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) .scheme-location-result > div.tw-absolute.tw-bottom-0 {
+html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap, .scheme-location-search) .scheme-location-result > div.tw-absolute.tw-bottom-0 {
     display: none !important;
 }
-html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) .scheme-location-result__title {
+html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap, .scheme-location-search) .scheme-location-result__title {
     font-size: 15px !important;
     font-weight: 800 !important;
     line-height: 1.3 !important;
     color: #111 !important;
 }
-html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) .scheme-location-result__address {
+html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap, .scheme-location-search) .scheme-location-result__address {
     font-size: 13px !important;
     line-height: 1.4 !important;
     color: #6b7280 !important;
     margin-top: 2px !important;
 }
-html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) .scheme-location-result .scheme-colorable-icon--map-pin {
+html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap, .scheme-location-search) .scheme-location-result .scheme-colorable-icon--map-pin {
     width: 20px !important;
     height: 20px !important;
     margin-top: 2px !important;
     opacity: 0.9 !important;
 }
 /* תג של תוצאה מוזרקת (MH Streets): מוסתר בכותרת, מוצג כגלולה בשורת המשנה */
-html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) .scheme-location-result__title .mh-st-tag {
+html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap, .scheme-location-search) .scheme-location-result__title .mh-st-tag {
     display: none !important;
 }
-html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) .scheme-location-result__address .mh-st-tag {
+html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap, .scheme-location-search) .scheme-location-result__address .mh-st-tag {
     display: inline-block !important;
     margin-inline-start: 6px !important;
     padding: 2px 8px !important;
@@ -5542,14 +5533,14 @@ html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) 
     vertical-align: middle !important;
 }
 /* "לא נמצאו תוצאות": טקסט + רמז */
-html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) .scheme-location-master .search-results > div:not(.results-list) > p {
+html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap, .scheme-location-search) .scheme-location-master .search-results > div:not(.results-list) > p {
     margin: 10px 18px !important;
     font-size: 14px !important;
     font-weight: 600 !important;
     color: #374151 !important;
     line-height: 1.45 !important;
 }
-html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) .scheme-location-master .search-results > div:not(.results-list) > p::after {
+html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap, .scheme-location-search) .scheme-location-master .search-results > div:not(.results-list) > p::after {
     content: 'לא מוצאים את הרחוב? נסו לכתוב רק את שם הרחוב, או הזיזו את הסיכה במפה למיקום המדויק.';
     display: block !important;
     margin-top: 6px !important;
@@ -5858,7 +5849,7 @@ html body .v-navigation-drawer:has(.address-panel-swap) .v-btn.v-btn--block.v-bt
     display: none !important;
 }
 @media (prefers-reduced-motion: reduce) {
-    html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) .scheme-location-result,
+    html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap, .scheme-location-search) .scheme-location-result,
     html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) .scheme-address-editor__submit,
     html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) #addAddressForm .v-field { transition: none !important; }
 }
