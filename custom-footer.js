@@ -691,7 +691,7 @@
 })();
 
 /* =========================================================
-   אישור גיל 18+ בהוספה לעגלה — MH AgeGate v1.2.0 | 2026-07-25, עדכון 2026-09-09
+   אישור גיל 18+ בהוספה לעגלה — MH AgeGate v1.2.1 | 2026-07-25, עדכון 2026-09-09, 2026-10-07 (v1.2.1: "מארזים עם אלכוהול" של פרחי דליה)
    - תופס לחיצה על button.add-btn בשלב ה-capture (לפני Vue)
    - מזהה קטגוריה: .product-category-name בפופאפ מוצר; ברשימה — כותרת הסקשן
      (.special-listing-inner / .cat-item): ה-h3 הראשון שאינו בתוך כרטיס מוצר.
@@ -724,7 +724,9 @@
         'טבק לגלגול', 'נלווים לעישון', 'ניירות גלגול ופילטרים',
         'פאקטים - סיגריות', 'פאקטים - טבק',
         'תערובות לנרגילה', 'נרגילות', 'גחלים לנרגילה', 'אביזרים לנרגילה',
-        'הפינה הירוקה'
+        'הפינה הירוקה',
+        /* פרחי דליה — 7.10.2026 (ה"אלכוהול" שלהם כבר למעלה). נבדק מול 21 החנויות: קיים רק אצלם */
+        'מארזים עם אלכוהול'
     ];
     /* חנויות שכל המלאי בהן 18+. חסימה לפי מזהה החנות ב-URL בלבד — סקופ נעול,
        לא נוגע בשום חנות אחרת גם אם שמות הקטגוריות ישתנו. */
@@ -741,7 +743,7 @@
         document.head.appendChild(st);
     }
 
-    var stats = { version: '1.2.0', checked: 0, gated: 0, byMerchant: 0, byCategory: 0 };
+    var stats = { version: '1.2.1', checked: 0, gated: 0, byMerchant: 0, byCategory: 0 };
     /* /he/m/<slug>/<merchantId> — מחזיר true רק אם המזהה נמצא ברשימה המפורשת */
     function onAgeMerchant() {
         var m = String(location.pathname).match(/\/m\/[^/]+\/([0-9a-fA-F]{16,})/);
@@ -4844,4 +4846,442 @@ log('פעיל');
   schedule();
   window.MH_ADDRWARN = { version: VERSION, sync: sync, stats: function () { return JSON.parse(JSON.stringify(stats)); } };
   /* mh-addrwarn-v1 */
+})();
+
+/* =========================================================================
+   פרחי דליה — MH Dalia  |  v1.0.0 | 2026-10-07
+   -------------------------------------------------------------------------
+   רק לעסק שבמערך MERCHANTS (פרחי דליה). שלושה חלקים, כל אחד נכשל-פתוח בנפרד:
+
+   1. חסימת מועדים — לפי שעון ישראל תמיד (Intl, Asia/Jerusalem), לא לפי אזור הזמן של המכשיר.
+      ההגדרות ב-Hyperzod (הזמנות מתוזמנות בלבד, שעה מראש, 7 ימים, חלונות של שעה, א'–ה' 08–22,
+      שישי 08–16, שבת סגור) נשארות; הבלוק מוסיף מעליהן:
+        א'–ה' — 3.5 שעות מראש לפחות. לאותו יום: רק בהזמנה עד 15:00, ורק לחלון ערב.
+                 למחר בבוקר: רק בהזמנה עד 15:00 היום (גם משבת לראשון, גם מחמישי לשישי).
+                 למחר בערב: בכל שעה.
+        שישי   — מהיום להיום: רק בהזמנה עד 13:00, שעה מראש לפחות, עד 16:00.
+                 לשישי מיום קודם: כמו הכללים הרגילים.
+        "ערב" = חלון שמתחיל ב-15:00 ואילך (CFG.EVENING). "עד 15:00" כולל את 15:00:00 עצמה.
+      שכבת רשת (שכבת הכסף): POST /store/v1/order של העסק עם מועד אסור / בלי מועד
+        (is_scheduled:false) — נחסם לפני השליחה + טוסט אדום + המועד מתנקה. בלי השדה
+        scheduling_slot בכלל (מבנה לא מזוהה) — עובר, כמו ב-MH Preorder.
+      שכבת תצוגה: התשובה של GET /order/getSchedulingSlots מסוננת לפני ש-Hyperzod קוראת אותה
+        (שני רכיבים קוראים אותה — Vuex וגם עותק מקומי — ולכן מסננים ברשת ולא ב-store).
+        בנוסף, כל 30 שניות ובכל לחיצה על "לוח זמנים" (.schedule-switch) או בתוך הבורר: הרשימות הפתוחות מסוננות מחדש
+        במקום (הזמן זז — חלון של 15:00 מותר ב-11:30 ואסור ב-11:31), ומועד שנבחר והפך לאסור מתנקה.
+   2. כרטיס "טוב לדעת" עם שלוש ההערות בראש התפריט בדף העסק (Hyperzod לא מציגה תיאור קטגוריה).
+   3. "החל מ-" לפני המחיר בכרטיס של מוצר עם קבוצת "גודל" שהיא חובה ושהמחיר בה משתנה
+      (קבוצה עם גודל אחד / אותו מחיר לכל הגדלים — בלי "החל מ-"). הנתונים: catalog/products/listByIds
+      דרך הלקוח של Hyperzod (apiRequest של רכיב דף העסק, MH_MENULOAD.findComp), פעם אחת לכל מוצר בסשן.
+
+   בדיקה: MH_DALIA.stats() · MH_DALIA.verdict(ms, 'YYYY-MM-DD', 'HH:MM', 'HH:MM')
+   שעון מדומה לבדיקות: window.__MH_DALIA_NOW__ = <ms>  (רק הבלוק הזה קורא אותו)
+   ========================================================================= */
+(function () {
+  'use strict';
+  if (window.__MH_DALIA__) { return; }
+  window.__MH_DALIA__ = true;
+
+  var CFG = {
+    VERSION: '1.0.0',
+    MERCHANTS: ['6ac61fa523f1f833040171d2'],   /* פרחי דליה */
+    TZ: 'Asia/Jerusalem',
+    EVENING: 15 * 60,      /* "ערב" = חלון שמתחיל ב-15:00 ואילך — לשנות כאן */
+    CUTOFF: 15 * 60,       /* א'–ה' (ושבת → ראשון בבוקר): הזמנה עד 15:00 */
+    LEAD: 210,             /* א'–ה': 3.5 שעות מראש (בדקות) */
+    FRI_CUTOFF: 13 * 60,   /* שישי מהיום להיום: הזמנה עד 13:00 */
+    FRI_LEAD: 60,          /* שישי: שעה מראש */
+    FRI_END: 16 * 60,      /* שישי: עד 16:00 */
+    SIZE: 'גודל',
+    NOTES: [
+      'הפרחים עשויים להשתנות לפי זמינות עונתית, תוך שמירה על הסגנון, הצבעוניות והאופי הכללי של הזר.',
+      'מומלץ להחליף מים באגרטל כל 2–3 ימים ולחתוך מעט את קצות הגבעולים לשמירה על טריות הפרחים.',
+      'האגרטל בתמונה להמחשה בלבד, אלא אם צוין אחרת.'
+    ]
+  };
+  var WHY = {
+    bad: 'המועד לא מזוהה',
+    sat: 'בשבת אין משלוחים',
+    past: 'המועד כבר עבר',
+    friEnd: 'בשישי המשלוחים עד 16:00',
+    friCutoff: 'משלוח לשישי של היום אפשר להזמין עד 13:00',
+    friLead: 'בשישי צריך להזמין לפחות שעה לפני חלון המשלוח',
+    cutoff: 'משלוח לאותו יום אפשר להזמין עד 15:00',
+    morning: 'משלוח לאותו יום — רק לחלונות הערב (מ-15:00)',
+    tomorrowMorning: 'משלוח למחר בבוקר אפשר להזמין עד 15:00 היום',
+    lead: 'צריך להזמין לפחות 3.5 שעות לפני חלון המשלוח',
+    none: 'יש לבחור מועד למשלוח'
+  };
+  var S = { version: CFG.VERSION, slotsFiltered: 0, slotsRemoved: 0, ordersSeen: 0, ordersBlocked: 0, refreshes: 0,
+            cleared: 0, notes: 0, fromMarked: 0, fromFetches: 0, errors: 0, last: null };
+  function warn() { try { console.warn.apply(console, ['[MH Dalia]'].concat([].slice.call(arguments))); } catch (e) {} }
+  function ours(mid) { return !!mid && CFG.MERCHANTS.indexOf(String(mid)) !== -1; }
+  function store() {
+    try { return document.getElementById('app').__vue_app__.config.globalProperties.$store; } catch (e) { return null; }
+  }
+  function nowMs() { return typeof window.__MH_DALIA_NOW__ === 'number' ? window.__MH_DALIA_NOW__ : Date.now(); }
+
+  /* ---------- 1א. הכללים ---------- */
+
+  var FMT = null, lastMs = NaN, lastWall = null;
+  /* שעון ישראל: יום (מספר ימים מ-1970) + דקות מתחילת היום (עם שברי שניות) */
+  function wall(ms) {
+    if (ms === lastMs) { return lastWall; }          /* סינון רשימה = אותו "עכשיו" לכל החלונות */
+    lastMs = ms; lastWall = wall0(ms);
+    return lastWall;
+  }
+  function wall0(ms) {
+    if (!FMT) {
+      FMT = new Intl.DateTimeFormat('en-US', { timeZone: CFG.TZ, hourCycle: 'h23', year: 'numeric', month: '2-digit',
+        day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    }
+    var p = {}, a = FMT.formatToParts(new Date(ms));
+    for (var i = 0; i < a.length; i++) { p[a[i].type] = a[i].value; }
+    return { day: Date.UTC(+p.year, +p.month - 1, +p.day) / 864e5, min: (+p.hour % 24) * 60 + (+p.minute) + (+p.second) / 60 };
+  }
+  function hm(s) {
+    var m = /^\s*(\d{1,2}):(\d{2})/.exec(String(s || ''));
+    return m ? (+m[1]) * 60 + (+m[2]) : -1;
+  }
+  function no(k) { return { ok: false, why: k }; }
+  var YES = { ok: true, why: '' };
+
+  /* מותר להזמין עכשיו (ms) לחלון from–to בתאריך date (שעון ישראל, כפי ש-Hyperzod שולחת)? */
+  function verdict(now, date, from, to) {
+    var dm = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(date || ''));
+    var st = hm(from), en = hm(to);
+    if (!dm || st < 0 || en < 0) { return no('bad'); }
+    var day = Date.UTC(+dm[1], +dm[2] - 1, +dm[3]) / 864e5;
+    var w = wall(now), delta = day - w.day, dow = (day + 4) % 7;     /* 1.1.1970 = חמישי; 0 = ראשון */
+    /* ponytail: דקות של שעון קיר, לא זמן שעבר. נבדלות רק בליל מעבר שעון (01:00–02:00), ואין אז חלונות */
+    var lead = delta * 1440 + st - w.min;
+    if (dow === 6) { return no('sat'); }
+    if (delta < 0 || lead <= 0) { return no('past'); }
+    if (dow === 5) {
+      if (en > CFG.FRI_END) { return no('friEnd'); }
+      if (delta === 0) {
+        if (w.min > CFG.FRI_CUTOFF) { return no('friCutoff'); }
+        return lead >= CFG.FRI_LEAD ? YES : no('friLead');
+      }
+    } else if (delta === 0) {
+      if (w.min > CFG.CUTOFF) { return no('cutoff'); }
+      if (st < CFG.EVENING) { return no('morning'); }
+    }
+    if (delta === 1 && st < CFG.EVENING && w.min > CFG.CUTOFF) { return no('tomorrowMorning'); }
+    return lead >= CFG.LEAD ? YES : no('lead');
+  }
+  /* "08:00 - 09:00" (הפורמט של Hyperzod: from + " - " + to) */
+  function verdictTime(now, date, time) {
+    var m = /^\s*(\d{1,2}:\d{2})\s*-\s*(\d{1,2}:\d{2})\s*$/.exec(String(time || ''));
+    return m ? verdict(now, date, m[1], m[2]) : no('bad');
+  }
+
+  /* ---------- 1ב. סינון רשימת המועדים ---------- */
+
+  /* מחזיר עותק מסונן של available_slots: [{date, slots:[[{from,to}]]}] — ימים ריקים יוצאים */
+  function filterDays(days, now) {
+    var out = [];
+    for (var i = 0; i < days.length; i++) {
+      var d = days[i];
+      if (!d || !Array.isArray(d.slots)) { out.push(d); continue; }
+      var groups = [], n = 0;
+      for (var g = 0; g < d.slots.length; g++) {
+        var grp = Array.isArray(d.slots[g]) ? d.slots[g] : [d.slots[g]], keep = [];
+        for (var j = 0; j < grp.length; j++) {
+          if (grp[j] && verdict(now, d.date, grp[j].from, grp[j].to).ok) { keep.push(grp[j]); } else { S.slotsRemoved++; }
+        }
+        if (keep.length) { groups.push(keep); n += keep.length; }
+      }
+      if (n) { var c = {}; for (var k in d) { if (Object.prototype.hasOwnProperty.call(d, k)) { c[k] = d[k]; } } c.slots = groups; out.push(c); }
+    }
+    return out;
+  }
+  function filterJson(j) {
+    if (!j || !j.data || !Array.isArray(j.data.available_slots)) { return false; }
+    j.data.available_slots = filterDays(j.data.available_slots, nowMs());
+    S.slotsFiltered++;
+    return true;
+  }
+  /* אותו סינון במקום, על מערכים ריאקטיביים שכבר אצל Vue (רשימה פתוחה שהזמן עבר עליה) */
+  function pruneDays(days, now) {
+    var removed = 0;
+    for (var i = days.length - 1; i >= 0; i--) {
+      var d = days[i]; if (!d || !Array.isArray(d.slots)) { continue; }
+      var n = 0;
+      for (var g = 0; g < d.slots.length; g++) {
+        var grp = d.slots[g]; if (!Array.isArray(grp)) { continue; }
+        for (var j = grp.length - 1; j >= 0; j--) {
+          if (!grp[j] || !verdict(now, d.date, grp[j].from, grp[j].to).ok) { grp.splice(j, 1); removed++; }
+        }
+        n += grp.length;
+      }
+      if (!n) { days.splice(i, 1); }
+    }
+    return removed;
+  }
+
+  /* ---------- 1ג. שכבת רשת ---------- */
+
+  var IS_ORDER = /\/store\/v1\/order(\?|$)/;
+  var IS_SLOTS = /\/store\/v1\/order\/getSchedulingSlots(\?|$)/;
+  function midOf(u) { var m = /[?&]merchant_id=([0-9a-fA-F]{16,})/.exec(String(u || '')); return m ? m[1] : null; }
+  var CLEAR = { is_scheduled: false, date: '0000-00-00', time: '00:00' };
+  function toast(msg) {
+    var st = store();
+    try { if (st) { st.commit('setToast', { message: msg, color: 'red', show: true }); } } catch (e) {}
+  }
+
+  /* true = מותר לשלוח */
+  function guardOrder(body) {
+    if (typeof body !== 'string') { return true; }
+    var o; try { o = JSON.parse(body); } catch (e) { return true; }
+    if (!o || !ours(o.merchant_id)) { return true; }
+    S.ordersSeen++;
+    if (!Object.prototype.hasOwnProperty.call(o, 'scheduling_slot')) { warn('הזמנה בלי scheduling_slot — מבנה לא מזוהה, עוברת'); return true; }
+    var s = o.scheduling_slot || {};
+    var v = s.is_scheduled === true ? verdictTime(nowMs(), s.date, s.time) : no('none');
+    S.last = { date: s.date, time: s.time, ok: v.ok, why: v.why };
+    if (v.ok) { return true; }
+    if (v.why === 'bad') { warn('פורמט מועד לא מזוהה — עוברת:', s.date, s.time); return true; }
+    S.ordersBlocked++;
+    warn('🛑 הזמנה נחסמה:', s.date, s.time, v.why);
+    var msg = v.why === 'none' ? 'יש לבחור מועד למשלוח — פרחי דליה מקבלים הזמנות מתוזמנות בלבד.'
+      : 'המועד שבחרת לא זמין: ' + WHY[v.why] + '. בחרו מועד אחר.';
+    setTimeout(function () {
+      var st = store();
+      try { if (st) { st.commit('setOrderSchedule', { is_scheduled: CLEAR.is_scheduled, date: CLEAR.date, time: CLEAR.time }); } } catch (e) {}
+      toast(msg); refresh();
+    }, 300);
+    return false;
+  }
+
+  /* XHR (axios של Hyperzod). הבלוק נטען אחרון — העטיפה שלו חיצונית ורצה ראשונה. */
+  try {
+    var XP = XMLHttpRequest.prototype, _o = XP.open, _s = XP.send;
+    var RT = Object.getOwnPropertyDescriptor(XP, 'responseText'), RS = Object.getOwnPropertyDescriptor(XP, 'response');
+    XP.open = function (m, url) {
+      var x = this;
+      try {
+        var M = String(m).toUpperCase(), u = String(url || '');
+        x.__mhDaliaOrder = M === 'POST' && IS_ORDER.test(u);
+        if (M === 'GET' && IS_SLOTS.test(u) && ours(midOf(u)) && RT && RS) {
+          /* readystatechange נרשם כאן, לפני ש-axios מציב onloadend — ולכן רץ לפניו */
+          x.addEventListener('readystatechange', function () {
+            if (x.readyState !== 4 || x.status !== 200) { return; }
+            try {
+              var json = x.responseType === 'json', j = json ? RS.get.call(x) : JSON.parse(RT.get.call(x));
+              if (!filterJson(j)) { return; }
+              var txt = JSON.stringify(j);
+              Object.defineProperty(x, 'responseText', { configurable: true, get: function () { return txt; } });
+              Object.defineProperty(x, 'response', { configurable: true, get: function () { return json ? j : txt; } });
+            } catch (e) { S.errors++; warn('slots', e); }
+          });
+        }
+      } catch (e) { S.errors++; }
+      return _o.apply(this, arguments);
+    };
+    XP.send = function (b) {
+      if (this.__mhDaliaOrder) {
+        var ok = true;
+        try { ok = guardOrder(b); } catch (e) { S.errors++; warn('send', e); ok = true; }
+        if (!ok) { throw new Error('MH Dalia: המועד שנבחר לא זמין'); }
+      }
+      return _s.apply(this, arguments);
+    };
+  } catch (e) { warn('xhr hook', e); }
+  try {
+    var _f = window.fetch;
+    if (typeof _f === 'function') {
+      window.fetch = function (input, init) {
+        try {
+          var u = typeof input === 'string' ? input : ((input && input.url) || '');
+          var M = String((init && init.method) || (input && input.method) || 'GET').toUpperCase();
+          if (M === 'POST' && IS_ORDER.test(u) && init && typeof init.body === 'string' && !guardOrder(init.body)) {
+            return Promise.reject(new Error('MH Dalia: המועד שנבחר לא זמין'));
+          }
+          if (M === 'GET' && IS_SLOTS.test(u) && ours(midOf(u))) {
+            return _f.apply(this, arguments).then(function (res) {
+              return res.clone().json().then(function (j) {
+                if (!filterJson(j)) { return res; }
+                return new Response(JSON.stringify(j), { status: res.status, statusText: res.statusText, headers: res.headers });
+              }).catch(function () { return res; });
+            });
+          }
+        } catch (e) { S.errors++; warn('fetch', e); }
+        return _f.apply(this, arguments);
+      };
+    }
+  } catch (e) { warn('fetch hook', e); }
+
+  /* ---------- 1ד. רענון רשימות פתוחות + מועד שנבחר ---------- */
+
+  /* כל הרכיבים שמחזיקים scheduling (ב-production אין __vueParentComponent — הולכים מ-#app._vnode) */
+  function schedComps() {
+    var el = document.getElementById('app'), out = [];
+    if (!el || !el._vnode) { return out; }
+    function inst(c, d) {
+      if (!c || d > 80) { return; }
+      try { var p = c.proxy; if (p && p.scheduling && Array.isArray(p.scheduling.available_slots)) { out.push(p); } } catch (e) {}
+      node(c.subTree, d + 1);
+    }
+    function node(v, d) {
+      if (!v || d > 300) { return; }
+      if (v.component) { inst(v.component, d + 1); }
+      if (v.suspense && v.suspense.activeBranch) { node(v.suspense.activeBranch, d + 1); }
+      if (Array.isArray(v.children)) { for (var i = 0; i < v.children.length; i++) { node(v.children[i], d + 1); } }
+    }
+    node(el._vnode, 0);
+    return out;
+  }
+  function refresh() {
+    var st = store(); if (!st) { return; }
+    try {
+      var cm = st.getters.getCartMerchant;
+      if (!cm || !ours(cm.merchant_id || cm._id)) { return; }
+      S.refreshes++;
+      var now = nowMs(), sch = st.getters.getScheduling;
+      if (sch && Array.isArray(sch.available_slots)) { pruneDays(sch.available_slots, now); }
+      var cs = schedComps();
+      for (var i = 0; i < cs.length; i++) {
+        var p = cs[i], days = p.scheduling.available_slots;
+        pruneDays(days, now);
+        if (p.date && Array.isArray(p.timeSlots)) {
+          for (var j = p.timeSlots.length - 1; j >= 0; j--) {
+            var t = p.timeSlots[j];
+            if (!t || !verdict(now, p.date, t.from, t.to).ok) { p.timeSlots.splice(j, 1); }
+          }
+        }
+        if (p.time && p.date && !verdictTime(now, p.date, p.time).ok) { p.time = null; }
+        if (p.date) {
+          var has = false;
+          for (var k = 0; k < days.length; k++) { if (days[k] && days[k].date === p.date) { has = true; break; } }
+          if (!has) {
+            if (days.length && typeof p.selectDate === 'function') { p.selectDate(days[0], true); }
+            else { p.date = null; p.timeSlots = null; p.time = null; }
+          }
+        }
+      }
+      var os = st.getters.getOrderSchedule;
+      if (os && os.is_scheduled) {
+        var v = verdictTime(now, os.date, os.time);
+        if (!v.ok && v.why !== 'bad') {
+          S.cleared++;
+          st.commit('setOrderSchedule', { is_scheduled: CLEAR.is_scheduled, date: CLEAR.date, time: CLEAR.time });
+          toast('המועד שבחרת כבר לא זמין: ' + WHY[v.why] + '. בחרו מועד אחר.');
+        }
+      }
+    } catch (e) { S.errors++; warn('refresh', e); }
+  }
+  try {
+    setInterval(refresh, 30000);
+    /* לפני ש-Hyperzod פותחת את הבורר (capture רץ לפני ה-handler של Vue) */
+    document.addEventListener('click', function (e) {
+      try {
+        /* השורה "לוח זמנים" (.navigation-item עם .schedule-switch; #OrderScheduling בבילדים קודמים)
+           או בתוך הבורר הפתוח (גיליון עם .date-btn; #TimeSlotSlider / #slTimeSlotSlider לפי הבילד) */
+        var t = e.target; if (!t || !t.closest) { return; }
+        var ni = t.closest('.navigation-item'), ov = t.closest('.v-overlay--active');
+        if (t.closest('#OrderScheduling, .schedule-switch') || (ni && ni.querySelector('.schedule-switch')) ||
+            (ov && ov.querySelector('.date-btn, [id$="TimeSlotSlider"]'))) { refresh(); }
+      } catch (err) {}
+    }, true);
+  } catch (e) { warn('refresh hooks', e); }
+
+  /* ---------- 2+3. דף העסק: "טוב לדעת" + "החל מ-" ---------- */
+
+  function pageMid() {
+    var m = /\/m\/[^/]+\/([0-9a-fA-F]{16,})/.exec(location.pathname);
+    return m && ours(m[1]) ? m[1] : null;
+  }
+  var NOTES_ID = 'mh-dalia-notes';
+  var ICON = '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false"><path fill="currentColor" d="M12 22c4.97 0 9-4.03 9-9-4.97 0-9 4.03-9 9zM5.6 10.25c0 1.38 1.12 2.5 2.5 2.5.53 0 1.01-.16 1.42-.44l-.02.19c0 1.38 1.12 2.5 2.5 2.5s2.5-1.12 2.5-2.5l-.02-.19c.4.28.89.44 1.42.44 1.38 0 2.5-1.12 2.5-2.5 0-1-.59-1.85-1.43-2.25.84-.4 1.43-1.25 1.43-2.25 0-1.38-1.12-2.5-2.5-2.5-.53 0-1.01.16-1.42.44l.02-.19C14.5 2.12 13.38 1 12 1S9.5 2.12 9.5 3.5l.02.19c-.4-.28-.89-.44-1.42-.44-1.38 0-2.5 1.12-2.5 2.5 0 1 .59 1.85 1.43 2.25-.84.4-1.43 1.25-1.43 2.25zM12 5.5c1.38 0 2.5 1.12 2.5 2.5s-1.12 2.5-2.5 2.5S9.5 9.38 9.5 8s1.12-2.5 2.5-2.5zM3 13c0 4.97 4.03 9 9 9 0-4.97-4.03-9-9-9z"/></svg>';
+  function notes() {
+    var el = document.getElementById(NOTES_ID);
+    var first = document.querySelector('#merchant-content .cat-section');
+    if (!first || !first.parentNode) { return; }
+    if (el && el.nextElementSibling === first) { return; }
+    if (!el) {
+      el = document.createElement('section');
+      el.id = NOTES_ID;
+      el.setAttribute('aria-label', 'טוב לדעת');
+      var li = '';
+      for (var i = 0; i < CFG.NOTES.length; i++) { li += '<li>' + CFG.NOTES[i] + '</li>'; }
+      el.innerHTML = '<div class="mh-dn-head"><span class="mh-dn-ico">' + ICON + '</span><span>טוב לדעת</span></div><ul>' + li + '</ul>';
+      S.notes++;
+    }
+    first.parentNode.insertBefore(el, first);
+  }
+
+  var FROM = {};          /* product_id → true ("החל מ-") / false; נבדק פעם אחת בסשן */
+  var LS = 'mh_dalia_from';
+  try { FROM = JSON.parse(sessionStorage.getItem(LS) || '{}') || {}; } catch (e) { FROM = {}; }
+  var asking = false, tries = 0;   /* ponytail: עד 3 בקשות לסשן — רשת שנופלת לא תגרום לסערת בקשות בכל שינוי DOM */
+  /* קבוצת "גודל" שהיא חובה, ושהמחיר בה משתנה. ponytail: גודל שהזול בו בתוספת מחיר (>0) — בלי "החל מ-",
+     כי המספר בכרטיס (מחיר הבסיס) לא היה נכון; היום אין כזה (41 מוצרים, כולם מ-+₪0). */
+  function isFrom(p) {
+    var gs = (p && p.product_options) || [];
+    for (var i = 0; i < gs.length; i++) {
+      var g = gs[i]; if (!g || !g.is_required || String(g.option_name || '').trim() !== CFG.SIZE) { continue; }
+      var prices = [], o = g.options || [];
+      for (var j = 0; j < o.length; j++) { if (o[j] && o[j].status !== false) { prices.push(+o[j].price_sell || 0); } }
+      if (prices.length < 2) { continue; }
+      var mn = Math.min.apply(null, prices), mx = Math.max.apply(null, prices);
+      if (mx > mn && mn === 0) { return true; }
+    }
+    return false;
+  }
+  function askFrom(mid, ids) {
+    if (asking || !ids.length || tries >= 3) { return; }
+    var comp = window.MH_MENULOAD && typeof window.MH_MENULOAD.findComp === 'function' ? window.MH_MENULOAD.findComp() : null;
+    if (!comp || typeof comp.apiRequest !== 'function') { return; }
+    asking = true; tries++; S.fromFetches++;
+    var req;
+    try { req = comp.apiRequest('Catalog', 'getProductsByIds', { ids: ids.slice(0, 120), merchant_id: mid }); } catch (e) { asking = false; return; }
+    Promise.resolve(req).then(function (r) {
+      var list = (r && r.data && r.data.success && Array.isArray(r.data.data)) ? r.data.data : null;
+      if (!list) { return; }
+      for (var i = 0; i < ids.length; i++) { FROM[ids[i]] = false; }
+      for (var k = 0; k < list.length; k++) { var p = list[k], id = p && (p._id || p.id || p.product_id); if (id) { FROM[String(id)] = isFrom(p); } }
+      try { sessionStorage.setItem(LS, JSON.stringify(FROM)); } catch (e) {}
+    }).catch(function () {}).then(function () { asking = false; schedule(); });
+  }
+  function fromPrice(mid) {
+    /* כרטיס רגיל (גריד) וכרטיס קרוסלה (.product-card-slider — למשל "מארזים עם אלכוהול"); לשניהם id = מזהה המוצר */
+    var cards = document.querySelectorAll('.merchant-page .product-card-basic[id], .merchant-page .product-card-slider[id]'), need = [];
+    for (var i = 0; i < cards.length; i++) {
+      var id = cards[i].id, h = cards[i].querySelector('h4.product-price');
+      if (!h) { continue; }
+      if (!(id in FROM)) { need.push(id); continue; }
+      if (FROM[id] && !h.hasAttribute('data-mh-from')) { h.setAttribute('data-mh-from', ''); S.fromMarked++; }
+      if (!FROM[id] && h.hasAttribute('data-mh-from')) { h.removeAttribute('data-mh-from'); }
+    }
+    if (need.length) { askFrom(mid, need); }
+  }
+  function sync() {
+    var mid = pageMid();
+    if (!mid) { var el = document.getElementById(NOTES_ID); if (el) { el.remove(); } return; }
+    try { notes(); } catch (e) { S.errors++; warn('notes', e); }
+    try { fromPrice(mid); } catch (e) { S.errors++; warn('from', e); }
+  }
+  var pending = false;
+  function schedule() {
+    if (pending) { return; }
+    pending = true;
+    setTimeout(function () { pending = false; try { sync(); } catch (e) { S.errors++; } }, 200);
+  }
+  try {
+    new MutationObserver(function (muts) {
+      for (var i = 0; i < muts.length; i++) { if (muts[i].addedNodes && muts[i].addedNodes.length) { schedule(); return; } }
+    }).observe(document.documentElement, { subtree: true, childList: true });
+    window.addEventListener('load', schedule);
+    schedule();
+  } catch (e) { warn('page hooks', e); }
+
+  window.MH_DALIA = {
+    version: CFG.VERSION,
+    verdict: verdict, verdictTime: verdictTime, filterDays: filterDays, refresh: refresh, sync: sync,
+    why: function (k) { return WHY[k] || ''; },
+    stats: function () { return JSON.parse(JSON.stringify(S)); }
+  };
+  /* mh-dalia-v1 */
 })();
