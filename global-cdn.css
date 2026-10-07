@@ -7587,9 +7587,10 @@ html body #mh-home-hero .mh-hero-text > :nth-child(4) { animation-delay: 0.24s !
 /* mh-homehero-v1 */
 
 /* =========================================================
-   חלק 55: פרחי דליה — "החל מ-" — MH Dalia v1.0.1 | 2026-10-07
+   חלק 55: פרחי דליה — "החל מ-" + הודעת שבת — MH Dalia v1.1.0 | 2026-10-07
    הבעלים של h4.product-price[data-mh-from] (ה-JS "MH Dalia" מסמן רק מוצרים של דליה עם קבוצת
-   "גודל" שהיא חובה ושהמחיר בה משתנה; כרטיס רגיל וכרטיס קרוסלה).
+   "גודל" שהיא חובה ושהמחיר בה משתנה; כרטיס רגיל וכרטיס קרוסלה), ושל #mh-dalia-shabbat — הודעה
+   בראש הצ'ק-אאוט בשבת כשהעגלה של דליה (בשבת אי אפשר להזמין מדליה בכלל, דוד 7.10).
    "טוב לדעת" הוסר מכאן 7.10 — הופיע באיחור (נוצר ב-JS); עכשיו סקשן Custom HTML שדוד מדביק
    בדף העסק (#mh-dalia-tips) והעיצוב בתוכו.
    ========================================================= */
@@ -7600,4 +7601,317 @@ html body .merchant-page .product-card-slider h4.product-price[data-mh-from]::be
     font-weight: 600 !important;
     color: #6b7280 !important;
 }
+/* שבת (v1.1.0, 7.10): הודעה בראש הצ'ק-אאוט כשהעגלה של דליה — ה-JS יוצר את #mh-dalia-shabbat רק בשבת */
+html body #checkout #mh-dalia-shabbat {
+    display: flex !important;
+    align-items: flex-start !important;
+    gap: 12px !important;
+    margin: 12px 0 12px !important;
+    padding: 14px 16px !important;
+    background: linear-gradient(135deg, #fff8f1 0%, #fff4f4 100%) !important;
+    border: 1px solid rgba(227, 30, 36, 0.16) !important;
+    border-radius: 18px !important;
+    box-shadow: 0 6px 18px rgba(227, 30, 36, 0.06) !important;
+    direction: rtl !important;
+    text-align: right !important;
+}
+html body #checkout #mh-dalia-shabbat .mh-ds-ico {
+    flex: none !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 38px !important;
+    height: 38px !important;
+    border-radius: 999px !important;
+    background: #fff !important;
+    color: #e31e24 !important;
+    box-shadow: 0 2px 8px rgba(227, 30, 36, 0.14) !important;
+}
+html body #checkout #mh-dalia-shabbat .mh-ds-txt {
+    font-size: 14px !important;
+    font-weight: 600 !important;
+    line-height: 1.5 !important;
+    color: #4a5568 !important;
+}
+html body #checkout #mh-dalia-shabbat .mh-ds-txt b {
+    display: block !important;
+    margin: 0 0 2px !important;
+    font-size: 16px !important;
+    font-weight: 900 !important;
+    color: #111 !important;
+}
 /* mh-dalia-v1 */
+
+/* =========================================================
+   חלק 56: בורר מועד המשלוח + כרטיס "מועד המשלוח" בצ'ק-אאוט — MH SchedUI v1.0.0 | 2026-10-07
+   הבעלים של: הגיליון (נייד) / החלון .schedule-model (מחשב) לבחירת יום וחלון זמן — בכל עסק עם תזמון
+   (דליה, רולדין) — ושל הכרטיס בצ'ק-אאוט שמכיל .schedule-switch. היה עיצוב ברירת המחדל של Hyperzod
+   (בחירה כחולה, כפתורים מרובעים, "המשך" שחור) וכותרת שגויה "סוג הזמנה".
+   עוגנים מבניים בלבד: .date-btn / .time-btn קיימים רק בשלוש התבניות של התזמון (נבדק בבאנדל 7.10) —
+   לכן :has(.date-btn) על ה-content של ה-overlay; בלי מחלקות שה-JS מוסיף (Vue דורס className).
+   שפה: גיליון לבן עם ידית, כרטיסי יום ברדיוס 16, חלונות זמן בגלולות 14, נבחר = מסגרת אדומה + #fff5f5,
+   אדום מלא רק בכפתור "אישור המועד". הטקסטים, "היום/מחר" ותרגום הטוסט — JS "MH SchedUI".
+   ========================================================= */
+/* 1. כרטיס "מועד המשלוח" בצ'ק-אאוט (הקופסה = הכרטיס הכללי של #checkout) */
+html body #checkout .tw-border:has(> .navigation-list .schedule-switch) > h2 {
+    margin: 4px 0 16px !important;   /* 16px: הרשימה של Hyperzod באה עם tw--mt-4 ונכנסת לתוך הכותרת */
+    font-size: 15px !important;
+    font-weight: 800 !important;
+    letter-spacing: 0 !important;
+    text-transform: none !important;
+    color: #111 !important;
+}
+html body #checkout .navigation-list:has(.schedule-switch) .navigation-item .v-list-item-title {
+    font-size: 15px !important;
+    font-weight: 700 !important;
+    color: #111 !important;
+}
+/* המועד שנבחר: גלולה מתחת לשורה, מיושרת לטקסט (אחרי האייקון) */
+html body #checkout .navigation-list:has(.schedule-switch) > .v-list-item-title {
+    display: inline-flex !important;
+    align-items: center !important;
+    width: auto !important;
+    margin: 0 60px 10px 0 !important;
+    padding: 6px 12px !important;
+    border-radius: 999px !important;
+    background: #fff5f5 !important;
+    color: #c8151b !important;
+    font-size: 13px !important;
+    font-weight: 800 !important;
+    line-height: 1.35 !important;
+}
+
+/* 2. הגיליון / החלון */
+html body .v-overlay__content:has(.date-btn) > .v-card {
+    position: relative !important;
+    padding: 20px 0 0 !important;
+    background: #fff !important;
+    border: 0 !important;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+    overflow-x: hidden !important;
+}
+html body .v-bottom-sheet__content:has(.date-btn) > .v-card {
+    border-radius: 26px 26px 0 0 !important;
+    box-shadow: 0 -14px 44px rgba(0, 0, 0, 0.16) !important;
+}
+html body .v-dialog.schedule-model > .v-overlay__content > .v-card {
+    border-radius: 24px !important;
+    box-shadow: 0 24px 64px rgba(0, 0, 0, 0.2) !important;
+}
+html body .v-bottom-sheet__content:has(.date-btn) > .v-card::before {
+    content: "" !important;
+    position: absolute !important;
+    top: 8px !important;
+    left: 50% !important;
+    width: 40px !important;
+    height: 5px !important;
+    margin-left: -20px !important;
+    border-radius: 999px !important;
+    background: rgba(0, 0, 0, 0.14) !important;
+}
+html body .v-overlay__content:has(.date-btn) .v-card-title {
+    border-bottom: 0 !important;   /* הכלל הגנרי של הגיליון (.v-bottom-sheet__content .v-card-title) מצייר קווים */
+}
+html body .v-overlay__content:has(.date-btn) .v-card-title:not(.text-h6) {
+    min-height: 40px !important;
+    padding: 4px 20px 0 !important;
+    font-size: 20px !important;
+    font-weight: 900 !important;
+    line-height: 1.2 !important;
+    letter-spacing: -0.2px !important;
+    color: #111 !important;
+}
+html body .v-overlay__content:has(.date-btn) .v-card-title:not(.text-h6) .v-btn {
+    width: 36px !important;
+    min-width: 36px !important;
+    height: 36px !important;
+    padding: 0 !important;
+    border-radius: 999px !important;
+    background: #f2f3f5 !important;
+}
+html body .v-overlay__content:has(.date-btn) .v-card-title:not(.text-h6) .v-btn .v-icon {
+    width: 20px !important;
+    height: 20px !important;
+    font-size: 20px !important;
+    color: #374151 !important;
+    caret-color: #374151 !important;
+}
+html body .v-overlay__content:has(.date-btn) .v-card-title .v-btn .v-btn__overlay,
+html body .v-overlay__content:has(.date-btn) .v-card-title .v-btn .v-btn__underlay {
+    display: none !important;
+}
+html body .v-overlay__content:has(.date-btn) .v-card-subtitle {
+    padding: 2px 20px 0 !important;
+    font-size: 13.5px !important;
+    font-weight: 500 !important;
+    color: #6b7280 !important;
+    opacity: 1 !important;
+    white-space: normal !important;
+}
+
+/* 3. רצועת הימים — נייד: גלילה אופקית טבעית; מחשב: ה-Swiper של Hyperzod */
+html body .v-overlay__content:has(.date-btn) .tw-px-6:has(> .simple-slider) {
+    padding: 0 !important;
+}
+html body .v-overlay__content:has(.date-btn) .slider-inner-container {
+    display: flex !important;
+    gap: 8px !important;
+    padding: 14px 20px 8px !important;
+    overflow-x: auto !important;
+    scroll-snap-type: x proximity !important;
+    scroll-padding-inline: 20px !important;   /* בלי זה ה-snap מיישר את היום הראשון לקצה המסך (scrollLeft -20) */
+    scrollbar-width: none !important;
+}
+html body .v-overlay__content:has(.date-btn) .slider-inner-container::-webkit-scrollbar {
+    display: none !important;
+}
+html body .v-overlay__content:has(.date-btn) .slider-inner-container > div {
+    flex: none !important;
+    scroll-snap-align: start !important;
+}
+html body .v-overlay__content:has(.date-btn) .slider-inner-container .tw-w-\[100px\] {
+    width: 76px !important;
+}
+html body .v-overlay__content:has(.date-btn) .swiper {
+    padding: 14px 20px 8px !important;
+}
+html body .v-overlay__content:has(.date-btn) .date-btn {
+    height: 84px !important;
+    min-height: 84px !important;
+    padding: 6px 2px !important;
+    border: 1.5px solid #e6e8ec !important;
+    border-radius: 16px !important;
+    background: #fff !important;
+    color: #111 !important;
+    caret-color: #111 !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03) !important;
+    transition: border-color 0.15s ease, background-color 0.15s ease, box-shadow 0.15s ease !important;
+}
+html body .v-overlay__content:has(.date-btn) .date-btn .v-btn__overlay,
+html body .v-overlay__content:has(.date-btn) .date-btn .v-btn__underlay {
+    display: none !important;
+}
+html body .v-overlay__content:has(.date-btn) .date-btn .tw-text-sm {
+    font-size: 11px !important;
+    font-weight: 700 !important;
+    line-height: 1.3 !important;
+    color: #8a8f98 !important;
+}
+html body .v-overlay__content:has(.date-btn) .date-btn .tw-text-lg {
+    font-size: 23px !important;
+    font-weight: 900 !important;
+    line-height: 1.15 !important;
+    color: #111 !important;
+}
+html body .v-overlay__content:has(.date-btn) .date-btn .line-clamp-1 {
+    font-size: 12px !important;
+    font-weight: 700 !important;
+    line-height: 1.3 !important;
+    color: #4b5563 !important;
+}
+/* "היום" / "מחר" (ה-JS שם data-mh-day על שורת שם היום) */
+html body .v-overlay__content:has(.date-btn) .date-btn .line-clamp-1[data-mh-day] {
+    font-size: 0 !important;
+}
+html body .v-overlay__content:has(.date-btn) .date-btn .line-clamp-1[data-mh-day]::after {
+    content: attr(data-mh-day) !important;
+    font-size: 12px !important;
+    font-weight: 800 !important;
+    color: #e31e24 !important;
+}
+html body .v-overlay__content:has(.date-btn) .date-btn.v-btn-active {
+    border-color: #e31e24 !important;
+    background: #fff5f5 !important;
+    box-shadow: inset 0 0 0 1px #e31e24 !important;   /* בלי צל חיצוני — רצועת הגלילה חותכת אותו */
+}
+html body .v-overlay__content:has(.date-btn) .date-btn.v-btn-active .tw-text-sm,
+html body .v-overlay__content:has(.date-btn) .date-btn.v-btn-active .tw-text-lg,
+html body .v-overlay__content:has(.date-btn) .date-btn.v-btn-active .line-clamp-1 {
+    color: #c8151b !important;
+}
+
+/* 4. חלונות הזמן */
+html body .v-overlay__content:has(.date-btn) .v-card-title.text-h6 {
+    margin: 10px 20px 0 !important;
+    padding: 14px 0 10px !important;
+    border-top: 1px solid rgba(0, 0, 0, 0.06) !important;
+    font-family: inherit !important;
+    font-size: 15px !important;
+    font-weight: 800 !important;
+    line-height: 1.3 !important;
+    letter-spacing: 0 !important;
+    color: #111 !important;
+}
+html body .v-overlay__content:has(.date-btn) .tw-grid:has(> .time-btn) {
+    gap: 10px !important;
+    padding: 2px 20px 6px !important;
+}
+html body .v-overlay__content:has(.date-btn) .time-btn {
+    height: 48px !important;
+    min-height: 48px !important;
+    padding: 0 8px !important;
+    border: 1.5px solid #e6e8ec !important;
+    border-radius: 14px !important;
+    background: #fff !important;
+    color: #111 !important;
+    box-shadow: none !important;
+    font-size: 15px !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.2px !important;
+    text-transform: none !important;
+    font-variant-numeric: tabular-nums !important;
+    transition: border-color 0.15s ease, background-color 0.15s ease !important;
+}
+html body .v-overlay__content:has(.date-btn) .time-btn .v-btn__overlay,
+html body .v-overlay__content:has(.date-btn) .time-btn .v-btn__underlay {
+    display: none !important;
+}
+html body .v-overlay__content:has(.date-btn) .time-btn.v-btn-active {
+    border-color: #e31e24 !important;
+    background: #fff5f5 !important;
+    box-shadow: inset 0 0 0 1px #e31e24 !important;
+    color: #c8151b !important;
+    font-weight: 800 !important;
+}
+@media (hover: hover) {
+    html body .v-overlay__content:has(.date-btn) .date-btn:not(.v-btn-active):hover,
+    html body .v-overlay__content:has(.date-btn) .time-btn:not(.v-btn-active):hover {
+        border-color: rgba(227, 30, 36, 0.35) !important;
+    }
+}
+
+/* 5. "אישור המועד" — האדום היחיד בבורר */
+html body .v-overlay__content:has(.date-btn) .v-card-actions {
+    min-height: 0 !important;
+    margin: 8px 0 0 !important;
+    padding: 12px 20px calc(14px + env(safe-area-inset-bottom)) !important;
+    border-top: 1px solid rgba(0, 0, 0, 0.05) !important;
+    background: #fff !important;
+}
+html body .v-overlay__content:has(.date-btn) .v-card-actions .v-btn {
+    height: 54px !important;
+    border-radius: 16px !important;
+    background: linear-gradient(135deg, #ff3b41 0%, #c8151b 100%) !important;
+    color: #fff !important;
+    box-shadow: 0 10px 24px rgba(227, 30, 36, 0.3) !important;
+    font-size: 16.5px !important;
+    font-weight: 800 !important;
+    letter-spacing: 0 !important;
+    transition: transform 0.12s ease !important;
+}
+html body .v-overlay__content:has(.date-btn) .v-card-actions .v-btn .v-btn__overlay,
+html body .v-overlay__content:has(.date-btn) .v-card-actions .v-btn .v-btn__underlay {
+    display: none !important;
+}
+html body .v-overlay__content:has(.date-btn) .v-card-actions .v-btn:active {
+    transform: scale(0.985) !important;
+}
+@media (prefers-reduced-motion: reduce) {
+    html body .v-overlay__content:has(.date-btn) .date-btn,
+    html body .v-overlay__content:has(.date-btn) .time-btn,
+    html body .v-overlay__content:has(.date-btn) .v-card-actions .v-btn {
+        transition: none !important;
+    }
+}
+/* mh-schedui-v1 */
