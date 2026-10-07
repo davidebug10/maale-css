@@ -7587,72 +7587,12 @@ html body #mh-home-hero .mh-hero-text > :nth-child(4) { animation-delay: 0.24s !
 /* mh-homehero-v1 */
 
 /* =========================================================
-   חלק 55: פרחי דליה — כרטיס "טוב לדעת" + "החל מ-" — MH Dalia v1.0.0 | 2026-10-07
-   הבעלים של #mh-dalia-notes (ה-JS "MH Dalia" יוצר אותו רק בדף של פרחי דליה, לפני הקטגוריה
-   הראשונה ב-#merchant-content) ושל h4.product-price[data-mh-from] (ה-JS מסמן רק מוצרים של דליה
-   עם קבוצת "גודל" שהיא חובה ושהמחיר בה משתנה). כרטיס לבן ושקט — האדום של המסך נשאר בקטגוריה
-   הפעילה ובמחירים; כאן רק האייקון.
+   חלק 55: פרחי דליה — "החל מ-" — MH Dalia v1.0.1 | 2026-10-07
+   הבעלים של h4.product-price[data-mh-from] (ה-JS "MH Dalia" מסמן רק מוצרים של דליה עם קבוצת
+   "גודל" שהיא חובה ושהמחיר בה משתנה; כרטיס רגיל וכרטיס קרוסלה).
+   "טוב לדעת" הוסר מכאן 7.10 — הופיע באיחור (נוצר ב-JS); עכשיו סקשן Custom HTML שדוד מדביק
+   בדף העסק (#mh-dalia-tips) והעיצוב בתוכו.
    ========================================================= */
-html body .merchant-page #mh-dalia-notes {
-    display: block !important;
-    margin: 18px 0 0 !important;
-    padding: 14px 16px 10px !important;
-    max-width: 760px !important;
-    background: #fff !important;
-    border: 1px solid rgba(0, 0, 0, 0.07) !important;
-    border-radius: 16px !important;
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.04) !important;
-    direction: rtl !important;
-    text-align: right !important;
-}
-html body .merchant-page #mh-dalia-notes .mh-dn-head {
-    display: flex !important;
-    align-items: center !important;
-    gap: 8px !important;
-    margin: 0 0 6px !important;
-    font-size: 15px !important;
-    font-weight: 800 !important;
-    line-height: 1.3 !important;
-    color: #111 !important;
-}
-html body .merchant-page #mh-dalia-notes .mh-dn-ico {
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    flex: none !important;
-    width: 28px !important;
-    height: 28px !important;
-    border-radius: 999px !important;
-    background: #fff1f1 !important;
-    color: #e31e24 !important;
-}
-html body .merchant-page #mh-dalia-notes ul {
-    list-style: none !important;
-    margin: 0 !important;
-    padding: 0 !important;
-}
-html body .merchant-page #mh-dalia-notes li {
-    position: relative !important;
-    margin: 0 !important;
-    padding: 6px 16px 6px 0 !important;
-    font-size: 13.5px !important;
-    font-weight: 500 !important;
-    line-height: 1.55 !important;
-    color: #4a5568 !important;
-}
-html body .merchant-page #mh-dalia-notes li + li {
-    border-top: 1px solid rgba(0, 0, 0, 0.05) !important;
-}
-html body .merchant-page #mh-dalia-notes li::before {
-    content: "" !important;
-    position: absolute !important;
-    right: 3px !important;
-    top: 14px !important;
-    width: 6px !important;
-    height: 6px !important;
-    border-radius: 999px !important;
-    background: rgba(0, 0, 0, 0.22) !important;
-}
 html body .merchant-page .product-card-basic h4.product-price[data-mh-from]::before,
 html body .merchant-page .product-card-slider h4.product-price[data-mh-from]::before {
     content: "החל מ-" !important;

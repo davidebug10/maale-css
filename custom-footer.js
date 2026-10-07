@@ -4849,7 +4849,7 @@ log('פעיל');
 })();
 
 /* =========================================================================
-   פרחי דליה — MH Dalia  |  v1.0.0 | 2026-10-07
+   פרחי דליה — MH Dalia  |  v1.0.1 | 2026-10-07 (v1.0.1: "טוב לדעת" עבר לסקשן Custom HTML)
    -------------------------------------------------------------------------
    רק לעסק שבמערך MERCHANTS (פרחי דליה). שלושה חלקים, כל אחד נכשל-פתוח בנפרד:
 
@@ -4869,7 +4869,8 @@ log('פעיל');
         (שני רכיבים קוראים אותה — Vuex וגם עותק מקומי — ולכן מסננים ברשת ולא ב-store).
         בנוסף, כל 30 שניות ובכל לחיצה על "לוח זמנים" (.schedule-switch) או בתוך הבורר: הרשימות הפתוחות מסוננות מחדש
         במקום (הזמן זז — חלון של 15:00 מותר ב-11:30 ואסור ב-11:31), ומועד שנבחר והפך לאסור מתנקה.
-   2. כרטיס "טוב לדעת" עם שלוש ההערות בראש התפריט בדף העסק (Hyperzod לא מציגה תיאור קטגוריה).
+   2. (הוסר 7.10: כרטיס "טוב לדעת" — הופיע באיחור כי נוצר ב-JS אחרי הטעינה; עכשיו זה סקשן Custom HTML
+      שדוד מדביק בדף העסק, #mh-dalia-tips, והעיצוב בתוכו.)
    3. "החל מ-" לפני המחיר בכרטיס של מוצר עם קבוצת "גודל" שהיא חובה ושהמחיר בה משתנה
       (קבוצה עם גודל אחד / אותו מחיר לכל הגדלים — בלי "החל מ-"). הנתונים: catalog/products/listByIds
       דרך הלקוח של Hyperzod (apiRequest של רכיב דף העסק, MH_MENULOAD.findComp), פעם אחת לכל מוצר בסשן.
@@ -4883,7 +4884,7 @@ log('פעיל');
   window.__MH_DALIA__ = true;
 
   var CFG = {
-    VERSION: '1.0.0',
+    VERSION: '1.0.1',
     MERCHANTS: ['6ac61fa523f1f833040171d2'],   /* פרחי דליה */
     TZ: 'Asia/Jerusalem',
     EVENING: 15 * 60,      /* "ערב" = חלון שמתחיל ב-15:00 ואילך — לשנות כאן */
@@ -4892,12 +4893,7 @@ log('פעיל');
     FRI_CUTOFF: 13 * 60,   /* שישי מהיום להיום: הזמנה עד 13:00 */
     FRI_LEAD: 60,          /* שישי: שעה מראש */
     FRI_END: 16 * 60,      /* שישי: עד 16:00 */
-    SIZE: 'גודל',
-    NOTES: [
-      'הפרחים עשויים להשתנות לפי זמינות עונתית, תוך שמירה על הסגנון, הצבעוניות והאופי הכללי של הזר.',
-      'מומלץ להחליף מים באגרטל כל 2–3 ימים ולחתוך מעט את קצות הגבעולים לשמירה על טריות הפרחים.',
-      'האגרטל בתמונה להמחשה בלבד, אלא אם צוין אחרת.'
-    ]
+    SIZE: 'גודל'
   };
   var WHY = {
     bad: 'המועד לא מזוהה',
@@ -4913,7 +4909,7 @@ log('פעיל');
     none: 'יש לבחור מועד למשלוח'
   };
   var S = { version: CFG.VERSION, slotsFiltered: 0, slotsRemoved: 0, ordersSeen: 0, ordersBlocked: 0, refreshes: 0,
-            cleared: 0, notes: 0, fromMarked: 0, fromFetches: 0, errors: 0, last: null };
+            cleared: 0, fromMarked: 0, fromFetches: 0, errors: 0, last: null };
   function warn() { try { console.warn.apply(console, ['[MH Dalia]'].concat([].slice.call(arguments))); } catch (e) {} }
   function ours(mid) { return !!mid && CFG.MERCHANTS.indexOf(String(mid)) !== -1; }
   function store() {
@@ -5187,31 +5183,12 @@ log('פעיל');
     }, true);
   } catch (e) { warn('refresh hooks', e); }
 
-  /* ---------- 2+3. דף העסק: "טוב לדעת" + "החל מ-" ---------- */
+  /* ---------- 3. דף העסק: "החל מ-" ---------- */
 
   function pageMid() {
     var m = /\/m\/[^/]+\/([0-9a-fA-F]{16,})/.exec(location.pathname);
     return m && ours(m[1]) ? m[1] : null;
   }
-  var NOTES_ID = 'mh-dalia-notes';
-  var ICON = '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false"><path fill="currentColor" d="M12 22c4.97 0 9-4.03 9-9-4.97 0-9 4.03-9 9zM5.6 10.25c0 1.38 1.12 2.5 2.5 2.5.53 0 1.01-.16 1.42-.44l-.02.19c0 1.38 1.12 2.5 2.5 2.5s2.5-1.12 2.5-2.5l-.02-.19c.4.28.89.44 1.42.44 1.38 0 2.5-1.12 2.5-2.5 0-1-.59-1.85-1.43-2.25.84-.4 1.43-1.25 1.43-2.25 0-1.38-1.12-2.5-2.5-2.5-.53 0-1.01.16-1.42.44l.02-.19C14.5 2.12 13.38 1 12 1S9.5 2.12 9.5 3.5l.02.19c-.4-.28-.89-.44-1.42-.44-1.38 0-2.5 1.12-2.5 2.5 0 1 .59 1.85 1.43 2.25-.84.4-1.43 1.25-1.43 2.25zM12 5.5c1.38 0 2.5 1.12 2.5 2.5s-1.12 2.5-2.5 2.5S9.5 9.38 9.5 8s1.12-2.5 2.5-2.5zM3 13c0 4.97 4.03 9 9 9 0-4.97-4.03-9-9-9z"/></svg>';
-  function notes() {
-    var el = document.getElementById(NOTES_ID);
-    var first = document.querySelector('#merchant-content .cat-section');
-    if (!first || !first.parentNode) { return; }
-    if (el && el.nextElementSibling === first) { return; }
-    if (!el) {
-      el = document.createElement('section');
-      el.id = NOTES_ID;
-      el.setAttribute('aria-label', 'טוב לדעת');
-      var li = '';
-      for (var i = 0; i < CFG.NOTES.length; i++) { li += '<li>' + CFG.NOTES[i] + '</li>'; }
-      el.innerHTML = '<div class="mh-dn-head"><span class="mh-dn-ico">' + ICON + '</span><span>טוב לדעת</span></div><ul>' + li + '</ul>';
-      S.notes++;
-    }
-    first.parentNode.insertBefore(el, first);
-  }
-
   var FROM = {};          /* product_id → true ("החל מ-") / false; נבדק פעם אחת בסשן */
   var LS = 'mh_dalia_from';
   try { FROM = JSON.parse(sessionStorage.getItem(LS) || '{}') || {}; } catch (e) { FROM = {}; }
@@ -5259,8 +5236,7 @@ log('פעיל');
   }
   function sync() {
     var mid = pageMid();
-    if (!mid) { var el = document.getElementById(NOTES_ID); if (el) { el.remove(); } return; }
-    try { notes(); } catch (e) { S.errors++; warn('notes', e); }
+    if (!mid) { return; }
     try { fromPrice(mid); } catch (e) { S.errors++; warn('from', e); }
   }
   var pending = false;
