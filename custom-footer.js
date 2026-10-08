@@ -5429,3 +5429,255 @@ log('פעיל');
   window.MH_SCHEDUI = { version: VERSION, sync: sync, stats: function () { return JSON.parse(JSON.stringify(stats)); } };
   /* mh-schedui-v1 */
 })();
+
+/* =========================================================================
+   כרטיס ברכה — כותבים את הברכה בחלון המוצר — MH Greet  |  v1.0.0 | 2026-10-08
+   -------------------------------------------------------------------------
+   כל מוצר ששמו מכיל "כרטיס ברכה" (פרחי דליה, קצפת, וכל עסק עתידי): בחלון המוצר, מתחת לתיאור,
+   כרטיס כתיבה מעוצב (חלק 57 ב-global-cdn.css). הברכה נכתבת **לאותו שדה בדיוק** של "יש הערה
+   למטבח?" בדף התשלום — Vuex Cart.orderNote (setOrderNote), שנשלח בהזמנה כ-order_comment
+   (buildOrderPayload של Hyperzod), ומשם לקבלה ולוואטסאפ. הברכה נוספת לסוף ההערה, באותה שורה:
+       <מה שכבר היה בהערה> | כרטיס ברכה: <הברכה>        (ירידות שורה בברכה → " / ")
+   שורה אחת בכוונה: שדה ההערה בצ'ק-אאוט הוא <input> חד-שורתי — ירידת שורה נמחקת בו והטקסט נדבק (נמדד 8.10).
+   בלי הצעות ברכה מוכנות (דוד 8.10: "אל תעשה וריאנס") — שדה טקסט אחד, ומה שנכתב בו הוא הברכה.
+   מתי נכתב: אחרי "הוספה" בחלון — רק כשהכרטיס באמת בעגלה (בודקים את העגלה עד 8 שניות).
+   מה Hyperzod עושה ומה הבלוק משלים (נבדק בקוד 8.10, בילד index-DU4_pdC9):
+     - שדה ההערה בצ'ק-אאוט מתחיל ריק (note:"") ולא טוען את ההערה מה-store — הלקוח לא ראה מה
+       נשלח, והקלדה בו דרסה הכל. הבלוק ממלא את השדה בהערה האמיתית פעם אחת בכל כניסה לצ'ק-אאוט (לכל עסק).
+     - עם יותר מעגלה אחת Hyperzod מאפסת את ההערה (setOrderNote null) — הבלוק מחזיר את הברכה
+       אם הכרטיס עדיין בעגלה של אותו עסק. עריכה/מחיקה של הלקוח בשדה בצ'ק-אאוט מכובדת: הרשומה
+       מתעדכנת/נמחקת. אחרי הזמנה (setOrderNote "") — הרשומה נמחקת.
+     - הכרטיס יצא מהעגלה (הוסר / העגלה התרוקנה) → הברכה יוצאת מההערה. "בעגלה" = getCartItems
+       (רשימת הפריטים המקומית, נשמרת ב-localStorage, לכל העסקים) — זמינה כבר בטעינה.
+     - ההערה של Hyperzod אחת לכל העגלות: כשהעגלה הפעילה של עסק אחר, הברכה יוצאת מההערה וחוזרת
+       כשחוזרים לעגלה של העסק שלה — שלא תישלח עם הזמנה של עסק אחר.
+   "+" בכרטיס המוצר (קצפת — מוצר בלי אפשרויות נוסף ישר לעגלה) פותח את חלון המוצר, כדי לראות את הכרטיס.
+   נכשל-פתוח. בדיקה: MH_GREET.stats() · MH_GREET.merge(note, text)
+   ========================================================================= */
+(function () {
+  'use strict';
+  if (window.__MH_GREET__) { return; }
+  window.__MH_GREET__ = true;
+  var VERSION = '1.0.0';
+  var NAME_RX = /כרטיס\s*ברכה/;
+  var LABEL = 'כרטיס ברכה:';
+  var MAX = 200;
+  var LS = 'mh_greet';                  /* {mid, text, ts} — הברכה, ולאיזה עסק היא שייכת */
+  var TTL = 3 * 864e5;
+  var stats = { version: VERSION, shown: 0, committed: 0, reapplied: 0, removed: 0, fieldSynced: 0, plusRouted: 0, errors: 0 };
+  var ours = false;                     /* מסמן commit שלנו — כדי שהמאזין לא יפרש אותו כעריכה של הלקוח */
+
+  function store() {
+    try { return document.getElementById('app').__vue_app__.config.globalProperties.$store; } catch (e) { return null; }
+  }
+  function noteOf(st) { var n = st.getters.getOrderNote; return n == null ? '' : String(n); }
+  function clean(t) { return String(t || '').replace(/\s*[\r\n]+\s*/g, ' / ').replace(/[ \t]{2,}/g, ' ').trim().slice(0, MAX); }
+  var SEP = ' | ';
+  /* הברכה = מה שאחרי "כרטיס ברכה:" עד סוף ההערה (היא תמיד בסוף) */
+  function greetingOf(note) {
+    var n = String(note || ''), i = n.indexOf(LABEL);
+    return i < 0 ? '' : n.slice(i + LABEL.length).trim();
+  }
+  /* ההערה בלי הברכה + הברכה בסוף אותה שורה (או בלי, כשהברכה ריקה); מה שהיה לפני נשאר כמו שהוא */
+  function merge(note, text) {
+    var n = String(note || ''), i = n.indexOf(LABEL), t = clean(text);
+    if (i < 0 && !t) { return n; }
+    var rest = (i < 0 ? n : n.slice(0, i)).replace(/[\s|]+$/, '').trim();
+    return t ? (rest ? rest + SEP : '') + LABEL + ' ' + t : rest;
+  }
+  function setNote(st, value) {
+    if (noteOf(st) === value) { return; }
+    ours = true;
+    try { st.commit('setOrderNote', value); } finally { ours = false; }
+  }
+  function readRec() {
+    try { var r = JSON.parse(localStorage.getItem(LS) || 'null'); if (r && Date.now() - r.ts < TTL) { return r; } } catch (e) {}
+    return null;
+  }
+  function writeRec(r) { try { if (r) { localStorage.setItem(LS, JSON.stringify(r)); } else { localStorage.removeItem(LS); } } catch (e) {} }
+  function activeMid(st) {
+    var m = st.getters.getCartMerchant || {}, c = st.getters.getCart || {};
+    return m.merchant_id || m._id || c.merchant_id || null;
+  }
+  function isCard(it, mid) { return !!(it && (!mid || it.merchant_id === mid) && NAME_RX.test(String(it.product_name || ''))); }
+  /* הכרטיס בעגלה של העסק? null = לא ידוע (לא נוגעים) */
+  function cardIn(st, mid) {
+    var a = st.getters.getCartItems;
+    if (!Array.isArray(a)) { return null; }
+    for (var i = 0; i < a.length; i++) { if (isCard(a[i], mid)) { return true; } }
+    return false;
+  }
+
+  /* ---------- כתיבה להערה ---------- */
+  function commit(text, mid) {
+    var st = store(); if (!st) { return; }
+    var t = clean(text);
+    setNote(st, merge(noteOf(st), t));
+    writeRec(t ? { mid: mid, text: t, ts: Date.now() } : null);
+    stats.committed++;
+    syncField(true);
+    paintAll();
+  }
+  var pending = null;
+  function afterAdd(text) {
+    pending = { text: text, until: Date.now() + 8000 };
+    (function tick() {
+      if (!pending) { return; }
+      var st = store(); if (!st) { return; }
+      var c = st.getters.getCart || {}, items = Array.isArray(c.cart_items) ? c.cart_items : [];   /* העגלה מהשרת — ההוספה הצליחה */
+      for (var i = 0; i < items.length; i++) { if (isCard(items[i])) { var p = pending; pending = null; commit(p.text, items[i].merchant_id || activeMid(st)); return; } }
+      if (Date.now() > pending.until) { pending = null; return; }
+      setTimeout(tick, 300);
+    })();
+  }
+
+  /* ---------- שדה ההערה בצ'ק-אאוט ---------- */
+  function noteComp() {
+    var el = document.getElementById('app'), found = null;
+    if (!el || !el._vnode) { return null; }
+    function inst(c, d) {
+      if (!c || found || d > 80) { return; }
+      try { var p = c.proxy; if (p && typeof p.setNote === 'function' && ('note' in p)) { found = p; return; } } catch (e) {}
+      node(c.subTree, d + 1);
+    }
+    function node(v, d) {
+      if (!v || found || d > 300) { return; }
+      if (v.component) { inst(v.component, d + 1); }
+      if (v.suspense && v.suspense.activeBranch) { node(v.suspense.activeBranch, d + 1); }
+      if (Array.isArray(v.children)) { for (var i = 0; i < v.children.length && !found; i++) { node(v.children[i], d + 1); } }
+    }
+    node(el._vnode, 0);
+    return found;
+  }
+  /* פעם אחת לכל שדה (כל כניסה לצ'ק-אאוט יוצרת שדה חדש, ריק) + אחרי שאנחנו שינינו את ההערה (force).
+     לא יותר: הלקוח שמחק את השדה ויצא ממנו לפני ה-debounce (400ms) — שלא נחזיר לו את הטקסט */
+  var syncedInput = null;
+  function syncField(force) {
+    var input = document.getElementById('messageInput');
+    if (!input || document.activeElement === input || (!force && input === syncedInput)) { return; }
+    var st = store(), p = st && noteComp(); if (!p) { return; }
+    var n = noteOf(st), first = input !== syncedInput;
+    syncedInput = input;
+    if (p.note !== n && (force || (first && !p.note))) { p.note = n; stats.fieldSynced++; }
+  }
+
+  /* ---------- שמירה על הברכה מול האיפוסים של Hyperzod ---------- */
+  function drop(st, n) { setNote(st, merge(n, '')); stats.removed++; syncField(true); }
+  function reconcile() {
+    var st = store(); if (!st) { return; }
+    var r = readRec();
+    if (r) {
+      var n = noteOf(st), g = greetingOf(n), has = cardIn(st, r.mid), mid = activeMid(st);
+      if (has === false) { if (g === r.text) { drop(st, n); } writeRec(null); }              /* הכרטיס יצא מהעגלה */
+      else if (has && mid && mid !== r.mid) { if (g === r.text) { drop(st, n); } }           /* עגלה של עסק אחר פעילה */
+      else if (has && !g) { setNote(st, merge(n, r.text)); stats.reapplied++; syncField(true); }   /* Hyperzod איפסה */
+    }
+    syncField(false);
+  }
+  var rt = null;
+  function scheduleReconcile(ms) { clearTimeout(rt); rt = setTimeout(function () { try { reconcile(); } catch (e) { stats.errors++; } }, ms); }
+  function hookStore() {
+    var st = store(); if (!st || st.__mhGreetHooked) { return !!st; }
+    st.__mhGreetHooked = true;
+    var last = noteOf(st);
+    st.subscribe(function (m) {
+      try {
+        if (m.type === 'setOrderNote') {
+          var was = last; last = noteOf(st);
+          if (ours) { return; }
+          var v = m.payload;
+          if (v === null || v === undefined) { scheduleReconcile(900); return; }        /* איפוס (כמה עגלות / התנתקות) */
+          var g = greetingOf(v), r = readRec();
+          if (r && !g && greetingOf(was) === r.text) { writeRec(null); }                 /* הלקוח מחק את הברכה / ההזמנה נשלחה ("") */
+          else if (r && g && r.text !== g) { r.text = g; r.ts = Date.now(); writeRec(r); }   /* הלקוח ערך את הברכה בשדה */
+          paintAll();
+          return;
+        }
+        if (/[Cc]art/.test(m.type)) { scheduleReconcile(900); }
+      } catch (e) { stats.errors++; }
+    });
+    return true;
+  }
+
+  /* ---------- כרטיס הכתיבה בחלון המוצר ---------- */
+  var ICON = '<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><path fill="currentColor" d="M20 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2zm0 2v.01L12 11 4 6.01V6h16zM4 18V8.24l7.47 4.67a1 1 0 0 0 1.06 0L20 8.24V18H4z"/><path fill="currentColor" d="M17.6 13.1c-.7-.7-1.8-.7-2.4 0l-.2.2-.2-.2c-.7-.7-1.8-.7-2.4 0-.7.7-.7 1.8 0 2.5L15 18.2l2.6-2.6c.7-.7.7-1.8 0-2.5z" opacity=".9"/></svg>';
+  function popupIsCard(pp) {
+    var n = pp.querySelector('.product-name');
+    return !!(n && NAME_RX.test(n.textContent || ''));
+  }
+  function build(prefill) {
+    var w = document.createElement('div');
+    w.id = 'mh-greet';
+    w.innerHTML =
+      '<div class="mh-gr-card"><div class="mh-gr-inner">' +
+        '<div class="mh-gr-head"><span class="mh-gr-ico">' + ICON + '</span>' +
+          '<span class="mh-gr-titles"><b>מה לכתוב בכרטיס?</b><span>הברכה תגיע לחנות יחד עם ההזמנה</span></span></div>' +
+        '<div class="mh-gr-paper"><textarea class="mh-gr-text" rows="4" maxlength="' + MAX + '" dir="rtl" enterkeyhint="done" ' +
+          'aria-label="הברכה לכרטיס" placeholder="לדוגמה: מזל טוב ליום ההולדת! אוהבים, משפחת כהן"></textarea></div>' +
+        '<div class="mh-gr-foot"><span class="mh-gr-status"></span><span class="mh-gr-count"></span></div>' +
+        '<div class="mh-gr-help">הברכה תופיע גם בדף התשלום, בשדה "יש הערה למטבח?" — אפשר לערוך אותה גם שם.</div>' +
+      '</div></div>';
+    var ta = w.querySelector('textarea');
+    ta.value = prefill || '';
+    ta.addEventListener('input', function () { paint(w); });
+    return w;
+  }
+  function paint(w) {
+    try {
+      var ta = w.querySelector('textarea'), v = ta.value, st = store();
+      w.querySelector('.mh-gr-count').textContent = v.length + '/' + MAX;
+      var saved = st && clean(v) && greetingOf(noteOf(st)) === clean(v);
+      var s = w.querySelector('.mh-gr-status');
+      s.textContent = saved ? '✓ שמור בהערות להזמנה' : (clean(v) ? 'יישמר בהוספה לעגלה' : '');
+      w.classList.toggle('mh-gr-saved', !!saved);
+    } catch (e) {}
+  }
+  function paintAll() { var w = document.getElementById('mh-greet'); if (w) { paint(w); } }
+  function mount() {
+    var pp = document.querySelector('.product-popup');
+    var w = document.getElementById('mh-greet');
+    if (!pp || !popupIsCard(pp)) { if (w) { w.remove(); } return; }
+    var info = pp.querySelector('#productInfo'), wrap = info && info.parentElement;
+    if (!wrap || !wrap.parentNode) { return; }
+    if (w && w.previousElementSibling === wrap) { return; }
+    if (!w) { var st = store(); w = build(st ? greetingOf(noteOf(st)) : ''); stats.shown++; }
+    wrap.parentNode.insertBefore(w, wrap.nextSibling);
+    paint(w);
+  }
+
+  try {
+    document.addEventListener('click', function (e) {
+      try {
+        var t = e.target; if (!t || !t.closest) { return; }
+        /* "הוספה" בחלון של כרטיס ברכה → הברכה נכתבת כשהכרטיס בעגלה */
+        var btn = t.closest('.product-popup .v-card-actions .v-btn--block');
+        if (btn) {
+          var w = document.getElementById('mh-greet'), pp = btn.closest('.product-popup');
+          if (w && pp && pp.contains(w)) { afterAdd(w.querySelector('textarea').value); }
+          return;
+        }
+        /* "+" בכרטיס מוצר של כרטיס ברכה → פותחים את חלון המוצר (שם כותבים את הברכה) */
+        var add = t.closest('button.add-btn'), card = add && add.closest('.product-card-basic, .product-card-slider');
+        var name = card && card.querySelector('.product-name');
+        if (name && NAME_RX.test(name.textContent || '')) {
+          e.preventDefault(); e.stopImmediatePropagation();
+          stats.plusRouted++;
+          name.click();
+        }
+      } catch (err) { stats.errors++; }
+    }, true);
+    var pend = false;
+    new MutationObserver(function () {
+      if (pend) { return; }
+      pend = true;
+      setTimeout(function () { pend = false; try { hookStore(); mount(); syncField(false); } catch (e) { stats.errors++; } }, 120);
+    }).observe(document.documentElement, { subtree: true, childList: true });
+    setTimeout(function () { hookStore(); reconcile(); }, 1500);
+  } catch (e) { console.warn('[MH Greet] disabled:', e); }
+
+  window.MH_GREET = {
+    version: VERSION, merge: merge, greetingOf: greetingOf, reconcile: reconcile,
+    stats: function () { return JSON.parse(JSON.stringify(stats)); }
+  };
+  /* mh-greet-v1 */
+})();
