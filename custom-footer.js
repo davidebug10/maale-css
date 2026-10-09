@@ -5686,7 +5686,7 @@ log('פעיל');
 })();
 
 /* =========================================================================
-   "ייפתח שוב ב-" — שעון 24 שעות + תאריך — MH Reopen  |  v1.0.0 | 2026-10-09
+   "ייפתח שוב ב-" — שעון 24 שעות + תאריך — MH Reopen  |  v1.1.0 | 2026-10-09 (v1.1.0: מוצ״ש)
    -------------------------------------------------------------------------
    מוצר עם לוח זמינות (schedule) שסגור עכשיו: Hyperzod כותבת בכרטיס (.product-availability-message)
    ובכפתור של חלון המוצר "ייפתח שוב ב- שישי, 08:00 AM". השעה עצמה נכונה — next_publish_time_utc
@@ -5698,16 +5698,24 @@ log('פעיל');
    הבלוק עוטף את format של dayjs ומחליף רק אותה ל-"ddd D.M, HH:mm" → "שישי 16.10, 08:00"
    (את שם היום ממשיכה לתרגם Hyperzod). תוויות שצוירו לפני שהבלוק נטען (computed במטמון) — מתוקנות
    בטקסט, עם התאריך מנתוני המוצר ב-store לפי ה-id של הכרטיס; אם לא נמצא — רק 24 שעות.
-   נכשל-פתוח. בדיקה: MH_REOPEN.stats()
+   מוצ״ש (v1.1.0, דוד 9.10): פתיחה בשבת מ-17:00 (CFG MOTZASH) כתובה "מוצ״ש" במקום "שבת":
+     - מוצר: "ייפתח שוב ב- מוצ״ש 10.10, 20:30";
+     - עסק — "הפתיחה הבאה" בכרטיס העסק (.merchant-close-comment) ובראש דף העסק
+       (.scheme-merchant-order-warning__text): Hyperzod בונה מהתבנית "{opening_next} {on} {saturday} {at} 20:30"
+       (getComment, בשני רכיבים) → "הפתיחה הבאה  שבת ב- 20:30"; הבלוק מחליף בטקסט ל-"הפתיחה הבאה במוצ״ש ב- 20:30".
+     שבת לפני 17:00 נשארת "שבת". 9.10: 9 עסקים פותחים בשבת 20:00–20:30.
+   נכשל-פתוח. בדיקה: MH_REOPEN.stats() · MH_REOPEN.motz('הפתיחה הבאה  שבת ב- 20:30')
    ========================================================================= */
 (function () {
   'use strict';
   if (window.__MH_REOPEN__) { return; }
   window.__MH_REOPEN__ = true;
-  var VERSION = '1.0.0';
+  var VERSION = '1.1.0';
   var OLD = 'ddd, hh:mm A', NEW = 'ddd D.M, HH:mm';
+  var MOTZASH = 17 * 60;                                  /* שבת מהשעה הזו = "מוצ״ש" — לשנות כאן */
+  var MOTZ = 'מוצ״ש';
   var RX = /([^\s,]+), (\d{1,2}):(\d{2}) ([AP]M)/;          /* "שישי, 08:00 AM" — הפורמט הישן */
-  var stats = { version: VERSION, patched: false, formatted: 0, relabeled: 0, noDate: 0, errors: 0 };
+  var stats = { version: VERSION, patched: false, formatted: 0, relabeled: 0, noDate: 0, motzash: 0, errors: 0 };
   var G = null;
 
   function patch() {
@@ -5716,7 +5724,11 @@ log('פעיל');
     var proto = Object.getPrototypeOf(g.$date()), orig = proto && proto.format;
     if (typeof orig !== 'function') { return false; }
     proto.format = function (f) {
-      if (f === OLD) { stats.formatted++; return orig.call(this, NEW); }
+      if (f === OLD) {
+        stats.formatted++;
+        if (hebrew() && this.day() === 6 && this.hour() * 60 + this.minute() >= MOTZASH) { stats.motzash++; return orig.call(this, '[' + MOTZ + '] D.M, HH:mm'); }
+        return orig.call(this, NEW);
+      }
       return orig.apply(this, arguments);
     };
     G = g; stats.patched = true;
@@ -5735,6 +5747,7 @@ log('פעיל');
     })([M.categoryProducts, M.searchedProducts, M.categoryPageProducts], 0);
     return found;
   }
+  function hebrew() { try { return (G.$store.getters.getLocale || {}).locale === 'he'; } catch (e) { return false; } }
   function to24(h, m, ap) { var H = (+h % 12) + (ap === 'PM' ? 12 : 0); return (H < 10 ? '0' : '') + H + ':' + m; }
   /* תווית בפורמט הישן → "שישי 16.10, 08:00" (התאריך רק אם השעה מהנתונים זהה לשעה שבתווית) */
   function relabel() {
@@ -5747,21 +5760,37 @@ log('פעיל');
         var card = els[i].closest('[id]'), id = card && /^[0-9a-f]{24}$/.test(card.id) ? card.id : null;
         var ts = id ? nextPub(id) : null;
         var d = ts ? G.$date.utc(ts).tz(G.$store.getters.getTimezone || 'Asia/Jerusalem') : null;
-        if (d && d.format('HH:mm') === hm) { rep = m[1] + ' ' + d.format('D.M') + ', ' + hm; } else { stats.noDate++; }
+        var day = m[1] === 'שבת' && (+hm.slice(0, 2)) * 60 + (+hm.slice(3)) >= MOTZASH ? MOTZ : m[1];
+        if (d && d.format('HH:mm') === hm) { rep = day + ' ' + d.format('D.M') + ', ' + hm; } else { rep = day + ', ' + hm; stats.noDate++; }
         n.nodeValue = n.nodeValue.replace(m[0], rep);
         stats.relabeled++;
       }
     }
   }
 
+  /* "הפתיחה הבאה  שבת ב- 20:30" → "הפתיחה הבאה במוצ״ש ב- 20:30" (רק שבת מ-17:00) */
+  var RXC = /(^|\s+)(?:ביום\s+|ב\s+)?שבת(\s+ב-\s*)(\d{1,2}):(\d{2})/;   /* גם אם {on} יתורגם ל"ב"/"ביום" */
+  function motz(t) {
+    var m = RXC.exec(t);
+    if (!m || (+m[3]) * 60 + (+m[4]) < MOTZASH) { return t; }
+    return t.slice(0, m.index) + (m[1] ? ' ' : '') + 'ב' + MOTZ + m[2] + m[3] + ':' + m[4] + t.slice(m.index + m[0].length);
+  }
+  function comments() {
+    var els = document.querySelectorAll('.merchant-close-comment, .scheme-merchant-order-warning__text');
+    for (var i = 0; i < els.length; i++) {
+      var w = document.createTreeWalker(els[i], NodeFilter.SHOW_TEXT, null), n;
+      while ((n = w.nextNode())) { var v = motz(n.nodeValue); if (v !== n.nodeValue) { n.nodeValue = v; stats.motzash++; } }
+    }
+  }
+
   try {
     var pend = false;
-    var run = function () { pend = false; try { if (stats.patched || patch()) { relabel(); } } catch (e) { stats.errors++; } };
+    var run = function () { pend = false; try { comments(); if (stats.patched || patch()) { relabel(); } } catch (e) { stats.errors++; } };
     new MutationObserver(function () { if (!pend) { pend = true; setTimeout(run, 150); } })
       .observe(document.documentElement, { subtree: true, childList: true, characterData: true });
     run();
   } catch (e) { console.warn('[MH Reopen] disabled:', e); }
 
-  window.MH_REOPEN = { version: VERSION, stats: function () { return JSON.parse(JSON.stringify(stats)); } };
+  window.MH_REOPEN = { version: VERSION, motz: motz, stats: function () { return JSON.parse(JSON.stringify(stats)); } };
   /* mh-reopen-v1 */
 })();
