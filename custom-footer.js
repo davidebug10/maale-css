@@ -6678,8 +6678,8 @@ log('פעיל');
   'use strict';
   if (window.__MH_COLLECTIONS__) { return; }
   window.__MH_COLLECTIONS__ = true;
-  var VERSION = '1.0.0';
-  var stats = { labels: 0, titles: 0, cards: 0, kosher: 0, tags: 0, closed: 0, ordered: 0, errors: 0 };
+  var VERSION = '1.1.0';
+  var stats = { labels: 0, titles: 0, cards: 0, kosher: 0, tags: 0, closed: 0, ordered: 0, errors: 0, pageNote: '' };
   var lastTitle = null;   /* הכותרת של הסקשן שממנו לחצו "הכל" */
 
   /* ---- כשרות מתוך "הודעת חלון הראווה" ---- */
@@ -6744,7 +6744,8 @@ log('פעיל');
   function decorate(card) {
     var body = card.querySelector('.merchant-card-body'), msgEl = card.querySelector('.merchant-store-front-message');
     var msg = msgEl ? msgEl.textContent : '', k = kosher(msg), t = k ? null : tagline(msg);
-    var meta = k || t || '';
+    var rt = card.querySelector('[id="AverageRating"] span'), r = rt ? parseFloat(rt.textContent) : 0;
+    var meta = [r > 0 ? '★ ' + (Math.round(r * 10) / 10) : '', k || t || ''].filter(Boolean).join(' · ');   /* "★ 4.8 · בשרי · מהדרין" */
     if (body && body.getAttribute('data-mh-meta') !== meta) { body.setAttribute('data-mh-meta', meta); if (k) { stats.kosher++; } else if (t) { stats.tags++; } }
     var st = cardState(card), w = shortWhen(st), cc = card.querySelector('.merchant-close-comment');
     card.setAttribute('data-mh-state', st.state);
@@ -6816,10 +6817,11 @@ log('פעיל');
     var open = states.filter(function (s) { return s.state === 'open'; }).length, first = null;
     states.forEach(function (s) { if (s.state === 'closed' && (!first || s.rank < first.rank)) { first = s; } });
     var note = '';
-    if (n && !open) { var w = first && shortWhen(first); note = w ? 'כולם סגורים עכשיו · הראשון ' + w.full : 'כולם סגורים עכשיו'; }
+    if (n && !open && !pageNote) { var w = first && shortWhen(first); note = w ? 'כולם סגורים עכשיו · הראשון ' + w.full : 'כולם סגורים עכשיו'; }
     var head = sec.firstElementChild;   /* attr() קורא מהאלמנט של ה-::after עצמו — לכן על הכותרת, לא על הסקשן */
     if (head && head.getAttribute('data-mh-note') !== note) { if (note) { head.setAttribute('data-mh-note', note); } else { head.removeAttribute('data-mh-note'); } }
     stats.closed = states.filter(function (s) { return s.state !== 'open'; }).length;
+    return states;
   }
 
   /* דף "הכול": הכותרת = כותרת הסקשן (Hyperzod מציגה "nearby-merchants") */
@@ -6844,9 +6846,34 @@ log('פעיל');
     }
   }
 
+  /* רוב הדף סגור (80%+) → שורה אחת לפני האוסף הראשון. שבת (רוב הפתיחות במוצ״ש) → "שבת שלום" */
+  var pageNote = '';
+  function pageSummary(secs) {
+    var all = [], seen = {};
+    secs.forEach(function (sec) { [].forEach.call(sec.querySelectorAll('a.merchant-card'), function (c) { var id = c.getAttribute('data-merchant-id') || c.getAttribute('href'); if (seen[id]) { return; } seen[id] = 1; all.push(cardState(c)); }); });
+    var closed = all.filter(function (x) { return x.state !== 'open'; }), timed = closed.filter(function (x) { return x.state === 'closed'; }), first = null, motz = 0;
+    timed.forEach(function (x) { if (!first || x.rank < first.rank) { first = x; } if (x.day === 'מוצ״ש') { motz++; } });
+    if (all.length < 4 || closed.length / all.length < 0.8 || !first) { return ''; }
+    if (motz * 2 >= timed.length && first.day === 'מוצ״ש') { return 'שבת שלום · נפתחים במוצ״ש, הראשון ב-' + first.time; }
+    return 'רוב המקומות סגורים עכשיו · הראשון נפתח ' + (first.day && first.day !== 'היום' ? first.day + ' ' : '') + 'ב-' + first.time;
+  }
+  /* פונט הכותרות (Noto Sans Hebrew צר 800, ~30KB, נשמר במטמון של Google) — רק כשיש סקשנים כאלה בדף */
+  var fontOn = false;
+  function titleFont() {
+    if (fontOn || !document.querySelector('[id="MerchantCollection"], [id="ProductHighlights"]')) { return; }
+    fontOn = true;
+    try { var l = document.createElement('link'); l.rel = 'stylesheet'; l.href = 'https://fonts.googleapis.com/css2?family=Noto+Sans+Hebrew:wdth,wght@75,800&display=swap'; l.setAttribute('data-mh-col-font', ''); document.head.appendChild(l); } catch (e) {}
+  }
   function sync() {
     try {
-      [].forEach.call(document.querySelectorAll('[id="MerchantCollection"]'), section);
+      titleFont();
+      var secs = [].slice.call(document.querySelectorAll('[id="MerchantCollection"]'));
+      pageNote = pageSummary(secs); stats.pageNote = pageNote;
+      secs.forEach(function (sec, i) {
+        var head = sec.firstElementChild, want = i === 0 ? pageNote : '';
+        if (head && (head.getAttribute('data-mh-page-note') || '') !== want) { if (want) { head.setAttribute('data-mh-page-note', want); } else { head.removeAttribute('data-mh-page-note'); } }
+      });
+      secs.forEach(section);
       collectionPage();
     } catch (e) { stats.errors++; }
   }
@@ -6859,6 +6886,7 @@ log('פעיל');
     if (h) { lastTitle = (h.textContent.replace(/\s+/g, ' ').trim() + (h.getAttribute('data-mh-emoji') ? ' ' + h.getAttribute('data-mh-emoji') : '')).trim(); }
   }, true);
 
+  try { document.addEventListener('touchstart', function () {}, { passive: true }); } catch (e) {}   /* בלי מאזין touchstart ספארי באייפון לא מפעיל :active (הלחיצה על הכרטיס) */
   /* MutationObserver → rAF: רץ לפני הציור הבא — "View all"/"nearby-merchants" לא מהבהבים */
   var busy = false;
   try {
