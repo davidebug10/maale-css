@@ -6661,3 +6661,212 @@ log('פעיל');
   window.MH_HOMEFILM = { version: VERSION, stats: function () { return Object.assign({}, stats); } };
   /* mh-homefilm-v1 */
 })();
+
+/* =========================================================
+   אוספי העסקים בדף הבית + הדף "הכל" — MH Collections v1.0.0 | 2026-10-09
+   הבעלים של ההתנהגות של #MerchantCollection (סקשני "Merchant Collection" שדוד בונה באדמין) ושל כותרת הדף
+   שנפתח מ"הכל" (#merchants_by_category?collection=true). העיצוב: CSS חלק 59.
+   - "View all" (קשיח באנגלית ב-chunk pb-MerchantCollection) → "הכל" + מספר העסקים.
+   - כותרת דף "הכל": Hyperzod בונה slug מהכותרת ומוחקת כל מה שאינו a-z → כותרת עברית = "nearby-merchants".
+     שומרים את כותרת הסקשן בלחיצה (שלב capture, לפני Hyperzod) וכותבים אותה ב-H1 של הדף.
+   - הכרטיס: "הודעת חלון הראווה" (אלרגנים + כשרות + "התמונות להמחשה בלבד") → רק הכשרות בשורה קטנה
+     (data-mh-meta); הודעה בלי "כשרות:" (טוסטראק, דליה) → כמו שהיא. הסטטוס הסגור → נוסח קצר (data-mh-when).
+   - סדר: פתוחים קודם, אחריהם לפי שעת הפתיחה הקרובה, "בקרוב נפתח" (מתג ידני) בסוף — CSS order, בלי לגעת ב-DOM של Vue.
+   נכשל-פתוח: בלי ה-JS הכרטיסים של Hyperzod כמו שהם (עם העיצוב של חלק 59). בדיקה: MH_COLLECTIONS.stats()
+   ========================================================= */
+(function () {
+  'use strict';
+  if (window.__MH_COLLECTIONS__) { return; }
+  window.__MH_COLLECTIONS__ = true;
+  var VERSION = '1.0.0';
+  var stats = { labels: 0, titles: 0, cards: 0, kosher: 0, tags: 0, closed: 0, ordered: 0, errors: 0 };
+  var lastTitle = null;   /* הכותרת של הסקשן שממנו לחצו "הכל" */
+
+  /* ---- כשרות מתוך "הודעת חלון הראווה" ---- */
+  function kosher(msg) {
+    var m = /כשרות\s*:\s*([^\n]+)/.exec(msg || '');
+    if (!m) { return null; }
+    var parts = m[1].split(/\s*·\s*|\s*,\s*/), out = [];
+    for (var i = 0; i < parts.length; i++) {
+      var p = parts[i].replace(/\s+/g, ' ').trim();
+      if (!p) { continue; }
+      if (/^(אלרגנים|אלרגן)|^(גלוטן|אגוזים|בוטנים|שומשום|ביצים|סויה|חלב)$/.test(p)) { break; }   /* אלרגן בלי כותרת ("· גלוטן") */
+      out.push(p);
+    }
+    return out.length ? out.join(' · ') : null;
+  }
+  function tagline(msg) {
+    var t = (msg || '').replace(/\s+/g, ' ').trim();
+    if (!t || /כשרות\s*:|אלרגנים\s*:|להמחשה/.test(t)) { return null; }
+    return t;
+  }
+
+  /* ---- סטטוס: "הפתיחה הבאה במוצ״ש ב- 20:30" → { label, rank } ---- */
+  var DAYS = { 'ראשון': 0, 'שני': 1, 'שלישי': 2, 'רביעי': 3, 'חמישי': 4, 'שישי': 5, 'שבת': 6, 'מוצ״ש': 6.5 };
+  function ilNow() {   /* יום (0=ראשון) ודקה בשעון ישראל */
+    try {
+      var p = new Intl.DateTimeFormat('en-US', { timeZone: 'Asia/Jerusalem', weekday: 'short', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }).formatToParts(new Date()), o = {};
+      p.forEach(function (x) { o[x.type] = x.value; });
+      return { day: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].indexOf(o.weekday), min: (+o.hour) * 60 + (+o.minute) };
+    } catch (e) { var d = new Date(); return { day: d.getDay(), min: d.getHours() * 60 + d.getMinutes() }; }
+  }
+  function status(text, now) {
+    var t = (text || '').replace(/\s+/g, ' ').trim();
+    if (!t) { return { state: 'open', rank: 0 }; }
+    var tm = /(\d{1,2}):(\d{2})/.exec(t), dw = /מוצ״ש|ראשון|שני|שלישי|רביעי|חמישי|שישי|שבת|היום|מחר/.exec(t);
+    if (!tm) { return { state: 'soon', rank: 1e7, label: t }; }   /* "בקרוב נפתח" — מתג ידני, בלי שעה */
+    now = now || ilNow();
+    var day = dw ? (dw[0] === 'היום' ? now.day : dw[0] === 'מחר' ? (now.day + 1) % 7 : Math.floor(DAYS[dw[0]])) : now.day;
+    var min = (+tm[1]) * 60 + (+tm[2]), ahead = ((day - now.day + 7) % 7) * 1440 + min - now.min;
+    if (ahead < 0) { ahead += 7 * 1440; }
+    return { state: 'closed', rank: 1 + ahead, label: t, day: dw ? dw[0] : '', time: tm[1] + ':' + tm[2] };
+  }
+
+  /* "הפתיחה הבאה במוצ״ש ב- 20:30" → "נפתח במוצ״ש 20:30" (כרטיס רגיל) / "מוצ״ש 20:30" (כרטיס קטן) */
+  function shortWhen(st) {
+    if (st.state !== 'closed') { return null; }
+    var d = st.day === 'היום' || !st.day ? '' : st.day === 'מחר' ? 'מחר ' : st.day === 'מוצ״ש' ? 'במוצ״ש ' : st.day + ' ';
+    return { full: 'נפתח ' + d + st.time, tiny: (d ? d.replace(/^ב(?=מוצ״ש)/, '') : 'היום ') + st.time };
+  }
+  function spoken(st, name) {   /* לקורא מסך: "מוצאי שבת" במלואו, לא אות-אות */
+    if (st.state === 'open') { return null; }
+    if (st.state === 'soon') { return name + ', סגור כרגע'; }
+    return name + ', סגור, נפתח ' + (st.day === 'מוצ״ש' ? 'במוצאי שבת' : st.day || 'היום') + ' בשעה ' + st.time;
+  }
+
+  function cardState(card) {
+    var cc = card.querySelector('.merchant-close-comment');
+    var st = status(cc ? cc.textContent : '');
+    if (st.state === 'open' && card.querySelector('.cover-img.is-unavailable')) { st = { state: 'soon', rank: 1e7 }; }
+    return st;
+  }
+
+  function decorate(card) {
+    var body = card.querySelector('.merchant-card-body'), msgEl = card.querySelector('.merchant-store-front-message');
+    var msg = msgEl ? msgEl.textContent : '', k = kosher(msg), t = k ? null : tagline(msg);
+    var meta = k || t || '';
+    if (body && body.getAttribute('data-mh-meta') !== meta) { body.setAttribute('data-mh-meta', meta); if (k) { stats.kosher++; } else if (t) { stats.tags++; } }
+    var st = cardState(card), w = shortWhen(st), cc = card.querySelector('.merchant-close-comment');
+    card.setAttribute('data-mh-state', st.state);
+    if (cc && w) { if (cc.getAttribute('data-mh-when') !== w.full) { cc.setAttribute('data-mh-when', w.full); cc.setAttribute('data-mh-tiny', w.tiny); } }
+    var name = ((card.querySelector('.merchant-card-title') || {}).textContent || '').trim(), sp = spoken(st, name);
+    if (sp) { card.setAttribute('aria-label', sp); } else if (card.getAttribute('aria-label')) { card.removeAttribute('aria-label'); }
+    stats.cards++;
+    return st;
+  }
+
+  /* חיצי הקרוסלה במחשב: Hyperzod גוללת לפי LTR — ב-RTL "הבאים" לא זז בכלל ו"הקודמים" נעול לתמיד (scrollLeft>1
+     לא מתקיים כשהגלילה שלילית). כאן: גלילה לפי כיוון הקרוסלה, מצב נעול לפי ההתחלה/הסוף בפועל, ותוויות בעברית. */
+  function arrows(sec) {
+    var car = sec.querySelector('.nm-carousel'), btns = sec.querySelectorAll('.nm-carousel-arrow-btn');
+    if (!car || btns.length < 2) { return; }
+    var pos = Math.abs(car.scrollLeft), atStart = pos < 2, atEnd = pos + car.clientWidth >= car.scrollWidth - 2;
+    [].forEach.call(btns, function (b) {
+      var next = /next/i.test(b.getAttribute('data-mh-dir') || b.getAttribute('aria-label') || '');
+      if (!b.getAttribute('data-mh-dir')) { b.setAttribute('data-mh-dir', next ? 'next' : 'prev'); }
+      b.setAttribute('aria-label', next ? 'המקומות הבאים' : 'המקומות הקודמים');
+      var off = next ? atEnd : atStart;
+      if (b.disabled !== off) { b.disabled = off; }
+    });
+    if (!car.__mhArrows) { car.__mhArrows = true; car.addEventListener('scroll', function () { arrows(sec); }, { passive: true }); }
+  }
+  document.addEventListener('click', function (e) {
+    var b = e.target && e.target.closest && e.target.closest('[id="MerchantCollection"] .nm-carousel-arrow-btn');
+    if (!b) { return; }
+    var car = b.closest('[id="MerchantCollection"]').querySelector('.nm-carousel');
+    if (!car) { return; }
+    e.preventDefault(); e.stopImmediatePropagation();      /* הגלילה של Hyperzod (LTR) לא זזה ב-RTL */
+    var next = b.getAttribute('data-mh-dir') === 'next', rtl = getComputedStyle(car).direction === 'rtl';
+    var step = Math.max(260, Math.round(car.clientWidth * 0.8));
+    car.scrollBy({ left: (next ? 1 : -1) * (rtl ? -1 : 1) * step, behavior: 'smooth' });
+    stats.arrows = (stats.arrows || 0) + 1;
+  }, true);
+
+  /* סקשן: תווית "הכול (N)", אימוג'י התיאור ליד הכותרת, סדר פתוחים-קודם, ושורת "כולם סגורים" */
+  function section(sec) {
+    var title = sec.querySelector('h1'), btn = sec.querySelector('.nm-see-all-btn'), desc = title && title.parentElement && title.parentElement.parentElement && title.parentElement.parentElement.querySelector('p');
+    var slides = [].slice.call(sec.querySelectorAll('.nm-carousel-slide')), cards = [].slice.call(sec.querySelectorAll('a.merchant-card'));
+    var n = cards.length, t = title ? title.textContent.replace(/\s+/g, ' ').trim() : '';
+    if (btn) {
+      var lbl = 'הכול' + (n ? ' (' + n + ')' : '');
+      if (btn.textContent !== lbl) { btn.textContent = lbl; stats.labels++; }
+      btn.setAttribute('aria-label', 'כל ' + (n || '') + ' המקומות ב„' + t + '”');
+    }
+    if (desc && title) {   /* תיאור שהוא רק אימוג'י → ליד הכותרת, לא שורה משלו */
+      var d = desc.textContent.replace(/\s+/g, '').trim(), emo = d && !/[֐-׿A-Za-z0-9]/.test(d);
+      if (emo) { sec.setAttribute('data-mh-emoji-desc', ''); } else { sec.removeAttribute('data-mh-emoji-desc'); }   /* מאפיין ולא class — Vue כותב מחדש את ה-class של הסקשן */
+      if (emo && title.getAttribute('data-mh-emoji') !== d) { title.setAttribute('data-mh-emoji', d); }
+    }
+    var states = cards.map(decorate), rows2 = !!sec.querySelector('.nm-carousel--rows-2');
+    if (!rows2) {
+      var car = sec.querySelector('.nm-carousel'), moved = false;
+      slides.forEach(function (sl) { var c = sl.querySelector('a.merchant-card'); if (!c) { return; } var r = cardState(c).rank; var o = String(Math.min(r, 1e7) | 0); if (sl.style.order !== o) { sl.style.order = o; moved = true; stats.ordered++; } });
+      /* scroll-snap "נצמד" לכרטיס שהיה ראשון ומגלגל אחריו לסוף — חוזרים להתחלה, רק אם הלקוח עוד לא נגע בשורה */
+      if (car && moved && !car.__mhTouched) {
+        if (!car.__mhWatch) { car.__mhWatch = true; ['pointerdown', 'touchstart', 'wheel'].forEach(function (ev) { car.addEventListener(ev, function () { car.__mhTouched = true; }, { passive: true }); }); }
+        car.scrollLeft = 0;
+      }
+    }
+    /* "הכול" מופיע רק אם Hyperzod מדדה גלישה — המדידה קורית פעם אחת (ResizeObserver), לפעמים לפני שהכרטיסים
+       נטענו → אין כפתור לתמיד. אירוע scroll מפעיל אצלם את המדידה מחדש (onScroll → updateCarouselScrollState). */
+    var crs = sec.querySelector('.nm-carousel');
+    if (crs && !rows2 && n && !btn && !crs.__mhNudged && crs.scrollWidth > crs.clientWidth + 1) { crs.__mhNudged = true; crs.dispatchEvent(new Event('scroll')); stats.nudged = (stats.nudged || 0) + 1; }
+    arrows(sec);
+    /* כולם סגורים → שורה אחת רגועה במקום להבין לבד מתוך כרטיסים אפורים */
+    var open = states.filter(function (s) { return s.state === 'open'; }).length, first = null;
+    states.forEach(function (s) { if (s.state === 'closed' && (!first || s.rank < first.rank)) { first = s; } });
+    var note = '';
+    if (n && !open) { var w = first && shortWhen(first); note = w ? 'כולם סגורים עכשיו · הראשון ' + w.full : 'כולם סגורים עכשיו'; }
+    var head = sec.firstElementChild;   /* attr() קורא מהאלמנט של ה-::after עצמו — לכן על הכותרת, לא על הסקשן */
+    if (head && head.getAttribute('data-mh-note') !== note) { if (note) { head.setAttribute('data-mh-note', note); } else { head.removeAttribute('data-mh-note'); } }
+    stats.closed = states.filter(function (s) { return s.state !== 'open'; }).length;
+  }
+
+  /* דף "הכול": הכותרת = כותרת הסקשן (Hyperzod מציגה "nearby-merchants") */
+  function collectionPage() {
+    var page = document.getElementById('merchants_by_category');
+    if (!page || !/[?&]collection=true/.test(location.search)) { return; }
+    var h = page.querySelector('.scheme-mobile-page-header h1, h1');
+    var want = lastTitle || 'כל המקומות';
+    if (h && h.textContent.trim() !== want) { h.textContent = want; stats.titles++; }
+    /* אותו סדר כמו בבית (פתוחים, ואז לפי שעת הפתיחה) + שורת סיכום בראש הרשימה */
+    var row = null, states = [];
+    [].forEach.call(page.querySelectorAll('a.merchant-card'), function (c) {
+      var st = decorate(c), col = c.closest('[class*="v-col"]');
+      states.push(st);
+      if (col) { row = row || col.parentElement; var o = String(Math.min(st.rank, 1e7) | 0); if (col.style.order !== o) { col.style.order = o; } }
+    });
+    if (row) {
+      var open = states.filter(function (x) { return x.state === 'open'; }).length, first = null, note;
+      states.forEach(function (x) { if (x.state === 'closed' && (!first || x.rank < first.rank)) { first = x; } });
+      note = states.length + ' מקומות · ' + (open ? (open === states.length ? 'כולם פתוחים עכשיו' : open + ' פתוחים עכשיו') : 'כולם סגורים עכשיו' + (first ? ' · הראשון ' + shortWhen(first).full : ''));
+      if (row.getAttribute('data-mh-note') !== note) { row.setAttribute('data-mh-note', note); }
+    }
+  }
+
+  function sync() {
+    try {
+      [].forEach.call(document.querySelectorAll('[id="MerchantCollection"]'), section);
+      collectionPage();
+    } catch (e) { stats.errors++; }
+  }
+
+  /* שלב capture — לפני ש-Hyperzod מנווטת: זוכרים את כותרת הסקשן (+ אימוג'י) */
+  document.addEventListener('click', function (e) {
+    var b = e.target && e.target.closest && e.target.closest('.nm-see-all-btn');
+    if (!b) { return; }
+    var sec = b.closest('[id="MerchantCollection"]'), h = sec && sec.querySelector('h1');
+    if (h) { lastTitle = (h.textContent.replace(/\s+/g, ' ').trim() + (h.getAttribute('data-mh-emoji') ? ' ' + h.getAttribute('data-mh-emoji') : '')).trim(); }
+  }, true);
+
+  /* MutationObserver → rAF: רץ לפני הציור הבא — "View all"/"nearby-merchants" לא מהבהבים */
+  var busy = false;
+  try {
+    new MutationObserver(function () { if (busy) { return; } busy = true; requestAnimationFrame(function () { try { sync(); } finally { busy = false; } }); })   /* לפני הציור הבא, פעם אחת לפריים */
+      .observe(document.documentElement, { subtree: true, childList: true, characterData: true });
+    sync();
+  } catch (e) { console.warn('[MH Collections] disabled:', e); }
+
+  window.MH_COLLECTIONS = { version: VERSION, sync: sync, kosher: kosher, tagline: tagline, status: status, stats: function () { return JSON.parse(JSON.stringify(stats)); } };
+  /* mh-collections-v1 */
+})();

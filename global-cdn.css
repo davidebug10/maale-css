@@ -1498,7 +1498,7 @@ a[href^="tel:"] svg path {
 /* --- 12ה: שורת החיפוש — הוסר 6.10.2026; השדה ורשימת התוצאות במודאל בבעלות "חלק 44: MH AddrEditor" --- */
 
 /* --- 12ו: דף הבית (Merchant & Product Cards) --- */
-.merchant-card {  /* 10.9.2026: .product-card-basic הוסר מהסלקטור — כרטיסי המוצר החדשים שקופים בכוונה (חלק 40) */
+.merchant-card {  /* 10.9.2026: .product-card-basic הוסר מהסלקטור — כרטיסי המוצר החדשים שקופים בכוונה (חלק 40). 9.10: באוספי דף הבית ובדף "הכול" — חלק 59 מבטל את זה (שם הבעלים) */
     background: rgba(255, 255, 255, 0.75) !important;
     backdrop-filter: blur(45px) saturate(210%) !important;
     border-radius: 32px !important;
@@ -1506,13 +1506,7 @@ a[href^="tel:"] svg path {
     box-shadow: 0 15px 40px rgba(0, 0, 0, 0.06) !important;
 }
 
-/* כותרות דף הבית */
-.CollectionGrid--172265 h1::before {
-    content: "קולקציות נבחרות" !important;
-    color: #000 !important;
-    font-weight: 900 !important;
-    letter-spacing: -0.5px !important;
-}
+/* כותרת "קולקציות נבחרות" ל-CollectionGrid--172265 — הוסרה 9.10.2026: הסקשן כבר לא קיים בדף הבית (QA). */
 
 
 /* =========================================================
@@ -7619,51 +7613,7 @@ html body #mh-addrwarn.mh-aw--default .mh-aw-body { gap: 0 !important; }
 html.mh-aw-on body #checkout { padding-bottom: var(--mh-aw-pad, 0px) !important; }
 /* mh-addrwarn-v1 */
 
-/* =========================================================
-   חלק 54: הירו דף הבית (כל השנה) — MH HomeHero v1.0.0 | 2026-10-04
-   ⚠ מוחלף ע"י חלק 58 (MH HomeFilm, #mh-home-film, 9.10). נשאר רק עד שדוד מדביק את home-film.html במקום התוכן הישן —
-   אחרי ההדבקה: למחוק את כל החלק הזה (אין לו השפעה על #mh-home-film).
-   הבעלים היחיד של #mh-home-hero (סקשן Custom Code בדף הבית; בסקשן רק תוכן — העיצוב כאן).
-   החליף את חלק 51 (סוכות). #mh-sukkah-hero = אותו סקשן לפני שדוד מדביק את הקוד החדש — מקבל אותו
-   עיצוב (בלי הקישוטים) כדי שלא יהיה רגע של הירו שבור; אפשר למחוק אותו מהסלקטורים אחרי ההדבקה.
-   שליח בשקיעה → אווירה חמה; זהות האתר: תווית זכוכית עם נקודת "חי" אדומה, "אצלך בדלת." בגרדיאנט QLED,
-   קו QLED זוהר. כניסה עדינה של הטקסט בטעינה (רק transform/opacity); prefers-reduced-motion = בלי.
-   ========================================================= */
-html body :is(#mh-home-hero, #mh-sukkah-hero) { direction: rtl !important; width: 100% !important; margin: 0 0 18px !important; padding: 0 !important; background: #120c08 !important; border-radius: 22px !important; overflow: hidden !important; box-shadow: 0 18px 40px -22px rgba(60, 25, 10, 0.55) !important; }
-html body :is(#mh-home-hero, #mh-sukkah-hero) .mh-hero-box { position: relative !important; width: 100% !important; height: clamp(380px, 112vw, 620px) !important; overflow: hidden !important; isolation: isolate !important; }
-html body :is(#mh-home-hero, #mh-sukkah-hero) .mh-hero-video { position: absolute !important; inset: 0 !important; width: 100% !important; height: 100% !important; max-width: none !important; object-fit: cover !important; object-position: center 22% !important; display: block !important; z-index: 1 !important; pointer-events: none !important; }
-@media (min-width: 900px) { html body :is(#mh-home-hero, #mh-sukkah-hero) .mh-hero-video { object-position: center 15% !important; } }
-html body #mh-sukkah-hero .mh-suk-deco { display: none !important; }   /* שאריות SVG אם נשארו במטמון */
-html body :is(#mh-home-hero, #mh-sukkah-hero) .mh-hero-text { position: absolute !important; left: 0 !important; right: 0 !important; bottom: 0 !important; z-index: 3 !important; padding: 72px 24px 24px !important; color: #fff !important; text-align: right !important; background: linear-gradient(to top, rgba(14, 8, 4, 0.92) 0%, rgba(14, 8, 4, 0.55) 52%, rgba(14, 8, 4, 0) 100%) !important; }
-html body :is(#mh-home-hero, #mh-sukkah-hero) .mh-hero-kicker {
-    display: inline-flex !important; align-items: center !important; gap: 8px !important;
-    margin: 0 0 12px !important; padding: 6px 13px 6px 12px !important; border-radius: 999px !important;
-    color: #fff !important; font-size: clamp(11.5px, 2.4vw, 13px) !important; font-weight: 800 !important; letter-spacing: 0.3px !important;
-    background: rgba(255, 255, 255, 0.14) !important; border: 1px solid rgba(255, 255, 255, 0.28) !important;
-    -webkit-backdrop-filter: blur(12px) saturate(160%) !important; backdrop-filter: blur(12px) saturate(160%) !important;
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35) !important;
-}
-html body #mh-home-hero .mh-hero-dot { position: relative !important; display: inline-block !important; flex: 0 0 8px !important; width: 8px !important; height: 8px !important; border-radius: 999px !important; background: #ff3b41 !important; box-shadow: 0 0 0 0 rgba(255, 59, 65, 0.6) !important; animation: mhHomeDot 2s ease-out infinite !important; }
-html body :is(#mh-home-hero, #mh-sukkah-hero) .mh-hero-title { color: #fff !important; font-size: clamp(26px, 6vw, 44px) !important; font-weight: 900 !important; line-height: 1.1 !important; letter-spacing: -0.3px !important; margin: 0 0 10px !important; text-shadow: 0 2px 14px rgba(0, 0, 0, 0.55) !important; }
-html body #mh-home-hero .mh-hero-accent { color: #ff4d52 !important; text-shadow: none !important; white-space: nowrap !important; }   /* "אצלך בדלת." לא נשבר באמצע */
-@supports ((-webkit-background-clip: text) or (background-clip: text)) {
-    html body #mh-home-hero .mh-hero-accent { background: linear-gradient(135deg, #ff7a7e 0%, #ff3b41 45%, #e31e24 100%) !important; -webkit-background-clip: text !important; background-clip: text !important; -webkit-text-fill-color: transparent !important; filter: drop-shadow(0 2px 10px rgba(227, 30, 36, 0.45)) !important; }
-}
-html body :is(#mh-home-hero, #mh-sukkah-hero) .mh-hero-p { color: rgba(255, 255, 255, 0.95) !important; font-size: clamp(14px, 3vw, 18px) !important; font-weight: 700 !important; line-height: 1.45 !important; margin: 0 !important; max-width: 620px !important; text-shadow: 0 1px 8px rgba(0, 0, 0, 0.6) !important; }
-html body :is(#mh-home-hero, #mh-sukkah-hero) .mh-hero-p2 { margin-top: 6px !important; }
-html body :is(#mh-home-hero, #mh-sukkah-hero) .mh-hero-line { width: 64px !important; height: 3px !important; border-radius: 999px !important; background: linear-gradient(90deg, #ff3b41 0%, #c8151b 100%) !important; margin: 16px 0 0 !important; box-shadow: 0 0 16px rgba(255, 59, 65, 0.7) !important; }
-@media (min-width: 900px) { html body :is(#mh-home-hero, #mh-sukkah-hero) .mh-hero-text { padding: 96px 48px 36px !important; } }
-/* כניסה עדינה בטעינה */
-html body #mh-home-hero .mh-hero-text > * { animation: mhHomeIn 0.75s cubic-bezier(0.2, 0.8, 0.2, 1) both !important; }
-html body #mh-home-hero .mh-hero-text > :nth-child(2) { animation-delay: 0.08s !important; }
-html body #mh-home-hero .mh-hero-text > :nth-child(3) { animation-delay: 0.16s !important; }
-html body #mh-home-hero .mh-hero-text > :nth-child(4) { animation-delay: 0.24s !important; }
-@keyframes mhHomeIn { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
-@keyframes mhHomeDot { 0% { box-shadow: 0 0 0 0 rgba(255, 59, 65, 0.6); } 70% { box-shadow: 0 0 0 8px rgba(255, 59, 65, 0); } 100% { box-shadow: 0 0 0 0 rgba(255, 59, 65, 0); } }
-@media (prefers-reduced-motion: reduce) {
-    html body #mh-home-hero .mh-hero-text > *, html body #mh-home-hero .mh-hero-dot { animation: none !important; }
-}
-/* mh-homehero-v1 */
+/* חלק 54 (הירו דף הבית הישן, #mh-home-hero, 4.10) — הוסר 9.10.2026 אחרי שדוד הדביק את home-film.html; הוחלף ע"י "חלק 58: MH HomeFilm". ההיסטוריה ב-git. */
 
 /* =========================================================
    חלק 55: פרחי דליה — "החל מ-" + הודעת שבת — MH Dalia v1.1.0 | 2026-10-07
@@ -8209,3 +8159,106 @@ html body #mh-home-film.mhf-in .mhf-cta { animation: mhfFade 0.8s cubic-bezier(0
     html body #mh-home-film .mhf-pp { top: auto !important; bottom: 18px !important; left: 18px !important; }
 }
 /* mh-homefilm-v1 */
+
+/* =========================================================
+   חלק 59: אוספי העסקים בדף הבית + דף "הכול" — MH Collections v1.0.0 | 2026-10-09
+   הבעלים היחיד של #MerchantCollection (סקשני "Merchant Collection" מהאדמין: כותרת, "הכול", קרוסלה, כרטיס עסק)
+   ושל כרטיסי העסקים בדף שנפתח מ"הכול" (#merchants_by_category). התנהגות: JS "MH Collections".
+   מחליף את הכלל הגלובלי הישן של .merchant-card (חלק 12ו — זכוכית, רדיוס 32) באזורים האלה.
+   עקרונות (מחקר 9.10): התמונה היא הכרטיס (בלי "כרטיס בתוך כרטיס"), סטטוס רק כשהוא חשוב — שבב כהה מלא על
+   התמונה ("נפתח במוצ״ש 20:30"), כשרות בשורה אחת מתחת לשם, אפור רק על התמונה (הטקסט בניגודיות מלאה),
+   אדום רק על כפתורי פעולה — כאן אין אדום.
+   ========================================================= */
+html body [id="MerchantCollection"] { margin: 30px 0 !important; }
+/* כותרת הסקשן: שם + אימוג'י בשורה אחת, "הכול (N)" משמאל */
+html body [id="MerchantCollection"] > div:first-child { margin: 0 16px 12px !important; }
+html body [id="MerchantCollection"] h1 { font-size: 20px !important; font-weight: 800 !important; line-height: 1.25 !important; color: #111 !important; letter-spacing: 0 !important; }
+html body [id="MerchantCollection"][data-mh-emoji-desc] h1::after { content: attr(data-mh-emoji) !important; display: inline-block !important; white-space: nowrap !important; margin-inline-start: 6px !important; font-size: 17px !important; font-weight: 400 !important; letter-spacing: 1px !important; }
+html body [id="MerchantCollection"][data-mh-emoji-desc] > div:first-child > p { display: none !important; }
+html body [id="MerchantCollection"] > div:first-child > p { margin-top: 2px !important; font-size: 13.5px !important; color: #6b7280 !important; }
+/* כולם סגורים: שורה אחת רגועה מתחת לכותרת (JS: data-mh-note) */
+html body [id="MerchantCollection"] > div:first-child[data-mh-note]::after { content: attr(data-mh-note) !important; display: block !important; margin-top: 4px !important; font-size: 13.5px !important; font-weight: 600 !important; line-height: 1.4 !important; color: #6b7280 !important; }
+html body [id="MerchantCollection"] .nm-see-all-btn { display: inline-flex !important; align-items: center !important; gap: 2px !important; min-height: 44px !important; padding: 0 2px 0 0 !important; margin: -12px 0 !important; font-size: 14.5px !important; font-weight: 700 !important; color: #111 !important; text-decoration: none !important; -webkit-tap-highlight-color: transparent !important; }
+html body [id="MerchantCollection"] .nm-see-all-btn::after { content: "" !important; width: 16px !important; height: 16px !important; background: currentColor !important;
+    -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M15 6l-6 6 6 6'/%3E%3C/svg%3E") center / contain no-repeat !important;
+    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M15 6l-6 6 6 6'/%3E%3C/svg%3E") center / contain no-repeat !important; }
+@media (hover: hover) { html body [id="MerchantCollection"] .nm-see-all-btn:hover { text-decoration: none !important; opacity: 0.7 !important; } }
+/* הקרוסלה: שוליים 16, רווח 12, הכרטיס הבא מציץ */
+html body [id="MerchantCollection"] .nm-carousel { gap: 12px !important; padding: 2px 16px 10px !important; scroll-padding-inline: 16px !important; }
+html body [id="MerchantCollection"] .nm-carousel:not(.nm-carousel--rows-2) .nm-carousel-slide { flex: 0 0 76% !important; max-width: 300px !important; }
+/* הכרטיס: התמונה היא הכרטיס. מבטל את הזכוכית של 12ו (רקע, טשטוש, רדיוס 32, צל, מסגרת) */
+html body :is([id="MerchantCollection"], #merchants_by_category) a.merchant-card {
+    background: transparent !important; -webkit-backdrop-filter: none !important; backdrop-filter: none !important;
+    border: 0 !important; border-radius: 0 !important; box-shadow: none !important; overflow: visible !important; -webkit-tap-highlight-color: transparent !important; }
+html body :is([id="MerchantCollection"], #merchants_by_category) a.merchant-card .cover-img { height: auto !important; aspect-ratio: 16 / 10 !important; border: 0 !important; border-radius: 18px !important; overflow: hidden !important; background: #f3f1ee !important; box-shadow: inset 0 0 0 1px rgba(17, 17, 17, 0.05) !important; transform: translateZ(0) !important; }
+html body :is([id="MerchantCollection"], #merchants_by_category) a.merchant-card:active .cover-img { transform: scale(0.985) !important; transition: transform 0.15s ease !important; }
+/* סגור: אפור רק על התמונה, בלי ה"שטיפה" (Hyperzod: אפור + שקיפות 76%) — הטקסט נשאר בניגודיות מלאה */
+html body :is([id="MerchantCollection"], #merchants_by_category) a.merchant-card .cover-img.is-unavailable .v-img__img { filter: grayscale(1) contrast(0.96) brightness(1.03) !important; opacity: 1 !important; }
+/* הגלולות על התמונה: "חלון הראווה" (אלרגנים/כשרות/להמחשה) יורד — הכשרות עוברת לשורה מתחת לשם */
+html body :is([id="MerchantCollection"], #merchants_by_category) a.merchant-card .merchant-store-front-message { display: none !important; }
+html body :is([id="MerchantCollection"], #merchants_by_category) a.merchant-card .v-responsive__content > div.tw-absolute { top: 10px !important; left: 10px !important; right: 10px !important; }
+/* שבב הסטטוס: כהה ומלא (ניגודיות על כל תמונה), שעון קטן, נוסח קצר מה-JS (data-mh-when) */
+html body :is([id="MerchantCollection"], #merchants_by_category) a.merchant-card .merchant-close-comment {
+    display: inline-flex !important; align-items: center !important; gap: 5px !important; max-width: 100% !important; padding: 5px 10px 5px 9px !important; border-radius: 999px !important;
+    background: rgba(17, 17, 17, 0.84) !important; color: #fff !important; font-size: 12.5px !important; font-weight: 700 !important; line-height: 16px !important; white-space: nowrap !important; }
+html body :is([id="MerchantCollection"], #merchants_by_category) a.merchant-card .merchant-close-comment::before { content: "" !important; flex: 0 0 13px !important; width: 13px !important; height: 13px !important; background: currentColor !important;
+    -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.4' stroke-linecap='round'%3E%3Ccircle cx='12' cy='12' r='9'/%3E%3Cpath d='M12 7v5l3 2'/%3E%3C/svg%3E") center / contain no-repeat !important;
+    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.4' stroke-linecap='round'%3E%3Ccircle cx='12' cy='12' r='9'/%3E%3Cpath d='M12 7v5l3 2'/%3E%3C/svg%3E") center / contain no-repeat !important; }
+html body :is([id="MerchantCollection"], #merchants_by_category) a.merchant-card .merchant-close-comment[data-mh-when] { font-size: 0 !important; }
+html body :is([id="MerchantCollection"], #merchants_by_category) a.merchant-card .merchant-close-comment[data-mh-when]::after { content: attr(data-mh-when) !important; font-size: 12.5px !important; }
+html body [id="MerchantCollection"] .merchant-card--compact .merchant-close-comment[data-mh-tiny]::after { content: attr(data-mh-tiny) !important; font-size: 12px !important; }
+/* גוף הכרטיס: שם, דירוג, ושורת כשרות/תיאור קצר (JS: data-mh-meta) */
+html body :is([id="MerchantCollection"], #merchants_by_category) a.merchant-card .merchant-card-body { padding: 10px 2px 2px !important; gap: 2px !important; background: transparent !important; }
+html body :is([id="MerchantCollection"], #merchants_by_category) a.merchant-card .merchant-card-title { font-size: 16px !important; font-weight: 800 !important; line-height: 22px !important; color: #111 !important; text-transform: none !important; }
+html body :is([id="MerchantCollection"], #merchants_by_category) a.merchant-card .merchant-card-body[data-mh-meta]:not([data-mh-meta=""])::after {
+    content: attr(data-mh-meta) !important; display: block !important; overflow: hidden !important; text-overflow: ellipsis !important; white-space: nowrap !important;
+    font-size: 13px !important; font-weight: 600 !important; line-height: 18px !important; color: #6b7280 !important; }
+html body :is([id="MerchantCollection"], #merchants_by_category) a.merchant-card [id="AverageRating"] span { font-size: 13px !important; font-weight: 700 !important; color: #111 !important; }
+/* כרטיס קטן (פריסת "שתי שורות") */
+html body [id="MerchantCollection"] .merchant-card--compact .cover-img { border-radius: 14px !important; }
+html body [id="MerchantCollection"] .merchant-card--compact .merchant-card-title { font-size: 14.5px !important; line-height: 20px !important; }
+html body [id="MerchantCollection"] .merchant-card--compact .merchant-close-comment { padding: 4px 8px 4px 7px !important; }
+html body [id="MerchantCollection"] .merchant-card--compact .v-responsive__content > div.tw-absolute { top: 8px !important; left: 8px !important; right: 8px !important; }
+/* דף "הכול": אותו כרטיס, רשת נקייה, שורת סיכום בראש הרשימה (JS: data-mh-note על ה-v-row) */
+html body #merchants_by_category .v-row > [class*="v-col"] { padding: 8px 8px 14px !important; }
+html body #merchants_by_category .v-row[data-mh-note]::before { content: attr(data-mh-note) !important; order: -1 !important; flex: 0 0 100% !important; padding: 0 10px 6px !important; font-size: 14px !important; font-weight: 600 !important; line-height: 1.4 !important; color: #6b7280 !important; }
+html body #merchants_by_category a.merchant-card .cover-img { aspect-ratio: 16 / 9 !important; }
+@media (prefers-reduced-motion: reduce) { html body :is([id="MerchantCollection"], #merchants_by_category) a.merchant-card:active .cover-img { transform: none !important; } }
+/* מחשב: חיצים עגולים, 3 כרטיסים בשורה */
+@media (min-width: 900px) {
+    html body [id="MerchantCollection"] > div:first-child { margin: 0 28px 14px !important; }
+    html body [id="MerchantCollection"] h1 { font-size: 24px !important; }
+    html body [id="MerchantCollection"] .nm-carousel { padding: 2px 28px 12px !important; scroll-padding-inline: 28px !important; gap: 20px !important; }
+    html body [id="MerchantCollection"] .nm-carousel:not(.nm-carousel--rows-2) .nm-carousel-slide { flex: 0 0 calc(33.333% - 14px) !important; max-width: none !important; }
+    /* החיצים: האייקון של Hyperzod מצויר ל-LTR — בעברית "הבאים" מצביע שמאלה; המצב (נעול/פעיל) לפי disabled שה-JS מנהל */
+    html body [id="MerchantCollection"] .nm-carousel-arrow-btn { width: 38px !important; height: 38px !important; border-radius: 999px !important; display: inline-grid !important; place-items: center !important; transition: opacity 0.15s ease !important; }
+    html body [id="MerchantCollection"] .nm-carousel-arrow-btn svg { width: 38px !important; height: 38px !important; transform: scaleX(-1) !important; }
+    html body [id="MerchantCollection"] .nm-carousel-arrow-btn svg path:first-child { fill: #f3f3f3 !important; }
+    html body [id="MerchantCollection"] .nm-carousel-arrow-btn svg path:last-child { opacity: 1 !important; fill: #111 !important; }
+    html body [id="MerchantCollection"] .nm-carousel-arrow-btn[disabled] { opacity: 0.35 !important; }
+    html body [id="MerchantCollection"] .nm-carousel-arrow-btn:not([disabled]):hover svg path:first-child { fill: #e9e9e9 !important; }
+}
+/* mh-collections-v1 */
+
+/* =========================================================
+   חלק 60: דף הבית — המסגרת — MH HomeLayout v1.0.0 | 2026-10-09
+   הבעלים של מה שבין הסקשנים בדף הבית: כותרות "מוצרים נבחרים" (ProductHighlights), גובה התא של כרטיס המוצר
+   בקרוסלה שלהם, והרוחב של סקשני הקידום (דליה/קצפת/גואה) במחשב. הכרטיס עצמו — חלק 40; אוספי העסקים — חלק 59.
+   QA 9.10: כותרות באותו משקל כמו אוספי העסקים (20/800), שם העסק כקישור עם חץ; במחשב Hyperzod קובעת תא
+   קבוע 192×326 לכרטיס של ~220 → רווח לבן ענק בין הסקשנים; סקשני הקידום היו ברוחב 1280 = 633px גובה כל אחד.
+   ========================================================= */
+html body [id="ProductHighlights"] { margin-top: 26px !important; margin-bottom: 18px !important; min-height: 0 !important; }
+html body [id="ProductHighlights"] > div:first-child { margin-bottom: 6px !important; }
+html body [id="ProductHighlights"] > div:first-child h1 { margin-inline-start: 16px !important; padding-top: 0 !important; font-size: 20px !important; font-weight: 800 !important; line-height: 1.25 !important; color: #111 !important; text-transform: none !important; letter-spacing: 0 !important; }
+html body [id="ProductHighlights"] > div:first-child > span { display: inline-flex !important; align-items: center !important; gap: 2px !important; margin-inline-start: 16px !important; font-size: 13.5px !important; font-weight: 600 !important; color: #6b7280 !important; }
+html body [id="ProductHighlights"] > div:first-child > span::after { content: "" !important; width: 14px !important; height: 14px !important; background: currentColor !important;
+    -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M15 6l-6 6 6 6'/%3E%3C/svg%3E") center / contain no-repeat !important;
+    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M15 6l-6 6 6 6'/%3E%3C/svg%3E") center / contain no-repeat !important; }
+@media (min-width: 900px) {
+    html body [id="ProductHighlights"] > div:first-child h1, html body [id="ProductHighlights"] > div:first-child > span { margin-inline-start: 28px !important; }
+    html body [id="ProductHighlights"] > div:first-child h1 { font-size: 24px !important; }
+    html body [id="ProductHighlights"] .slider-inner-container > div > div[class*="tw-h-"] { height: auto !important; }   /* תא 326px לכרטיס של ~220 */
+    /* סקשני הקידום: אותו יחס, רוחב של "באנר" ולא של מסך */
+    html body :is(#mh-home-dalia, #mh-home-katsefet, #mh-soon-goa) { max-width: 920px !important; margin: 30px auto !important; }
+}
+/* mh-homelayout-v1 */
