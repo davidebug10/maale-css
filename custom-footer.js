@@ -5684,3 +5684,84 @@ log('פעיל');
   };
   /* mh-greet-v1 */
 })();
+
+/* =========================================================================
+   "ייפתח שוב ב-" — שעון 24 שעות + תאריך — MH Reopen  |  v1.0.0 | 2026-10-09
+   -------------------------------------------------------------------------
+   מוצר עם לוח זמינות (schedule) שסגור עכשיו: Hyperzod כותבת בכרטיס (.product-availability-message)
+   ובכפתור של חלון המוצר "ייפתח שוב ב- שישי, 08:00 AM". השעה עצמה נכונה — next_publish_time_utc
+   מהשרת, מוצג באזור הזמן של החנות (getTimezone = Asia/Jerusalem, נבדק 9.10) — אבל:
+     - 12 שעות עם AM/PM (ובחלון המוצר ה-"AM" קופץ לצד השני בגלל RTL);
+     - רק יום בשבוע, בלי תאריך: בשישי, "שישי 08:00" של השבוע הבא נקרא כמו "היום" (דוד 9.10).
+   התיקון במקור האחד: formattedUTCDateTimeWithTranslation של Hyperzod (5 הקוראים — כרטיסים, חיפוש,
+   חלון המוצר) מעצבת עם dayjs format("ddd, hh:mm A"), מחרוזת שאין לה שום שימוש אחר בבאנדל (index-jfOdlzWH).
+   הבלוק עוטף את format של dayjs ומחליף רק אותה ל-"ddd D.M, HH:mm" → "שישי 16.10, 08:00"
+   (את שם היום ממשיכה לתרגם Hyperzod). תוויות שצוירו לפני שהבלוק נטען (computed במטמון) — מתוקנות
+   בטקסט, עם התאריך מנתוני המוצר ב-store לפי ה-id של הכרטיס; אם לא נמצא — רק 24 שעות.
+   נכשל-פתוח. בדיקה: MH_REOPEN.stats()
+   ========================================================================= */
+(function () {
+  'use strict';
+  if (window.__MH_REOPEN__) { return; }
+  window.__MH_REOPEN__ = true;
+  var VERSION = '1.0.0';
+  var OLD = 'ddd, hh:mm A', NEW = 'ddd D.M, HH:mm';
+  var RX = /([^\s,]+), (\d{1,2}):(\d{2}) ([AP]M)/;          /* "שישי, 08:00 AM" — הפורמט הישן */
+  var stats = { version: VERSION, patched: false, formatted: 0, relabeled: 0, noDate: 0, errors: 0 };
+  var G = null;
+
+  function patch() {
+    var g; try { g = document.getElementById('app').__vue_app__.config.globalProperties; } catch (e) { return false; }
+    if (!g || typeof g.$date !== 'function') { return false; }
+    var proto = Object.getPrototypeOf(g.$date()), orig = proto && proto.format;
+    if (typeof orig !== 'function') { return false; }
+    proto.format = function (f) {
+      if (f === OLD) { stats.formatted++; return orig.call(this, NEW); }
+      return orig.apply(this, arguments);
+    };
+    G = g; stats.patched = true;
+    return true;
+  }
+
+  /* next_publish_time_utc של מוצר לפי id — מהרשימות שבדף העסק / בחיפוש / בדף קטגוריה */
+  function nextPub(id) {
+    var M = G.$store.state.Merchant, found = null;
+    (function scan(o, d) {
+      if (found || !o || typeof o !== 'object' || d > 4) { return; }
+      if (Array.isArray(o)) { for (var i = 0; i < o.length && !found; i++) { scan(o[i], d + 1); } return; }
+      if (o._id === id) { found = o.next_publish_time_utc || null; return; }
+      if (o.category_products) { scan(o.category_products, d + 1); }
+      if (o.data) { scan(o.data, d + 1); }
+    })([M.categoryProducts, M.searchedProducts, M.categoryPageProducts], 0);
+    return found;
+  }
+  function to24(h, m, ap) { var H = (+h % 12) + (ap === 'PM' ? 12 : 0); return (H < 10 ? '0' : '') + H + ':' + m; }
+  /* תווית בפורמט הישן → "שישי 16.10, 08:00" (התאריך רק אם השעה מהנתונים זהה לשעה שבתווית) */
+  function relabel() {
+    var els = document.querySelectorAll('.product-availability-message, .product-popup .v-card-actions .v-btn');
+    for (var i = 0; i < els.length; i++) {
+      var w = document.createTreeWalker(els[i], NodeFilter.SHOW_TEXT, null), n;
+      while ((n = w.nextNode())) {
+        var m = RX.exec(n.nodeValue); if (!m) { continue; }
+        var hm = to24(m[2], m[3], m[4]), rep = m[1] + ', ' + hm;
+        var card = els[i].closest('[id]'), id = card && /^[0-9a-f]{24}$/.test(card.id) ? card.id : null;
+        var ts = id ? nextPub(id) : null;
+        var d = ts ? G.$date.utc(ts).tz(G.$store.getters.getTimezone || 'Asia/Jerusalem') : null;
+        if (d && d.format('HH:mm') === hm) { rep = m[1] + ' ' + d.format('D.M') + ', ' + hm; } else { stats.noDate++; }
+        n.nodeValue = n.nodeValue.replace(m[0], rep);
+        stats.relabeled++;
+      }
+    }
+  }
+
+  try {
+    var pend = false;
+    var run = function () { pend = false; try { if (stats.patched || patch()) { relabel(); } } catch (e) { stats.errors++; } };
+    new MutationObserver(function () { if (!pend) { pend = true; setTimeout(run, 150); } })
+      .observe(document.documentElement, { subtree: true, childList: true, characterData: true });
+    run();
+  } catch (e) { console.warn('[MH Reopen] disabled:', e); }
+
+  window.MH_REOPEN = { version: VERSION, stats: function () { return JSON.parse(JSON.stringify(stats)); } };
+  /* mh-reopen-v1 */
+})();
