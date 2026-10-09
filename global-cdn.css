@@ -8130,6 +8130,9 @@ html body #mh-home-film .mhf-pp .mhf-ring { stroke: #fff !important; transform: 
 html body #mh-home-film .mhf-pp .mhf-i-play { display: none !important; }
 html body #mh-home-film:not(.mhf-playing) .mhf-pp .mhf-i-play { display: inline !important; }
 html body #mh-home-film:not(.mhf-playing) .mhf-pp .mhf-i-pause { display: none !important; }
+/* דוד 9.10: "להעיף — שיתנגן לבד": הכפתור לא נראה. נשאר רק למקלדת/קורא מסך (WCAG 2.2.2 — עצירת תנועה מעל 5 שנ')
+   ומופיע רק כשמגיעים אליו בטאב, כמו "דלג לתוכן". */
+html body #mh-home-film .mhf-pp:not(:focus-visible) { width: 1px !important; height: 1px !important; padding: 0 !important; overflow: hidden !important; clip-path: inset(50%) !important; opacity: 0 !important; pointer-events: none !important; }
 /* "יש ___." — החריץ בסוף השורה מתחלף עם הסצנה (JS). בלי JS: הטקסט מהסקשן ("מה לאכול.").
    מסוע: הישנה עולה ויוצאת, החדשה עולה מלמטה — אותו משך, אותה עקומה, 140% מרחק (גובה שורה + עוקץ ל + זנב ק) = אין חפיפה. המסכה: .mhf-line */
 html body #mh-home-film .mhf-w { display: inline-block !important; position: relative !important; white-space: nowrap !important; vertical-align: top !important; }
