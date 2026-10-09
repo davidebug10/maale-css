@@ -6796,9 +6796,10 @@ log('פעיל');
     var slides = [].slice.call(sec.querySelectorAll('.nm-carousel-slide')), cards = [].slice.call(sec.querySelectorAll('a.merchant-card'));
     var n = cards.length, t = title ? title.textContent.replace(/\s+/g, ' ').trim() : '';
     if (btn) {
-      var lbl = 'הכול' + (n ? ' (' + n + ')' : '');
+      if (n) { sec.__mhN = n; }   /* בזמן ש-Hyperzod מציירת מחדש את הכרטיסים יש רגע עם 0 — לא מורידים את המספר */
+      var cnt = n || sec.__mhN || 0, lbl = 'הכול' + (cnt ? ' (' + cnt + ')' : '');
       if (btn.textContent !== lbl) { btn.textContent = lbl; stats.labels++; }
-      btn.setAttribute('aria-label', 'כל ' + (n || '') + ' המקומות ב„' + t + '”');
+      btn.setAttribute('aria-label', 'כל ' + (cnt || '') + ' המקומות ב„' + t + '”');
     }
     if (desc && title) {   /* תיאור שהוא רק אימוג'י → ליד הכותרת, לא שורה משלו */
       var d = desc.textContent.replace(/\s+/g, '').trim(), emo = d && !/[֐-׿A-Za-z0-9]/.test(d);
@@ -6904,4 +6905,50 @@ log('פעיל');
 
   window.MH_COLLECTIONS = { version: VERSION, sync: sync, kosher: kosher, tagline: tagline, status: status, stats: function () { return JSON.parse(JSON.stringify(stats)); } };
   /* mh-collections-v1 */
+})();
+
+/* =========================================================
+   תמונות מוצר מ-Google Drive בגודל שבו הן מוצגות — MH DriveImg v1.0.0 | 2026-10-09
+   רקע (QA דף הבית 9.10): תמונות המוצרים באדמין הן קישורי Drive עם &sz=w1000 — 1000px לאריח של ~140px
+   (~0.6–0.8 שנ' כל אחת, אריחים לבנים בזמן הטעינה). כאן: רק תמונה בתוך אריח מוצר (.product-image-frame)
+   ברוחב עד 260px → sz לפי הרוחב בפועל × צפיפות המסך (מעוגל ל-40, 240–600). תמונה גדולה (חלון המוצר) — לא נוגעים.
+   עובד גם למוצרים חדשים (לפי הכתובת, לא רשימה). נכשל-פתוח. בדיקה: MH_DRIVEIMG.stats()
+   ========================================================= */
+(function () {
+  'use strict';
+  if (window.__MH_DRIVEIMG__) { return; }
+  window.__MH_DRIVEIMG__ = true;
+  var stats = { rewritten: 0, skipped: 0, errors: 0 };
+  var RX = /^(https:\/\/drive\.google\.com\/thumbnail\?[^#]*?[?&]sz=w)(\d+)/;
+  function fix(img) {
+    try {
+      var src = img.getAttribute('src') || '', m = RX.exec(src);
+      if (!m) { return; }
+      var frame = img.closest('.product-image-frame');
+      if (!frame) { return; }
+      var w = frame.getBoundingClientRect().width;
+      if (!w || w > 260) { stats.skipped++; return; }
+      var want = Math.min(600, Math.max(240, Math.ceil(w * (window.devicePixelRatio || 1) / 40) * 40));
+      if (+m[2] <= want) { return; }
+      img.setAttribute('src', src.replace(RX, '$1' + want));
+      stats.rewritten++;
+    } catch (e) { stats.errors++; }
+  }
+  function scan(root) {
+    if (!root || !root.querySelectorAll) { return; }
+    if (root.tagName === 'IMG') { fix(root); return; }
+    var imgs = root.querySelectorAll('.product-image-frame img[src*="drive.google.com/thumbnail"]');
+    for (var i = 0; i < imgs.length; i++) { fix(imgs[i]); }
+  }
+  try {
+    new MutationObserver(function (ms) {
+      for (var i = 0; i < ms.length; i++) {
+        if (ms[i].type === 'attributes') { fix(ms[i].target); continue; }
+        for (var j = 0; j < ms[i].addedNodes.length; j++) { scan(ms[i].addedNodes[j]); }
+      }
+    }).observe(document.documentElement, { subtree: true, childList: true, attributes: true, attributeFilter: ['src'] });
+    scan(document);
+  } catch (e) { console.warn('[MH DriveImg] disabled:', e); }
+  window.MH_DRIVEIMG = { version: '1.0.0', stats: function () { return JSON.parse(JSON.stringify(stats)); } };
+  /* mh-driveimg-v1 */
 })();
