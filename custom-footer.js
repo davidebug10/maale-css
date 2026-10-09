@@ -3461,6 +3461,7 @@ log('פעיל');
 
   window.MH_SEARCH = {
     version: VERSION, sync: sync, core: CORE,
+    index: loadIndex,                                        /* האינדקס (Promise, הורדה אחת לכל הדף) — גם להירו של דף הבית (מספר העסקים והמנות) */
     last: function () { return last; },
     stats: function () { return Object.assign({}, stats); },
     /* MH_SEARCH.explain('פלאפל') — הדירוג מהאינדקס בלבד (בלי מרחק/פתוח), לבדיקה */
@@ -6453,4 +6454,201 @@ log('פעיל');
 
   window.MH_REOPEN = { version: VERSION, motz: motz, stats: function () { return JSON.parse(JSON.stringify(stats)); } };
   /* mh-reopen-v1 */
+})();
+
+/* =========================================================
+   הירו דף הבית — "התרנגול" — MH HomeFilm v1.0.0 | 2026-10-09
+   ההתנהגות של #mh-home-film (העיצוב: CSS חלק 58; התוכן: הסקשן שדוד מדביק — home-film.html בריפו).
+   - הסרטון מקבל src רק מכאן (data-src): "פחות תנועה" / חיסכון בנתונים → לא מורידים אותו בכלל.
+   - הוא שקוף עד שפריים אמיתי מוצג (מתחת: תמונת הפריים הראשון) — אין הבהוב שחור ואין כפתור ▶ של המערכת.
+   - ניגון חסום (מצב חיסכון בסוללה באייפון, אפליקציה שלא מתירה ניגון) → הסרטון יוצא מהדף ונשארת תמונה אחת:
+     פריים המסירה. בלי ניסיונות חוזרים בנגיעה (באפליקציה זה עלול לפתוח נגן במסך מלא).
+   - כפתור עצירה/המשך עם טבעת התקדמות (WCAG 2.2.2), מופיע רק כשהסרט באמת מתנגן; עצירה של המשתמש נשמרת.
+   - הסרט עוצר מחוץ למסך / ברקע וממשיך כשחוזרים.
+   - "יש מה לאכול." — המילים אחרי "יש" מתחלפות עם הסצנה (פיצה, מאפים, המבורגר, סטייק — רק מה שיש באפליקציה;
+     סושי אין — בסצנה הזו, בפני התרנגול ובמשלוח חוזר "מה לאכול").
+   - המספרים בשורה מאינדקס החיפוש (MH_SEARCH.index — אותה הורדה) — מתעדכנים לבד.
+   נכשל-פתוח: בלי ה-JS — התמונה + הטקסט. בדיקה: MH_HOMEFILM.stats()
+   ========================================================= */
+(function () {
+  'use strict';
+  if (window.__MH_HOMEFILM__) { return; }
+  window.__MH_HOMEFILM__ = true;
+  var VERSION = '1.0.0';
+  /* הפונט של הכותרת בלבד: Noto Sans Hebrew צר-שחור (wdth 75 / wght 900) — רק האותיות של הכותרת (text=, ~2-4KB),
+     נבנה מהתוכן בפועל (הכותרת + כל המילים של הסצנות), כך ששינוי טקסט בסקשן לא שובר אותו */
+  var FONT = 'https://fonts.googleapis.com/css2?family=Noto+Sans+Hebrew:wdth,wght@75,900&display=swap';
+  var FONT_TEST = '900 60px "Noto Sans Hebrew"';
+  var STILL = 'https://davidebug10.github.io/maale-css/home-film-still.webp';   /* תמונה אחת כשאין סרט: התרנגול מוסר את השקית */
+  /* 6 הסצנות (נמדד מהפריימים 9.10): סושי | פיצה 1.375 | מאפים 3.0 | המבורגר 4.292 | סטייק 5.708 → פני התרנגול 6.5 | משלוח 7.417 */
+  var SCENES = [[0, ''], [1.375, 'פיצה'], [3.0, 'מאפים'], [4.292, 'המבורגר'], [5.708, 'סטייק'], [6.5, '']];   /* '' = הטקסט מהסקשן ("מה לאכול") */
+  var stats = { bound: 0, playing: 0, live: 0, still: '', userPause: 0, userPlay: 0, offscreen: 0, words: 0, counts: null, cta: 0, errors: 0 };
+  var RM = window.matchMedia ? window.matchMedia('(prefers-reduced-motion: reduce)') : null;
+  var SVGNS = 'http://www.w3.org/2000/svg', R = 16, C = 2 * Math.PI * R, animated = false;
+
+  function fmt(n) { return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ','); }
+  function router() { try { return document.getElementById('app').__vue_app__.config.globalProperties.$router; } catch (e) { return null; } }
+  function sceneAt(t) { var w = ''; for (var i = 0; i < SCENES.length; i++) { if (t + 0.02 >= SCENES[i][0]) { w = SCENES[i][1]; } } return w; }
+
+  /* "למעלה מ-1,500 מנות" / "אלפי מנות" (2,000+) · "מעשרות מסעדות ובתי עסק" (20+) — לפי האינדקס */
+  function counts(root) {
+    var S = window.MH_SEARCH;
+    if (!S || typeof S.index !== 'function') { return; }
+    S.index().then(function (j) {
+      if (!j || !j.stores || !j.stores.length) { return; }
+      var items = 0, seen = {};   /* מוצר שמופיע בכמה קטגוריות נספר פעם אחת */
+      j.stores.forEach(function (s) { (s.secs || []).forEach(function (x) { (x[1] || []).forEach(function (p) { if (p && p[0] && !seen[p[0]]) { seen[p[0]] = 1; items++; } }); }); });
+      stats.counts = { stores: j.stores.length, items: items };
+      var it = root.querySelector('[data-mhf-n="items"]'), st = root.querySelector('[data-mhf-n="stores"]');
+      if (it && items >= 300) { it.textContent = items >= 2000 ? 'אלפי מנות' : 'למעלה מ-' + fmt(Math.floor(items / 100) * 100) + ' מנות'; }
+      if (st && j.stores.length >= 5) { st.textContent = j.stores.length >= 20 ? 'מעשרות מסעדות ובתי\u00a0עסק' : 'מ-' + j.stores.length + ' מסעדות ובתי\u00a0עסק'; }
+    })['catch'](function () { stats.errors++; });
+  }
+
+  /* החריץ בסוף השורה ("יש ___."), הנקודה חלק מהמילה — שום דבר אחריו לא זז. המעבר: "מסוע" — הישנה עולה והחדשה עולה
+     מלמטה באותו קצב ובאותו מרחק, כך שאין רגע של חפיפה; המסכה היא השורה עצמה (.mhf-line, overflow:hidden). */
+  function wordSlot(root) {
+    var slot = root.querySelector('.mhf-w'); if (!slot) { return null; }
+    var base = (slot.textContent || '').replace(/\s+/g, ' ').trim(); if (!base) { return null; }
+    var tail = (base.match(/[.!?\u2026]+$/) || [''])[0], cur = null, live = null;
+    slot.textContent = '';
+    function set(word, instant) {
+      var text = word ? word + tail : base;
+      if (text === cur) { return; }
+      cur = text; stats.words++;
+      var old = live;
+      if (old) {
+        if (instant) { old.parentNode.removeChild(old); }
+        else { old.classList.add('mhf-out'); setTimeout(function () { if (old.parentNode) { old.parentNode.removeChild(old); } }, 700); }
+      }
+      live = document.createElement('span'); live.className = 'mhf-wi' + (instant ? ' mhf-now' : ''); live.textContent = text;
+      slot.appendChild(live);
+    }
+    set('', true);
+    return set;
+  }
+
+  function loadFont(root, done) {
+    var t = ((root.querySelector('.mhf-line') || {}).textContent || '') + '.';
+    SCENES.forEach(function (x) { t += x[1]; });
+    var seen = {}, chars = '';
+    t.replace(/\s+/g, '').split('').forEach(function (c) { if (!seen[c]) { seen[c] = 1; chars += c; } });
+    var url = FONT + '&text=' + encodeURIComponent(chars), fired = false;
+    function go() { if (!fired) { fired = true; done(); } }
+    setTimeout(go, 700);                                   /* לא מחכים יותר מזה — הכותרת עולה בפונט המערכת ומתחלפת כשהפונט מגיע */
+    try {
+      var l = document.querySelector('link[data-mhf-font]');
+      if (l && l.getAttribute('href') === url && l.__mhfOk) { go(); return; }
+      if (!l) { l = document.createElement('link'); l.rel = 'stylesheet'; l.setAttribute('data-mhf-font', ''); document.head.appendChild(l); }
+      l.onload = function () { l.__mhfOk = true; if (document.fonts && document.fonts.load) { document.fonts.load(FONT_TEST, chars).then(go, go); } else { go(); } };
+      l.onerror = go;
+      if (l.getAttribute('href') !== url) { l.href = url; }
+    } catch (e) { go(); }
+  }
+
+  function button() {
+    var b = document.createElement('button');
+    b.type = 'button'; b.className = 'mhf-pp';
+    var s = document.createElementNS(SVGNS, 'svg'); s.setAttribute('viewBox', '0 0 38 38'); s.setAttribute('aria-hidden', 'true');
+    s.innerHTML = '<circle class="mhf-ring-bg" cx="19" cy="19" r="' + R + '" fill="none" stroke-width="2"/>' +
+      '<circle class="mhf-ring" cx="19" cy="19" r="' + R + '" fill="none" stroke-width="2" stroke-linecap="round" stroke-dasharray="' + C.toFixed(2) + '" stroke-dashoffset="' + C.toFixed(2) + '"/>' +
+      '<g class="mhf-i-pause" fill="#fff"><rect x="14" y="12.5" width="3.4" height="13" rx="1.2"/><rect x="20.6" y="12.5" width="3.4" height="13" rx="1.2"/></g>' +
+      '<path class="mhf-i-play" fill="#fff" d="M15.5 12.4v13.2c0 .8.9 1.3 1.6.9l10.2-6.6c.6-.4.6-1.3 0-1.7l-10.2-6.6c-.7-.5-1.6 0-1.6.8z"/>';
+    b.appendChild(s);
+    return b;
+  }
+
+  function bind(root) {
+    if (root.__mhf) { return; }
+    root.__mhf = true; stats.bound++;
+    var film = root.querySelector('.mhf-film'), v = root.querySelector('video.mhf-video'), img = root.querySelector('.mhf-poster');
+    var setWord = wordSlot(root);
+    var b = null, ring = null, userPaused = false, vis = true, raf = 0, shown = false;
+    counts(root);
+    root.classList.add('mhf-wait');                        /* הכותרת מחכה לפונט (עד 0.7 שנ'), ואז הכניסה — פעם אחת לטעינה */
+    loadFont(root, function () { root.classList.remove('mhf-wait'); if (!animated) { animated = true; root.classList.add('mhf-in'); } });
+    if (!film || !v) { return; }
+
+    function still(why) {
+      stats.still = why;
+      root.classList.add('mhf-still'); root.classList.remove('mhf-live', 'mhf-playing');
+      if (img && img.getAttribute('src') !== STILL) { img.src = STILL; }
+      try { v.pause(); v.removeAttribute('src'); v.load(); } catch (e) {}
+      if (v.parentNode) { v.parentNode.removeChild(v); }
+      if (b && b.parentNode) { b.parentNode.removeChild(b); }
+      if (setWord) { setWord('', true); }
+    }
+    var saveData = !!(navigator.connection && navigator.connection.saveData);
+    if ((RM && RM.matches) || saveData || !v.getAttribute('data-src')) { still(RM && RM.matches ? 'reduced-motion' : saveData ? 'save-data' : 'no-src'); return; }
+
+    v.muted = true; v.defaultMuted = true; v.playsInline = true; v.loop = true;
+    v.setAttribute('muted', ''); v.setAttribute('playsinline', '');
+    v.src = v.getAttribute('data-src');
+
+    function tick() {
+      raf = 0;
+      if (ring && v.duration > 0) { ring.setAttribute('stroke-dashoffset', (C * (1 - v.currentTime / v.duration)).toFixed(2)); }
+      if (setWord) { setWord(sceneAt(v.currentTime)); }
+      if (!v.paused) { raf = requestAnimationFrame(tick); }
+    }
+    function label() { if (b) { b.setAttribute('aria-label', v.paused ? 'המשך הסרטון' : 'עצירת הסרטון'); b.setAttribute('aria-pressed', v.paused ? 'true' : 'false'); } }
+    function sync() {
+      if (!v.isConnected) { return; }
+      if (vis && !userPaused && !document.hidden) {
+        if (!v.paused) { return; }
+        var p; try { p = v.play(); } catch (e) { p = null; }
+        if (p && p.then) { p.then(null, function (e) { if (e && /NotAllowed|NotSupported/.test(e.name)) { still(e.name); } }); }
+      } else if (!v.paused) { v.pause(); }
+    }
+    function reveal() {   /* הסרט נכנס רק כשפריים אמיתי על המסך (במקום הבהוב שחור / object-fit שגוי בספארי) */
+      if (shown || !v.isConnected) { return; }
+      shown = true; stats.live++;
+      root.classList.add('mhf-live');
+      b = button(); ring = b.querySelector('.mhf-ring'); film.appendChild(b); label();
+      b.addEventListener('click', function (e) {
+        e.preventDefault(); e.stopPropagation();
+        if (v.paused) { userPaused = false; stats.userPlay++; sync(); } else { userPaused = true; stats.userPause++; v.pause(); }
+      });
+    }
+    v.addEventListener('playing', function () {
+      stats.playing++; root.classList.add('mhf-playing'); label();
+      if (!raf) { raf = requestAnimationFrame(tick); }
+      if (!shown) {
+        if (v.requestVideoFrameCallback) { v.requestVideoFrameCallback(function () { v.requestVideoFrameCallback(reveal); }); }
+        setTimeout(reveal, 400);
+      }
+    });
+    v.addEventListener('pause', function () { root.classList.remove('mhf-playing'); label(); });
+    v.addEventListener('timeupdate', function () { if (setWord) { setWord(sceneAt(v.currentTime)); } });   /* גיבוי ל-rAF */
+    v.addEventListener('error', function () { still('error'); });
+
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver(function (es) { vis = es[es.length - 1].isIntersecting; if (!vis && !v.paused) { stats.offscreen++; } sync(); }, { threshold: 0.2 }).observe(film);
+    }
+    document.addEventListener('visibilitychange', sync);
+    window.addEventListener('pageshow', sync);
+
+    var cta = root.querySelector('.mhf-cta');
+    if (cta) {
+      cta.addEventListener('click', function (e) {
+        var r = router(); if (!r) { return; }        /* בלי ה-router — הקישור הרגיל */
+        e.preventDefault(); stats.cta++;
+        r.push({ name: 'search' })['catch'](function () {});
+      });
+    }
+    sync();
+  }
+
+  var queued = false;
+  function scan() {
+    queued = false;
+    try { var r = document.getElementById('mh-home-film'); if (r) { bind(r); } } catch (e) { stats.errors++; }
+  }
+  try {
+    new MutationObserver(function () { if (!queued) { queued = true; requestAnimationFrame(scan); } }).observe(document.documentElement, { childList: true, subtree: true });
+    scan();
+  } catch (e) { console.warn('[MH HomeFilm] disabled:', e); }
+
+  window.MH_HOMEFILM = { version: VERSION, stats: function () { return Object.assign({}, stats); } };
+  /* mh-homefilm-v1 */
 })();

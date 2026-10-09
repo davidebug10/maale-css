@@ -7621,6 +7621,8 @@ html.mh-aw-on body #checkout { padding-bottom: var(--mh-aw-pad, 0px) !important;
 
 /* =========================================================
    חלק 54: הירו דף הבית (כל השנה) — MH HomeHero v1.0.0 | 2026-10-04
+   ⚠ מוחלף ע"י חלק 58 (MH HomeFilm, #mh-home-film, 9.10). נשאר רק עד שדוד מדביק את home-film.html במקום התוכן הישן —
+   אחרי ההדבקה: למחוק את כל החלק הזה (אין לו השפעה על #mh-home-film).
    הבעלים היחיד של #mh-home-hero (סקשן Custom Code בדף הבית; בסקשן רק תוכן — העיצוב כאן).
    החליף את חלק 51 (סוכות). #mh-sukkah-hero = אותו סקשן לפני שדוד מדביק את הקוד החדש — מקבל אותו
    עיצוב (בלי הקישוטים) כדי שלא יהיה רגע של הירו שבור; אפשר למחוק אותו מהסלקטורים אחרי ההדבקה.
@@ -8128,3 +8130,82 @@ html body .product-popup #mh-greet .mh-gr-help {
     }
 }
 /* mh-greet-v1 */
+
+/* =========================================================
+   חלק 58: הירו דף הבית — "התרנגול" — MH HomeFilm v1.0.0 | 2026-10-09
+   הבעלים היחיד של #mh-home-film (סקשן Custom Code בדף הבית; בסקשן רק תוכן — העיצוב כאן, ההתנהגות ב-JS "MH HomeFilm").
+   הסרט ריבועי (1:1) ונבלע בלוח כהה חם; הכותרת יושבת על הנפילה של הסרט. אדום אחד בלבד — כפתור הפעולה.
+   ========================================================= */
+html body #mh-home-film {
+    --mhf-ink: #100a07;
+    --mhf-display: "Noto Sans Hebrew", -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+    position: relative !important; display: block !important; direction: rtl !important; width: 100% !important; box-sizing: border-box !important;
+    margin: 0 0 20px !important; padding: 0 !important; overflow: hidden !important; isolation: isolate !important;
+    border-radius: 26px !important; background: var(--mhf-ink) !important; color: #fff !important; text-align: right !important;
+}
+html body #mh-home-film .mhf-film { position: relative !important; width: 100% !important; aspect-ratio: 1 / 1 !important; overflow: hidden !important; background: var(--mhf-ink) !important; }
+html body #mh-home-film .mhf-poster,
+html body #mh-home-film .mhf-video { position: absolute !important; inset: 0 !important; width: 100% !important; height: 100% !important; max-width: none !important; margin: 0 !important; object-fit: cover !important; display: block !important; pointer-events: none !important; border: 0 !important; border-radius: 0 !important; }
+html body #mh-home-film .mhf-video { opacity: 0 !important; transition: opacity 0.45s ease !important; }   /* נכנס רק כשפריים אמיתי מוצג (JS: .mhf-live) */
+html body #mh-home-film.mhf-live .mhf-video { opacity: 1 !important; }
+html body #mh-home-film .mhf-video::-webkit-media-controls-start-playback-button { display: none !important; -webkit-appearance: none !important; }
+html body #mh-home-film .mhf-video::-webkit-media-controls { display: none !important; }
+/* הנפילה: הסרט נבלע בלוח בלי "פס" — מעבר מרוכך (9 עצירות, בלי פסים בגרדיאנט) */
+html body #mh-home-film .mhf-film::after { content: "" !important; position: absolute !important; left: 0 !important; right: 0 !important; bottom: -1px !important; height: 52% !important; pointer-events: none !important;
+    background: linear-gradient(to bottom, rgba(16, 10, 7, 0) 0%, rgba(16, 10, 7, 0.04) 14%, rgba(16, 10, 7, 0.12) 27%, rgba(16, 10, 7, 0.26) 40%, rgba(16, 10, 7, 0.45) 52%, rgba(16, 10, 7, 0.65) 64%, rgba(16, 10, 7, 0.82) 76%, rgba(16, 10, 7, 0.94) 88%, var(--mhf-ink) 100%) !important; }
+html body #mh-home-film .mhf-copy { position: relative !important; z-index: 2 !important; margin: -92px 0 0 !important; padding: 0 22px 32px !important; }
+html body #mh-home-film .mhf-title { margin: 0 0 12px !important; padding: 0 !important; font-family: var(--mhf-display) !important; font-stretch: 75% !important; font-size: clamp(50px, 15.6vw, 64px) !important; font-weight: 900 !important; line-height: 1 !important; letter-spacing: 0 !important; color: #fff !important; }
+html body #mh-home-film.mhf-wait .mhf-copy { visibility: hidden !important; }   /* JS: עד שהפונט מוכן (עד 0.7 שנ') — בלי JS הטקסט פשוט מוצג */
+html body #mh-home-film .mhf-line { display: block !important; overflow: hidden !important; padding: 0.06em 0 0.1em !important; margin: -0.06em 0 -0.1em !important; }
+html body #mh-home-film .mhf-line > span { display: inline-block !important; }
+html body #mh-home-film .mhf-sub { margin: 0 0 24px !important; padding: 0 !important; max-width: 360px !important; font-size: 17px !important; font-weight: 500 !important; line-height: 1.5 !important; color: rgba(255, 255, 255, 0.76) !important; }
+html body #mh-home-film .mhf-sub, html body #mh-home-film .mhf-joke { text-wrap: balance !important; }   /* בלי מילה יתומה בשורה ("עסק.") */
+html body #mh-home-film .mhf-joke { display: block !important; }   /* הבדיחה בשורה משלה — תזמון קומי בכל רוחב */
+html body #mh-home-film .mhf-cta { display: inline-flex !important; align-items: center !important; justify-content: center !important; gap: 10px !important; height: 52px !important; padding: 0 26px !important; border-radius: 999px !important; box-sizing: border-box !important;
+    background: #e31e24 !important; color: #fff !important; font-size: 17px !important; font-weight: 800 !important; line-height: 1 !important; text-decoration: none !important; -webkit-tap-highlight-color: transparent !important;
+    box-shadow: none !important; transition: transform 0.18s cubic-bezier(0.23, 1, 0.32, 1), background-color 0.18s ease !important; }
+@media (max-width: 899px) { html body #mh-home-film .mhf-cta { display: flex !important; width: 100% !important; height: 54px !important; } }   /* אגודל: כפתור ברוחב מלא בטלפון */
+html body #mh-home-film .mhf-cta::after { content: "" !important; width: 18px !important; height: 18px !important; flex: 0 0 18px !important; background: currentColor !important;
+    -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M19 12H5M11 6l-6 6 6 6'/%3E%3C/svg%3E") center / contain no-repeat !important;
+    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M19 12H5M11 6l-6 6 6 6'/%3E%3C/svg%3E") center / contain no-repeat !important; }
+html body #mh-home-film .mhf-cta:active { transform: scale(0.97) !important; }
+@media (hover: hover) { html body #mh-home-film .mhf-cta:hover { background: #c8151b !important; } }
+/* עצירה/המשך + טבעת התקדמות (נוצר ב-JS) */
+html body #mh-home-film .mhf-pp { position: absolute !important; z-index: 3 !important; top: 14px !important; left: 14px !important; width: 38px !important; height: 38px !important; padding: 0 !important; margin: 0 !important; border: 0 !important; border-radius: 999px !important; cursor: pointer !important;
+    background: rgba(16, 10, 7, 0.38) !important; -webkit-backdrop-filter: blur(10px) !important; backdrop-filter: blur(10px) !important; color: #fff !important; display: grid !important; place-items: center !important; -webkit-tap-highlight-color: transparent !important; }
+html body #mh-home-film .mhf-pp svg { width: 38px !important; height: 38px !important; display: block !important; }
+html body #mh-home-film .mhf-pp .mhf-ring-bg { stroke: rgba(255, 255, 255, 0.22) !important; }
+html body #mh-home-film .mhf-pp .mhf-ring { stroke: #fff !important; transform: rotate(-90deg) !important; transform-origin: 50% 50% !important; }
+html body #mh-home-film .mhf-pp .mhf-i-play { display: none !important; }
+html body #mh-home-film:not(.mhf-playing) .mhf-pp .mhf-i-play { display: inline !important; }
+html body #mh-home-film:not(.mhf-playing) .mhf-pp .mhf-i-pause { display: none !important; }
+/* "יש ___." — החריץ בסוף השורה מתחלף עם הסצנה (JS). בלי JS: הטקסט מהסקשן ("מה לאכול.").
+   מסוע: הישנה עולה ויוצאת, החדשה עולה מלמטה — אותו משך, אותה עקומה, 140% מרחק (גובה שורה + עוקץ ל + זנב ק) = אין חפיפה. המסכה: .mhf-line */
+html body #mh-home-film .mhf-w { display: inline-block !important; position: relative !important; white-space: nowrap !important; vertical-align: top !important; }
+html body #mh-home-film .mhf-wi { display: inline-block !important; white-space: nowrap !important; animation: mhfWordIn 0.62s cubic-bezier(0.7, 0, 0.2, 1) both !important; }
+html body #mh-home-film .mhf-wi.mhf-now { animation: none !important; }
+html body #mh-home-film .mhf-wi.mhf-out { position: absolute !important; right: 0 !important; top: 0 !important; animation: mhfWordOut 0.62s cubic-bezier(0.7, 0, 0.2, 1) both !important; }
+@keyframes mhfWordIn { from { transform: translateY(140%); } to { transform: none; } }
+@keyframes mhfWordOut { to { transform: translateY(-140%); } }
+html body #mh-home-film .mhf-sr { position: absolute !important; width: 1px !important; height: 1px !important; margin: -1px !important; padding: 0 !important; overflow: hidden !important; clip: rect(0 0 0 0) !important; white-space: nowrap !important; border: 0 !important; }
+/* כניסה: שורות הכותרת עולות מתוך מסכה, אחריהן השורה והכפתור */
+html body #mh-home-film.mhf-in .mhf-line > span { animation: mhfRise 0.9s cubic-bezier(0.16, 1, 0.3, 1) both !important; }
+html body #mh-home-film.mhf-in .mhf-line:nth-child(2) > span { animation-delay: 0.09s !important; }
+html body #mh-home-film.mhf-in .mhf-sub { animation: mhfFade 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.28s both !important; }
+html body #mh-home-film.mhf-in .mhf-cta { animation: mhfFade 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.38s both !important; }
+@keyframes mhfRise { from { transform: translateY(105%); } to { transform: none; } }
+@keyframes mhfFade { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { html body #mh-home-film .mhf-line > span, html body #mh-home-film .mhf-sub, html body #mh-home-film .mhf-cta, html body #mh-home-film .mhf-wi { animation: none !important; } }
+/* מחשב: הסרט משמאל, הטקסט מימין; מתחת להדר הצף (71px) */
+@media (min-width: 900px) {
+    html body #mh-home-film { display: grid !important; grid-template-columns: minmax(0, 1fr) auto !important; align-items: center !important; width: auto !important; margin: 88px 28px 28px !important; border-radius: 30px !important; }
+    html body #mh-home-film .mhf-film { width: auto !important; height: clamp(440px, 42vw, 580px) !important; aspect-ratio: 1 / 1 !important; grid-column: 2 !important; grid-row: 1 !important; }
+    html body #mh-home-film .mhf-film::after { top: 0 !important; bottom: 0 !important; left: auto !important; right: -1px !important; width: 42% !important; height: auto !important;
+        background: linear-gradient(to right, rgba(16, 10, 7, 0) 0%, rgba(16, 10, 7, 0.04) 14%, rgba(16, 10, 7, 0.12) 27%, rgba(16, 10, 7, 0.26) 40%, rgba(16, 10, 7, 0.45) 52%, rgba(16, 10, 7, 0.65) 64%, rgba(16, 10, 7, 0.82) 76%, rgba(16, 10, 7, 0.94) 88%, var(--mhf-ink) 100%) !important; }
+    html body #mh-home-film .mhf-copy { grid-column: 1 !important; grid-row: 1 !important; margin: 0 !important; padding: 48px 64px 48px 24px !important; }
+    html body #mh-home-film .mhf-title { font-size: clamp(76px, 7.8vw, 108px) !important; margin-bottom: 18px !important; }
+    html body #mh-home-film .mhf-sub { max-width: 460px !important; font-size: 19px !important; margin-bottom: 30px !important; }
+    html body #mh-home-film .mhf-cta { height: 56px !important; padding: 0 30px !important; font-size: 18px !important; }
+    html body #mh-home-film .mhf-pp { top: auto !important; bottom: 18px !important; left: 18px !important; }
+}
+/* mh-homefilm-v1 */
