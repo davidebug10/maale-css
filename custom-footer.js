@@ -2752,7 +2752,7 @@ log('פעיל');
 })();
 
 /* =========================================================================
-   דף תוצאות החיפוש — MH Search  |  v2.0.0 | 2026-10-09  (v1.0.0 6.9: טקסטים בלבד)
+   דף תוצאות החיפוש — MH Search  |  v2.0.1 | 2026-10-09  (v1.0.0 6.9: טקסטים בלבד; v2.0.1: זמני משלוח מוסתרים)
    -------------------------------------------------------------------------
    דוד 9.10: "רטרופיט לדף תוצאות החיפוש" — חנויות קודם, ורלוונטיות חכמה (פלאפל → חנויות פלאפל, הקרובה קודם;
    חביתה → מקומות של ארוחת בוקר; איטלקי → פיצה/פסטה גם בלי המילה בשם), וגם לחנויות ומוצרים עתידיים.
@@ -2783,7 +2783,7 @@ log('פעיל');
   'use strict';
   if (window.__MH_SEARCH__) { return; }
   window.__MH_SEARCH__ = true;
-  var VERSION = '2.0.0';
+  var VERSION = '2.0.1';
   /* MH-SEARCH-CORE-START — הליבה של מנוע החיפוש: טהורה (בלי DOM ובלי רשת), כדי שאפשר לבדוק אותה גם ב-node.
      מילון כללי לעברית של אוכל — לא רשימה לפי חנות: חנויות ומוצרים חדשים נכנסים לבד (דוד 9.10). */
   var CORE = (function () {
@@ -3057,7 +3057,7 @@ log('פעיל');
   })();
   /* MH-SEARCH-CORE-END */
 
-  var stats = { version: VERSION, fixes: 0, runs: 0, searches: 0, rewritten: 0, chips: 0, swipes: 0, fallback: 0, timeouts: 0,
+  var stats = { version: VERSION, fixes: 0, runs: 0, searches: 0, rewritten: 0, chips: 0, swipes: 0, fallback: 0, timeouts: 0, timesHidden: 0,
                 index: 'none', indexStores: 0, extraCalls: 0, idFetches: 0, tabAuto: 0, why: 0, errors: 0 };
   var INDEX_URL = 'https://raw.githubusercontent.com/davidebug10/maale-css/search-index/search-index.json';
   var T_JOB = 4000, T_CALL = 2500;      /* תקרת זמן: אחרי זה — התשובה המקורית של Hyperzod */
@@ -3397,6 +3397,13 @@ log('פעיל');
     bindSwipe(main);
     var texts = main.querySelectorAll('#SearchedMerchantAverageTimeAndDistance, #merchantDistance, .tab-item-merchant h6, .tab-item-product h6, .tab-item-merchant .text-h6, .tab-item-product .text-h6');
     for (var i = 0; i < texts.length; i++) { walk(texts[i]); }
+    /* זמני משלוח מוסתרים (דוד 9.10): בכותרת קבוצת המוצרים הזמן הוא צומת הטקסט הראשון לפני הנקודה — מרוקנים
+       (השעון והנקודה מוסתרים ב-CSS, חלק 26ב סעיף 13; המרחק נשאר) */
+    var heads = main.querySelectorAll('#SearchedMerchantAverageTimeAndDistance > span');
+    for (var h = 0; h < heads.length; h++) {
+      var f0 = heads[h].firstChild;
+      if (f0 && f0.nodeType === 3 && f0.nodeValue.trim()) { f0.nodeValue = ''; stats.timesHidden++; }
+    }
     var ratings = main.querySelectorAll('#SearchedMerchantRating');
     for (var j = 0; j < ratings.length; j++) {
       var un = /לא מדורג|not rated/i.test(ratings[j].textContent);

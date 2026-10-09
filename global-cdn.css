@@ -4074,6 +4074,14 @@ html body main#MultiVendorSearch .tab-item-merchant .mh-why::before {
    ל"חנויות"/"מוצרים" (נמדד 9.10: ב-1024 וב-1280 tabs top 10 < header bottom 71; במובייל אין AppBar) */
 html body:has(#AppBar) main#MultiVendorSearch { padding-top: 72px !important; }
 
+/* 13. זמני משלוח מוסתרים בדף החיפוש (דוד 9.10: "הזמנים האלה אמורים להיות מוסתרים!!"). Hyperzod מציגה בכותרת קבוצת
+   המוצרים delivery_data.time בלי לבדוק show_delivery_time (בכל מקום אחר היא בודקת), ובכרטיס החנות — כשהדגל דלוק
+   (כפר אדומים "עד שעה", חומוס אדומים "בערך חצי שעה"). נשאר רק המרחק. הטקסט בכותרת הוא צומת טקסט — מתרוקן ב-MH Search */
+html body main#MultiVendorSearch #AverageTime,
+html body main#MultiVendorSearch .merchant-card-info__dot,
+html body main#MultiVendorSearch #SearchedMerchantAverageTimeAndDistance img,
+html body main#MultiVendorSearch #SearchedMerchantAverageTimeAndDistance span > div { display: none !important; }
+
 html body main#MultiVendorSearch #mh-search-note {
     margin: -4px 4px 12px;
     padding: 9px 14px;
