@@ -1,0 +1,40 @@
+# אינדקס החיפוש (MH Search v2): פעמיים ביום שואב מחדש את כל החנויות והתפריטים מ-Hyperzod
+# ומפרסם search-index.json לענף search-index — לא ל-main, כדי לא לבנות מחדש את GitHub Pages (הסרטונים).
+# האתר קורא אותו מ-raw.githubusercontent.com/davidebug10/maale-css/search-index/search-index.json.
+# הרצה ידנית: Actions → search-index → Run workflow.
+name: search-index
+on:
+  schedule:
+    - cron: '17 3,15 * * *'   # 06:17 / 18:17 שעון ישראל (קיץ)
+  workflow_dispatch: {}
+permissions:
+  contents: write
+concurrency:
+  group: search-index
+  cancel-in-progress: false
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: build the index (fails → the previous index stays)
+        run: node tools/build-search-index.mjs "$RUNNER_TEMP/search-index.json"
+      - name: publish to the search-index branch (only if the menus changed)
+        env:
+          TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -e
+          cd "$RUNNER_TEMP"
+          curl -fsS "https://raw.githubusercontent.com/$REPO/search-index/search-index.json" -o old.json || echo '{}' > old.json
+          node -e "const f=p=>{try{const j=JSON.parse(require('fs').readFileSync(p,'utf8'));delete j.built;return JSON.stringify(j)}catch(e){return ''}};process.exit(f('old.json')===f('search-index.json')?0:1)" && { echo "no menu changes"; exit 0; }
+          mkdir pub && cd pub && git init -q -b search-index
+          cp ../search-index.json .
+          git add search-index.json
+          git -c user.name="search-index-bot" -c user.email="actions@github.com" commit -q -m "search index $(date -u +%FT%TZ)"
+          git push -q -f "https://x-access-token:${TOKEN}@github.com/${REPO}.git" search-index
+          echo "published"
