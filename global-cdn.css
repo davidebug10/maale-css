@@ -3778,7 +3778,7 @@ html body nav.scheme-coupon-panel .scheme-coupon-content p.tw-text-\[12px\] {
 /* mh-coupon-v2 */
 
 /* =========================================================
-   חלק 26ב: דף תוצאות חיפוש — MH Search v1.0.0 | 2026-09-06
+   חלק 26ב: דף תוצאות חיפוש — MH Search v2.0.0 | 2026-09-06, עדכון 2026-10-09 (9–10: חנויות קודם, מונים, "למה")
    סקופ קשיח: כל כלל כאן מתחיל ב-html body main#MultiVendorSearch (דף החיפוש הגלובלי בלבד).
    לא נוגע בדף המרצ'נט, בדף הבית, בפופאפ מוצר או בצ'ק-אאוט — גם אם שם יש אותם קלאסים.
    מה זה עושה: טאבים "מוצרים/חנויות" (תיקון "מוצרs"), קבוצת מרצ'נט ככרטיס לבן, רשימת מוצרים
@@ -4014,7 +4014,76 @@ html body main#MultiVendorSearch .tab-item-product h6.text-h6 {
     font-weight: 700 !important;
     color: #6b7280 !important;
 }
-/* mh-search-v1 */
+
+/* 9. חנויות קודם (דוד 9.10): הטאב "חנויות" ראשון (מימין). ה-JS גם פותח אותו קודם (MH Search v2) */
+html body main#MultiVendorSearch .scheme-global-search-tabs #search-merchant-tab { order: -1 !important; }
+
+/* 10. מונה בטאב — data-mh-n מה-JS על ה-span הפנימי ("חנויות 4" / "מוצרים 12"); 0 → בלי מונה.
+   לא על הכפתור: ה-::after שלו תפוס (absolute, שכבת זכוכית) */
+html body main#MultiVendorSearch .scheme-global-search-tabs .v-btn.v-tab .v-btn__content[data-mh-n]::after {
+    content: attr(data-mh-n);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 22px;
+    height: 20px;
+    margin-inline-start: 7px;
+    padding: 0 6px;
+    box-sizing: border-box;
+    border-radius: 999px;
+    background: rgba(17, 24, 39, 0.08);
+    color: #374151;
+    font-size: 12px;
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+}
+html body main#MultiVendorSearch .scheme-global-search-tabs .v-btn.v-tab.v-tab--selected .v-btn__content[data-mh-n]::after {
+    background: rgba(255, 255, 255, 0.24);
+    color: #ffffff;
+}
+html body main#MultiVendorSearch .scheme-global-search-tabs .v-btn.v-tab .v-btn__content[data-mh-n="0"]::after { display: none; }
+
+/* 11. כרטיס חנות — שורת "למה" (המנות שהתאימו לחיפוש; Baymard: 57% מהמשתמשים לא הבינו למה תוצאה הופיעה) */
+html body main#MultiVendorSearch .tab-item-merchant .mh-why {
+    display: flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    margin: 3px 0 0 !important;
+    min-width: 0 !important;
+    color: #374151 !important;
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    line-height: 1.35 !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    direction: rtl !important;
+    text-align: right !important;
+}
+html body main#MultiVendorSearch .tab-item-merchant .mh-why::before {
+    content: "";
+    flex: none;
+    width: 14px;
+    height: 14px;
+    background: #e31e24;
+    -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M15.5 14h-.79l-.28-.27A6.47 6.47 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z'/%3E%3C/svg%3E") center / contain no-repeat;
+    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M15.5 14h-.79l-.28-.27A6.47 6.47 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+/* 12. דסקטופ: ה-AppBar קבוע (71px) ודף החיפוש מתחיל מתחתיו — הטאבים היו מוסתרים מאחורי ההדר ואי אפשר היה לעבור
+   ל"חנויות"/"מוצרים" (נמדד 9.10: ב-1024 וב-1280 tabs top 10 < header bottom 71; במובייל אין AppBar) */
+html body:has(#AppBar) main#MultiVendorSearch { padding-top: 72px !important; }
+
+html body main#MultiVendorSearch #mh-search-note {
+    margin: -4px 4px 12px;
+    padding: 9px 14px;
+    border-radius: 12px;
+    background: #fff5f5;
+    color: #b91c1c;
+    font-size: 13.5px;
+    font-weight: 700;
+}
+/* mh-search-v2 */
 
 /* =========================================================
    חלק 22ט: רשימת האופציות בפופאפ המוצר — MH Options v1.1.0 | 2026-09-23 (§8 מגבלת בחירה)

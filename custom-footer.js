@@ -2751,49 +2751,686 @@ log('פעיל');
   window.MH_PAY_NOSEL = { version: VERSION, stats: function () { return Object.assign({}, stats); } };
 })();
 
-/* ============================================================
-   דף תוצאות חיפוש — MH Search  |  v1.0.0 | 2026-09-06
-   טקסטים בדף החיפוש הגלובלי (#MultiVendorSearch בלבד) ש-CSS לא יכול לתקן:
-     "30 mins" → "30 דק׳", "קילומטר" → "ק״מ", "No merchants found." → עברית,
-     "לא מדורג" → מסומן ב-mh-unrated (ה-CSS מסתיר), "0 תוצאות" → הודעת מצב ריק ידידותית.
-   העיצוב עצמו ב-global-cdn.css (חלק 26ב). נכשל-פתוח: כל שגיאה → הדף נשאר כמו שהוא.
-   בדיקה: window.MH_SEARCH.stats()
-   ============================================================ */
+/* =========================================================================
+   דף תוצאות החיפוש — MH Search  |  v2.0.0 | 2026-10-09  (v1.0.0 6.9: טקסטים בלבד)
+   -------------------------------------------------------------------------
+   דוד 9.10: "רטרופיט לדף תוצאות החיפוש" — חנויות קודם, ורלוונטיות חכמה (פלאפל → חנויות פלאפל, הקרובה קודם;
+   חביתה → מקומות של ארוחת בוקר; איטלקי → פיצה/פסטה גם בלי המילה בשם), וגם לחנויות ומוצרים עתידיים.
+   איך Hyperzod מחפשת (נבדק 9.10, בילד index-jfOdlzWH): getSearch שולח יחד שתי בקשות
+     GET /store/v1/search?location[]&q&locale&search_type=merchant|product. חנויות = fuzzy על שם החנות בלבד;
+     מוצרים = עד 5 לחנות, 10 חנויות לעמוד, fuzzy מאוד ("פלאפל" → "פלפל מרוקאי", "חביתה" → "חבילת ניוקי הביתה"),
+     והסדר לא מתחשב במרחק. אחר כך: products.length>0 ? tab=0 (מוצרים) : tab=1.
+   מה הבלוק עושה:
+     1. תופס את שתי התשובות ב-XHR (לפני ש-Hyperzod קוראת אותן) ומחזיר במקומן תוצאות משלו:
+        - מועמדים: התשובות של Hyperzod + שאר העמודים + חיפושי מושג ("איטלקי" → גם "פיצה", "פסטה") +
+          האינדקס — כל התפריטים של כל החנויות (שמות קטגוריות ומוצרים), נבנה פעמיים ביום אוטומטית
+          (tools/build-search-index.mjs + .github/workflows/search-index.yml → ענף search-index). מחיר/מלאי —
+          תמיד חיים: מוצר שנמצא רק באינדקס נמשך לפי מזהה (catalog/products/listByIds).
+        - התאמה בעברית (הליבה, CORE למטה): ניקוד, סופיות, ׳/״, ו/ה/ב/ל/מ/ש/כ (רק ממילה שאינה מילה בפני
+          עצמה — לחמניות ≠ ל+חמניות), ים/ות/יים/ית, סמיכות (פרחי), כתיב מלא/חסר, תעתיק (pizza), מקלדת אנגלית
+          (phmv → פיצה). אף פעם לא fuzzy: פלפל ≠ פלאפל, פיצה ≠ פיתה. "כריך חביתה" = חביתה, "ביסלי פלאפל" = טעם.
+        - ציון חנות: שם (100) + קטגוריית החנות במערכת (60) + קטגוריה בתפריט (36) + מוצרים (עד 5) + כמה מהתפריט
+          מתאים (30). פחות 4 לק"מ, 25 לסגור, 35 ל"לא מקבל הזמנות". טאב חנויות = חנות עם ראיה (שם / קטגוריה /
+          מנה שהיא באמת המנה / 3 מנות של מושג קשור) וציון ≥ 30; אם אין אף אחת — גם חנויות עם מוצר מתאים.
+          סדר: קודם מה שאפשר להזמין עכשיו (Wolt: סגורים למטה, לא מוסתרים), ואז הציון.
+        - אין שום התאמה → התשובה של Hyperzod כמו שהיא (גיבוי לשגיאות כתיב).
+     2. "חנויות" נפתח קודם: watch סינכרוני על tab מיד אחרי חיפוש (בלי הבהוב); לחיצה של הלקוח — מכובדת.
+     3. מונה בטאבים (data-mh-n) ושורת "למה" בכל כרטיס חנות ("פלאפל בפיתה · פלאפל בבגט · ועוד 3"). עיצוב: חלק 26ב.
+   מיון/סינון שהלקוח בחר בצ'יפים (sort_by/filters) → Hyperzod כמו שהיא. נכשל-פתוח: שגיאה / 4 שניות → המקור.
+   בדיקה: MH_SEARCH.stats() · MH_SEARCH.last() · MH_SEARCH.explain('פלאפל') · capture/search-retrofit/eval.mjs
+   ========================================================================= */
 (function () {
   'use strict';
   if (window.__MH_SEARCH__) { return; }
   window.__MH_SEARCH__ = true;
-  var VERSION = '1.0.0';
-  var stats = { version: VERSION, fixes: 0, runs: 0 };
+  var VERSION = '2.0.0';
+  /* MH-SEARCH-CORE-START — הליבה של מנוע החיפוש: טהורה (בלי DOM ובלי רשת), כדי שאפשר לבדוק אותה גם ב-node.
+     מילון כללי לעברית של אוכל — לא רשימה לפי חנות: חנויות ומוצרים חדשים נכנסים לבד (דוד 9.10). */
+  var CORE = (function () {
+    'use strict';
+    var FIN = { 'ך': 'כ', 'ם': 'מ', 'ן': 'נ', 'ף': 'פ', 'ץ': 'צ' };
+    /* ניקוד, אותיות סופיות, גרש/גרשיים (צ'יפס = ציפס), סימנים → רווח */
+    function norm(s) {
+      return String(s == null ? '' : s).toLowerCase()
+        .replace(/[֑-ׇ]/g, '')
+        .replace(/[ךםןףץ]/g, function (c) { return FIN[c]; })
+        .replace(/['"`׳״’‘“”]/g, '')
+        .replace(/[^a-z0-9א-ת]+/g, ' ')
+        .replace(/\s+/g, ' ').trim();
+    }
+    /* מפתח השוואה של מילה: רבים/נקבה/ה' בסוף, ואז כתיב מלא↔חסר (וו→ו, יי→י) */
+    function key(t) {
+      var s = t;
+      /* אחרי norm ה-ם הסופית היא מ: "ים" = "ימ" */
+      if (s.length >= 5 && /יימ$/.test(s)) { s = s.slice(0, -2); }          /* טבעוניים → טבעוני */
+      else if (s.length >= 5 && /ית$/.test(s)) { s = s.slice(0, -1); }      /* איטלקית → איטלקי · פרגית → פרגי */
+      else if (s.length >= 4 && /(ימ|ות)$/.test(s)) { s = s.slice(0, -2); } /* פיצות → פיצ · סלטים → סלט */
+      else if (s.length >= 3 && /ה$/.test(s)) { s = s.slice(0, -1); }       /* פיצה → פיצ · חלה → חל */
+      return s.replace(/וו/g, 'ו').replace(/יי/g, 'י');
+    }
+    /* כתיב/תעתיק → צורה אחת (אחרי norm, לפני key) */
+    var VAR = {
+      'pizza': 'פיצה', 'pizzas': 'פיצה', 'pizzeria': 'פיצה', 'burger': 'המבורגר', 'burgers': 'המבורגר', 'hamburger': 'המבורגר',
+      'בורגר': 'המבורגר', 'בורגרים': 'המבורגר', 'pasta': 'פסטה', 'falafel': 'פלאפל', 'shawarma': 'שווארמה', 'sushi': 'סושי',
+      'coffee': 'קפה', 'cafe': 'קפה', 'caffe': 'קפה', 'waffle': 'וופל', 'toast': 'טוסט', 'grill': 'גריל', 'bakery': 'מאפייה',
+      'hummus': 'חומוס', 'humus': 'חומוס', 'schnitzel': 'שניצל', 'shnitzel': 'שניצל', 'flowers': 'פרחים', 'pita': 'פיתה',
+      'chips': 'ציפס', 'fries': 'ציפס', 'beer': 'בירה', 'wine': 'יין', 'vodka': 'וודקה', 'whisky': 'ויסקי', 'whiskey': 'ויסקי',
+      'שאורמה': 'שווארמה', 'שאוורמה': 'שווארמה', 'שוארמה': 'שווארמה', 'שוורמה': 'שווארמה', 'שווארמות': 'שווארמה',
+      'סנדביץ': 'סנדוויץ', 'סנדויץ': 'סנדוויץ', 'קוראסון': 'קרואסון', 'קרוסון': 'קרואסון', 'קרואסונים': 'קרואסון',
+      'פוקאצה': 'פוקצה', 'פוקאציה': 'פוקצה', 'פוקציה': 'פוקצה', 'פוקצות': 'פוקצה', 'מלאווח': 'מלוואח', 'מלאוח': 'מלוואח',
+      'נקנקיה': 'נקניקיה', 'נקניקייה': 'נקניקיה', 'נקנקייה': 'נקניקיה', 'הוטדוג': 'נקניקיה',
+      'ארוחת': 'ארוחה', 'עוגת': 'עוגה', 'מנת': 'מנה', 'שתיה': 'שתייה', 'גלידריה': 'גלידה', 'פיצריה': 'פיצה',
+      'ציפסים': 'ציפס', 'פלאפלים': 'פלאפל', 'ויפ': 'וייפ', 'vape': 'וייפ', 'nargila': 'נרגילה', 'hookah': 'נרגילה'
+    };
+    var PHRASE = [['הוט דוג', 'נקניקיה'], ['hot dog', 'נקניקיה'], ['ארוחת ערב', 'ערב']];   /* בלי \b: ב-JS הוא לא מכיר אותיות עבריות */
+    /* מושגים: מילת חיפוש → מונחים קשורים ומשקל. "איטלקי" → פיצה, פסטה... גם לחיפושים נוספים מול Hyperzod */
+    var CON = {
+      'איטלקי': 'פיצה .8|פסטה .8|ניוקי .7|רביולי .7|לזניה .7|ריזוטו .7|פוקצה .6|מרגריטה .5',
+      'ארוחת בוקר': 'חביתה .8|שקשוקה .8|ארוחות בוקר 1|טוסט .6|כריך .6|סנדוויץ .6|קרואסון .5|בייגל .5',
+      'בוקר': 'ארוחת בוקר 1|חביתה .8|שקשוקה .8|טוסט .6|כריך .6',
+      'בראנץ': 'ארוחת בוקר 1|חביתה .8|שקשוקה .8',
+      'חביתה': 'שקשוקה .35|ארוחת בוקר .35',
+      'שקשוקה': 'חביתה .35|ארוחת בוקר .35',
+      'מתוק': 'קינוח .8|עוגה .7|גלידה .7|עוגיות .6|וופל .6|קרפ .6|שוקולד .6|מלבי .5|סופגניה .5|מילקשייק .5|מאפים מתוקים .6',
+      'קינוח': 'עוגה .7|גלידה .7|וופל .6|קרפ .6|מלבי .6|שוקולד .5|סופגניה .5|עוגיות .5|פחזניות .5|טארט .5|מילקשייק .5',
+      'בשרי': 'בשר .8|שיפוד .7|אנטריקוט .7|קבב .7|המבורגר .6|פרגית .6|שווארמה .6|מעורב .6|סטייק .7',
+      'בשר': 'בשרי .8|שיפוד .7|אנטריקוט .7|קבב .7|המבורגר .6|פרגית .6|סטייק .7',
+      'על האש': 'שיפוד .8|גחלים .7|אנטריקוט .7|קבב .7|פרגית .7|מעורב .6|גריל .7',
+      'גריל': 'על האש .8|שיפוד .7|אנטריקוט .7|קבב .7|פרגית .7',
+      'שיפוד': 'על האש .7|גחלים .6|קבב .6|פרגית .6|אנטריקוט .6',
+      'דג': 'דגים 1|סלמון .8|דניס .8|פיש אנד ציפס .7|סשימי .6|טונה .4',
+      'עוף': 'חזה עוף .9|פרגית .8|שניצל .6|כנפיים .7|נאגטס .7',
+      'מאפה': 'מאפים 1|בורקס .8|קרואסון .8|רוגלך .7|גביניות .6|מאפייה .7',
+      'מאפייה': 'מאפים .9|לחם .8|חלה .8|לחמניות .7|בורקס .6|פיתות .6',
+      'לחם': 'לחמניות .8|חלה .7|בגט .6|פיתה .6|בייגל .5|מחמצת .6',
+      'אלכוהול': 'יין .9|בירה .9|וודקה .9|ויסקי .9|ערק .8|ליקר .8',
+      'משקאות חריפים': 'אלכוהול 1|וודקה .9|ויסקי .9|ערק .8|ליקר .8',
+      'עישון': 'סיגריות 1|טבק .9|נרגילה .9|גחלים .6',
+      'סיגריה': 'סיגריות 1|טבק .5',
+      'נרגילה': 'טבק .8|גחלים .7',
+      'וייפ': 'סיגריות חד פעמיות .9|סיגריה אלקטרונית .9|סיגריות רב פעמיות .8',
+      'מתנה': 'זר .8|פרחים .8|שוקולד .6|בלון .6|מארז .5|דובי .6|עציץ .6|סחלב .6|כרטיס ברכה .5',
+      'פרח': 'זר .9|ורדים .8|סחלב .7|עציץ .6',
+      'זר': 'פרחים .9|ורדים .8',
+      'ילדים': 'ארוחת ילדים 1',
+      'טבעוני': 'צמחוני .6',
+      'צמחוני': 'טבעוני .6',
+      'ללא גלוטן': 'ללא קמח .8',
+      'קפה': 'אספרסו .8|קפוצינו .8|אמריקנו .8|הפוך .8|אייס קפה .8|קפה קר .8',
+      'גלידה': 'ארטיק .5|פרוזן יוגורט .8|מילקשייק .5|גביע .3',
+      'יין': 'מרלו .7|קברנה .7|קברנה סוביניון .7|שרדונה .7|סוביניון .7|גוורצטרמינר .7|מוסקט .6|למברוסקו .6|אלכוהול .6',
+      'בירה': 'בירות 1|אלכוהול .4',
+      'המבורגר': 'בורגר 1|אנגוס .7',
+      'פיצה': 'מרגריטה .5|פיצות 1',
+      'כריך': 'סנדוויץ 1|טוסט .5|בגט .5',
+      'סנדוויץ': 'כריך 1|טוסט .5|בגט .5',
+      'נקניקיה': 'נקניק .7',
+      'מילקשייק': 'שייק .8',
+      'שייק': 'מילקשייק .8',
+      'סושי': 'סשימי .7'
+    };
+    function prep(s) { var t = ' ' + norm(s) + ' '; for (var i = 0; i < PHRASE.length; i++) { t = t.split(' ' + PHRASE[i][0] + ' ').join(' ' + PHRASE[i][1] + ' '); } return t.trim(); }
+    function canon(tok) { var v = VAR[tok]; return v ? norm(v) : tok; }
+    var ALT = {};                                    /* מפתח קנוני → המפתחות של הכתיבים האחרים (להתאמת תחילת מילה בשם חנות) */
+    Object.keys(VAR).forEach(function (v) { var c = key(norm(VAR[v])), a = key(v); if (a !== c && a.length >= 4) { (ALT[c] = ALT[c] || []).push(a); } });
+    /* מילים של "צורה" (כריך, עסקית, כדורי...): "כריך חביתה" = חביתה, אבל "ביסלי פלאפל" = טעם, לא פלאפל */
+    var FORMAT = {};
+    'כריך כריכי סנדוויץ טוסט בגט באגט פיתה לאפה צלחת מגש מנה ארוחה עסקית קערה מארז כדורי ביס בייגל טורטיה מיני חצי זוג שלישיית שישיית זר זרי'
+      .split(' ').forEach(function (w) { FORMAT[key(canon(norm(w)))] = 1; });
+    /* מילה בטקסט → מפתחות אפשריים: המילה עצמה, ובלי 1–2 אותיות שימוש (ו/ה/ב/ל/מ/ש/כ) אם נשארות 3+ אותיות */
+    /* מילים "עצמאיות": מילה ראשונה בשם מוצר/קטגוריה/חנות. ממילה כזו לא מורידים אות שימוש — לחמניות ≠ ל+חמניות
+       (חמניות = פרחים). setVocab נקרא עם האינדקס */
+    var HEADS = {}, VOCAB = {}, VKEYS = {};
+    function setVocab(names) {
+      HEADS = {}; VOCAB = {}; VKEYS = {}; CACHE = {};
+      for (var i = 0; i < names.length; i++) {
+        var ts = prep(names[i]).split(' ');
+        if (ts[0] && !/^\d+$/.test(ts[0])) { HEADS[key(canon(ts[0]))] = 1; }
+        for (var j = 0; j < ts.length; j++) { var t = ts[j]; if (t.length >= 3 && !/\d/.test(t)) { VOCAB[t] = (VOCAB[t] || 0) + 1; VKEYS[key(canon(t))] = 1; } }
+      }
+    }
+    /* שגיאת כתיב — רק כשאין שום תוצאה: מרחק 1 (החלפה/הוספה/מחיקה/היפוך), רק למילים של 5+ אותיות
+       (פיצה↔פיתה במרחק 1!), ורק מילה מהתפריטים עצמם — והמועמד היחיד הנפוץ ביותר */
+    function dl1(a, b) {
+      if (a === b) { return true; }
+      var la = a.length, lb = b.length;
+      if (Math.abs(la - lb) > 1) { return false; }
+      var i = 0; while (i < la && i < lb && a[i] === b[i]) { i++; }
+      if (la === lb) { return a.slice(i + 1) === b.slice(i + 1) || (a[i] === b[i + 1] && a[i + 1] === b[i] && a.slice(i + 2) === b.slice(i + 2)); }
+      return la > lb ? a.slice(i + 1) === b.slice(i) : a.slice(i) === b.slice(i + 1);
+    }
+    function correct(q) {
+      var ts = prep(q).split(' '), changed = false;
+      var out = ts.map(function (t) {
+        if (t.length < 5 || VKEYS[key(canon(t))]) { return t; }
+        var best = null, bc = 0;
+        Object.keys(VOCAB).forEach(function (u) { if (u.length >= 5 && dl1(t, u) && VOCAB[u] > bc) { best = u; bc = VOCAB[u]; } });
+        if (best) { changed = true; return best; }
+        return t;
+      });
+      return changed ? out.join(' ') : null;
+    }
+    function tokKeys(tok) {
+      var c = canon(tok), k0 = key(c), out = [[k0, 1]];
+      if (c.length >= 4 && /י$/.test(c)) { out.push([key(c.slice(0, -1)), 0.9]); }   /* סמיכות רבים: פרחי = פרחים, לחמי = לחמים */
+      if (HEADS[k0]) { return out; }
+      if (/^[והבלמשכ]/.test(tok) && tok.length - 1 >= 3) { out.push([key(canon(tok.slice(1))), 0.95]); }
+      if (/^[והבלמשכ][והבלמשכ]/.test(tok) && tok.length - 2 >= 3) { out.push([key(canon(tok.slice(2))), 0.9]); }
+      return out;
+    }
+    var CACHE = {};
+    /* טקסט → רשימת מילים מוכנות להשוואה (נשמר במטמון — שמות המוצרים חוזרים בכל חיפוש) */
+    function prepText(s) {
+      var k = String(s == null ? '' : s);
+      var hit = CACHE[k]; if (hit) { return hit; }
+      var toks = prep(k).split(' ').filter(Boolean);
+      var r = { n: toks.join(' '), toks: toks.map(function (t) { return { t: t, keys: tokKeys(t) }; }) };
+      if (Object.keys(CACHE).length > 20000) { CACHE = {}; }
+      CACHE[k] = r;
+      return r;
+    }
+    /* מילת שאילתה מול מילה בטקסט: 1 = אותה מילה · 0.8 = הטקסט מתחיל בה (4+ אותיות: בורגר→בורגראנץ') ·
+       0.45 = בתוך מילה מורכבת (סביח→תסביח). אף פעם לא fuzzy: פלפל ≠ פלאפל */
+    function tokScore(qk, tt) {
+      var best = 0, alts = ALT[qk] || [];
+      for (var i = 0; i < tt.keys.length; i++) {
+        var k = tt.keys[i][0], w = tt.keys[i][1];
+        if (k === qk) { best = Math.max(best, w); continue; }
+        if (qk.length >= 4 && k.length > qk.length && k.indexOf(qk) === 0) { best = Math.max(best, 0.8 * w); continue; }
+        for (var a = 0; a < alts.length; a++) { if (k.length > alts[a].length && k.indexOf(alts[a]) === 0) { best = Math.max(best, 0.8 * w); } }
+        if (qk.length >= 4 && k.length > qk.length + 1 && k.indexOf(qk) > 0) { best = Math.max(best, 0.45 * w); }
+      }
+      return best;
+    }
+    /* צורה (מילה/צירוף) מול טקסט: כל המילים חייבות להימצא. 1 = זהה · 0.95 = מתחיל בה · 0.8 = במקום אחר */
+    function formScore(form, text) {
+      var tx = typeof text === 'string' ? prepText(text) : text;
+      if (!tx.toks.length || !form.keys.length) { return 0; }
+      var level = 1, first = false;
+      for (var i = 0; i < form.keys.length; i++) {
+        var b = 0, at = -1;
+        for (var j = 0; j < tx.toks.length; j++) { var s = tokScore(form.keys[i], tx.toks[j]); if (s > b) { b = s; at = j; } }
+        if (!b) { return 0; }
+        level = Math.min(level, b);
+        if (i === 0) { first = at === 0 || !!form.mod || lead(tx, at); }
+      }
+      if (tx.toks.length === form.keys.length && level === 1) { return 1; }
+      return (first ? 0.95 : 0.8) * level;
+    }
+    /* כל המילים לפני המקום הזה הן מילות צורה או מספרים ("10 כדורי פלאפל", "כריך חביתה") */
+    var MOD = {};
+    'טבעוני צמחוני חריף ללא גלוטן סוכר ילדים דיאט זירו ביתי טרי קר חם מתוק מלוח'.split(' ').forEach(function (w) { MOD[key(canon(norm(w)))] = 1; });
+    function lead(tx, at) {
+      for (var i = 0; i < at; i++) { var t = tx.toks[i].t; if (!/^\d+$/.test(t) && !FORMAT[key(canon(t))]) { return false; } }
+      return at > 0;
+    }
+    function mkForm(s, w, src) {
+      var toks = prep(s).split(' ').filter(Boolean).map(function (t) { return key(canon(t)); });
+      return { s: s, w: w, src: src, keys: toks, mod: toks.length > 0 && toks.every(function (k) { return MOD[k]; }) };
+    }
+    /* מקלדת באנגלית כשהתכוונו לעברית: "phmv" → "פיצה" (SI-1452). משתמשים רק כשאין שום תוצאה */
+    var KB = { q: '/', w: "'", e: 'ק', r: 'ר', t: 'א', y: 'ט', u: 'ו', i: 'ן', o: 'ם', p: 'פ', a: 'ש', s: 'ד', d: 'ג', f: 'כ', g: 'ע', h: 'י', j: 'ח', k: 'ל', l: 'ך', ';': 'ף', z: 'ז', x: 'ס', c: 'ב', v: 'ה', b: 'נ', n: 'מ', m: 'צ', ',': 'ת', '.': 'ץ' };
+    function fromLatinKeyboard(q) {
+      var s = String(q || '').toLowerCase();
+      if (!/^[a-z;,.'\/ ]+$/.test(s) || !/[a-z]/.test(s)) { return null; }
+      return s.split('').map(function (c) { return KB[c] || c; }).join('');
+    }
+    /* הבנת השאילתה: הצורה המקורית (1) + מושגים קשורים (המשקל שלהם) */
+    function understand(q) {
+      var n = prep(q), forms = [mkForm(q, 1, 'q')], seen = {};
+      seen[forms[0].keys.join(' ')] = 1;
+      var canonQ = n.split(' ').map(canon).join(' ');
+      var keysQ = n.split(' ').map(function (t) { return key(canon(t)); }).join(' ');
+      Object.keys(CON).forEach(function (c) {
+        var ck = prep(c).split(' ').map(function (t) { return key(canon(t)); }).join(' ');
+        if (ck !== keysQ && prep(c) !== canonQ) { return; }
+        CON[c].split('|').forEach(function (pair) {
+          var m = /^(.*\S)\s+([\d.]+)$/.exec(pair); if (!m) { return; }
+          var f = mkForm(m[1], +m[2], 'concept'), fk = f.keys.join(' ');
+          if (!seen[fk]) { seen[fk] = 1; forms.push(f); }
+        });
+      });
+      return forms;
+    }
+    /* הציון של שם מוצר מול השאילתה (כל הצורות, כל אחת במשקל שלה) */
+    function itemScore(forms, name) {
+      var best = 0, by = null;
+      for (var i = 0; i < forms.length; i++) { var s = formScore(forms[i], name) * forms[i].w; if (s > best) { best = s; by = forms[i]; } }
+      return { s: best, lit: !!by && by.src === 'q', by: by };
+    }
+
+    /* דירוג חנות. st = { name, cats:[שמות קטגוריות], secs:[[שם קטגוריה בתפריט, [[id, שם מוצר]...]]], live:[מוצרים חיים {_id,name}] }
+       ctx = { km, open, accepting }. מחזיר { rel, final, items:[{id,name,s}], why } */
+    var W = { name: 100, cat: 60, sec: 36, first: 30, more: 8, itemN: 5, share: 30, km: 4, closed: 25, paused: 35, storesMin: 30 };
+    function scoreStore(forms, st, ctx) {
+      var nameS = 0, catS = 0, secS = 0, items = [], seen = {};
+      for (var f = 0; f < forms.length; f++) {
+        var fw = forms[f].w;
+        var ns = formScore(forms[f], st.name || ''); if (ns >= 0.75) { nameS = Math.max(nameS, ns * fw); }
+        (st.cats || []).forEach(function (c) { var cs = formScore(forms[f], c); if (cs >= 0.75) { catS = Math.max(catS, cs * fw); } });
+      }
+      var menuN = 0, secLit = false, secCon = false;
+      (st.secs || []).forEach(function (sec) {
+        var list = sec[1] || [];
+        menuN += list.length;
+        var sh = itemScore(forms, sec[0]), head = sh.s >= 0.9 * (sh.by ? sh.by.w : 1);   /* "פיצות אדומות" — כן; "כריכים בלחם מלא" — לא */
+        if (sh.s >= 0.5) { secS = Math.max(secS, (head ? 1 : 0.5) * sh.s * Math.min(1, 0.3 + list.length * 0.1)); }
+        if (head && sh.s >= 0.5) { if (sh.lit) { secLit = true; } else { secCon = true; } }
+        list.forEach(function (p) {
+          var r = itemScore(forms, p[1]), s = r.s, lit = r.lit;
+          if (head && sh.s >= 0.5 && s < 0.7 * sh.s) { s = 0.7 * sh.s; lit = sh.lit; }   /* מרגריטה בתוך "פיצות אדומות" = פיצה */
+          if (s >= 0.3 && !seen[p[0]]) { seen[p[0]] = 1; items.push({ id: p[0], name: p[1], s: s, lit: lit }); }
+        });
+      });
+      (st.live || []).forEach(function (p) {                                   /* מוצר חדש שעוד לא באינדקס */
+        if (seen[p._id]) { return; }
+        var r = itemScore(forms, p.name);
+        if (r.s >= 0.3) { seen[p._id] = 1; items.push({ id: p._id, name: p.name, s: r.s, lit: r.lit, live: true }); menuN++; }
+      });
+      items.sort(function (a, b) { return b.s - a.s; });
+      var itemPts = 0;
+      items.slice(0, W.itemN).forEach(function (it, i) { itemPts += (i === 0 ? W.first : W.more) * it.s; });
+      var strong = items.filter(function (it) { return it.s >= 0.9; }).length;
+      var share = menuN ? Math.min(1, (strong / menuN) * 5) : 0;               /* חלק מהתפריט = התמחות */
+      var rel = W.name * nameS + W.cat * catS + W.sec * secS + itemPts + W.share * share;
+      /* "חנות" (לא רק מוצר): שם/קטגוריה/קטגוריה בתפריט, מנה שהיא באמת המנה (≥0.9), או 3+ מנות של מושג קשור */
+      var litStrong = items.filter(function (it) { return it.lit && it.s >= 0.9; }).length;
+      var conStrong = items.filter(function (it) { return !it.lit && it.s >= 0.5; }).length;
+      var evidence = nameS >= 0.75 || catS >= 0.75 || secLit || litStrong >= 1 || secCon || conStrong >= 3;
+      var weak = items.some(function (it) { return it.lit && it.s >= 0.75; });   /* למקרה שאין אף חנות "חזקה" (rank מרפה) */
+      var c = ctx || {};
+      var final = rel - (c.km || 0) * W.km - (c.open === false ? W.closed : 0) - (c.accepting === false ? W.paused : 0);
+      return { rel: Math.round(rel * 10) / 10, final: Math.round(final * 10) / 10, avail: c.open !== false && c.accepting !== false, store: evidence && rel >= W.storesMin, weak: weak, items: items, nameS: nameS, catS: catS, secS: secS, share: share };
+    }
+    /* כל החנויות יחד: אם אין אף חנות "חזקה" — חנויות עם מוצר מתאים (גם אם המילה לא ראשונה) נכנסות לטאב החנויות */
+    function pickStores(rows) {
+      var strong = rows.filter(function (r) { return r.store; });
+      if (strong.length) { return strong; }
+      return rows.filter(function (r) { return r.weak && r.rel >= 15; });
+    }
+    /* סדר: קודם מה שאפשר להזמין עכשיו (פתוח ומקבל הזמנות), ובתוך כל קבוצה לפי הציון (Wolt: סגורים למטה, לא מוסתרים) */
+    function order(rows) {
+      return rows.slice().sort(function (a, b) { return (b.avail ? 1 : 0) - (a.avail ? 1 : 0) || b.final - a.final; });
+    }
+    return { norm: norm, key: key, prepText: prepText, formScore: formScore, understand: understand, itemScore: itemScore, scoreStore: scoreStore,
+      pickStores: pickStores, order: order, setVocab: setVocab, fromLatinKeyboard: fromLatinKeyboard, correct: correct, W: W, CON: CON };
+  })();
+  /* MH-SEARCH-CORE-END */
+
+  var stats = { version: VERSION, fixes: 0, runs: 0, searches: 0, rewritten: 0, chips: 0, swipes: 0, fallback: 0, timeouts: 0,
+                index: 'none', indexStores: 0, extraCalls: 0, idFetches: 0, tabAuto: 0, why: 0, errors: 0 };
+  var INDEX_URL = 'https://raw.githubusercontent.com/davidebug10/maale-css/search-index/search-index.json';
+  var T_JOB = 4000, T_CALL = 2500;      /* תקרת זמן: אחרי זה — התשובה המקורית של Hyperzod */
+  var last = null;                       /* התוצאה האחרונה (לשורת "למה" ולבדיקות) */
+
+  function app() { try { return document.getElementById('app').__vue_app__.config.globalProperties; } catch (e) { return null; } }
+  function store() { var a = app(); return a && a.$store; }
+  function timeout(p, ms) { return Promise.race([p, new Promise(function (r) { setTimeout(function () { r(null); }, ms); })]); }
+  function heName(m) {
+    var t = (m && m.language_translation) || [];
+    for (var i = 0; i < t.length; i++) { if (t[i].key === 'name' && t[i].locale === 'he') { return t[i].value; } }
+    return (m && m.name) || '';
+  }
+  function idOf(m) { return m && (m._id || m.merchant_id || m.id); }
+
+  /* ---------- 1. האינדקס: כל התפריטים (נבנה פעמיים ביום ב-GitHub Actions, ענף search-index) ---------- */
+  var IDX = null, idxP = null;
+  function useIndex(j) {
+    if (!j || !Array.isArray(j.stores) || !j.stores.length) { return null; }
+    var names = [];
+    j.stores.forEach(function (s) { names.push(s.name); (s.secs || []).forEach(function (x) { names.push(x[0]); (x[1] || []).forEach(function (p) { names.push(p[1]); }); }); });
+    CORE.setVocab(names);
+    IDX = j; stats.index = j.built || 'ok'; stats.indexStores = j.stores.length;
+    return IDX;
+  }
+  function loadIndex() {
+    if (idxP) { return idxP; }
+    var o = window.__MH_SEARCH_INDEX__;                       /* בדיקות: אובייקט או כתובת */
+    if (o && typeof o === 'object') { idxP = Promise.resolve(useIndex(o)); return idxP; }
+    idxP = fetch(typeof o === 'string' ? o : INDEX_URL).then(function (r) { return r.ok ? r.json() : null; })
+      .then(useIndex, function () { stats.index = 'failed'; return null; });
+    return idxP;
+  }
+
+  /* ---------- 2. נתונים חיים ---------- */
+  function homeMerchants() {
+    var st = store(), h = st && st.state && st.state.homeData;
+    return (h && [].concat(h.merchants || [], h.featured_merchants || [])) || [];
+  }
+  function catNames() {
+    var st = store(), list = (st && st.getters && st.getters.getMerchantCategories) || [], map = {};
+    (Array.isArray(list) ? list : []).forEach(function (c) { map[idOf(c)] = heName(c); });
+    return map;
+  }
+  /* קריאה נוספת ל-API, עם אותן כותרות שהאפליקציה שלחה (X-Tenant וכו') */
+  function call(base, params, headers) {
+    stats.extraCalls++;
+    var qs = Object.keys(params).map(function (k) {
+      var v = params[k];
+      return Array.isArray(v) ? v.map(function (x) { return encodeURIComponent(k + '[]') + '=' + encodeURIComponent(x); }).join('&') : encodeURIComponent(k) + '=' + encodeURIComponent(v);
+    }).join('&');
+    /* בלי Authorization: החיפוש ציבורי, ו-401 על טוקן ישן לא צריך לגעת בכלום */
+    var h = {}; Object.keys(headers || {}).forEach(function (k) { if (!/apm|content-type|authorization/i.test(k)) { h[k] = headers[k]; } });
+    return timeout(fetch(base + '?' + qs, { headers: h, credentials: 'omit' }).then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; }), T_CALL);
+  }
+
+  /* ---------- 3. המנוע ---------- */
+  function compute(s, mRaw, pRaw, headers, depth) {
+    var api = s.origin + '/store/v1';
+    function retryKeyboard(res) {
+      var kb = !depth && !res && (CORE.fromLatinKeyboard(s.q) || CORE.correct(s.q));   /* מקלדת באנגלית, ואז שגיאת כתיב */
+      if (!kb) { return res; }
+      var s2 = Object.assign({}, s, { q: kb }), b2 = { location: [s.lat, s.lng], locale: s.locale || 'he', q: kb };
+      return Promise.all([call(api + '/search', Object.assign({ search_type: 'merchant' }, b2), headers), call(api + '/search', Object.assign({ search_type: 'product' }, b2), headers)])
+        .then(function (r) { return compute(s2, r[0], r[1], headers, 1); })
+        .then(function (r2) { if (r2 && last) { last.q = s.q; last.kb = kb; } return r2; });
+    }
+    var forms = CORE.understand(s.q);
+    var objs = {}, live = {}, prodById = {};
+    function take(list, withProducts) {
+      (Array.isArray(list) ? list : []).forEach(function (g) {
+        var id = idOf(g); if (!id) { return; }
+        if (!objs[id] || (withProducts && !objs[id].products)) { objs[id] = g; }
+        if (withProducts) {
+          var arr = live[id] || (live[id] = []);
+          (g.products || []).forEach(function (p) { if (p && p._id && !prodById[p._id]) { prodById[p._id] = p; arr.push(p); } });
+        }
+      });
+    }
+    take(pRaw && pRaw.data, true);
+    take(mRaw && mRaw.data, false);
+    take(homeMerchants(), false);
+    var base = { location: [s.lat, s.lng], locale: s.locale || 'he', search_type: 'product' };
+    var more = [];
+    if (pRaw && Array.isArray(pRaw.data) && pRaw.data.length >= 10) {     /* שאר העמודים של Hyperzod */
+      [2, 3].forEach(function (pg) { more.push(call(api + '/search', Object.assign({}, base, { q: s.q, page: pg }), headers)); });
+    }
+    forms.filter(function (f) { return f.src === 'concept' && f.w >= 0.6; }).slice(0, 3).forEach(function (f) {   /* "איטלקי" → גם "פיצה", "פסטה" */
+      more.push(call(api + '/search', Object.assign({}, base, { q: f.s }), headers));
+    });
+    return Promise.all(more).then(function (rs) {
+      rs.forEach(function (r) { if (r && r.success) { take(r.data, true); } });
+      var cats = catNames(), rows = [], inIdx = {};
+      function row(id, st) {
+        var o = objs[id];
+        var r = CORE.scoreStore(forms, st, o ? { km: (+o.user_to_merchant_distance_meters || 0) / 1000, open: o.is_open !== false, accepting: o.is_accepting_orders !== false } : {});
+        r.id = id; r.obj = o || null; r.name = st.name;
+        return r;
+      }
+      ((IDX && IDX.stores) || []).forEach(function (st) {
+        inIdx[st.id] = 1;
+        rows.push(row(st.id, { name: st.name, cats: (st.cats || []).map(function (c) { return cats[c]; }).filter(Boolean), secs: st.secs, live: live[st.id] || [] }));
+      });
+      Object.keys(objs).forEach(function (id) {                            /* חנות חדשה שעוד לא באינדקס */
+        if (inIdx[id]) { return; }
+        var o = objs[id];
+        rows.push(row(id, { name: heName(o), cats: (o.merchant_category_ids || []).map(function (c) { return cats[c]; }).filter(Boolean), secs: [], live: live[id] || [] }));
+      });
+      rows = rows.filter(function (r) { return r.rel > 0 && r.obj; });      /* בלי אובייקט חי = לא מגיעה ללקוח הזה */
+      var stores = CORE.order(CORE.pickStores(rows));
+      /* מוצרים: חזק (המילה היא המנה) קודם, ואז מה שאפשר להזמין עכשיו, ואז הציון */
+      var groups = rows.map(function (r) {
+        var items = r.items.filter(function (it) { return it.lit ? it.s >= 0.6 : it.s >= 0.5; });   /* 0.665 = מנה מתוך "פיצות אדומות" */
+        return { r: r, items: items, strong: items.some(function (it) { return it.s >= 0.9; }) };
+      }).filter(function (g) { return g.items.length; });
+      groups.sort(function (a, b) { return (b.strong ? 1 : 0) - (a.strong ? 1 : 0) || (b.r.avail ? 1 : 0) - (a.r.avail ? 1 : 0) || b.r.final - a.r.final; });
+      if (!stores.length && !groups.length) { return retryKeyboard(null); }  /* כלום — מקלדת באנגלית? ואם לא: Hyperzod (fuzzy) כגיבוי */
+      /* מוצרים מהאינדקס שלא הגיעו בחיפוש של Hyperzod: מושכים אותם חיים לפי מזהה (מחיר ומלאי עדכניים) */
+      var need = [];
+      groups.slice(0, 12).forEach(function (g) {
+        var miss = g.items.slice(0, 6).filter(function (it) { return !prodById[it.id]; }).map(function (it) { return it.id; });
+        if (miss.length) { need.push({ id: g.r.id, ids: miss }); }
+      });
+      return Promise.all(need.slice(0, 6).map(function (n) {
+        stats.idFetches++;
+        return call(api + '/catalog/products/listByIds', { merchant_id: n.id, ids: n.ids }, headers).then(function (r) {
+          var list = (r && (Array.isArray(r.data) ? r.data : r.data && r.data.data)) || [];
+          list.forEach(function (p) { if (p && p._id && p.status !== false) { prodById[p._id] = p; } });
+        });
+      })).then(function () {
+        var outGroups = [];
+        groups.forEach(function (g) {
+          var prods = [];
+          g.items.forEach(function (it) { var p = prodById[it.id]; if (p && prods.length < 6 && prods.indexOf(p) < 0) { prods.push(p); } });
+          if (!prods.length) { return; }
+          var o = Object.assign({}, g.r.obj); o.products = prods; o.is_paginated = false;
+          outGroups.push(o);
+        });
+        var outStores = stores.map(function (r) { var o = Object.assign({}, r.obj); delete o.products; return o; });
+        last = { q: s.q, at: Date.now(), forms: forms.map(function (f) { return f.s + (f.w < 1 ? '·' + f.w : ''); }),
+          stores: stores.map(function (r) { return { id: r.id, slug: r.obj.slug, name: r.name, rel: r.rel, final: r.final, avail: r.avail,
+            items: r.items.filter(function (it) { return it.lit ? it.s >= 0.6 : it.s >= 0.5; }).slice(0, 12).map(function (it) { return it.name; }) }; }),
+          groups: outGroups.map(function (o) { return { slug: o.slug, n: o.products.length }; }) };
+        return {
+          merchants: Object.assign({}, mRaw || { success: true }, { success: true, data: outStores }),
+          products: Object.assign({}, pRaw || { success: true }, { success: true, data: outGroups })
+        };
+      });
+    });
+  }
+
+  /* שתי הבקשות (חנויות + מוצרים) יוצאות יחד — עבודה אחת לשתיהן */
+  var jobs = {};
+  function job(s, headers) {
+    var k = s.q + '|' + s.lat + '|' + s.lng, j = jobs[k];
+    if (j && Date.now() - j.t < 15000) { return j; }
+    var rm, rp, pm = new Promise(function (r) { rm = r; }), pp = new Promise(function (r) { rp = r; });
+    j = jobs[k] = { t: Date.now(), m: rm, p: rp, done: false };
+    stats.searches++;
+    j.result = Promise.all([timeout(pm, 2500), timeout(pp, 2500), timeout(loadIndex(), 2500)])
+      .then(function (a) { return compute(s, a[0], a[1], headers); })
+      .then(function (r) { j.done = !!r; j.settled = true; if (!r) { stats.fallback++; } return r; },
+            function (e) { j.settled = true; stats.errors++; console.warn('[MH Search]', e); return null; });
+    return j;
+  }
+
+  /* ---------- 4. XHR: לפני ש-Hyperzod קוראת את התשובה ---------- */
+  function parseSearch(url) {
+    var u; try { u = new URL(url, location.href); } catch (e) { return null; }
+    if (!/\/store\/v1\/search\/?$/.test(u.pathname)) { return null; }
+    var p = u.searchParams, type = p.get('search_type'), q = (p.get('q') || '').trim();
+    if ((type !== 'merchant' && type !== 'product') || q.length < 2) { return null; }
+    /* מיון/סינון מהצ'יפים: sort_by[0][key]=average_rating&sort_by[0][value]=desc&filters[1][key]=accepted_order_types&filters[1][value][0]=delivery */
+    var sort = [], filters = [];
+    p.forEach(function (v, k) {
+      var m = /^sort_by\[(\d+)\]\[(key|value)\]$/.exec(k);
+      if (m) { (sort[m[1]] = sort[m[1]] || {})[m[2]] = v; return; }
+      m = /^filters\[(\d+)\]\[(key|value)\](\[\d+\])?$/.exec(k);
+      if (m) { var f = filters[m[1]] = filters[m[1]] || { values: [] }; if (m[2] === 'key') { f.key = v; } else { f.values.push(v); } }
+    });
+    sort = sort.filter(Boolean); filters = filters.filter(Boolean);
+    var loc = p.getAll('location[]');
+    return { type: type, q: q, lat: loc[0], lng: loc[1], locale: p.get('locale'), page: +(p.get('page') || 1), origin: u.origin,
+      filtered: !!(sort.length || filters.length), sort: sort, filters: filters };
+  }
+  try {
+    var XP = XMLHttpRequest.prototype, _open = XP.open, _send = XP.send, _set = XP.setRequestHeader;
+    var RT = Object.getOwnPropertyDescriptor(XP, 'responseText');
+    XP.open = function (m, url) {
+      try { this.__mhs = String(m).toUpperCase() === 'GET' ? parseSearch(url) : null; if (this.__mhs) { this.__mhsH = {}; } } catch (e) { this.__mhs = null; }
+      return _open.apply(this, arguments);
+    };
+    XP.setRequestHeader = function (k, v) { try { if (this.__mhsH) { this.__mhsH[k] = v; } } catch (e) {} return _set.apply(this, arguments); };
+    XP.send = function () {
+      var x = this, s = x.__mhs;
+      if (s) { try { hook(x, s); } catch (e) { stats.errors++; } }
+      return _send.apply(this, arguments);
+    };
+  } catch (e) { console.warn('[MH Search] XHR hook disabled:', e); }
+  /* הלקוח בחר מיון/סינון: אותה רלוונטיות שלנו, ועליה הסינון והמיון שלו (Hyperzod לבד מחפשת רק בשם החנות) */
+  function applyChips(s, out) {
+    var list = (out && out.merchants && out.merchants.data) || [];
+    s.filters.forEach(function (f) {
+      if (f.key === 'minimum_rating') { list = list.filter(function (m) { return (+m.average_rating || 0) >= (+f.values[0] || 0); }); }
+      else if (f.key === 'accepted_order_types') { list = list.filter(function (m) { return (m.accepted_order_types || []).some(function (t) { return f.values.indexOf(t) >= 0; }); }); }
+      else if (f.key === 'merchant_category_ids') { list = list.filter(function (m) { return (m.merchant_category_ids || []).some(function (c) { return f.values.indexOf(c) >= 0; }); }); }
+    });
+    s.sort.forEach(function (o) {
+      if (o.key === 'average_rating') { list = list.slice().sort(function (a, b) { return (+b.average_rating || 0) - (+a.average_rating || 0); }); }
+      else if (o.key === 'distance_haversine') { list = list.slice().sort(function (a, b) { return (+a.user_to_merchant_distance_meters || 0) - (+b.user_to_merchant_distance_meters || 0); }); }
+    });
+    return Object.assign({}, out.merchants, { data: list });
+  }
+  function hook(x, s) {
+    var end = x.onloadend;                                   /* axios מגדיר onloadend לפני send */
+    if (typeof end !== 'function') { return; }
+    x.onloadend = function () {
+      var self = this, args = arguments, called = false;
+      function finish(out) {
+        if (called) { return; } called = true;
+        if (out) {
+          var txt = JSON.stringify(out);
+          try {
+            Object.defineProperty(x, 'responseText', { configurable: true, get: function () { return txt; } });
+            Object.defineProperty(x, 'response', { configurable: true, get: function () { return x.responseType === 'json' ? out : txt; } });
+            stats.rewritten++;
+          } catch (e) { stats.errors++; }
+        }
+        end.apply(self, args);
+      }
+      try {
+        var raw = RT.get.call(x), j = null;
+        if (x.status !== 200 || !raw) { return finish(null); }
+        try { j = JSON.parse(raw); } catch (e) { return finish(null); }
+        if (s.type === 'product' && s.page > 1) {           /* עמוד 1 שלנו כבר מכיל הכל */
+          var k = s.q + '|' + s.lat + '|' + s.lng;
+          return finish(jobs[k] && jobs[k].done ? Object.assign({}, j, { data: [] }) : null);
+        }
+        if (s.filtered) {                                    /* רק בקשת חנויות (searchMerchantsWithFilters) — בלי זוג */
+          if (s.type !== 'merchant') { return finish(null); }
+          stats.chips++;
+          return timeout(loadIndex(), 2500).then(function () { return timeout(compute(s, j, null, x.__mhsH), T_JOB); })
+            .then(function (r) { finish(r ? applyChips(s, r) : null); }, function () { finish(null); });
+        }
+        var jb = job(s, x.__mhsH);
+        if (s.type === 'merchant') { jb.m(j); } else { jb.p(j); }
+        timeout(jb.result, T_JOB).then(function (r) {
+          if (!jb.settled) { stats.timeouts++; }
+          finish(r ? (s.type === 'merchant' ? r.merchants : r.products) : null);
+        }, function () { finish(null); });
+      } catch (e) { stats.errors++; finish(null); }
+    };
+  }
+
+  /* ---------- 5. "חנויות" נפתח קודם (Hyperzod: products.length>0 ? tab=0) ---------- */
+  function searchComp() {
+    var el = document.getElementById('app'), found = null;
+    if (!el || !el._vnode) { return null; }
+    (function node(v, d) {
+      if (!v || found || d > 300) { return; }
+      if (v.component) {
+        try { var p = v.component.proxy; if (p && typeof p.getSearch === 'function' && 'tab' in p && 'merchants' in p) { found = p; return; } } catch (e) {}
+        node(v.component.subTree, d + 1);
+      }
+      if (v.suspense && v.suspense.activeBranch) { node(v.suspense.activeBranch, d + 1); }
+      if (Array.isArray(v.children)) { for (var i = 0; i < v.children.length && !found; i++) { node(v.children[i], d + 1); } }
+    })(el._vnode, 0);
+    return found;
+  }
+  var watched = null;
+  function watchTabs() {
+    if (!document.getElementById('MultiVendorSearch')) { return; }
+    var p = searchComp();
+    if (!p || p === watched || typeof p.$watch !== 'function') { return; }
+    watched = p;
+    var auto = false;
+    function storesFirst() { if (auto && p.tab !== 1 && Array.isArray(p.merchants) && p.merchants.length) { p.tab = 1; stats.tabAuto++; } }
+    p.$watch('searchedText', function () { auto = true; }, { flush: 'sync' });
+    p.$watch('merchants', storesFirst, { flush: 'sync' });
+    p.$watch('tab', storesFirst, { flush: 'sync' });
+    p.$watch('loading', function (v) { if (!v) { auto = false; } }, { flush: 'sync' });
+  }
+
+  /* ---------- 6. מונה בטאבים + שורת "למה" בכרטיסי החנויות + טקסטים (v1) ---------- */
   var MAP = [
     [/(\d+)\s*mins?\b/g, '$1 דק׳'],
     [/\bmins?\b/g, 'דק׳'],
     [/קילומטר/g, 'ק״מ'],
     [/No merchants found\.?/g, 'לא נמצאו חנויות'],
-    [/No products found\.?/g, 'לא נמצאו מוצרים']
+    [/No products found\.?/g, 'לא נמצאו מוצרים'],
+    [/No results found\.?/g, 'לא נמצאו תוצאות']
   ];
   function fixText(node) {
-    var t = node.nodeValue; if (!t) return;
+    var t = node.nodeValue; if (!t) { return; }
     var n = t;
-    for (var i = 0; i < MAP.length; i++) n = n.replace(MAP[i][0], MAP[i][1]);
+    for (var i = 0; i < MAP.length; i++) { n = n.replace(MAP[i][0], MAP[i][1]); }
     if (n !== t) { node.nodeValue = n; stats.fixes++; }
   }
-  function walk(root) {
-    var w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT); var n;
-    while ((n = w.nextNode())) fixText(n);
+  function walk(root) { var w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT); var n; while ((n = w.nextNode())) { fixText(n); } }
+  function why(it) {
+    var n = it.items.length;
+    if (!n) { return ''; }
+    return it.items.slice(0, 2).join(' · ') + (n > 2 ? ' · ועוד ' + (n - 2) : '');
+  }
+  /* החלקה בין הטאבים (דוד: "שיהיה אפשר להחליק"). RTL: "חנויות" מימין — החלקה ימינה → מוצרים, שמאלה → חנויות.
+     לא מתחילים מתוך שורה שגוללת לרוחב (הצ'יפים) או מקצה המסך (חזרה של האייפון) */
+  function bindSwipe(main) {
+    if (main.__mhSwipe) { return; }
+    main.__mhSwipe = true;
+    var sx = 0, sy = 0, st = 0, on = false;
+    main.addEventListener('touchstart', function (e) {
+      on = false;
+      var t = e.touches && e.touches[0];
+      if (!t || e.touches.length > 1 || !e.target.closest || !e.target.closest('.scheme-global-search-tabs-window')) { return; }
+      if (t.clientX < 24 || t.clientX > window.innerWidth - 24) { return; }
+      for (var el = e.target; el && el !== main; el = el.parentElement) {
+        if (el.scrollWidth > el.clientWidth + 2 && /(auto|scroll)/.test(getComputedStyle(el).overflowX)) { return; }
+      }
+      sx = t.clientX; sy = t.clientY; st = Date.now(); on = true;
+    }, { passive: true });
+    main.addEventListener('touchend', function (e) {
+      if (!on) { return; }
+      on = false;
+      var t = e.changedTouches && e.changedTouches[0], p = watched;
+      if (!t || !p) { return; }
+      var dx = t.clientX - sx, dy = t.clientY - sy;
+      if (Math.abs(dx) < 60 || Math.abs(dy) > Math.abs(dx) * 0.6 || Date.now() - st > 800) { return; }
+      var want = dx > 0 ? 0 : 1;
+      if (p.tab !== want) { p.tab = want; stats.swipes++; }
+    }, { passive: true });
   }
   function sync() {
     var main = document.getElementById('MultiVendorSearch');
-    if (!main) return;
+    if (!main) { return; }
     stats.runs++;
-    var texts = main.querySelectorAll('#SearchedMerchantAverageTimeAndDistance, #merchantDistance, .tab-item-merchant h6.text-h6, .tab-item-product h6.text-h6');
-    for (var i = 0; i < texts.length; i++) walk(texts[i]);
+    watchTabs();
+    bindSwipe(main);
+    var texts = main.querySelectorAll('#SearchedMerchantAverageTimeAndDistance, #merchantDistance, .tab-item-merchant h6, .tab-item-product h6, .tab-item-merchant .text-h6, .tab-item-product .text-h6');
+    for (var i = 0; i < texts.length; i++) { walk(texts[i]); }
     var ratings = main.querySelectorAll('#SearchedMerchantRating');
     for (var j = 0; j < ratings.length; j++) {
       var un = /לא מדורג|not rated/i.test(ratings[j].textContent);
-      if (ratings[j].classList.contains('mh-unrated') !== un) ratings[j].classList.toggle('mh-unrated', un);
+      if (ratings[j].classList.contains('mh-unrated') !== un) { ratings[j].classList.toggle('mh-unrated', un); }
     }
-    /* מצב ריק במוצרים: "0 תוצאות" */
+    var p = watched;
+    if (p) {                                                /* מונים: "חנויות 4" / "מוצרים 12" */
+      var nm = Array.isArray(p.merchants) ? p.merchants.length : 0;
+      var np = Array.isArray(p.products) ? p.products.reduce(function (a, g) { return a + ((g && g.products) || []).length; }, 0) : 0;
+      /* על ה-span הפנימי: ה-::after של הכפתור תפוס (שכבת הזכוכית) — ה-::before של ה-span הוא התווית (חלק 26ב) */
+      var tm = document.querySelector('#search-merchant-tab .v-btn__content'), tp = document.querySelector('#search-product-tab .v-btn__content');
+      if (tm && tm.getAttribute('data-mh-n') !== String(nm)) { tm.setAttribute('data-mh-n', nm); }
+      if (tp && tp.getAttribute('data-mh-n') !== String(np)) { tp.setAttribute('data-mh-n', np); }
+    }
+    /* שורת "למה" — הכרטיסים מצוירים בסדר של הרשימה ששלחנו */
+    var L = last, cards = main.querySelectorAll('.tab-item-merchant .merchant-card-title');
+    if (L && p && p.searchedText === L.q && cards.length === L.stores.length) {
+      for (var c = 0; c < cards.length; c++) {
+        var host = cards[c].parentElement, line = host && host.querySelector('.mh-why'), text = why(L.stores[c]);
+        if (!host) { continue; }
+        if (!text) { if (line) { line.remove(); } continue; }
+        if (!line) { line = document.createElement('div'); line.className = 'mh-why'; cards[c].insertAdjacentElement('afterend', line); }
+        if (line.textContent !== text) { line.textContent = text; stats.why++; }
+      }
+    }
+    /* הוקלד במקלדת באנגלית: "הצגנו תוצאות עבור: פיצה" */
+    var note = main.querySelector('#mh-search-note'), kbq = L && p && p.searchedText === L.q && L.kb;
+    var tabs = main.querySelector('.scheme-global-search-tabs');
+    if (kbq && tabs) {
+      if (!note) { note = document.createElement('div'); note.id = 'mh-search-note'; tabs.insertAdjacentElement('afterend', note); }
+      var nt = 'הצגנו תוצאות עבור: ' + kbq;
+      if (note.textContent !== nt) { note.textContent = nt; }
+    } else if (note) { note.remove(); }
+    /* מצב ריק במוצרים: "0 תוצאות" (מ-v1) */
     var counter = main.querySelector('.tab-item-product > .tw-flex > span');
     var empty = main.querySelector('#mh-search-empty');
     var isZero = !!counter && /^0\s/.test(counter.textContent.trim());
@@ -2805,14 +3442,30 @@ log('פעיל');
   }
   var pending = false;
   function schedule() {
-    if (pending) return; pending = true;
-    setTimeout(function () { pending = false; try { sync(); } catch (e) { /* נכשל-פתוח */ } }, 60);
+    if (pending) { return; } pending = true;
+    setTimeout(function () { pending = false; try { sync(); } catch (e) { stats.errors++; } }, 60);
   }
   try {
     new MutationObserver(schedule).observe(document.documentElement, { subtree: true, childList: true, characterData: true });
     schedule();
+    /* האינדקס (~25KB) נטען בזמן מת, כדי שהחיפוש הראשון לא יחכה לו */
+    setTimeout(function () { (window.requestIdleCallback || function (f) { setTimeout(f, 1); })(function () { loadIndex(); }); }, 2500);
   } catch (e) { console.warn('[MH Search] disabled:', e); }
-  window.MH_SEARCH = { version: VERSION, sync: sync, stats: function () { return Object.assign({}, stats); } };
+
+  window.MH_SEARCH = {
+    version: VERSION, sync: sync, core: CORE,
+    last: function () { return last; },
+    stats: function () { return Object.assign({}, stats); },
+    /* MH_SEARCH.explain('פלאפל') — הדירוג מהאינדקס בלבד (בלי מרחק/פתוח), לבדיקה */
+    explain: function (q) {
+      return loadIndex().then(function () {
+        var forms = CORE.understand(q);
+        return ((IDX && IDX.stores) || []).map(function (st) { var r = CORE.scoreStore(forms, { name: st.name, secs: st.secs }, {}); return { slug: st.slug, rel: r.rel, store: r.store, items: r.items.slice(0, 3).map(function (i) { return i.name; }) }; })
+          .filter(function (r) { return r.rel > 0; }).sort(function (a, b) { return b.rel - a.rel; });
+      });
+    }
+  };
+  /* mh-search-v2 */
 })();
 
 /* ============================================================
