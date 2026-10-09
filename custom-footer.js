@@ -6457,7 +6457,7 @@ log('פעיל');
 })();
 
 /* =========================================================
-   הירו דף הבית — "התרנגול" — MH HomeFilm v1.0.0 | 2026-10-09
+   הירו דף הבית — "התרנגול" — MH HomeFilm v1.0.1 | 2026-10-09 (v1.0.1: גיבוי שעון כש-rVFC נתקע — בספארי המילה פיגרה סצנה)
    ההתנהגות של #mh-home-film (העיצוב: CSS חלק 58; התוכן: הסקשן שדוד מדביק — home-film.html בריפו).
    - הסרטון מקבל src רק מכאן (data-src): "פחות תנועה" / חיסכון בנתונים → לא מורידים אותו בכלל.
    - הוא שקוף עד שפריים אמיתי מוצג (מתחת: תמונת הפריים הראשון) — אין הבהוב שחור ואין כפתור ▶ של המערכת.
@@ -6474,7 +6474,7 @@ log('פעיל');
   'use strict';
   if (window.__MH_HOMEFILM__) { return; }
   window.__MH_HOMEFILM__ = true;
-  var VERSION = '1.0.0';
+  var VERSION = '1.0.1';
   /* הפונט של הכותרת בלבד: Noto Sans Hebrew צר-שחור (wdth 75 / wght 900) — רק האותיות של הכותרת (text=, ~2-4KB),
      נבנה מהתוכן בפועל (הכותרת + כל המילים של הסצנות), כך ששינוי טקסט בסקשן לא שובר אותו */
   var FONT = 'https://fonts.googleapis.com/css2?family=Noto+Sans+Hebrew:wdth,wght@75,900&display=swap';
@@ -6589,7 +6589,7 @@ log('פעיל');
     function tick() {
       raf = 0;
       if (ring && v.duration > 0) { ring.setAttribute('stroke-dashoffset', (C * (1 - v.currentTime / v.duration)).toFixed(2)); }
-      if (setWord && !rvfc) { setWord(sceneAt(v.currentTime)); }
+      if (setWord && clockOk()) { setWord(sceneAt(v.currentTime)); }
       if (!v.paused) { raf = requestAnimationFrame(tick); }
     }
     function label() { if (b) { b.setAttribute('aria-label', v.paused ? 'המשך הסרטון' : 'עצירת הסרטון'); b.setAttribute('aria-pressed', v.paused ? 'true' : 'false'); } }
@@ -6612,9 +6612,12 @@ log('פעיל');
       });
     }
     /* סנכרון לפריים שמוצג בפועל (mediaTime) — לא לשעון: currentTime/rAF מפגרים אחרי התמונה כשהמכשיר עמוס */
-    var rvfc = !!v.requestVideoFrameCallback, frameCb = 0;
+    var rvfc = !!v.requestVideoFrameCallback, frameCb = 0, lastVF = 0;
+    /* השעון (currentTime) נכנס רק כשאין דיווח פריימים: בלי rVFC, כשעצור (seek), או כשהדיווח נתקע מעל 0.3 שנ'
+       (ספארי/WebView מאטים את rVFC כשהעמוד עמוס או מחוץ למסך — בלי זה המילה פיגרה סצנה שלמה, QA 9.10) */
+    function clockOk() { return !rvfc || v.paused || (performance.now() - lastVF > 300); }
     function onFrame(now, md) {
-      frameCb = 0;
+      frameCb = 0; lastVF = performance.now();
       if (setWord && md) { setWord(sceneAt(md.mediaTime)); }
       if (!v.paused && v.isConnected) { frameCb = v.requestVideoFrameCallback(onFrame); }
     }
@@ -6628,7 +6631,7 @@ log('פעיל');
       }
     });
     v.addEventListener('pause', function () { root.classList.remove('mhf-playing'); label(); });
-    v.addEventListener('timeupdate', function () { if (setWord && (!rvfc || v.paused)) { setWord(sceneAt(v.currentTime)); } });   /* גיבוי: בלי rVFC, או seek כשעצור (אחרת currentTime המפגר היה מחזיר את המילה הקודמת) */
+    v.addEventListener('timeupdate', function () { if (setWord && clockOk()) { setWord(sceneAt(v.currentTime)); } });   /* גיבוי לשעון — ראו clockOk */
     v.addEventListener('error', function () { still('error'); });
 
     if ('IntersectionObserver' in window) {
@@ -6728,10 +6731,12 @@ log('פעיל');
     var d = st.day === 'היום' || !st.day ? '' : st.day === 'מחר' ? 'מחר ' : st.day === 'מוצ״ש' ? 'במוצ״ש ' : st.day + ' ';
     return { full: 'נפתח ' + d + st.time, tiny: (d ? d.replace(/^ב(?=מוצ״ש)/, '') : 'היום ') + st.time };
   }
-  function spoken(st, name) {   /* לקורא מסך: "מוצאי שבת" במלואו, לא אות-אות */
-    if (st.state === 'open') { return null; }
-    if (st.state === 'soon') { return name + ', סגור כרגע'; }
-    return name + ', סגור, נפתח ' + (st.day === 'מוצ״ש' ? 'במוצאי שבת' : st.day || 'היום') + ' בשעה ' + st.time;
+  function spoken(st, name, meta) {   /* לקורא מסך: שם, מצב, ושורת המידע — "מוצאי שבת" במלואו, לא אות-אות */
+    var parts = [name];
+    if (st.state === 'soon') { parts.push('סגור כרגע'); }
+    else if (st.state === 'closed') { parts.push('סגור, נפתח ' + (st.day === 'מוצ״ש' ? 'במוצאי שבת' : st.day || 'היום') + ' בשעה ' + st.time); }
+    if (meta) { parts.push(meta.replace(/★\s*([\d.]+)/, 'דירוג $1').replace(/ · /g, ', ')); }
+    return parts.join(', ');
   }
 
   function cardState(card) {
@@ -6750,8 +6755,10 @@ log('פעיל');
     var st = cardState(card), w = shortWhen(st), cc = card.querySelector('.merchant-close-comment');
     card.setAttribute('data-mh-state', st.state);
     if (cc && w) { if (cc.getAttribute('data-mh-when') !== w.full) { cc.setAttribute('data-mh-when', w.full); cc.setAttribute('data-mh-tiny', w.tiny); } }
-    var name = ((card.querySelector('.merchant-card-title') || {}).textContent || '').trim(), sp = spoken(st, name);
-    if (sp) { card.setAttribute('aria-label', sp); } else if (card.getAttribute('aria-label')) { card.removeAttribute('aria-label'); }
+    var name = ((card.querySelector('.merchant-card-title') || {}).textContent || '').trim(), sp = spoken(st, name, meta);
+    if (card.getAttribute('aria-label') !== sp) { card.setAttribute('aria-label', sp); }
+    var img = card.querySelector('.cover-img');   /* Hyperzod: role=img aria-label="Product image" בכל כרטיס — רעש לקורא מסך */
+    if (img && img.getAttribute('aria-hidden') !== 'true') { img.setAttribute('aria-hidden', 'true'); }
     stats.cards++;
     return st;
   }
