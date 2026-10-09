@@ -8182,9 +8182,9 @@ html body #mh-home-film:not(.mhf-playing) .mhf-pp .mhf-i-pause { display: none !
 /* "יש ___." — החריץ בסוף השורה מתחלף עם הסצנה (JS). בלי JS: הטקסט מהסקשן ("מה לאכול.").
    מסוע: הישנה עולה ויוצאת, החדשה עולה מלמטה — אותו משך, אותה עקומה, 140% מרחק (גובה שורה + עוקץ ל + זנב ק) = אין חפיפה. המסכה: .mhf-line */
 html body #mh-home-film .mhf-w { display: inline-block !important; position: relative !important; white-space: nowrap !important; vertical-align: top !important; }
-html body #mh-home-film .mhf-wi { display: inline-block !important; white-space: nowrap !important; animation: mhfWordIn 0.62s cubic-bezier(0.7, 0, 0.2, 1) both !important; }
+html body #mh-home-film .mhf-wi { display: inline-block !important; white-space: nowrap !important; animation: mhfWordIn 0.5s cubic-bezier(0.7, 0, 0.2, 1) both !important; }
 html body #mh-home-film .mhf-wi.mhf-now { animation: none !important; }
-html body #mh-home-film .mhf-wi.mhf-out { position: absolute !important; right: 0 !important; top: 0 !important; animation: mhfWordOut 0.62s cubic-bezier(0.7, 0, 0.2, 1) both !important; }
+html body #mh-home-film .mhf-wi.mhf-out { position: absolute !important; right: 0 !important; top: 0 !important; animation: mhfWordOut 0.5s cubic-bezier(0.7, 0, 0.2, 1) both !important; }
 @keyframes mhfWordIn { from { transform: translateY(140%); } to { transform: none; } }
 @keyframes mhfWordOut { to { transform: translateY(-140%); } }
 html body #mh-home-film .mhf-sr { position: absolute !important; width: 1px !important; height: 1px !important; margin: -1px !important; padding: 0 !important; overflow: hidden !important; clip: rect(0 0 0 0) !important; white-space: nowrap !important; border: 0 !important; }

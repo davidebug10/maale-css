@@ -6488,7 +6488,8 @@ log('פעיל');
 
   function fmt(n) { return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ','); }
   function router() { try { return document.getElementById('app').__vue_app__.config.globalProperties.$router; } catch (e) { return null; } }
-  function sceneAt(t) { var w = ''; for (var i = 0; i < SCENES.length; i++) { if (t + 0.02 >= SCENES[i][0]) { w = SCENES[i][1]; } } return w; }
+  var LEAD = 0.22;   /* הגלגול (0.5 שנ') מתחיל לפני החיתוך — אמצע המעבר נופל על החיתוך עצמו (נמדד מול הפריימים המוצגים, 9.10) */
+  function sceneAt(t) { var w = ''; for (var i = 0; i < SCENES.length; i++) { if (t + LEAD >= SCENES[i][0]) { w = SCENES[i][1]; } } return w; }
 
   /* "למעלה מ-1,500 מנות" / "אלפי מנות" (2,000+) · "מעשרות מסעדות ובתי עסק" (20+) — לפי האינדקס */
   function counts(root) {
@@ -6519,7 +6520,7 @@ log('פעיל');
       var old = live;
       if (old) {
         if (instant) { old.parentNode.removeChild(old); }
-        else { old.classList.add('mhf-out'); setTimeout(function () { if (old.parentNode) { old.parentNode.removeChild(old); } }, 700); }
+        else { old.classList.add('mhf-out'); setTimeout(function () { if (old.parentNode) { old.parentNode.removeChild(old); } }, 600); }
       }
       live = document.createElement('span'); live.className = 'mhf-wi' + (instant ? ' mhf-now' : ''); live.textContent = text;
       slot.appendChild(live);
@@ -6588,7 +6589,7 @@ log('פעיל');
     function tick() {
       raf = 0;
       if (ring && v.duration > 0) { ring.setAttribute('stroke-dashoffset', (C * (1 - v.currentTime / v.duration)).toFixed(2)); }
-      if (setWord) { setWord(sceneAt(v.currentTime)); }
+      if (setWord && !rvfc) { setWord(sceneAt(v.currentTime)); }
       if (!v.paused) { raf = requestAnimationFrame(tick); }
     }
     function label() { if (b) { b.setAttribute('aria-label', v.paused ? 'המשך הסרטון' : 'עצירת הסרטון'); b.setAttribute('aria-pressed', v.paused ? 'true' : 'false'); } }
@@ -6610,16 +6611,24 @@ log('פעיל');
         if (v.paused) { userPaused = false; stats.userPlay++; sync(); } else { userPaused = true; stats.userPause++; v.pause(); }
       });
     }
+    /* סנכרון לפריים שמוצג בפועל (mediaTime) — לא לשעון: currentTime/rAF מפגרים אחרי התמונה כשהמכשיר עמוס */
+    var rvfc = !!v.requestVideoFrameCallback, frameCb = 0;
+    function onFrame(now, md) {
+      frameCb = 0;
+      if (setWord && md) { setWord(sceneAt(md.mediaTime)); }
+      if (!v.paused && v.isConnected) { frameCb = v.requestVideoFrameCallback(onFrame); }
+    }
     v.addEventListener('playing', function () {
       stats.playing++; root.classList.add('mhf-playing'); label();
       if (!raf) { raf = requestAnimationFrame(tick); }
+      if (rvfc && !frameCb) { frameCb = v.requestVideoFrameCallback(onFrame); }
       if (!shown) {
         if (v.requestVideoFrameCallback) { v.requestVideoFrameCallback(function () { v.requestVideoFrameCallback(reveal); }); }
         setTimeout(reveal, 400);
       }
     });
     v.addEventListener('pause', function () { root.classList.remove('mhf-playing'); label(); });
-    v.addEventListener('timeupdate', function () { if (setWord) { setWord(sceneAt(v.currentTime)); } });   /* גיבוי ל-rAF */
+    v.addEventListener('timeupdate', function () { if (setWord && (!rvfc || v.paused)) { setWord(sceneAt(v.currentTime)); } });   /* גיבוי: בלי rVFC, או seek כשעצור (אחרת currentTime המפגר היה מחזיר את המילה הקודמת) */
     v.addEventListener('error', function () { still('error'); });
 
     if ('IntersectionObserver' in window) {
