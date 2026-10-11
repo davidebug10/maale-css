@@ -6666,7 +6666,7 @@ log('פעיל');
 })();
 
 /* =========================================================
-   אוספי העסקים בדף הבית + הדף "הכל" — MH Collections v1.0.0 | 2026-10-09
+   אוספי העסקים בדף הבית + הדף "הכל" — MH Collections v1.1.1 | 2026-10-09 (v1.1.0 סבב 2; v1.1.1 11.10: גם div.merchant-card — באפליקציה הכרטיס אינו <a>)
    הבעלים של ההתנהגות של #MerchantCollection (סקשני "Merchant Collection" שדוד בונה באדמין) ושל כותרת הדף
    שנפתח מ"הכל" (#merchants_by_category?collection=true). העיצוב: CSS חלק 59.
    - "View all" (קשיח באנגלית ב-chunk pb-MerchantCollection) → "הכל" + מספר העסקים.
@@ -6681,7 +6681,7 @@ log('פעיל');
   'use strict';
   if (window.__MH_COLLECTIONS__) { return; }
   window.__MH_COLLECTIONS__ = true;
-  var VERSION = '1.1.0';
+  var VERSION = '1.1.1';
   var stats = { labels: 0, titles: 0, cards: 0, kosher: 0, tags: 0, closed: 0, ordered: 0, errors: 0, pageNote: '' };
   var lastTitle = null;   /* הכותרת של הסקשן שממנו לחצו "הכל" */
 
@@ -6793,7 +6793,7 @@ log('פעיל');
   /* סקשן: תווית "הכול (N)", אימוג'י התיאור ליד הכותרת, סדר פתוחים-קודם, ושורת "כולם סגורים" */
   function section(sec) {
     var title = sec.querySelector('h1'), btn = sec.querySelector('.nm-see-all-btn'), desc = title && title.parentElement && title.parentElement.parentElement && title.parentElement.parentElement.querySelector('p');
-    var slides = [].slice.call(sec.querySelectorAll('.nm-carousel-slide')), cards = [].slice.call(sec.querySelectorAll('a.merchant-card'));
+    var slides = [].slice.call(sec.querySelectorAll('.nm-carousel-slide')), cards = [].slice.call(sec.querySelectorAll('.merchant-card'));
     var n = cards.length, t = title ? title.textContent.replace(/\s+/g, ' ').trim() : '';
     if (btn) {
       if (n) { sec.__mhN = n; }   /* בזמן ש-Hyperzod מציירת מחדש את הכרטיסים יש רגע עם 0 — לא מורידים את המספר */
@@ -6809,7 +6809,7 @@ log('פעיל');
     var states = cards.map(decorate), rows2 = !!sec.querySelector('.nm-carousel--rows-2');
     if (!rows2) {
       var car = sec.querySelector('.nm-carousel'), moved = false;
-      slides.forEach(function (sl) { var c = sl.querySelector('a.merchant-card'); if (!c) { return; } var r = cardState(c).rank; var o = String(Math.min(r, 1e7) | 0); if (sl.style.order !== o) { sl.style.order = o; moved = true; stats.ordered++; } });
+      slides.forEach(function (sl) { var c = sl.querySelector('.merchant-card'); if (!c) { return; } var r = cardState(c).rank; var o = String(Math.min(r, 1e7) | 0); if (sl.style.order !== o) { sl.style.order = o; moved = true; stats.ordered++; } });
       /* scroll-snap "נצמד" לכרטיס שהיה ראשון ומגלגל אחריו לסוף — חוזרים להתחלה, רק אם הלקוח עוד לא נגע בשורה */
       if (car && moved && !car.__mhTouched) {
         if (!car.__mhWatch) { car.__mhWatch = true; ['pointerdown', 'touchstart', 'wheel'].forEach(function (ev) { car.addEventListener(ev, function () { car.__mhTouched = true; }, { passive: true }); }); }
@@ -6841,7 +6841,7 @@ log('פעיל');
     if (h && h.textContent.trim() !== want) { h.textContent = want; stats.titles++; }
     /* אותו סדר כמו בבית (פתוחים, ואז לפי שעת הפתיחה) + שורת סיכום בראש הרשימה */
     var row = null, states = [];
-    [].forEach.call(page.querySelectorAll('a.merchant-card'), function (c) {
+    [].forEach.call(page.querySelectorAll('.merchant-card'), function (c) {
       var st = decorate(c), col = c.closest('[class*="v-col"]');
       states.push(st);
       if (col) { row = row || col.parentElement; var o = String(Math.min(st.rank, 1e7) | 0); if (col.style.order !== o) { col.style.order = o; } }
@@ -6858,7 +6858,7 @@ log('פעיל');
   var pageNote = '';
   function pageSummary(secs) {
     var all = [], seen = {};
-    secs.forEach(function (sec) { [].forEach.call(sec.querySelectorAll('a.merchant-card'), function (c) { var id = c.getAttribute('data-merchant-id') || c.getAttribute('href'); if (seen[id]) { return; } seen[id] = 1; all.push(cardState(c)); }); });
+    secs.forEach(function (sec) { [].forEach.call(sec.querySelectorAll('.merchant-card'), function (c) { var id = c.getAttribute('data-merchant-id') || c.getAttribute('href'); if (seen[id]) { return; } seen[id] = 1; all.push(cardState(c)); }); });
     var closed = all.filter(function (x) { return x.state !== 'open'; }), timed = closed.filter(function (x) { return x.state === 'closed'; }), first = null, motz = 0;
     timed.forEach(function (x) { if (!first || x.rank < first.rank) { first = x; } if (x.day === 'מוצ״ש') { motz++; } });
     if (all.length < 4 || closed.length / all.length < 0.8 || !first) { return ''; }

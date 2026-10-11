@@ -8173,6 +8173,7 @@ html body #mh-home-film.mhf-in .mhf-cta { animation: mhfFade 0.8s cubic-bezier(0
    **התמונה נשארת בצבע גם כשסגור** (אף אחד מהם לא מאפיר — בשבת דף אפור נראה מת); הסטטוס בגלולה אחת בתחתית
    התמונה ("נפתח במוצ״ש 20:30"), מתג ידני = גלולה לבנה שקטה "בקרוב נפתח"; מתחת לתמונה שורה לשם ושורה אחת
    ל"★ 4.8 · בשרי · מהדרין"; אדום רק על כפתורי פעולה — כאן אין אדום. v1.1.0 (סבב 2): כל זה.
+   11.10: באפליקציה הכרטיס הוא div.merchant-card (לא <a> — שם נפתח פאנל צד) — הסלקטורים בלי a.
    ========================================================= */
 html body [id="MerchantCollection"] { margin: 30px 0 !important; }
 /* כותרת הסקשן: שם + אימוג'י בשורה אחת, "הכול (N)" משמאל */
@@ -8196,49 +8197,49 @@ html body [id="MerchantCollection"] .nm-see-all-btn::after { content: "" !import
 html body [id="MerchantCollection"] .nm-carousel { gap: 12px !important; padding: 2px 16px 10px !important; scroll-padding-inline: 16px !important; }
 html body [id="MerchantCollection"] .nm-carousel:not(.nm-carousel--rows-2) .nm-carousel-slide { flex: 0 0 78% !important; max-width: 300px !important; }
 /* הכרטיס: התמונה היא הכרטיס. מבטל את הזכוכית של 12ו (רקע, טשטוש, רדיוס 32, צל, מסגרת) */
-html body :is([id="MerchantCollection"], #merchants_by_category) a.merchant-card {
+html body :is([id="MerchantCollection"], #merchants_by_category) .merchant-card {
     background: transparent !important; -webkit-backdrop-filter: none !important; backdrop-filter: none !important;
     border: 0 !important; border-radius: 0 !important; box-shadow: none !important; overflow: visible !important; -webkit-tap-highlight-color: transparent !important; }
-html body :is([id="MerchantCollection"], #merchants_by_category) a.merchant-card .cover-img { height: auto !important; aspect-ratio: 16 / 9 !important; border: 0 !important; border-radius: 18px !important; overflow: hidden !important; background: #f3f1ee !important; box-shadow: inset 0 0 0 1px rgba(17, 17, 17, 0.05) !important; transform: translateZ(0) !important; }
-html body :is([id="MerchantCollection"], #merchants_by_category) a.merchant-card .cover-img { transition: transform 0.12s cubic-bezier(0.2, 0, 0, 1) !important; }
-html body :is([id="MerchantCollection"], #merchants_by_category) a.merchant-card:active .cover-img { transform: scale(0.98) !important; }   /* באייפון :active עובד רק עם מאזין touchstart — ב-JS */
+html body :is([id="MerchantCollection"], #merchants_by_category) .merchant-card .cover-img { height: auto !important; aspect-ratio: 16 / 9 !important; border: 0 !important; border-radius: 18px !important; overflow: hidden !important; background: #f3f1ee !important; box-shadow: inset 0 0 0 1px rgba(17, 17, 17, 0.05) !important; transform: translateZ(0) !important; }
+html body :is([id="MerchantCollection"], #merchants_by_category) .merchant-card .cover-img { transition: transform 0.12s cubic-bezier(0.2, 0, 0, 1) !important; }
+html body :is([id="MerchantCollection"], #merchants_by_category) .merchant-card:active .cover-img { transform: scale(0.98) !important; }   /* באייפון :active עובד רק עם מאזין touchstart — ב-JS */
 /* סגור: התמונה בצבע מלא (Hyperzod: אפור + שקיפות 76%) — הסטטוס נאמר במילים בגלולה */
-html body :is([id="MerchantCollection"], #merchants_by_category) a.merchant-card .cover-img.is-unavailable .v-img__img { filter: none !important; opacity: 1 !important; }
-html body :is([id="MerchantCollection"], #merchants_by_category) a.merchant-card .cover-img.is-unavailable { background: #f3f1ee !important; }
+html body :is([id="MerchantCollection"], #merchants_by_category) .merchant-card .cover-img.is-unavailable .v-img__img { filter: none !important; opacity: 1 !important; }
+html body :is([id="MerchantCollection"], #merchants_by_category) .merchant-card .cover-img.is-unavailable { background: #f3f1ee !important; }
 /* הגלולות על התמונה: "חלון הראווה" (אלרגנים/כשרות/להמחשה) יורד — הכשרות עוברת לשורה מתחת לשם */
-html body :is([id="MerchantCollection"], #merchants_by_category) a.merchant-card .merchant-store-front-message { display: none !important; }
-html body :is([id="MerchantCollection"], #merchants_by_category) a.merchant-card .v-responsive__content > div.tw-absolute { top: auto !important; bottom: 10px !important; left: 10px !important; right: 10px !important; }   /* הגלולה בתחתית התמונה, קרוב לשם */
+html body :is([id="MerchantCollection"], #merchants_by_category) .merchant-card .merchant-store-front-message { display: none !important; }
+html body :is([id="MerchantCollection"], #merchants_by_category) .merchant-card .v-responsive__content > div.tw-absolute { top: auto !important; bottom: 10px !important; left: 10px !important; right: 10px !important; }   /* הגלולה בתחתית התמונה, קרוב לשם */
 /* שבב הסטטוס: כהה ומלא (ניגודיות על כל תמונה), שעון קטן, נוסח קצר מה-JS (data-mh-when) */
-html body :is([id="MerchantCollection"], #merchants_by_category) a.merchant-card .merchant-close-comment {
+html body :is([id="MerchantCollection"], #merchants_by_category) .merchant-card .merchant-close-comment {
     display: inline-flex !important; align-items: center !important; gap: 5px !important; max-width: 100% !important; height: 28px !important; padding: 0 11px 0 10px !important; border-radius: 999px !important; box-sizing: border-box !important;
     background: rgba(17, 17, 17, 0.78) !important; -webkit-backdrop-filter: blur(10px) saturate(140%) !important; backdrop-filter: blur(10px) saturate(140%) !important;
     color: #fff !important; font-size: 12.5px !important; font-weight: 700 !important; line-height: 28px !important; white-space: nowrap !important; }
 /* מתג ידני ("בקרוב נפתח", בלי שעה): גלולה לבנה שקטה, בלי שעון */
-html body :is([id="MerchantCollection"], #merchants_by_category) a.merchant-card[data-mh-state="soon"] .merchant-close-comment { background: rgba(255, 255, 255, 0.94) !important; color: #111 !important; -webkit-backdrop-filter: none !important; backdrop-filter: none !important; box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12) !important; }
-html body :is([id="MerchantCollection"], #merchants_by_category) a.merchant-card[data-mh-state="soon"] .merchant-close-comment::before { display: none !important; }
-html body :is([id="MerchantCollection"], #merchants_by_category) a.merchant-card .merchant-close-comment::before { content: "" !important; flex: 0 0 13px !important; width: 13px !important; height: 13px !important; background: currentColor !important;
+html body :is([id="MerchantCollection"], #merchants_by_category) .merchant-card[data-mh-state="soon"] .merchant-close-comment { background: rgba(255, 255, 255, 0.94) !important; color: #111 !important; -webkit-backdrop-filter: none !important; backdrop-filter: none !important; box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12) !important; }
+html body :is([id="MerchantCollection"], #merchants_by_category) .merchant-card[data-mh-state="soon"] .merchant-close-comment::before { display: none !important; }
+html body :is([id="MerchantCollection"], #merchants_by_category) .merchant-card .merchant-close-comment::before { content: "" !important; flex: 0 0 13px !important; width: 13px !important; height: 13px !important; background: currentColor !important;
     -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.4' stroke-linecap='round'%3E%3Ccircle cx='12' cy='12' r='9'/%3E%3Cpath d='M12 7v5l3 2'/%3E%3C/svg%3E") center / contain no-repeat !important;
     mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.4' stroke-linecap='round'%3E%3Ccircle cx='12' cy='12' r='9'/%3E%3Cpath d='M12 7v5l3 2'/%3E%3C/svg%3E") center / contain no-repeat !important; }
-html body :is([id="MerchantCollection"], #merchants_by_category) a.merchant-card .merchant-close-comment[data-mh-when] { font-size: 0 !important; }
-html body :is([id="MerchantCollection"], #merchants_by_category) a.merchant-card .merchant-close-comment[data-mh-when]::after { content: attr(data-mh-when) !important; font-size: 12.5px !important; }
-html body :is([id="MerchantCollection"], #merchants_by_category) a.merchant-card.merchant-card--compact .merchant-close-comment[data-mh-tiny]::after { content: attr(data-mh-tiny) !important; font-size: 12px !important; }   /* :is() עם id — אחרת הכלל הכללי (שיש בו id) מנצח */
+html body :is([id="MerchantCollection"], #merchants_by_category) .merchant-card .merchant-close-comment[data-mh-when] { font-size: 0 !important; }
+html body :is([id="MerchantCollection"], #merchants_by_category) .merchant-card .merchant-close-comment[data-mh-when]::after { content: attr(data-mh-when) !important; font-size: 12.5px !important; }
+html body :is([id="MerchantCollection"], #merchants_by_category) .merchant-card.merchant-card--compact .merchant-close-comment[data-mh-tiny]::after { content: attr(data-mh-tiny) !important; font-size: 12px !important; }   /* :is() עם id — אחרת הכלל הכללי (שיש בו id) מנצח */
 /* גוף הכרטיס: שם, דירוג, ושורת כשרות/תיאור קצר (JS: data-mh-meta) */
-html body :is([id="MerchantCollection"], #merchants_by_category) a.merchant-card .merchant-card-body { padding: 10px 2px 2px !important; gap: 2px !important; background: transparent !important; }
-html body :is([id="MerchantCollection"], #merchants_by_category) a.merchant-card .merchant-card-title { font-size: 16px !important; font-weight: 800 !important; line-height: 22px !important; color: #111 !important; text-transform: none !important; }
-html body :is([id="MerchantCollection"], #merchants_by_category) a.merchant-card .merchant-card-body[data-mh-meta]:not([data-mh-meta=""])::after {
+html body :is([id="MerchantCollection"], #merchants_by_category) .merchant-card .merchant-card-body { padding: 10px 2px 2px !important; gap: 2px !important; background: transparent !important; }
+html body :is([id="MerchantCollection"], #merchants_by_category) .merchant-card .merchant-card-title { font-size: 16px !important; font-weight: 800 !important; line-height: 22px !important; color: #111 !important; text-transform: none !important; }
+html body :is([id="MerchantCollection"], #merchants_by_category) .merchant-card .merchant-card-body[data-mh-meta]:not([data-mh-meta=""])::after {
     content: attr(data-mh-meta) !important; display: block !important; overflow: hidden !important; text-overflow: ellipsis !important; white-space: nowrap !important;
     font-size: 13px !important; font-weight: 600 !important; line-height: 18px !important; color: #6b7280 !important; }
-html body :is([id="MerchantCollection"], #merchants_by_category) a.merchant-card [id="AverageRating"] { display: none !important; }   /* הדירוג עובר לשורת המידע: "★ 4.8 · בשרי · מהדרין" */
+html body :is([id="MerchantCollection"], #merchants_by_category) .merchant-card [id="AverageRating"] { display: none !important; }   /* הדירוג עובר לשורת המידע: "★ 4.8 · בשרי · מהדרין" */
 /* כרטיס קטן (פריסת "שתי שורות") */
-html body :is([id="MerchantCollection"], #merchants_by_category) a.merchant-card.merchant-card--compact .cover-img { border-radius: 14px !important; aspect-ratio: 4 / 3 !important; }
-html body :is([id="MerchantCollection"], #merchants_by_category) a.merchant-card.merchant-card--compact .merchant-card-title { font-size: 14.5px !important; line-height: 20px !important; }
-html body :is([id="MerchantCollection"], #merchants_by_category) a.merchant-card.merchant-card--compact .merchant-close-comment { height: 24px !important; line-height: 24px !important; padding: 0 8px 0 7px !important; }
-html body :is([id="MerchantCollection"], #merchants_by_category) a.merchant-card.merchant-card--compact .v-responsive__content > div.tw-absolute { top: auto !important; bottom: 8px !important; left: 8px !important; right: 8px !important; }
+html body :is([id="MerchantCollection"], #merchants_by_category) .merchant-card.merchant-card--compact .cover-img { border-radius: 14px !important; aspect-ratio: 4 / 3 !important; }
+html body :is([id="MerchantCollection"], #merchants_by_category) .merchant-card.merchant-card--compact .merchant-card-title { font-size: 14.5px !important; line-height: 20px !important; }
+html body :is([id="MerchantCollection"], #merchants_by_category) .merchant-card.merchant-card--compact .merchant-close-comment { height: 24px !important; line-height: 24px !important; padding: 0 8px 0 7px !important; }
+html body :is([id="MerchantCollection"], #merchants_by_category) .merchant-card.merchant-card--compact .v-responsive__content > div.tw-absolute { top: auto !important; bottom: 8px !important; left: 8px !important; right: 8px !important; }
 /* דף "הכול": אותו כרטיס, רשת נקייה, שורת סיכום בראש הרשימה (JS: data-mh-note על ה-v-row) */
 html body #merchants_by_category .v-row > [class*="v-col"] { padding: 8px 8px 14px !important; }
 html body #merchants_by_category .v-row[data-mh-note]::before { content: attr(data-mh-note) !important; order: -1 !important; flex: 0 0 100% !important; padding: 0 10px 6px !important; font-size: 14px !important; font-weight: 600 !important; line-height: 1.4 !important; color: #6b7280 !important; }
-html body #merchants_by_category a.merchant-card .cover-img { aspect-ratio: 16 / 9 !important; }
-@media (prefers-reduced-motion: reduce) { html body :is([id="MerchantCollection"], #merchants_by_category) a.merchant-card:active .cover-img { transform: none !important; } }
+html body #merchants_by_category .merchant-card .cover-img { aspect-ratio: 16 / 9 !important; }
+@media (prefers-reduced-motion: reduce) { html body :is([id="MerchantCollection"], #merchants_by_category) .merchant-card:active .cover-img { transform: none !important; } }
 /* מחשב: חיצים עגולים, 3 כרטיסים בשורה */
 @media (min-width: 900px) {
     html body [id="MerchantCollection"] > div:first-child { margin: 0 28px 14px !important; }
