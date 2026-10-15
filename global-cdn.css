@@ -8176,7 +8176,7 @@ html body #mh-home-film.mhf-in .mhf-cta { animation: mhfFade 0.8s cubic-bezier(0
    11.10: באפליקציה הכרטיס הוא div.merchant-card (לא <a> — שם נפתח פאנל צד) — הסלקטורים בלי a.
    ========================================================= */
 html body [id="MerchantCollection"] { margin: 30px 0 !important; }
-/* כותרת הסקשן: שם + אימוג'י בשורה אחת, "הכול (N)" משמאל */
+/* כותרת הסקשן: שם + אימוג'י בשורה אחת, "הכול" משמאל (בלי מספר — דוד 15.10) */
 html body [id="MerchantCollection"] > div:first-child { margin: 0 16px 12px !important; }
 /* כותרות הסקשנים באותה משפחה של ההירו (Noto Sans Hebrew צר) — דף אחד, קול אחד. הפונט נטען ב-JS (MH Collections) רק בדף הבית */
 html body [id="MerchantCollection"] h1 { font-family: "Noto Sans Hebrew", -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif !important; font-stretch: 75% !important; font-size: 24px !important; font-weight: 800 !important; line-height: 1.1 !important; color: #111 !important; letter-spacing: 0 !important; }

@@ -6347,7 +6347,7 @@ log('פעיל');
 })();
 
 /* =========================================================================
-   "ייפתח שוב ב-" — שעון 24 שעות + תאריך — MH Reopen  |  v1.1.0 | 2026-10-09 (v1.1.0: מוצ״ש)
+   "ייפתח שוב ב-" — שעון 24 שעות + תאריך — MH Reopen  |  v1.2.0 | 2026-10-15 (v1.1.0: מוצ״ש; v1.2.0: "היום"/"מחר" בעסק)
    -------------------------------------------------------------------------
    מוצר עם לוח זמינות (schedule) שסגור עכשיו: Hyperzod כותבת בכרטיס (.product-availability-message)
    ובכפתור של חלון המוצר "ייפתח שוב ב- שישי, 08:00 AM". השעה עצמה נכונה — next_publish_time_utc
@@ -6365,18 +6365,20 @@ log('פעיל');
        (.scheme-merchant-order-warning__text): Hyperzod בונה מהתבנית "{opening_next} {on} {saturday} {at} 20:30"
        (getComment, בשני רכיבים) → "הפתיחה הבאה  שבת ב- 20:30"; הבלוק מחליף בטקסט ל-"הפתיחה הבאה במוצ״ש ב- 20:30".
      שבת לפני 17:00 נשארת "שבת". 9.10: 9 עסקים פותחים בשבת 20:00–20:30.
-   נכשל-פתוח. בדיקה: MH_REOPEN.stats() · MH_REOPEN.motz('הפתיחה הבאה  שבת ב- 20:30')
+   היום/מחר (v1.2.0, דוד 15.10): Hyperzod כותבת שם יום גם כשזה היום ("הפתיחה הבאה חמישי ב- 09:00" ביום חמישי) →
+     "הפתיחה הבאה היום ב- 09:00" / "מחר ב-"; שם היום רק מעבר למחר. מוצ״ש קודם (גם כשהיום שבת). מוצר — בלי שינוי (יום + תאריך).
+   נכשל-פתוח. בדיקה: MH_REOPEN.stats() · MH_REOPEN.rel('הפתיחה הבאה  חמישי ב- 09:00', { day: 4, min: 523 })
    ========================================================================= */
 (function () {
   'use strict';
   if (window.__MH_REOPEN__) { return; }
   window.__MH_REOPEN__ = true;
-  var VERSION = '1.1.0';
+  var VERSION = '1.2.0';
   var OLD = 'ddd, hh:mm A', NEW = 'ddd D.M, HH:mm';
   var MOTZASH = 17 * 60;                                  /* שבת מהשעה הזו = "מוצ״ש" — לשנות כאן */
   var MOTZ = 'מוצ״ש';
   var RX = /([^\s,]+), (\d{1,2}):(\d{2}) ([AP]M)/;          /* "שישי, 08:00 AM" — הפורמט הישן */
-  var stats = { version: VERSION, patched: false, formatted: 0, relabeled: 0, noDate: 0, motzash: 0, errors: 0 };
+  var stats = { version: VERSION, patched: false, formatted: 0, relabeled: 0, noDate: 0, motzash: 0, comments: 0, errors: 0 };
   var G = null;
 
   function patch() {
@@ -6429,18 +6431,32 @@ log('פעיל');
     }
   }
 
-  /* "הפתיחה הבאה  שבת ב- 20:30" → "הפתיחה הבאה במוצ״ש ב- 20:30" (רק שבת מ-17:00) */
-  var RXC = /(^|\s+)(?:ביום\s+|ב\s+)?שבת(\s+ב-\s*)(\d{1,2}):(\d{2})/;   /* גם אם {on} יתורגם ל"ב"/"ביום" */
-  function motz(t) {
+  /* "הפתיחה הבאה  חמישי ב- 09:00" → "היום" / "מחר" כשזה היום או מחר, "במוצ״ש" לשבת מ-17:00; אחרת שם היום כמו שהוא */
+  var DAYN = ['ראשון', 'שני', 'שלישי', 'רביעי', 'חמישי', 'שישי', 'שבת'];
+  var RXC = /(^|\s+)(?:ביום\s+|ב\s+)?(ראשון|שני|שלישי|רביעי|חמישי|שישי|שבת)(\s+ב-\s*)(\d{1,2}):(\d{2})/;   /* גם אם {on} יתורגם ל"ב"/"ביום" */
+  function ilNow() {   /* יום (0=ראשון) ודקה בשעון ישראל */
+    try {
+      var p = new Intl.DateTimeFormat('en-US', { timeZone: 'Asia/Jerusalem', weekday: 'short', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }).formatToParts(new Date()), o = {};
+      p.forEach(function (x) { o[x.type] = x.value; });
+      return { day: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].indexOf(o.weekday), min: (+o.hour) * 60 + (+o.minute) };
+    } catch (e) { var d = new Date(); return { day: d.getDay(), min: d.getHours() * 60 + d.getMinutes() }; }
+  }
+  function rel(t, now) {
     var m = RXC.exec(t);
-    if (!m || (+m[3]) * 60 + (+m[4]) < MOTZASH) { return t; }
-    return t.slice(0, m.index) + (m[1] ? ' ' : '') + 'ב' + MOTZ + m[2] + m[3] + ':' + m[4] + t.slice(m.index + m[0].length);
+    if (!m) { return t; }
+    var dn = DAYN.indexOf(m[2]), min = (+m[4]) * 60 + (+m[5]);
+    now = now || ilNow();
+    var ahead = ((dn - now.day + 7) % 7) * 1440 + min - now.min;
+    if (ahead < 0) { ahead += 7 * 1440; }
+    var w = dn === 6 && min >= MOTZASH ? 'ב' + MOTZ : ahead < 1440 && dn === now.day ? 'היום' : ahead < 2 * 1440 && dn === (now.day + 1) % 7 ? 'מחר' : null;
+    if (!w) { return t; }
+    return t.slice(0, m.index) + (m[1] ? ' ' : '') + w + m[3] + m[4] + ':' + m[5] + t.slice(m.index + m[0].length);
   }
   function comments() {
     var els = document.querySelectorAll('.merchant-close-comment, .scheme-merchant-order-warning__text');
     for (var i = 0; i < els.length; i++) {
       var w = document.createTreeWalker(els[i], NodeFilter.SHOW_TEXT, null), n;
-      while ((n = w.nextNode())) { var v = motz(n.nodeValue); if (v !== n.nodeValue) { n.nodeValue = v; stats.motzash++; } }
+      while ((n = w.nextNode())) { var v = rel(n.nodeValue); if (v !== n.nodeValue) { n.nodeValue = v; stats.comments++; } }
     }
   }
 
@@ -6452,7 +6468,7 @@ log('פעיל');
     run();
   } catch (e) { console.warn('[MH Reopen] disabled:', e); }
 
-  window.MH_REOPEN = { version: VERSION, motz: motz, stats: function () { return JSON.parse(JSON.stringify(stats)); } };
+  window.MH_REOPEN = { version: VERSION, rel: rel, stats: function () { return JSON.parse(JSON.stringify(stats)); } };
   /* mh-reopen-v1 */
 })();
 
@@ -6666,10 +6682,12 @@ log('פעיל');
 })();
 
 /* =========================================================
-   אוספי העסקים בדף הבית + הדף "הכל" — MH Collections v1.1.1 | 2026-10-09 (v1.1.0 סבב 2; v1.1.1 11.10: גם div.merchant-card — באפליקציה הכרטיס אינו <a>)
+   אוספי העסקים בדף הבית + הדף "הכל" — MH Collections v1.2.0 | 2026-10-15 (v1.1.0 סבב 2; v1.1.1 11.10: גם div.merchant-card — באפליקציה הכרטיס אינו <a>;
+   v1.2.0 15.10, דוד: בלי מספר המקומות — המספר הכולל מעורפל; "היום"/"מחר" במקום שם היום)
    הבעלים של ההתנהגות של #MerchantCollection (סקשני "Merchant Collection" שדוד בונה באדמין) ושל כותרת הדף
    שנפתח מ"הכל" (#merchants_by_category?collection=true). העיצוב: CSS חלק 59.
-   - "View all" (קשיח באנגלית ב-chunk pb-MerchantCollection) → "הכל" + מספר העסקים.
+   - "View all" (קשיח באנגלית ב-chunk pb-MerchantCollection) → "הכול", בלי מספר (גם לא בקורא מסך ובדף "הכול").
+   - מתי נפתח: היום → "היום", מחר → "מחר", אחרת שם היום; שבת מ-17:00 = "מוצ״ש" (גם כשהיום שבת).
    - כותרת דף "הכל": Hyperzod בונה slug מהכותרת ומוחקת כל מה שאינו a-z → כותרת עברית = "nearby-merchants".
      שומרים את כותרת הסקשן בלחיצה (שלב capture, לפני Hyperzod) וכותבים אותה ב-H1 של הדף.
    - הכרטיס: "הודעת חלון הראווה" (אלרגנים + כשרות + "התמונות להמחשה בלבד") → רק הכשרות בשורה קטנה
@@ -6681,7 +6699,7 @@ log('פעיל');
   'use strict';
   if (window.__MH_COLLECTIONS__) { return; }
   window.__MH_COLLECTIONS__ = true;
-  var VERSION = '1.1.1';
+  var VERSION = '1.2.0';
   var stats = { labels: 0, titles: 0, cards: 0, kosher: 0, tags: 0, closed: 0, ordered: 0, errors: 0, pageNote: '' };
   var lastTitle = null;   /* הכותרת של הסקשן שממנו לחצו "הכל" */
 
@@ -6706,6 +6724,7 @@ log('פעיל');
 
   /* ---- סטטוס: "הפתיחה הבאה במוצ״ש ב- 20:30" → { label, rank } ---- */
   var DAYS = { 'ראשון': 0, 'שני': 1, 'שלישי': 2, 'רביעי': 3, 'חמישי': 4, 'שישי': 5, 'שבת': 6, 'מוצ״ש': 6.5 };
+  var NAMES = ['ראשון', 'שני', 'שלישי', 'רביעי', 'חמישי', 'שישי', 'שבת'];
   function ilNow() {   /* יום (0=ראשון) ודקה בשעון ישראל */
     try {
       var p = new Intl.DateTimeFormat('en-US', { timeZone: 'Asia/Jerusalem', weekday: 'short', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }).formatToParts(new Date()), o = {};
@@ -6722,19 +6741,21 @@ log('פעיל');
     var day = dw ? (dw[0] === 'היום' ? now.day : dw[0] === 'מחר' ? (now.day + 1) % 7 : Math.floor(DAYS[dw[0]])) : now.day;
     var min = (+tm[1]) * 60 + (+tm[2]), ahead = ((day - now.day + 7) % 7) * 1440 + min - now.min;
     if (ahead < 0) { ahead += 7 * 1440; }
-    return { state: 'closed', rank: 1 + ahead, label: t, day: dw ? dw[0] : '', time: tm[1] + ':' + tm[2] };
+    /* Hyperzod כותבת את שם היום גם כשזה היום ("חמישי" ביום חמישי) → היום / מחר / שם היום (דוד 15.10); שבת מ-17:00 = מוצ״ש */
+    var rel = !dw ? '' : day === 6 && min >= 17 * 60 ? 'מוצ״ש' : ahead < 1440 && day === now.day ? 'היום' : ahead < 2 * 1440 && day === (now.day + 1) % 7 ? 'מחר' : NAMES[day];
+    return { state: 'closed', rank: 1 + ahead, label: t, day: rel, time: tm[1] + ':' + tm[2] };
   }
 
-  /* "הפתיחה הבאה במוצ״ש ב- 20:30" → "נפתח במוצ״ש 20:30" (כרטיס רגיל) / "מוצ״ש 20:30" (כרטיס קטן) */
+  /* "הפתיחה הבאה חמישי ב- 09:00" ביום חמישי → "נפתח היום 09:00" (כרטיס רגיל) / "היום 09:00" (כרטיס קטן) */
   function shortWhen(st) {
     if (st.state !== 'closed') { return null; }
-    var d = st.day === 'היום' || !st.day ? '' : st.day === 'מחר' ? 'מחר ' : st.day === 'מוצ״ש' ? 'במוצ״ש ' : st.day + ' ';
-    return { full: 'נפתח ' + d + st.time, tiny: (d ? d.replace(/^ב(?=מוצ״ש)/, '') : 'היום ') + st.time };
+    var d = st.day === 'מוצ״ש' ? 'במוצ״ש ' : st.day ? st.day + ' ' : '';
+    return { full: 'נפתח ' + d + st.time, tiny: (st.day ? st.day + ' ' : '') + st.time };
   }
   function spoken(st, name, meta) {   /* לקורא מסך: שם, מצב, ושורת המידע — "מוצאי שבת" במלואו, לא אות-אות */
     var parts = [name];
     if (st.state === 'soon') { parts.push('סגור כרגע'); }
-    else if (st.state === 'closed') { parts.push('סגור, נפתח ' + (st.day === 'מוצ״ש' ? 'במוצאי שבת' : st.day || 'היום') + ' בשעה ' + st.time); }
+    else if (st.state === 'closed') { parts.push('סגור, נפתח ' + (st.day === 'מוצ״ש' ? 'במוצאי שבת' : NAMES.indexOf(st.day) >= 0 ? 'ביום ' + st.day : st.day || 'היום') + ' בשעה ' + st.time); }
     if (meta) { parts.push(meta.replace(/★\s*([\d.]+)/, 'דירוג $1').replace(/ · /g, ', ')); }
     return parts.join(', ');
   }
@@ -6790,16 +6811,14 @@ log('פעיל');
     stats.arrows = (stats.arrows || 0) + 1;
   }, true);
 
-  /* סקשן: תווית "הכול (N)", אימוג'י התיאור ליד הכותרת, סדר פתוחים-קודם, ושורת "כולם סגורים" */
+  /* סקשן: תווית "הכול", אימוג'י התיאור ליד הכותרת, סדר פתוחים-קודם, ושורת "כולם סגורים" */
   function section(sec) {
     var title = sec.querySelector('h1'), btn = sec.querySelector('.nm-see-all-btn'), desc = title && title.parentElement && title.parentElement.parentElement && title.parentElement.parentElement.querySelector('p');
     var slides = [].slice.call(sec.querySelectorAll('.nm-carousel-slide')), cards = [].slice.call(sec.querySelectorAll('.merchant-card'));
     var n = cards.length, t = title ? title.textContent.replace(/\s+/g, ' ').trim() : '';
-    if (btn) {
-      if (n) { sec.__mhN = n; }   /* בזמן ש-Hyperzod מציירת מחדש את הכרטיסים יש רגע עם 0 — לא מורידים את המספר */
-      var cnt = n || sec.__mhN || 0, lbl = 'הכול' + (cnt ? ' (' + cnt + ')' : '');
-      if (btn.textContent !== lbl) { btn.textContent = lbl; stats.labels++; }
-      btn.setAttribute('aria-label', 'כל ' + (cnt || '') + ' המקומות ב„' + t + '”');
+    if (btn) {   /* בלי מספר — המספר הכולל של המקומות מעורפל (דוד 15.10) */
+      if (btn.textContent !== 'הכול') { btn.textContent = 'הכול'; stats.labels++; }
+      btn.setAttribute('aria-label', 'כל המקומות ב„' + t + '”');
     }
     if (desc && title) {   /* תיאור שהוא רק אימוג'י → ליד הכותרת, לא שורה משלו */
       var d = desc.textContent.replace(/\s+/g, '').trim(), emo = d && !/[֐-׿A-Za-z0-9]/.test(d);
@@ -6849,8 +6868,9 @@ log('פעיל');
     if (row) {
       var open = states.filter(function (x) { return x.state === 'open'; }).length, first = null, note;
       states.forEach(function (x) { if (x.state === 'closed' && (!first || x.rank < first.rank)) { first = x; } });
-      note = states.length + ' מקומות · ' + (open ? (open === states.length ? 'כולם פתוחים עכשיו' : open + ' פתוחים עכשיו') : 'כולם סגורים עכשיו' + (first ? ' · הראשון ' + shortWhen(first).full : ''));
-      if (row.getAttribute('data-mh-note') !== note) { row.setAttribute('data-mh-note', note); }
+      /* בלי מספרים (דוד 15.10) — שורה רק כשכולם פתוחים או כולם סגורים */
+      note = open ? (open === states.length ? 'כולם פתוחים עכשיו' : '') : 'כולם סגורים עכשיו' + (first ? ' · הראשון ' + shortWhen(first).full : '');
+      if (!note) { row.removeAttribute('data-mh-note'); } else if (row.getAttribute('data-mh-note') !== note) { row.setAttribute('data-mh-note', note); }
     }
   }
 
@@ -6863,7 +6883,7 @@ log('פעיל');
     timed.forEach(function (x) { if (!first || x.rank < first.rank) { first = x; } if (x.day === 'מוצ״ש') { motz++; } });
     if (all.length < 4 || closed.length / all.length < 0.8 || !first) { return ''; }
     if (motz * 2 >= timed.length && first.day === 'מוצ״ש') { return 'שבת שלום · נפתחים במוצ״ש, הראשון ב-' + first.time; }
-    return 'רוב המקומות סגורים עכשיו · הראשון נפתח ' + (first.day && first.day !== 'היום' ? first.day + ' ' : '') + 'ב-' + first.time;
+    return 'רוב המקומות סגורים עכשיו · הראשון נפתח ' + (first.day === 'מוצ״ש' ? 'במוצ״ש ' : first.day ? first.day + ' ' : '') + 'ב-' + first.time;
   }
   /* פונט הכותרות (Noto Sans Hebrew צר 800, ~30KB, נשמר במטמון של Google) — רק כשיש סקשנים כאלה בדף */
   var fontOn = false;
