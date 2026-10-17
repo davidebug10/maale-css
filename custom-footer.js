@@ -6706,8 +6706,9 @@ log('פעיל');
 })();
 
 /* =========================================================
-   אוספי העסקים בדף הבית + הדף "הכל" — MH Collections v1.2.0 | 2026-10-15 (v1.1.0 סבב 2; v1.1.1 11.10: גם div.merchant-card — באפליקציה הכרטיס אינו <a>;
-   v1.2.0 15.10, דוד: בלי מספר המקומות — המספר הכולל מעורפל; "היום"/"מחר" במקום שם היום)
+   אוספי העסקים בדף הבית + הדף "הכל" — MH Collections v1.3.0 | 2026-10-18 (v1.1.0 סבב 2; v1.1.1 11.10: גם div.merchant-card — באפליקציה הכרטיס אינו <a>;
+   v1.2.0 15.10, דוד: בלי מספר המקומות — המספר הכולל מעורפל; "היום"/"מחר" במקום שם היום;
+   v1.3.0 18.10, דוד: בלי שורות "רוב המקומות סגורים" / "כולם סגורים" / "שבת שלום" — לקוח מבין "הכול סגור" ולא מזמין)
    הבעלים של ההתנהגות של #MerchantCollection (סקשני "Merchant Collection" שדוד בונה באדמין) ושל כותרת הדף
    שנפתח מ"הכל" (#merchants_by_category?collection=true). העיצוב: CSS חלק 59.
    - "View all" (קשיח באנגלית ב-chunk pb-MerchantCollection) → "הכול", בלי מספר (גם לא בקורא מסך ובדף "הכול").
@@ -6723,8 +6724,8 @@ log('פעיל');
   'use strict';
   if (window.__MH_COLLECTIONS__) { return; }
   window.__MH_COLLECTIONS__ = true;
-  var VERSION = '1.2.0';
-  var stats = { labels: 0, titles: 0, cards: 0, kosher: 0, tags: 0, closed: 0, ordered: 0, errors: 0, pageNote: '' };
+  var VERSION = '1.3.0';
+  var stats = { labels: 0, titles: 0, cards: 0, kosher: 0, tags: 0, closed: 0, ordered: 0, errors: 0 };
   var lastTitle = null;   /* הכותרת של הסקשן שממנו לחצו "הכל" */
 
   /* ---- כשרות מתוך "הודעת חלון הראווה" ---- */
@@ -6835,7 +6836,7 @@ log('פעיל');
     stats.arrows = (stats.arrows || 0) + 1;
   }, true);
 
-  /* סקשן: תווית "הכול", אימוג'י התיאור ליד הכותרת, סדר פתוחים-קודם, ושורת "כולם סגורים" */
+  /* סקשן: תווית "הכול", אימוג'י התיאור ליד הכותרת, סדר פתוחים-קודם */
   function section(sec) {
     var title = sec.querySelector('h1'), btn = sec.querySelector('.nm-see-all-btn'), desc = title && title.parentElement && title.parentElement.parentElement && title.parentElement.parentElement.querySelector('p');
     var slides = [].slice.call(sec.querySelectorAll('.nm-carousel-slide')), cards = [].slice.call(sec.querySelectorAll('.merchant-card'));
@@ -6864,13 +6865,8 @@ log('פעיל');
     var crs = sec.querySelector('.nm-carousel');
     if (crs && !rows2 && n && !btn && !crs.__mhNudged && crs.scrollWidth > crs.clientWidth + 1) { crs.__mhNudged = true; crs.dispatchEvent(new Event('scroll')); stats.nudged = (stats.nudged || 0) + 1; }
     arrows(sec);
-    /* כולם סגורים → שורה אחת רגועה במקום להבין לבד מתוך כרטיסים אפורים */
-    var open = states.filter(function (s) { return s.state === 'open'; }).length, first = null;
-    states.forEach(function (s) { if (s.state === 'closed' && (!first || s.rank < first.rank)) { first = s; } });
-    var note = '';
-    if (n && !open && !pageNote) { var w = first && shortWhen(first); note = w ? 'כולם סגורים עכשיו · הראשון ' + w.full : 'כולם סגורים עכשיו'; }
-    var head = sec.firstElementChild;   /* attr() קורא מהאלמנט של ה-::after עצמו — לכן על הכותרת, לא על הסקשן */
-    if (head && head.getAttribute('data-mh-note') !== note) { if (note) { head.setAttribute('data-mh-note', note); } else { head.removeAttribute('data-mh-note'); } }
+    /* בלי שורות סיכום "סגורים" (לא בראש הדף, לא בסקשן, לא בדף "הכול") — דוד 18.10: כשיש מקומות פתוחים לקוח
+       מבין "הכול סגור" ולא מזמין. מצב כל עסק — רק בתג שעל הכרטיס ("נפתח היום 08:40"). */
     stats.closed = states.filter(function (s) { return s.state !== 'open'; }).length;
     return states;
   }
@@ -6882,33 +6878,13 @@ log('פעיל');
     var h = page.querySelector('.scheme-mobile-page-header h1, h1');
     var want = lastTitle || 'כל המקומות';
     if (h && h.textContent.trim() !== want) { h.textContent = want; stats.titles++; }
-    /* אותו סדר כמו בבית (פתוחים, ואז לפי שעת הפתיחה) + שורת סיכום בראש הרשימה */
-    var row = null, states = [];
+    /* אותו סדר כמו בבית (פתוחים, ואז לפי שעת הפתיחה); בלי שורת סיכום (דוד 18.10) */
     [].forEach.call(page.querySelectorAll('.merchant-card'), function (c) {
       var st = decorate(c), col = c.closest('[class*="v-col"]');
-      states.push(st);
-      if (col) { row = row || col.parentElement; var o = String(Math.min(st.rank, 1e7) | 0); if (col.style.order !== o) { col.style.order = o; } }
+      if (col) { var o = String(Math.min(st.rank, 1e7) | 0); if (col.style.order !== o) { col.style.order = o; } }
     });
-    if (row) {
-      var open = states.filter(function (x) { return x.state === 'open'; }).length, first = null, note;
-      states.forEach(function (x) { if (x.state === 'closed' && (!first || x.rank < first.rank)) { first = x; } });
-      /* בלי מספרים (דוד 15.10) — שורה רק כשכולם פתוחים או כולם סגורים */
-      note = open ? (open === states.length ? 'כולם פתוחים עכשיו' : '') : 'כולם סגורים עכשיו' + (first ? ' · הראשון ' + shortWhen(first).full : '');
-      if (!note) { row.removeAttribute('data-mh-note'); } else if (row.getAttribute('data-mh-note') !== note) { row.setAttribute('data-mh-note', note); }
-    }
   }
 
-  /* רוב הדף סגור (80%+) → שורה אחת לפני האוסף הראשון. שבת (רוב הפתיחות במוצ״ש) → "שבת שלום" */
-  var pageNote = '';
-  function pageSummary(secs) {
-    var all = [], seen = {};
-    secs.forEach(function (sec) { [].forEach.call(sec.querySelectorAll('.merchant-card'), function (c) { var id = c.getAttribute('data-merchant-id') || c.getAttribute('href'); if (seen[id]) { return; } seen[id] = 1; all.push(cardState(c)); }); });
-    var closed = all.filter(function (x) { return x.state !== 'open'; }), timed = closed.filter(function (x) { return x.state === 'closed'; }), first = null, motz = 0;
-    timed.forEach(function (x) { if (!first || x.rank < first.rank) { first = x; } if (x.day === 'מוצ״ש') { motz++; } });
-    if (all.length < 4 || closed.length / all.length < 0.8 || !first) { return ''; }
-    if (motz * 2 >= timed.length && first.day === 'מוצ״ש') { return 'שבת שלום · נפתחים במוצ״ש, הראשון ב-' + first.time; }
-    return 'רוב המקומות סגורים עכשיו · הראשון נפתח ' + (first.day === 'מוצ״ש' ? 'במוצ״ש ' : first.day ? first.day + ' ' : '') + 'ב-' + first.time;
-  }
   /* פונט הכותרות (Noto Sans Hebrew צר 800, ~30KB, נשמר במטמון של Google) — רק כשיש סקשנים כאלה בדף */
   var fontOn = false;
   function titleFont() {
@@ -6920,11 +6896,6 @@ log('פעיל');
     try {
       titleFont();
       var secs = [].slice.call(document.querySelectorAll('[id="MerchantCollection"]'));
-      pageNote = pageSummary(secs); stats.pageNote = pageNote;
-      secs.forEach(function (sec, i) {
-        var head = sec.firstElementChild, want = i === 0 ? pageNote : '';
-        if (head && (head.getAttribute('data-mh-page-note') || '') !== want) { if (want) { head.setAttribute('data-mh-page-note', want); } else { head.removeAttribute('data-mh-page-note'); } }
-      });
       secs.forEach(section);
       collectionPage();
     } catch (e) { stats.errors++; }
