@@ -3,14 +3,14 @@
 // מגבלה: takeSnapshot של WebKit לא מצייר backdrop-filter בכלל — טשטוש זכוכית בודקים בכרום (cdp.mjs);
 // כאן בודקים את כל השאר: אייקונים (mask), צבעים, גבולות, צללים, פריסה. הצעד הראשון לפעמים לפני טעינת הפונט.
 // steps.json: { "url": "...", "width": 390, "height": 844, "ua": "...", "block": ["regex", ...],
-//               "injectCss": "path", "injectJs": "path", "wait": 6,
+//               "injectCss": "path", "injectJs": "path", "injectJsStart": "path" (לפני כל סקריפט בדף — מאזינים לשגיאות/לוגים), "wait": 6,
 //               "steps": [ { "js": "...", "wait": 1.0, "snap": "out.png", "clip": [x,y,w,h], "print": true } ] }
 // js שמחזיר מחרוזת/מספר מודפס ל-stdout כשה-print=true. clip ביחידות CSS.
 import Cocoa
 import WebKit
 
 struct Step: Decodable { let js: String?; let wait: Double?; let snap: String?; let clip: [Double]?; let print: Bool? }
-struct Cfg: Decodable { let url: String; let width: Double?; let height: Double?; let ua: String?; let block: [String]?; let injectCss: String?; let injectJs: String?; let wait: Double?; let steps: [Step] }
+struct Cfg: Decodable { let url: String; let width: Double?; let height: Double?; let ua: String?; let block: [String]?; let injectCss: String?; let injectJs: String?; let injectJsStart: String?; let wait: Double?; let steps: [Step] }
 
 final class Runner: NSObject, WKNavigationDelegate {
   let cfg: Cfg; var web: WKWebView!; var window: NSWindow!; var loaded = false
@@ -22,6 +22,9 @@ final class Runner: NSObject, WKNavigationDelegate {
     if let p = cfg.injectCss, let css = try? String(contentsOfFile: p, encoding: .utf8) {
       let data = try! JSONSerialization.data(withJSONObject: [css]); let lit = String(data: data, encoding: .utf8)!
       ucc.addUserScript(WKUserScript(source: "(function(){var s=document.createElement('style');s.id='wk-local-css';s.textContent=\(lit)[0];(document.head||document.documentElement).appendChild(s);})();", injectionTime: .atDocumentEnd, forMainFrameOnly: true))
+    }
+    if let p = cfg.injectJsStart, let js = try? String(contentsOfFile: p, encoding: .utf8) {
+      ucc.addUserScript(WKUserScript(source: js, injectionTime: .atDocumentStart, forMainFrameOnly: true))
     }
     if let p = cfg.injectJs, let js = try? String(contentsOfFile: p, encoding: .utf8) {
       ucc.addUserScript(WKUserScript(source: js, injectionTime: .atDocumentEnd, forMainFrameOnly: true))

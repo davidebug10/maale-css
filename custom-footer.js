@@ -8,6 +8,11 @@
    For instant updates: https://www.jsdelivr.com/tools/purge
    ============================================================ */
 
+/* טעינה כפולה (17.10): ה-cache של Hyperzod מגיש לפעמים את הדף עם תג ה-<script> הזה פעמיים (14–17.10, שורש
+   האפליקציה). ריצה שנייה של כל הקובץ הרסה בלוקים בלי שומר (רבעי הפיצה עושה destroy לעצמו ועולה מחדש — באייפון
+   העלייה מחדש נכשלה). שומר אחד לכל הקובץ: הריצה השנייה לא עושה כלום. הסוגר — בסוף הקובץ. */
+if (!window.__MH_FOOTER__) { window.__MH_FOOTER__ = true;
+
 /* ============================================================
    Custom Global Scripts - מעלה המשלוחים
    ============================================================ */
@@ -837,7 +842,15 @@
 })();
 
 /* ============================================================================
-   MH Pizza Quarters — Production v1.4
+   MH Pizza Quarters — Production v1.5
+   ----------------------------------------------------------------------------
+   שינויים מ-v1.4 (17.10.2026, דוד: "למה ה-JS של הפיצה נפל? כל פעם זה קורה"):
+     [FIX] הגלגל נעלם לסירוגין באייפון (באפליקציה). סיבת שורש: שער הכניסה בדק פעם
+           אחת, בטעינה, אם global-cdn.css כבר נטען (cssLoaded) — ואם לא, הבלוק יצא
+           לתמיד. ב-WebKit הקוד רץ לפעמים לפני שקובץ העיצוב (395KB, דרך @import) סיים
+           לרדת → אין גלגל עד סגירת האפליקציה. בכרום זה לא קורה (מחכה לעיצוב) — לכן
+           הבדיקות בכרום לא תפסו. עכשיו הבדיקה בכל סריקה, עד שהעיצוב נטען; עד אז
+           הרשימה המקורית (כמו קודם). + טעינה כפולה של הקובץ — שומר בראש הקובץ.
    ----------------------------------------------------------------------------
    שינויים מ-v1.3 (22.9.2026, mhq-halves-v1):
      [NEW] מסעדה שמוכרת חצאים בלבד (שיבולת השרון: "(הכל)/(חצי ימין)/(חצי שמאל)",
@@ -1511,6 +1524,8 @@
     if (OBSERVER) OBSERVER.disconnect();   /* מונע לולאה. חסרון: אירועים בחלון הזה אובדים */
 
     try {
+      /* [v1.5] בלי העיצוב אין ממשק — אבל לא מוותרים לתמיד: בודקים שוב בכל סריקה עד שהוא נטען */
+      if (!CSS_OK && !(CSS_OK = cssLoaded())) { cssWait(); return; }
       var map = collect(popup), seen = {}, firstGrid = null;
 
       map.forEach(function (t, name) {
@@ -1597,15 +1612,19 @@
     probe.remove();
     return ok;
   }
+  /* [v1.5] העיצוב עוד לא ירד (באייפון הקוד רץ לפעמים לפניו): הרשימה המקורית נשארת, וסריקה נוספת בעוד
+     0.4 שנ' — עד ~16 שנ', ואחר כך בכל שינוי בדף (פתיחת מוצר, לחיצה). */
+  var CSS_OK = false, CSS_TRIES = 0, CSS_TIMER = null;
+  function cssWait() {
+    if (CSS_TRIES++ === 0) console.warn('[mhq] ה-CSS עוד לא נטען מ-global-cdn.css — מחכים לו, בינתיים הרשימה המקורית');
+    if (CSS_TRIES <= 40) { clearTimeout(CSS_TIMER); CSS_TIMER = setTimeout(scan, 400); }
+  }
 
   /* ==========================================================================
      10. הפעלה
      ========================================================================== */
-  /* שער כניסה: בלי ה-CSS אין ממשק. יוצאים בשקט ומשאירים את המקור. */
-  if (!cssLoaded()) {
-    console.warn('[mhq] ה-CSS לא נטען מ-global-cdn.css — הממשק לא הופעל');
-    return;
-  }
+  /* שער הכניסה "בלי ה-CSS אין ממשק" עבר לכל סריקה (scanInner, v1.5). עד v1.4 הוא נבדק פעם אחת כאן,
+     והבלוק יצא לתמיד אם העיצוב עוד לא ירד באותו רגע — הגלגל נעלם לסירוגין באייפון (17.10). */
   document.addEventListener('click', onAddClick, true);
 
   OBSERVER = new MutationObserver(function () {
@@ -1636,6 +1655,7 @@
         expansions: EXPAND_N,
         requiredGroups: requiredGroups(p).length,
         heroImg: !!findHeroImg(p),
+        css: CSS_OK, cssTries: CSS_TRIES,   /* [v1.5] העיצוב נטען? כמה פעמים חיכינו לו */
         checked: [].slice.call(p.querySelectorAll('input[type=checkbox]'))
           .filter(function (i) { return i.checked; })
           .map(function (i) { return i.closest('.v-list-item').innerText.replace(/\s+/g, ' ').trim(); })
@@ -1704,7 +1724,7 @@
     },
 
     destroy: function () {
-      SETTLE.forEach(clearTimeout); SETTLE = [];
+      SETTLE.forEach(clearTimeout); SETTLE = []; clearTimeout(CSS_TIMER);
       EXPAND_N = 0; LAST_POPUP = null; PENDING_EXPAND = false;
       if (OBSERVER) OBSERVER.disconnect();
       document.removeEventListener('click', onAddClick, true);
@@ -6972,3 +6992,5 @@ log('פעיל');
   window.MH_DRIVEIMG = { version: '1.0.0', stats: function () { return JSON.parse(JSON.stringify(stats)); } };
   /* mh-driveimg-v1 */
 })();
+
+}   /* סוף השומר מטעינה כפולה (window.__MH_FOOTER__) — בראש הקובץ */
