@@ -14,7 +14,7 @@ NSColor.white.setFill(); NSRect(x: 0, y: 0, width: W, height: H).fill()
 for (i, im) in imgs.enumerated() {
   let r = i / cols, c = i % cols, y = H - CGFloat(r + 1) * (ch + 22)
   im.draw(in: NSRect(x: CGFloat(c) * cw, y: y, width: cw - 4, height: ch))
-  ((files[i] as NSString).lastPathComponent as NSString).draw(at: NSPoint(x: CGFloat(c) * cw + 4, y: y + ch + 3), withAttributes: [.font: NSFont.boldSystemFont(ofSize: 13), .foregroundColor: NSColor.red])
+  (((files[i] as NSString).lastPathComponent as NSString).deletingPathExtension as NSString).draw(at: NSPoint(x: CGFloat(c) * cw + 4, y: y + ch + 3), withAttributes: [.font: NSFont.boldSystemFont(ofSize: 13), .foregroundColor: NSColor.red])
 }
 NSGraphicsContext.restoreGraphicsState()
 try! rep.representation(using: .jpeg, properties: [.compressionFactor: 0.72])!.write(to: URL(fileURLWithPath: out))
