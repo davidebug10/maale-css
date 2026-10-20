@@ -6923,9 +6923,9 @@ log('פעיל');
 })();
 
 /* =========================================================
-   תמונות מוצר מ-Google Drive בגודל שבו הן מוצגות — MH DriveImg v1.0.0 | 2026-10-09
+   תמונות מוצר מ-Google Drive בגודל שבו הן מוצגות — MH DriveImg v1.1.0 | 2026-10-20 (v1.1.0: גם שורות החיפוש — 1000px לתמונה של 96px)
    רקע (QA דף הבית 9.10): תמונות המוצרים באדמין הן קישורי Drive עם &sz=w1000 — 1000px לאריח של ~140px
-   (~0.6–0.8 שנ' כל אחת, אריחים לבנים בזמן הטעינה). כאן: רק תמונה בתוך אריח מוצר (.product-image-frame)
+   (~0.6–0.8 שנ' כל אחת, אריחים לבנים בזמן הטעינה). כאן: רק תמונה בתוך אריח מוצר (.product-image-frame) או שורת חיפוש (.pro-card-h-img)
    ברוחב עד 260px → sz לפי הרוחב בפועל × צפיפות המסך (מעוגל ל-40, 240–600). תמונה גדולה (חלון המוצר) — לא נוגעים.
    עובד גם למוצרים חדשים (לפי הכתובת, לא רשימה). נכשל-פתוח. בדיקה: MH_DRIVEIMG.stats()
    ========================================================= */
@@ -6939,7 +6939,7 @@ log('פעיל');
     try {
       var src = img.getAttribute('src') || '', m = RX.exec(src);
       if (!m) { return; }
-      var frame = img.closest('.product-image-frame');
+      var frame = img.closest('.product-image-frame, .pro-card-h-img');   /* v1.1.0: גם שורות החיפוש (בחנות ובחיפוש הכללי) */
       if (!frame) { return; }
       var w = frame.getBoundingClientRect().width;
       if (!w || w > 260) { stats.skipped++; return; }
@@ -6952,7 +6952,7 @@ log('פעיל');
   function scan(root) {
     if (!root || !root.querySelectorAll) { return; }
     if (root.tagName === 'IMG') { fix(root); return; }
-    var imgs = root.querySelectorAll('.product-image-frame img[src*="drive.google.com/thumbnail"]');
+    var imgs = root.querySelectorAll('.product-image-frame img[src*="drive.google.com/thumbnail"], .pro-card-h-img img[src*="drive.google.com/thumbnail"]');
     for (var i = 0; i < imgs.length; i++) { fix(imgs[i]); }
   }
   try {
@@ -6964,7 +6964,7 @@ log('פעיל');
     }).observe(document.documentElement, { subtree: true, childList: true, attributes: true, attributeFilter: ['src'] });
     scan(document);
   } catch (e) { console.warn('[MH DriveImg] disabled:', e); }
-  window.MH_DRIVEIMG = { version: '1.0.0', stats: function () { return JSON.parse(JSON.stringify(stats)); } };
+  window.MH_DRIVEIMG = { version: '1.1.0', stats: function () { return JSON.parse(JSON.stringify(stats)); } };
   /* mh-driveimg-v1 */
 })();
 
@@ -7080,6 +7080,149 @@ log('פעיל');
 
   window.MH_NOCASH = { version: VERSION, list: function () { return JSON.parse(JSON.stringify(NO_CASH)); }, stats: function () { return JSON.parse(JSON.stringify(stats)); } };
   /* mh-nocash-v1 */
+})();
+
+/* =========================================================================
+   החיפוש בתוך חנות — MH StoreSearch  |  v1.0.0 | 2026-10-20 (דוד: "לעצב את מנגנון החיפוש שיהיה נוח")
+   -------------------------------------------------------------------------
+   הדף: #MerchantSearchPage (הנתיב merchant-search — הזכוכית בראש דף העסק). Hyperzod כבר מחפשת תוך כדי
+   הקלדה (v-debounce 500ms על keyup, GET /store/v1/search/merchant/products). כאן:
+     - כפתור ניקוי (×) בשורת החיפוש;
+     - מצב ריק: "מה מחפשים ב-<חנות>?" + חיפושים אחרונים של החנות הזו (localStorage, עד 6, לחיצה = חיפוש);
+     - "אין תוצאות" בעברית עם המילה שחיפשו (Hyperzod כותבת "No results found." קשיח);
+     - placeholder "חיפוש במפגש השייח" / "חיפוש ב-Milk" (Hyperzod: "חיפוש ב מפגש השייח - 07");
+     - שמירת חיפוש אחרון: רק חיפוש שהחזיר תוצאות והחזיק 1.5 שנ' (לא כל אות בדרך).
+   לא נוגעים ב-DOM של Vue: מאפייני data-* ו-placeholder בלבד, ושני אלמנטים משלנו (#mh-ss-empty אחרי הראש, #mh-ss-clear בשורה).
+   העיצוב — CSS חלק 62. נכשל-פתוח: בלי ה-JS הדף של Hyperzod כמו שהוא. בדיקה: window.MH_STORESEARCH.stats()
+   ========================================================================= */
+(function () {
+  'use strict';
+  if (window.__MH_STORESEARCH__) { return; }
+  window.__MH_STORESEARCH__ = true;
+  var VERSION = '1.0.0', KEY = 'mh_ss_recent', MAX = 6;
+  var stats = { version: VERSION, syncs: 0, cleared: 0, saved: 0, recentTaps: 0, errors: 0 };
+
+  function store() { try { return document.getElementById('app').__vue_app__.config.globalProperties.$store; } catch (e) { return null; } }
+  function merchant() { try { var m = store().getters.getMerchant; return m && (m._id || m.id) ? m : null; } catch (e) { return null; } }
+  function readAll() { try { return JSON.parse(localStorage.getItem(KEY) || '{}') || {}; } catch (e) { return {}; } }
+  function recent(mid) { var a = readAll()[mid]; return Array.isArray(a) ? a : []; }
+  function writeRecent(mid, arr) { try { var o = readAll(); if (arr.length) { o[mid] = arr.slice(0, MAX); } else { delete o[mid]; } localStorage.setItem(KEY, JSON.stringify(o)); } catch (e) {} }
+  function el(tag, attrs, text) { var e = document.createElement(tag); for (var k in attrs) { e.setAttribute(k, attrs[k]); } if (text) { e.textContent = text; } return e; }
+  function clean(q) { return String(q || '').replace(/\s+/g, ' ').trim(); }
+  /* "ב" + שם החנות: Milk → ב-Milk; מפגש השייח - 07 → במפגש השייח (בלי הסיומת אחרי " - "). ה' בתחילת השם נשארת
+     (בהשיפודיה) — בשם מותג היא לפעמים חלק מהשם (הדס), ולהשמיט אות משם זה גרוע מ"ב" צמודה */
+  function inStore(name) {
+    var n = clean(name).split(/\s+[-–—]\s+/)[0];
+    if (!n) { return ''; }
+    return (/^[A-Za-z0-9]/.test(n) ? 'ב-' : 'ב') + n;
+  }
+
+  /* כמו הקלדה: v-model מאזין ל-input, ה-debounce של Hyperzod ל-keyup */
+  function setQuery(inp, q) {
+    inp.value = q;
+    inp.dispatchEvent(new Event('input', { bubbles: true }));
+    inp.dispatchEvent(new KeyboardEvent('keyup', { bubbles: true, key: q ? q.slice(-1) : 'Backspace' }));
+  }
+
+  var saveTimer = null, lastSaved = '';
+  function maybeSave(page, inp) {
+    clearTimeout(saveTimer);
+    var q = clean(inp.value), m = merchant();
+    if (!m || q.length < 2) { return; }
+    saveTimer = setTimeout(function () {
+      if (clean(inp.value) !== q || !page.querySelector('.product-card-horizontal')) { return; }
+      var mid = m._id || m.id, arr = recent(mid).filter(function (x) { return x.toLowerCase() !== q.toLowerCase(); });
+      arr.unshift(q); writeRecent(mid, arr);
+      if (lastSaved !== q) { lastSaved = q; stats.saved++; }
+      renderRecent(page);
+    }, 1500);
+  }
+
+  function renderRecent(page) {
+    var box = page.querySelector('#mh-ss-empty .mh-ss-recent'); if (!box) { return; }
+    var m = merchant(), list = m ? recent(m._id || m.id) : [];
+    var sig = list.join('\u0001');
+    if (box.__sig === sig) { return; }
+    box.__sig = sig;
+    box.textContent = '';
+    if (!list.length) { box.setAttribute('hidden', ''); return; }
+    box.removeAttribute('hidden');
+    var head = el('div', { 'class': 'mh-ss-recent-head' });
+    head.appendChild(el('span', { 'class': 'mh-ss-recent-title' }, 'חיפושים אחרונים'));
+    var clr = el('button', { type: 'button', 'class': 'mh-ss-recent-clear', 'aria-label': 'ניקוי החיפושים האחרונים' }, 'ניקוי');
+    clr.addEventListener('click', function () { var mm = merchant(); if (mm) { writeRecent(mm._id || mm.id, []); } renderRecent(page); });
+    head.appendChild(clr);
+    box.appendChild(head);
+    var chips = el('div', { 'class': 'mh-ss-chips' });
+    list.forEach(function (q) {
+      var b = el('button', { type: 'button', 'class': 'mh-ss-chip' }, q);
+      b.addEventListener('click', function () {
+        var inp = page.querySelector('#searchProducts'); if (!inp) { return; }
+        stats.recentTaps++; setQuery(inp, q); inp.blur(); sync();
+      });
+      chips.appendChild(b);
+    });
+    box.appendChild(chips);
+  }
+
+  var pend = false;
+  function sync() {
+    pend = false;
+    try {
+      var page = document.getElementById('MerchantSearchPage'); if (!page) { return; }
+      var inp = page.querySelector('#searchProducts'), bar = page.querySelector('.scheme-merchant-search-control-bar');
+      var head = page.querySelector('.scheme-merchant-search-header');
+      if (!inp || !bar || !head) { return; }
+      stats.syncs++;
+      var m = merchant(), name = m ? clean(m.name) : '', q = clean(inp.value);
+      /* × בשורת החיפוש */
+      var x = bar.querySelector('#mh-ss-clear');
+      if (!x) {
+        x = el('button', { type: 'button', id: 'mh-ss-clear', 'aria-label': 'ניקוי החיפוש' });
+        x.addEventListener('click', function () { var i = page.querySelector('#searchProducts'); if (!i) { return; } stats.cleared++; setQuery(i, ''); i.focus(); sync(); });
+        bar.appendChild(x);
+      }
+      if (!!q !== x.hasAttribute('data-on')) { if (q) { x.setAttribute('data-on', ''); } else { x.removeAttribute('data-on'); } }
+      /* מצב ריק */
+      var box = page.querySelector('#mh-ss-empty');
+      if (!box) {
+        box = el('div', { id: 'mh-ss-empty' });
+        box.appendChild(el('div', { 'class': 'mh-ss-ico', 'aria-hidden': 'true' }));
+        box.appendChild(el('p', { 'class': 'mh-ss-title' }));
+        box.appendChild(el('p', { 'class': 'mh-ss-sub' }, 'מוצר, מותג או סוג — התוצאות מופיעות תוך כדי הקלדה'));
+        box.appendChild(el('div', { 'class': 'mh-ss-recent', hidden: '' }));
+        head.parentNode.insertBefore(box, head.nextSibling);
+      }
+      var title = name ? 'מה מחפשים ' + inStore(name) + '?' : 'מה מחפשים?';
+      var t = box.querySelector('.mh-ss-title'); if (t.textContent !== title) { t.textContent = title; }
+      var ph = name ? 'חיפוש ' + inStore(name) : '';   /* Hyperzod: "חיפוש ב Milk", "חיפוש ב מפגש השייח - 07" */
+      if (ph && inp.getAttribute('placeholder') !== ph) { inp.setAttribute('placeholder', ph); }
+      /* "אין תוצאות" — הסימון יורד כשהטקסט מתחלף (Vue יכול למחזר את האלמנט) */
+      var none = null, kids = page.children;
+      for (var i = 0; i < kids.length; i++) {
+        var k = kids[i], is = k.id !== 'mh-ss-empty' && clean(k.textContent) === 'No results found.';
+        if (is !== k.hasAttribute('data-mh-ss-none')) { if (is) { k.setAttribute('data-mh-ss-none', ''); } else { k.removeAttribute('data-mh-ss-none'); } }
+        if (is) { none = k; }
+      }
+      if (none) {
+        var nt = q ? 'לא מצאנו את "' + (q.length > 28 ? q.slice(0, 27) + '…' : q) + '"' + (name ? ' ' + inStore(name) : '') : 'לא מצאנו מוצרים כאלה';
+        if (none.getAttribute('data-mh-ss-title') !== nt) { none.setAttribute('data-mh-ss-title', nt); }
+      }
+      /* מצב ריק: אין מילה, אין תוצאות (גם לא מסינון/קטגוריה בלי מילה) ואין "לא מצאנו" */
+      var empty = !q && !none && !page.querySelector('.product-card-horizontal');
+      if (empty !== box.hasAttribute('data-on')) { if (empty) { box.setAttribute('data-on', ''); } else { box.removeAttribute('data-on'); } }
+      if (empty) { renderRecent(page); }
+      maybeSave(page, inp);
+    } catch (e) { stats.errors++; }
+  }
+  function schedule() { if (!pend) { pend = true; requestAnimationFrame(sync); } }
+  try {
+    new MutationObserver(function () { if (document.getElementById('MerchantSearchPage')) { schedule(); } })
+      .observe(document.documentElement, { subtree: true, childList: true });
+    document.addEventListener('input', function (e) { if (e.target && e.target.id === 'searchProducts') { schedule(); } }, true);
+  } catch (e) { stats.errors++; }
+  window.MH_STORESEARCH = { version: VERSION, sync: sync, inStore: inStore, stats: function () { return JSON.parse(JSON.stringify(stats)); } };
+  /* mh-storesearch-v1 */
 })();
 
 }   /* סוף השומר מטעינה כפולה (window.__MH_FOOTER__) — בראש הקובץ */
