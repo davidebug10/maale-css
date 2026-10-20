@@ -4011,7 +4011,7 @@ log('פעיל');
 })();
 
 /* ============================================================
-   טעינת כל קטגוריות התפריט בדף העסק — MH MenuLoad  |  v1.0.0 | 2026-09-10
+   טעינת כל קטגוריות התפריט בדף העסק — MH MenuLoad  |  v1.0.1 | 2026-10-20 (v1.0.1: ניסוי — לא ב-Milk)
    הבעיה (נמדדה בגואה, 28 קטגוריות): Hyperzod מביאה את התפריט בדפים של 15
    קטגוריות (max_categories_per_page) ומבקשת את הדף הבא רק כשאלמנט-זקיף
    בתחתית הדף נכנס למסך. בכרום ללא ראש קפיצה לתחתית לא מפעילה אותו בכלל,
@@ -4032,9 +4032,10 @@ log('פעיל');
   if (window.__MH_MENULOAD__) { return; }
   window.__MH_MENULOAD__ = true;
 
-  var VERSION = '1.0.0';
+  var VERSION = '1.0.1';
   var PAGE_SIZE = 15;   /* max_categories_per_page של Hyperzod, נמדד 10.9.2026 */
   var MAX_PAGES = 10;   /* תקרה בטיחותית: עד 150 קטגוריות */
+  var SKIP = { '6a96c723644ae747fe064e93': 'Milk' };   /* ניסוי 20.10 — ראו run() */
   var stats = { version: VERSION, runs: 0, calls: 0, added: 0, skipped: 0, lastMerchant: null };
   var busy = false;
 
@@ -4101,6 +4102,10 @@ log('פעיל');
     if (!p) { return; }
     var mid = p.merchantId;
     if (!mid) { return; }
+    /* ניסוי 20.10 (דוד אישר): Milk — 953 מוצרים — קורסת באייפון 14 פרו מקס של לקוח 0.4–2 שנ' אחרי שעמוד 2
+       נטען כאן. בלי הטעינה האוטומטית: Hyperzod טוענת את עמוד 2 בעצמה כשגוללים לסוף. אם הקריסה נעלמת →
+       תיקון קבוע (טעינה הדרגתית בחנויות ענקיות) והשורה הזו נמחקת. */
+    if (SKIP[mid]) { stats.skipped++; stats.lastMerchant = mid; return; }
     if (p.loading || p.loadMoreInFlight) { return; }      /* דף בדרך — ננסה שוב במוטציה הבאה */
     var page = p.page;
     if (!(page >= 1)) { return; }
