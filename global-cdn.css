@@ -8272,3 +8272,11 @@ html body [id="ProductHighlights"] > div:first-child > span::after { content: ""
     html body :is(#mh-home-dalia, #mh-home-katsefet, #mh-soon-goa) { max-width: 920px !important; margin: 30px auto !important; }
 }
 /* mh-homelayout-v1 */
+
+/* =========================================================
+   חלק 61: עסקים בלי תשלום במזומן — MH NoCash v1.0.0 | 2026-10-20 (דוד)
+   כרטיס "מזומן" מוסתר בצ'ק-אאוט של עסק שברשימה. הרשימה וההגנות (ביטול בחירה, חסימת ההזמנה) —
+   JS "MH NoCash" ב-custom-footer.js, שמסמן data-mh-nocash על #payment-card.
+   ========================================================= */
+html body #payment-card[data-mh-nocash] .payment-method[data-test-id$="-cod"] { display: none !important; }
+/* mh-nocash-v1 */

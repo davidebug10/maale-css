@@ -6973,4 +6973,118 @@ log('פעיל');
   /* mh-driveimg-v1 */
 })();
 
+/* =========================================================================
+   עסקים בלי תשלום במזומן — MH NoCash  |  v1.0.0 | 2026-10-20 (דוד: "רשימה בקוד של עסקים שבהם
+   התשלום במזומן מוסתר — רק אשראי")
+   -------------------------------------------------------------------------
+   Hyperzod מגדירה אמצעי תשלום לכל האתר, לא לעסק (בנתוני העסק אין שדה כזה) — לכן הרשימה כאן.
+   להוספת עסק: שורה ב-NO_CASH (המזהה מופיע בכתובת /m/<slug>/<id>). שלוש שכבות:
+     1. תצוגה — כרטיס "מזומן" (.payment-method[data-test-id$="-cod"]) מוסתר בצ'ק-אאוט של עסק ברשימה
+        (CSS חלק 61, לפי data-mh-nocash על #payment-card).
+     2. בחירה — אם "מזומן" כבר מסומן (Hyperzod זוכרת את האמצעי האחרון) — לחיצה על הכרטיס שלו מבטלת
+        את הבחירה דרך הרכיב של Hyperzod עצמו (select() על אותו אמצעי = ביטול), והלקוח בוחר אשראי.
+     3. כסף — POST /store/v1/order של עסק ברשימה עם payment_mode_id של מזומן נחסם לפני שהוא יוצא,
+        עם הודעה אדומה (אותה שיטה כמו MH Dalia).
+   העסק מזוהה לפי מזהה (getCartMerchant בצ'ק-אאוט, merchant_id בבקשה), לא לפי שם.
+   בדיקה: window.MH_NOCASH.stats()
+   ========================================================================= */
+(function () {
+  'use strict';
+  if (window.__MH_NOCASH__) { return; }
+  window.__MH_NOCASH__ = true;
+  var VERSION = '1.0.0';
+  var NO_CASH = {
+    '6a9c4df444043fb3f601ba52': 'מפגש השייח - 07'
+  };
+  var CASH_ID = 3;   /* payment_mode_id של "מזומן" (cod), נמדד 6.9 — ונוסף כל מזהה שהנתונים מסמנים cod */
+  var MSG = 'בעסק הזה אפשר לשלם באשראי בלבד — בחרו אשראי ונסו שוב.';
+  var IS_ORDER = /\/store\/v1\/order(\?|$)/;
+  var stats = { version: VERSION, merchants: Object.keys(NO_CASH).length, hidden: 0, deselected: 0, ordersSeen: 0, blocked: 0, errors: 0 };
+
+  function store() { try { return document.getElementById('app').__vue_app__.config.globalProperties.$store; } catch (e) { return null; } }
+  function cartMid(st) {
+    try { var m = st.getters.getCartMerchant; if (m && (m._id || m.id)) { return m._id || m.id; } } catch (e) {}
+    try { var c = st.getters.getCart; return (c && (c.merchant_id || (c.cart_items && c.cart_items[0] && c.cart_items[0].merchant_id))) || null; } catch (e) { return null; }
+  }
+  function isCash(st, id) {
+    if (id === CASH_ID) { return true; }
+    try {
+      var modes = (st && st.getters.paymentModes) || [];   /* getter של Hyperzod (setPaymentModes ← getPaymentModes) */
+      for (var i = 0; i < modes.length; i++) { var m = modes[i]; if (m && m.payment_mode_id === id && m.payment_mode && m.payment_mode.name === 'cod') { return true; } }
+    } catch (e) {}
+    return false;
+  }
+  function toast(msg) { var st = store(); try { if (st) { st.commit('setToast', { message: msg, color: 'red', show: true }); } } catch (e) {} }
+
+  /* 1+2: צ'ק-אאוט */
+  var lastClick = 0;
+  function sync() {
+    pend = false;
+    var card = document.getElementById('payment-card');
+    if (!card) { return; }
+    var st = store(), mid = st && cartMid(st), on = !!(mid && NO_CASH[mid]);
+    if (on !== card.hasAttribute('data-mh-nocash')) {
+      if (on) { card.setAttribute('data-mh-nocash', ''); stats.hidden++; } else { card.removeAttribute('data-mh-nocash'); }
+    }
+    if (!on) { return; }
+    var cash = card.querySelector('.payment-method[data-test-id$="-cod"]');
+    if (cash && cash.querySelector('.v-selection-control--dirty, input:checked') && Date.now() - lastClick > 1000) {
+      lastClick = Date.now(); stats.deselected++;
+      cash.click();   /* select() של Hyperzod: אותו אמצעי שוב → method=null + setPaymentModeId(null) */
+    }
+  }
+  var pend = false;
+  try {
+    new MutationObserver(function () { if (!pend && document.getElementById('payment-card')) { pend = true; requestAnimationFrame(sync); } })
+      .observe(document.documentElement, { subtree: true, childList: true, attributes: true, attributeFilter: ['class'] });
+  } catch (e) { stats.errors++; }
+
+  /* 3: הבקשה עצמה. true = מותר לשלוח */
+  function guard(body) {
+    if (typeof body !== 'string') { return true; }
+    var o; try { o = JSON.parse(body); } catch (e) { return true; }
+    if (!o || !NO_CASH[o.merchant_id]) { return true; }
+    stats.ordersSeen++;
+    var st = store();
+    if (!isCash(st, o.payment_mode_id)) { return true; }
+    stats.blocked++;
+    console.warn('[MH NoCash] 🛑 הזמנה במזומן נחסמה:', NO_CASH[o.merchant_id]);
+    setTimeout(function () { try { if (st) { st.commit('setPaymentModeId', null); } } catch (e) {} toast(MSG); sync(); }, 300);
+    return false;
+  }
+  try {
+    var XP = XMLHttpRequest.prototype, _o = XP.open, _s = XP.send;
+    XP.open = function (m, url) {
+      try { this.__mhNoCashOrder = String(m).toUpperCase() === 'POST' && IS_ORDER.test(String(url || '')); } catch (e) {}
+      return _o.apply(this, arguments);
+    };
+    XP.send = function (b) {
+      if (this.__mhNoCashOrder) {
+        var ok = true;
+        try { ok = guard(b); } catch (e) { stats.errors++; ok = true; }
+        if (!ok) { throw new Error('MH NoCash: בעסק הזה אפשר לשלם באשראי בלבד'); }
+      }
+      return _s.apply(this, arguments);
+    };
+  } catch (e) { stats.errors++; }
+  try {
+    var _f = window.fetch;
+    if (typeof _f === 'function') {
+      window.fetch = function (input, init) {
+        try {
+          var u = typeof input === 'string' ? input : ((input && input.url) || '');
+          var M = String((init && init.method) || (input && input.method) || 'GET').toUpperCase();
+          if (M === 'POST' && IS_ORDER.test(u) && init && typeof init.body === 'string' && !guard(init.body)) {
+            return Promise.reject(new Error('MH NoCash: בעסק הזה אפשר לשלם באשראי בלבד'));
+          }
+        } catch (e) { stats.errors++; }
+        return _f.apply(this, arguments);
+      };
+    }
+  } catch (e) { stats.errors++; }
+
+  window.MH_NOCASH = { version: VERSION, list: function () { return JSON.parse(JSON.stringify(NO_CASH)); }, stats: function () { return JSON.parse(JSON.stringify(stats)); } };
+  /* mh-nocash-v1 */
+})();
+
 }   /* סוף השומר מטעינה כפולה (window.__MH_FOOTER__) — בראש הקובץ */
