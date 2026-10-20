@@ -6,13 +6,23 @@
 //               "injectCss": "path", "injectJs": "path", "injectJsStart": "path" (לפני כל סקריפט בדף — מאזינים לשגיאות/לוגים), "wait": 6,
 //               "steps": [ { "js": "...", "wait": 1.0, "snap": "out.png", "clip": [x,y,w,h], "print": true } ] }
 // js שמחזיר מחרוזת/מספר מודפס ל-stdout כשה-print=true. clip ביחידות CSS.
+// "native": true = מצב אפליקציה כמו react-native-webview (window.ReactNativeWebView דרך messageHandlers; כל הודעה מודפסת "RN <זמן> <סוג> <KB>").
+// קריסת תהליך הדף מודפסת "WEBCONTENT TERMINATED at <זמן>" ויציאה 4.
 import Cocoa
 import WebKit
 
 struct Step: Decodable { let js: String?; let wait: Double?; let snap: String?; let clip: [Double]?; let print: Bool? }
-struct Cfg: Decodable { let url: String; let width: Double?; let height: Double?; let ua: String?; let block: [String]?; let injectCss: String?; let injectJs: String?; let injectJsStart: String?; let wait: Double?; let steps: [Step] }
+struct Cfg: Decodable { let url: String; let width: Double?; let height: Double?; let ua: String?; let block: [String]?; let injectCss: String?; let injectJs: String?; let injectJsStart: String?; let wait: Double?; let native: Bool?; let steps: [Step] }
 
-final class Runner: NSObject, WKNavigationDelegate {
+final class Runner: NSObject, WKNavigationDelegate, WKScriptMessageHandler {
+  let t0 = Date()
+  func stamp() -> String { String(format: "%.1fs", Date().timeIntervalSince(t0)) }
+  /* native: כמו react-native-webview באייפון — window.ReactNativeWebView.postMessage עובר דרך messageHandlers לצד הנייטיב; כאן רק נרשם (סוג + גודל) */
+  func userContentController(_ u: WKUserContentController, didReceive m: WKScriptMessage) {
+    let body = "\(m.body)"; var kind = ""
+    if let d = body.data(using: .utf8), let o = try? JSONSerialization.jsonObject(with: d) as? [String: Any] { kind = "\(o["type"] ?? o["event"] ?? o["action"] ?? "?")" }
+    print("RN \(stamp()) \(kind == "?" || kind.isEmpty ? String(body.prefix(70)) : kind) \(body.utf8.count / 1024)KB")
+  }
   let cfg: Cfg; var web: WKWebView!; var window: NSWindow!; var loaded = false
   init(_ c: Cfg) { cfg = c }
   func start() {
@@ -28,6 +38,10 @@ final class Runner: NSObject, WKNavigationDelegate {
     }
     if let p = cfg.injectJs, let js = try? String(contentsOfFile: p, encoding: .utf8) {
       ucc.addUserScript(WKUserScript(source: js, injectionTime: .atDocumentEnd, forMainFrameOnly: true))
+    }
+    if cfg.native == true {
+      ucc.add(self, name: "ReactNativeWebView")
+      ucc.addUserScript(WKUserScript(source: "window.ReactNativeWebView = { postMessage: function (d) { window.webkit.messageHandlers.ReactNativeWebView.postMessage(String(d)); } };", injectionTime: .atDocumentStart, forMainFrameOnly: true))
     }
     conf.userContentController = ucc
     conf.websiteDataStore = .nonPersistent()   /* בלי מטמון מריצה קודמת — אחרת נטען CSS ישן (max-age=600 של GitHub Pages) */
@@ -61,6 +75,8 @@ final class Runner: NSObject, WKNavigationDelegate {
     DispatchQueue.main.asyncAfter(deadline: .now() + (cfg.wait ?? 6)) { self.run(0) }
   }
   func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) { FileHandle.standardError.write("fail \(error)\n".data(using: .utf8)!); exit(2) }
+  /* קריסה של תהליך הדף (WebContent) — מה שהלקוח רואה כמסך לבן/סגירה */
+  func webViewWebContentProcessDidTerminate(_ webView: WKWebView) { print("WEBCONTENT TERMINATED at \(stamp())"); fflush(stdout); exit(4) }
   func run(_ i: Int) {
     if i >= cfg.steps.count { exit(0) }
     let s = cfg.steps[i]
@@ -79,7 +95,7 @@ final class Runner: NSObject, WKNavigationDelegate {
     }
     if let js = s.js {
       web.evaluateJavaScript(js) { res, err in
-        if s.print == true { print(res.map { "\($0)" } ?? "ERR \(String(describing: err))") }
+        if s.print == true { print((self.cfg.native == true ? "[\(self.stamp())] " : "") + (res.map { "\($0)" } ?? "ERR \(String(describing: err))")) }
         afterJs()
       }
     } else { afterJs() }
