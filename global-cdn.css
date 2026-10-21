@@ -8282,7 +8282,7 @@ html body #payment-card[data-mh-nocash] .payment-method[data-test-id$="-cod"] { 
 /* mh-nocash-v1 */
 
 /* =========================================================
-   חלק 62: החיפוש בתוך חנות — MH StoreSearch v1.0.0 | 2026-10-20 (דוד: "שיהיה נוח לחוויית משתמש")
+   חלק 62: החיפוש בתוך חנות — MH StoreSearch v1.0.1 | 2026-10-20 (דוד: "שיהיה נוח לחוויית משתמש"; v1.0.1 21.10: באפליקציה שורת החיפוש נשארת מתחת לפס השעון בגלילה)
    הבעלים של #MerchantSearchPage (נתיב merchant-search, הזכוכית בראש דף העסק): שורת החיפוש, גלולות המיון והסינון,
    שורות התוצאות, המצב הריק ו"אין תוצאות". התנהגות (×, חיפושים אחרונים, טקסטים): JS "MH StoreSearch".
    עקרונות: שורה צפופה (6–7 תוצאות במסך במקום 4–5), תמונה 88px (DriveImg מוריד אותה בגודל הזה — זיכרון),
@@ -8290,6 +8290,11 @@ html body #payment-card[data-mh-nocash] .payment-method[data-test-id$="-cod"] { 
    ========================================================= */
 html body #MerchantSearchPage { background: #fff !important; }
 html body #MerchantSearchPage .scheme-merchant-search-header { background: #fff !important; padding-bottom: 4px !important; box-shadow: 0 1px 0 rgba(17, 17, 17, 0.06) !important; }
+/* באפליקציה (הראש עם style של --native-status-bar-height — רק בנייד): Hyperzod רוצה שהראש יידבק מתחת לפס השעון
+   (top: calc(פס + 16px) inline), אבל tw-top-[-1px] שלה עם !important גובר — בגלילה שורת החיפוש נכנסה מתחת לפס
+   ורק תחתיתה נראתה (דוד 21.10: "שדה החזרה מוסתר"). כאן: נדבק לראש המסך, והפס הופך לריפוד לבן בתוך הראש —
+   שורת החיפוש תמיד מתחת לפס, גם לפני הגלילה וגם אחריה (אותו מקום כמו קודם לפני גלילה) */
+html body #MerchantSearchPage .scheme-merchant-search-header[style*="native-status-bar-height"] { top: 0 !important; margin-top: 0 !important; padding-top: calc(var(--native-status-bar-height, 0px) + 12px) !important; }
 /* שורת החיפוש: גלולה אחת — חזרה, זכוכית מגדלת, שדה, × */
 html body #MerchantSearchPage .scheme-merchant-search-control-bar { position: relative !important; height: 52px !important; margin: 10px 0 6px !important; padding: 0 4px !important; gap: 2px !important; border: 0 !important; border-radius: 999px !important; background: #f3f1ee !important; }
 html body #MerchantSearchPage .scheme-merchant-search-control-bar > .native-top-notch-margin.tw-flex-none { flex: 0 0 auto !important; width: auto !important; }   /* עטיפת כפתור החזרה (רק בנייד; במחשב הילד הראשון הוא השדה) */
