@@ -8384,3 +8384,17 @@ html body:has(#AppBar) #MerchantSearchPage .scheme-merchant-search-header { top:
 }
 /* mh-storesearch-v1 */
 
+/* =========================================================
+   חלק 63: חלון החנות באפליקציה — יציאה בלי החלקה | MH SheetExit v1.0.0 | 2026-10-21 (הקריסה בחיפוש של Milk)
+   באפליקציה החנות נפתחת כחלון (.merchant-bottom-sheet) מעל דף הבית. ביציאה ממנו — חיפוש, חזרה, תשלום —
+   Hyperzod מחליקה את החלון החוצה (slide-in-left-leave-active, transform .38s) כשכל תוכן החנות עוד בפנים,
+   ו-WebKit מקצה זיכרון גרפי לפי כל התוכן: ב-Milk ‏630MB → 1,050MB בחצי שנייה (נמדד, footprint) — באייפון
+   (צפיפות 3) מעבר למגבלה → הדף נסגר. בלי ההחלקה ביציאה — 631MB. הכניסה לחנות נשארת עם החלקה
+   (התוכן שלה מצויר רק אחריה). באתר החנות היא דף רגיל — אין כאן חלון, הכלל לא חל.
+   + 410 פסי טעינה מוסתרים של Vuetify (אחד בכל כרטיס, לא פעילים, גובה 0) מחזיקים אנימציה "עצורה"
+   שב-WebKit עדיין עולה: Milk פתוחה = 98% מעבד → 38% בלעדיהם. פס פעיל (--active) נשאר.
+   בדיקות: capture/milk-search-21.10/ (mk.py, runfp.sh, summ.py).
+   ========================================================= */
+html body .merchant-bottom-sheet > .v-overlay__content[class*="-leave-active"] { transition: none !important; animation: none !important; }
+html body .merchant-page .v-card__loader > .v-progress-linear:not(.v-progress-linear--active) .v-progress-linear__indeterminate { display: none !important; }
+/* mh-sheetexit-v1 */
