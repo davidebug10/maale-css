@@ -34,6 +34,8 @@ html body {
     --mh-e1: 0 1px 2px rgba(17, 17, 17, 0.06), 0 1px 1px rgba(17, 17, 17, 0.04);
     --mh-e2: 0 4px 16px rgba(17, 17, 17, 0.08);
     --mh-float: 0 8px 28px rgba(17, 17, 17, 0.14);
+    --mh-scrim: rgba(17, 17, 17, 0.4);   /* רקע מעומעם מאחורי גיליון */
+    --mh-grip: #d9d5d0;                  /* ידית גיליון 36×5 */
     --mh-ease: cubic-bezier(.2, .8, .2, 1);
     --mh-ease-sheet: cubic-bezier(.32, .72, 0, 1);
 }
@@ -118,70 +120,9 @@ html body #payment-card .method-icon img.v-img__img {
    הסיבה: Vue scoped ID השתנה מ-data-v-5c0877f3 ל-data-v-aee55508
    ========================================================= */
 
-/* =========================================================
-   חלק 4: כפתורי קריסטל גלובליים (RED & WHITE LIQUID)
-   מטרה: הפיכת כל כפתורי ה-Add והפעולה לקפסולות זכוכית
-   ========================================================= */
-
-/* 1. הגדרת בסיס הכפתור הגלובלי (Add Buttons) */
-html body .v-btn.add-btn,
-html body .v-btn.bg-white.text-button_normal,
-html body button.add-btn {
-    /* עיצוב זכוכית לבנה */
-    background: rgba(255, 255, 255, 0.6) !important;
-    backdrop-filter: blur(15px) saturate(150%) !important;
-    -webkit-backdrop-filter: blur(15px) saturate(150%) !important;
-    
-    /* מסגרת אדום QLED דקה וחדה */
-    border: 1.2px solid #e31e24 !important;
-    border-radius: 10px !important; /* פינות מעוגלות iOS Style */
-    
-    /* טקסט אדום מודגש */
-    color: #e31e24 !important;
-    font-weight: 800 !important;
-    font-size: 13px !important;
-    letter-spacing: 0.3px !important;
-    
-    /* ניקוי צלליות מערכת ישנות */
-    box-shadow: 0 4px 12px rgba(227, 30, 36, 0.08) !important;
-    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
-    
-    /* מניעת חיתוך טקסט */
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-}
-
-/* 2. ביטול שכבות הצבע האטומות של Tailwind/Hyperzod */
-html body .v-btn.add-btn.tw-border-grey-500 {
-    border-color: #e31e24 !important;
-}
-
-/* 3. אפקט ריחוף ולחיצה (Tactile Response) */
-html body .v-btn.add-btn:hover {
-    background: rgba(255, 255, 255, 0.9) !important;
-    transform: translateY(-1px) !important;
-    box-shadow: 0 6px 15px rgba(227, 30, 36, 0.15) !important;
-}
-
-html body .v-btn.add-btn:active {
-    transform: scale(0.94) !important; /* תחושת לחיצה פיזית */
-    background: #e31e24 !important; /* היפוך צבעים בלחיצה */
-    color: #ffffff !important;
-}
-
-/* 4. טיפול באייקון ה "+" בתוך הכפתור */
-html body .v-btn.add-btn .tw-ms-1 {
-    font-size: 16px !important;
-    line-height: 0 !important;
-    margin-bottom: 2px !important;
-}
-
-/* 5. ניקוי שכבות ה-Overlay של Vuetify שיוצרות "עננות" על הכפתור */
-html body .v-btn.add-btn .v-btn__overlay,
-html body .v-btn.add-btn .v-btn__underlay {
-    display: none !important;
-}
+/* חלק 4 (כפתורי קריסטל גלובליים — html body .v-btn.add-btn / .v-btn.bg-white.text-button_normal: זכוכית, מסגרת אדומה, רדיוס 10
+   על כל כפתור הוספה באתר) — הוסר 23.10.2026. ה-"+" והמונה בכל כרטיסי המוצר בבעלות "חלק 40: MH Cards" (סקופ לפי הקשר);
+   "הוספה לעגלה" בפופאפ המוצר — חלק 22י. ההיסטוריה ב-git. */
 
 /* =========================================================
    חלק 5: דף העגלה - CRYSTAL BASKET OVERHAUL
@@ -4049,31 +3990,48 @@ html body .product-popup #add_to_cart_hide_from_mobile_app .v-field__outline { d
 /* mh-product-v1 */
 
 /* =========================================================
-   חלק 33: סרגל הקטגוריות בדף העסק — MH CatNav v1.0.0 | 2026-09-07 — Liquid Glass + אדום QLED
-   סקופ: html body #mobileStickyHeader / #ProductCategoriesNav בלבד (הסרגל "תוך-מסעדתי" שמתחת להדר העסק,
-   ונדבק ל-53px מהחלק העליון בגלילה). לא נוגע בהדר העסק, בסרגל התחתון, בחיפוש או בכל swiper אחר.
-   מצבים: לפני גלילה Hyperzod נותנת ל-#ProductCategoriesNav את tw-border-b-2; בגלילה היא מסירה אותה →
-   :not(.tw-border-b-2) = מצב דביק (צל רך + זכוכית מעט אטומה יותר).
-   הפריט הפעיל = a.scrollactive-item.is-active (vue-scrollactive). לא נוגעים בשוליים של ה-swiper-slide
-   (Swiper מודד אותם); הבלוק MH CatNav ב-custom-footer.js קורא swiper.update() אחרי שה-CSS נטען.
+   חלק 33: סרגל הקטגוריות בדף העסק — MH CatNav v2.0.0 | 2026-10-22 — שפת 2026 (DESIGN_SYSTEM.md §5, §8)
+   סקופ: html body #mobileStickyHeader / #ProductCategoriesNav / #ProductCategoriesSlider בלבד (הסרגל שמתחת
+   להדר העסק, נדבק בגלילה). לא נוגע בהדר העסק (חלק 47), בסרגל התחתון, בחיפוש או בכל swiper אחר.
+   מראה אחד לפני ואחרי ההידבקות: לבן אטום + קו דק תחתון. בלי זכוכית, בלי צל רך, בלי אדום.
+   צ'יפ 36 גלולה: לא פעיל --mh-fill + --mh-ink 14/500; פעיל (a.scrollactive-item.is-active של vue-scrollactive)
+   --mh-ink + לבן 600 — אותו גודל, בלי קפיצה.
+   v2 מחליף את v1 (זכוכית + גלולה אדומה בגרדיאנט וזוהר). נמחק גם מצב :not(.tw-border-b-2) — אין יותר שני מראות.
+   באג שתוקן (22.10, גם חי): כש-Hyperzod מחליפה את מצב ההידבקות, Vue כותב מחדש את ה-class של
+   #ProductCategoriesNav ומוחק את mh-cm-has שהוסיף MH CatMap → הסרגל חזר ל-display:block וכפתור "☰ N" ירד
+   לשורה שנייה עד השינוי הבא ב-DOM. עכשיו הסרגל flex תמיד, בלי תלות במחלקה מ-JS.
+   ריווח: Swiper קובע margin-left: 20px (spaceBetween) על כל swiper-slide ומודד אותם — לא נוגעים בהם.
+   כדי שהרווח הנראה בין הצ'יפים יהיה 8 (קצב הקבוצה), הצ'יפ עצמו בולט 6px לכל צד מתוך ה-slide
+   (margin שלילי על ה-a). ה-slide נמדד לפי התוכן, ולכן החשבון של Swiper נשאר נכון.
    ========================================================= */
 html body #mobileStickyHeader {
-    background: transparent !important;
+    background: var(--mh-bg) !important;
     border: 0 !important;
+    box-shadow: none !important;
 }
 html body #ProductCategoriesNav {
-    background: rgba(255, 255, 255, 0.72) !important;
-    backdrop-filter: blur(24px) saturate(180%) !important;
-    -webkit-backdrop-filter: blur(24px) saturate(180%) !important;
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    align-items: center !important;
+    overflow: hidden !important;
+    background: var(--mh-bg) !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
     border: 0 !important;
-    border-bottom: 1px solid rgba(227, 30, 36, 0.14) !important;
-    box-shadow: none !important;
-    transition: background-color 0.25s ease, box-shadow 0.25s ease !important;
+    box-shadow: 0 1px 0 var(--mh-line) !important;
 }
-/* מצב דביק (אחרי גלילה): קצת יותר אטום + צל שמפריד מהתוכן שעובר מתחת */
-html body #ProductCategoriesNav:not(.tw-border-b-2) {
-    background: rgba(255, 255, 255, 0.82) !important;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08), 0 1px 0 rgba(227, 30, 36, 0.10) !important;
+html body #ProductCategoriesNav > div:first-child {
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+    /* קצה ההתחלה (ימין): אחרי גלילה אוטומטית לצ'יפ הפעיל, ~5px מהצ'יפ הקודם נשארו בקצה המסך (הרווח ירד מ-20 ל-8).
+       4px שקופים + דהייה עד 14; צ'יפ במנוחה עומד 16 מהקצה (20 בדסקטופ) — לא מושפע */
+    -webkit-mask-image: linear-gradient(to left, transparent 4px, #000 14px) !important;
+    mask-image: linear-gradient(to left, transparent 4px, #000 14px) !important;
+}
+/* עם כפתור "☰ N" (חלק 38) בקצה הסוף: גם הצ'יפים שנגללים לידו נמוגים (24) — לא נחתכים חד מול הכפתור */
+html body #ProductCategoriesNav:has(> #mh-catmap-btn) > div:first-child {
+    -webkit-mask-image: linear-gradient(to right, transparent 0, #000 24px, #000 calc(100% - 14px), transparent calc(100% - 4px)) !important;
+    mask-image: linear-gradient(to right, transparent 0, #000 24px, #000 calc(100% - 14px), transparent calc(100% - 4px)) !important;
 }
 html body #ProductCategoriesNav > div,
 html body #ProductCategoriesSlider {
@@ -4081,115 +4039,107 @@ html body #ProductCategoriesSlider {
 }
 html body #ProductCategoriesSlider .swiper-wrapper {
     align-items: center !important;
-    height: 48px !important;
-    padding: 0 6px !important;
+    height: 52px !important;
+    padding: 0 10px !important;
 }
 html body #ProductCategoriesSlider .swiper-slide {
-    height: 48px !important;
+    height: 52px !important;
     display: flex !important;
     align-items: center !important;
 }
-/* הפריט = גלולת זכוכית */
+/* מקום בסוף המסילה: בלי זה הצ'יפ האחרון נחתך בקצה (Swiper לא סופר ריפוד של ה-wrapper, כן סופר את ה-slide) */
+html body #ProductCategoriesSlider .swiper-slide:last-child { padding-inline-end: 20px !important; }
 html body #ProductCategoriesSlider a.scrollactive-item {
     display: inline-flex !important;
     align-items: center !important;
-    height: 34px !important;
+    justify-content: center !important;
+    box-sizing: border-box !important;
+    height: 36px !important;
     padding: 0 14px !important;
-    margin: 0 !important;
+    margin: 0 -6px !important;
+    border: 0 !important;
     border-radius: 999px !important;
-    background: rgba(255, 255, 255, 0.55) !important;
-    border: 1px solid rgba(0, 0, 0, 0.06) !important;
-    color: #374151 !important;
-    font-size: 13.5px !important;
-    font-weight: 700 !important;
-    line-height: 1 !important;
+    background: var(--mh-fill) !important;
+    color: var(--mh-ink) !important;
+    font-size: 14px !important;
+    font-weight: 500 !important;
     letter-spacing: 0 !important;
     text-transform: none !important;
     white-space: nowrap !important;
     box-shadow: none !important;
-    transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease, transform 0.15s ease !important;
+    -webkit-tap-highlight-color: transparent !important;
+    transition: background-color .2s var(--mh-ease), color .2s var(--mh-ease), transform .1s var(--mh-ease) !important;
 }
 html body #ProductCategoriesSlider a.scrollactive-item::before,
 html body #ProductCategoriesSlider a.scrollactive-item::after { display: none !important; content: none !important; }
 @media (hover: hover) {
-    html body #ProductCategoriesSlider a.scrollactive-item:not(.is-active):hover {
-        background: rgba(227, 30, 36, 0.08) !important;
-        color: #c8151b !important;
-    }
+    html body #ProductCategoriesSlider a.scrollactive-item:not(.is-active):hover { background: var(--mh-line) !important; }
 }
-html body #ProductCategoriesSlider a.scrollactive-item:active { transform: scale(0.96) !important; }
-/* הפריט הפעיל — QLED אדום */
+html body #ProductCategoriesSlider a.scrollactive-item:active { transform: scale(.97) !important; }
 html body #ProductCategoriesSlider a.scrollactive-item.is-active {
-    background: linear-gradient(135deg, #ff3b41 0%, #c8151b 100%) !important;
-    border-color: transparent !important;
-    color: #ffffff !important;
-    font-weight: 800 !important;
-    box-shadow: 0 6px 16px rgba(227, 30, 36, 0.32) !important;
+    background: var(--mh-ink) !important;
+    color: var(--mh-bg) !important;
+    font-weight: 600 !important;
 }
 html body #ProductCategoriesSlider a.scrollactive-item:focus-visible {
-    outline: 2px solid #e31e24 !important;
+    outline: 2px solid var(--mh-ink) !important;
     outline-offset: 2px !important;
+}
+@media (prefers-reduced-motion: reduce) {
+    html body #ProductCategoriesSlider a.scrollactive-item { transition: none !important; }
 }
 /* mh-catnav-v1 */
 
 /* =========================================================
-   חלק 38: מפת הקטגוריות בדף העסק — MH CatMap v1.0.0 | 2026-09-09 — Liquid Glass + אדום QLED
-   מחליף: כלום. תוספת לחלק 33 (MH CatNav) ולא החלפה שלו — הסרגל האופקי נשאר בדיוק כפי שהוא.
-   סקופ: html body #ProductCategoriesNav.mh-cm-has (הכפתור) + html body #mh-catmap (הגיליון).
-         הגיליון נבנה ע"י MH CatMap ב-custom-footer.js ויושב על body, לכן אין לו הורה משותף
-         עם שום רכיב של Hyperzod. כל סלקטור מתחיל ב-id ייחודי שלנו.
-   מצבים: #mh-catmap.on = פתוח; .mh-cm-row.on = הקטגוריה המודגשת (אחת בכל רגע).
-   הכפתור מוצג רק מ-8 קטגוריות ומעלה (הלוגיקה ב-JS מוסיפה .mh-cm-has).
+   חלק 38: מפת הקטגוריות בדף העסק — MH CatMap v2.0.0 | 2026-10-22 — שפת 2026 (DESIGN_SYSTEM.md §5)
+   בעלים של: הכפתור "☰ N" (#mh-catmap-btn) והגיליון (#mh-catmap), שניהם נבנים ע"י MH CatMap ב-custom-footer.js
+   (הכפתור בתוך #ProductCategoriesNav, הגיליון על body). פריסת הסרגל עצמו (flex) — בחלק 33.
+   מצבים: #mh-catmap.on = פתוח; .mh-cm-row.on = הקטגוריה הנוכחית (אחת בכל רגע, aria-current).
+   v2 מחליף את v1: כפתור = צ'יפ ניטרלי (במקום זכוכית אדומה); גיליון לבן אטום רדיוס 20 עם ידית, שורות 48
+   עם קו דק; השורה הנוכחית = טקסט 600 + ✓ (במקום גלולה אדומה בגרדיאנט שגדלה בגובה ובגופן).
    ========================================================= */
-/* הסרגל הופך לשורת flex: [הסליידר גמיש] + [הכפתור קבוע]. הכפתור לא מרחף מעל הגלולות
-   ולכן שום פריט לא נחתך. הסליידר מצטמצם ב-~62px, ולכן MH CatMap קורא ל-swiper.update(). */
-html body #ProductCategoriesNav.mh-cm-has {
-    display: flex !important;
-    align-items: center !important;
-    overflow: hidden !important;
-}
-html body #ProductCategoriesNav.mh-cm-has > div:first-child {
-    flex: 1 1 auto !important;
-    min-width: 0 !important;
-}
+/* הכפתור — בקרה משנית (לבן + קו דק), לא עוד קטגוריה: 8px מהמסילה. הדהייה של המסילה לידו — בחלק 33.
+   (r1b: במילוי של הצ'יפים ובלי רווח הוא והצ'יפ החתוך לידו נקראו כגוש אחד) */
 html body #mh-catmap-btn {
     flex: 0 0 auto !important;
-    margin-inline-end: 10px !important;
-    margin-inline-start: 4px !important;
+    margin: 0 !important;
+    margin-inline-start: 8px !important;
+    margin-inline-end: 16px !important;
     display: inline-flex !important;
     align-items: center !important;
     gap: 6px !important;
-    height: 34px !important;
-    min-width: 0 !important;
-    padding: 0 11px !important;
-    border: 1px solid rgba(227,30,36,.22) !important;
+    box-sizing: border-box !important;
+    height: 36px !important;
+    min-width: 44px !important;
+    padding: 0 12px !important;
+    border: 0 !important;
     border-radius: 999px !important;
-    background: rgba(255,255,255,.92) !important;
-    -webkit-backdrop-filter: blur(16px) saturate(180%) !important;
-    backdrop-filter: blur(16px) saturate(180%) !important;
-    box-shadow: 0 4px 14px rgba(0,0,0,.10) !important;
-    color: #c8151b !important;
-    font-size: 12.5px !important;
-    font-weight: 800 !important;
+    background: var(--mh-bg) !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    box-shadow: inset 0 0 0 1px var(--mh-line-2) !important;
+    color: var(--mh-ink) !important;
+    font-size: 14px !important;
+    font-weight: 600 !important;
     line-height: 1 !important;
     cursor: pointer !important;
     -webkit-tap-highlight-color: transparent !important;
-    transition: transform .15s ease, box-shadow .2s ease !important;
+    transition: background-color .2s var(--mh-ease), transform .1s var(--mh-ease) !important;
 }
-html body #mh-catmap-btn:active { transform: scale(.94) !important; }
-@media (hover: hover) { html body #mh-catmap-btn:hover { box-shadow: 0 6px 18px rgba(227,30,36,.22) !important; } }
-html body #mh-catmap-btn:focus-visible { outline: 2px solid #e31e24 !important; outline-offset: 2px !important; }
+html body #mh-catmap-btn:active { transform: scale(.97) !important; background: var(--mh-bg-2) !important; }
+@media (hover: hover) { html body #mh-catmap-btn:hover { background: var(--mh-bg-2) !important; } }
+html body #mh-catmap-btn:focus-visible { outline: 2px solid var(--mh-ink) !important; outline-offset: 2px !important; }
 html body #mh-catmap-btn .mh-cm-bars {
     display: inline-flex !important; flex-direction: column !important; justify-content: center !important;
-    gap: 3px !important; width: 13px !important;
+    align-items: flex-start !important; gap: 3px !important; width: 14px !important;
 }
 html body #mh-catmap-btn .mh-cm-bars i {
     display: block !important; height: 2px !important; border-radius: 2px !important;
-    background: linear-gradient(135deg, #ff3b41 0%, #c8151b 100%) !important;
+    background: currentColor !important;
 }
-html body #mh-catmap-btn .mh-cm-bars i:nth-child(1) { width: 13px !important; }
-html body #mh-catmap-btn .mh-cm-bars i:nth-child(2) { width: 9px !important; }
-html body #mh-catmap-btn .mh-cm-bars i:nth-child(3) { width: 11px !important; }
+html body #mh-catmap-btn .mh-cm-bars i:nth-child(1) { width: 14px !important; }
+html body #mh-catmap-btn .mh-cm-bars i:nth-child(2) { width: 10px !important; }
+html body #mh-catmap-btn .mh-cm-bars i:nth-child(3) { width: 12px !important; }
 html body #mh-catmap-btn .mh-cm-num { font-variant-numeric: tabular-nums !important; }
 
 /* ---------- הגיליון ---------- */
@@ -4202,13 +4152,13 @@ html body #mh-catmap {
     display: block !important;
     visibility: hidden !important;
     opacity: 0 !important;
-    transition: opacity .26s ease, visibility 0s linear .26s !important;
+    transition: opacity .25s var(--mh-ease), visibility 0s linear .32s !important;
 }
-html body #mh-catmap.on { visibility: visible !important; opacity: 1 !important; transition: opacity .26s ease !important; }
+html body #mh-catmap.on { visibility: visible !important; opacity: 1 !important; transition: opacity .25s var(--mh-ease) !important; }
 html body #mh-catmap .mh-cm-scrim {
     position: absolute !important; inset: 0 !important;
-    background: rgba(17,17,20,.42) !important;
-    -webkit-backdrop-filter: blur(6px) !important; backdrop-filter: blur(6px) !important;
+    background: var(--mh-scrim) !important;
+    backdrop-filter: none !important; -webkit-backdrop-filter: none !important;
 }
 html body #mh-catmap .mh-cm-panel {
     position: absolute !important;
@@ -4217,43 +4167,49 @@ html body #mh-catmap .mh-cm-panel {
     display: flex !important;
     flex-direction: column !important;
     box-sizing: border-box !important;
-    padding: 8px 14px calc(14px + env(safe-area-inset-bottom, 0px)) !important;
-    border-radius: 30px 30px 0 0 !important;
-    background: rgba(255,255,255,.9) !important;
-    -webkit-backdrop-filter: blur(40px) saturate(180%) !important;
-    backdrop-filter: blur(40px) saturate(180%) !important;
-    box-shadow: 0 -18px 50px rgba(0,0,0,.22) !important;
-    transform: translateY(14px) !important;
-    transition: transform .3s cubic-bezier(.22,1,.36,1) !important;
+    padding: 8px 0 calc(8px + env(safe-area-inset-bottom, 0px)) !important;
+    border-radius: var(--mh-r-lg) var(--mh-r-lg) 0 0 !important;
+    background: var(--mh-bg) !important;
+    backdrop-filter: none !important; -webkit-backdrop-filter: none !important;
+    box-shadow: var(--mh-float) !important;
+    transform: translateY(32px) !important;
+    transition: transform .32s var(--mh-ease-sheet) !important;
 }
 html body #mh-catmap.on .mh-cm-panel { transform: translateY(0) !important; }
 html body #mh-catmap .mh-cm-grip {
-    width: 42px !important; height: 4px !important; border-radius: 999px !important;
-    background: rgba(0,0,0,.14) !important; margin: 2px auto 10px !important; flex: 0 0 auto !important;
+    width: 36px !important; height: 5px !important; border-radius: 999px !important;
+    background: var(--mh-grip) !important; margin: 0 auto 8px !important; flex: 0 0 auto !important;
 }
 html body #mh-catmap .mh-cm-head {
     display: flex !important; align-items: center !important; gap: 8px !important;
-    padding: 0 4px 10px !important; flex: 0 0 auto !important;
+    padding: 0 16px 8px !important; flex: 0 0 auto !important;
+    box-shadow: 0 1px 0 var(--mh-line) !important;
 }
-html body #mh-catmap .mh-cm-title { font-size: 18px !important; font-weight: 900 !important; color: #111 !important; }
+html body #mh-catmap .mh-cm-title { font-size: 19px !important; font-weight: 700 !important; line-height: 1.3 !important; color: var(--mh-ink) !important; letter-spacing: 0 !important; }
 html body #mh-catmap .mh-cm-count {
-    font-size: 11px !important; font-weight: 800 !important; color: #c8151b !important;
-    background: rgba(227,30,36,.10) !important; border-radius: 999px !important; padding: 4px 9px !important;
+    font-size: 13px !important; font-weight: 500 !important; color: var(--mh-ink-2) !important;
+    background: none !important; border-radius: 0 !important; padding: 0 !important;
+    font-variant-numeric: tabular-nums !important;
 }
 html body #mh-catmap .mh-cm-x {
     margin-inline-start: auto !important;
-    width: 32px !important; height: 32px !important; border: 0 !important; border-radius: 999px !important;
-    background: rgba(0,0,0,.05) !important; color: #4b5563 !important;
-    font-size: 14px !important; font-weight: 800 !important; line-height: 1 !important; cursor: pointer !important;
+    flex: 0 0 auto !important;
+    display: inline-flex !important; align-items: center !important; justify-content: center !important;
+    width: 40px !important; height: 40px !important; padding: 0 !important;
+    border: 0 !important; border-radius: 999px !important;
+    background: var(--mh-fill) !important; color: var(--mh-ink) !important;
+    font-size: 16px !important; font-weight: 400 !important; line-height: 1 !important; cursor: pointer !important;
+    -webkit-tap-highlight-color: transparent !important;
 }
+html body #mh-catmap .mh-cm-x:active { transform: scale(.97) !important; }
 html body #mh-catmap .mh-cm-rows {
     flex: 1 1 auto !important;
     overflow-y: auto !important;
     overscroll-behavior: contain !important;
     display: flex !important;
     flex-direction: column !important;
-    gap: 7px !important;
-    padding: 2px 2px 4px !important;
+    gap: 0 !important;
+    padding: 0 16px !important;
     touch-action: pan-y !important;
     scrollbar-width: none !important;
 }
@@ -4261,117 +4217,128 @@ html body #mh-catmap .mh-cm-rows::-webkit-scrollbar { width: 0 !important; heigh
 html body #mh-catmap .mh-cm-row {
     display: flex !important;
     align-items: center !important;
-    gap: 10px !important;
+    gap: 12px !important;
     width: 100% !important;
     box-sizing: border-box !important;
     flex: 0 0 auto !important;
-    min-height: 46px !important;
-    padding: 0 14px !important;
-    border: 1px solid #e6e8ec !important;
-    border-radius: 14px !important;
-    background: #fff !important;
-    color: #374151 !important;
-    font-size: 15px !important;
-    font-weight: 700 !important;
+    min-height: 48px !important;
+    margin: 0 !important;
+    padding: 0 4px !important;
+    border: 0 !important;
+    border-bottom: 1px solid var(--mh-line) !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    color: var(--mh-ink) !important;
+    font-size: 16px !important;
+    font-weight: 400 !important;
+    line-height: 1.35 !important;
     text-align: start !important;
     cursor: pointer !important;
     -webkit-tap-highlight-color: transparent !important;
-    box-shadow: 0 2px 8px rgba(0,0,0,.03) !important;
-    transition: background .18s ease, color .18s ease, transform .18s ease, box-shadow .18s ease !important;
+    box-shadow: none !important;
+    transform: none !important;
+    transition: background-color .15s var(--mh-ease) !important;
 }
+html body #mh-catmap .mh-cm-row:last-child { border-bottom: 0 !important; }
 html body #mh-catmap .mh-cm-row .mh-cm-n {
     flex: 0 0 auto !important;
-    min-width: 22px !important; height: 22px !important;
-    display: inline-flex !important; align-items: center !important; justify-content: center !important;
-    border-radius: 999px !important;
-    background: rgba(0,0,0,.05) !important;
-    color: #6b7280 !important;
-    font-size: 11px !important; font-weight: 800 !important;
+    min-width: 20px !important; height: auto !important;
+    display: inline-block !important;
+    background: none !important; border-radius: 0 !important;
+    color: var(--mh-ink-3) !important;
+    font-size: 13px !important; font-weight: 500 !important;
     font-variant-numeric: tabular-nums !important;
-    transition: background .18s ease, color .18s ease !important;
+    text-align: start !important;
 }
 html body #mh-catmap .mh-cm-row .mh-cm-t { flex: 1 1 auto !important; text-align: start !important; }
-/* ההדגשה — אחת בכל רגע */
-html body #mh-catmap .mh-cm-row.on {
-    background: linear-gradient(135deg, #ff3b41 0%, #c8151b 100%) !important;
-    border-color: transparent !important;
-    color: #fff !important;
-    font-size: 16.5px !important;
-    font-weight: 900 !important;
-    min-height: 54px !important;
-    transform: scale(1.015) !important;
-    box-shadow: 0 8px 22px rgba(227,30,36,.30) !important;
+/* הקטגוריה הנוכחית: 600 + ✓ בקצה. אותו גובה ואותו גופן — בלי קפיצה */
+html body #mh-catmap .mh-cm-row.on { font-weight: 600 !important; }
+html body #mh-catmap .mh-cm-row.on .mh-cm-n { color: var(--mh-ink) !important; }
+html body #mh-catmap .mh-cm-row.on::after {
+    content: '' !important;
+    flex: 0 0 auto !important;
+    width: 6px !important; height: 11px !important;
+    margin: -3px 2px 0 4px !important;
+    border: solid var(--mh-ink) !important;
+    border-width: 0 2px 2px 0 !important;
+    transform: rotate(45deg) !important;
 }
-html body #mh-catmap .mh-cm-row.on .mh-cm-n { background: rgba(255,255,255,.22) !important; color: #fff !important; }
-html body #mh-catmap .mh-cm-row:active { transform: scale(.985) !important; }
-html body #mh-catmap .mh-cm-row.on:active { transform: scale(1) !important; }
+html body #mh-catmap .mh-cm-row:active { background: var(--mh-bg-2) !important; }
 @media (hover: hover) {
-    html body #mh-catmap .mh-cm-row:not(.on):hover { background: rgba(227,30,36,.06) !important; color: #c8151b !important; }
+    html body #mh-catmap .mh-cm-row:hover { background: var(--mh-bg-2) !important; }
+    html body #mh-catmap .mh-cm-x:hover { background: var(--mh-line) !important; }
 }
-/* מסך רחב: הגיליון הופך לכרטיס ממורכז במקום רצועה על כל הרוחב */
+html body #mh-catmap .mh-cm-row:focus-visible,
+html body #mh-catmap .mh-cm-x:focus-visible { outline: 2px solid var(--mh-ink) !important; outline-offset: -2px !important; }
+/* מסך רחב: כרטיס ממורכז במקום גיליון תחתון */
 @media (min-width: 700px) {
     html body #mh-catmap .mh-cm-panel {
         left: 50% !important;
         right: auto !important;
-        bottom: 24px !important;
-        width: min(520px, calc(100vw - 48px)) !important;
-        max-height: 74vh !important;
-        transform: translateX(-50%) translateY(14px) !important;
-        border-radius: 26px !important;
-        padding-bottom: 16px !important;
-        box-shadow: 0 24px 60px rgba(0,0,0,.28) !important;
+        top: 50% !important;
+        bottom: auto !important;
+        width: min(480px, calc(100vw - 48px)) !important;
+        max-height: min(640px, 80vh) !important;
+        padding: 16px 0 8px !important;
+        transform: translate(-50%, calc(-50% + 16px)) !important;
+        border-radius: var(--mh-r-lg) !important;
     }
-    html body #mh-catmap.on .mh-cm-panel { transform: translateX(-50%) translateY(0) !important; }
+    html body #mh-catmap.on .mh-cm-panel { transform: translate(-50%, -50%) !important; }
+    html body #mh-catmap .mh-cm-grip { display: none !important; }
 }
 @media (prefers-reduced-motion: reduce) {
-    html body #mh-catmap, html body #mh-catmap .mh-cm-panel, html body #mh-catmap .mh-cm-row { transition: none !important; }
+    html body #mh-catmap, html body #mh-catmap .mh-cm-panel, html body #mh-catmap .mh-cm-row, html body #mh-catmap-btn { transition: none !important; }
 }
 /* mh-catmap-v1 */
 
 /* =========================================================
-   חלק 39: כפתור "הצג עוד" בקטגוריה חתוכה בדף העסק — MH ShowMore v1.0.1 | 2026-09-10 — Liquid Glass + אדום QLED
-   מחליף: כלום (רכיב חדש). סקופ: html body #merchant-content button.mh-more — אלמנט שלנו בלבד,
-   שנבנה ע"י MH ShowMore ב-custom-footer.js בתחתית .special-listing-inner של קטגוריה מסומנת is_paginated.
+   חלק 39: כפתור "הצג עוד" בקטגוריה חתוכה בדף העסק — MH ShowMore v2.0.0 | 2026-10-22 — שפת 2026 (כפתור משני §5)
+   סקופ: html body #merchant-content button.mh-more — אלמנט שלנו בלבד, שנבנה ע"י MH ShowMore ב-custom-footer.js
+   בתחתית .special-listing-inner של קטגוריה מסומנת is_paginated.
    מצבים: .is-loading (בקשה בדרך), .is-done (אין עוד — נעלם אחרי 1.8 שנ').
+   v2 מחליף את v1 (גלולת זכוכית עם טקסט אדום וזוהר): לבן, קו דק, טקסט --mh-ink 15/600, רדיוס 14, גובה 48.
    ========================================================= */
 html body #merchant-content button.mh-more {
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
-    gap: 10px !important;
+    gap: 8px !important;
+    box-sizing: border-box !important;
     width: min(100%, 360px) !important;
-    margin: 14px auto 6px !important;
-    height: 44px !important;
-    padding: 0 18px !important;
-    border: 1px solid rgba(227,30,36,.22) !important;
-    border-radius: 999px !important;
-    background: rgba(255,255,255,.92) !important;
-    -webkit-backdrop-filter: blur(16px) saturate(180%) !important;
-    backdrop-filter: blur(16px) saturate(180%) !important;
-    box-shadow: 0 4px 14px rgba(0,0,0,.08) !important;
-    color: #c8151b !important;
-    font-size: 14px !important;
-    font-weight: 800 !important;
+    margin: 16px auto 8px !important;
+    height: 48px !important;
+    padding: 0 16px !important;
+    border: 1px solid var(--mh-line) !important;
+    border-radius: 14px !important;
+    background: var(--mh-bg) !important;
+    backdrop-filter: none !important; -webkit-backdrop-filter: none !important;
+    box-shadow: none !important;
+    color: var(--mh-ink) !important;
+    font-size: 15px !important;
+    font-weight: 600 !important;
     line-height: 1 !important;
+    letter-spacing: 0 !important;
     cursor: pointer !important;
     -webkit-tap-highlight-color: transparent !important;
-    transition: transform .15s ease, box-shadow .2s ease, opacity .2s ease !important;
+    transition: background-color .2s var(--mh-ease), transform .1s var(--mh-ease), opacity .2s var(--mh-ease) !important;
 }
 html body #merchant-content button.mh-more .mh-more-n {
-    font-size: 11.5px !important; font-weight: 700 !important; color: #6b7280 !important;
-    background: rgba(0,0,0,.05) !important; border-radius: 999px !important; padding: 4px 9px !important;
+    font-size: 13px !important; font-weight: 500 !important; color: var(--mh-ink-2) !important;
+    background: none !important; border-radius: 0 !important; padding: 0 !important;
     font-variant-numeric: tabular-nums !important;
 }
-html body #merchant-content button.mh-more:active { transform: scale(.97) !important; }
-@media (hover: hover) { html body #merchant-content button.mh-more:hover { box-shadow: 0 6px 18px rgba(227,30,36,.22) !important; } }
-html body #merchant-content button.mh-more:focus-visible { outline: 2px solid #e31e24 !important; outline-offset: 2px !important; }
+html body #merchant-content button.mh-more:active { transform: scale(.98) !important; background: var(--mh-bg-2) !important; }
+@media (hover: hover) { html body #merchant-content button.mh-more:hover { background: var(--mh-bg-2) !important; } }
+html body #merchant-content button.mh-more:focus-visible { outline: 2px solid var(--mh-ink) !important; outline-offset: 2px !important; }
 html body #merchant-content button.mh-more.is-loading { opacity: .72 !important; cursor: progress !important; }
+/* שלוש נקודות — חריג מוצהר ל-§7 (שאוסר infinite): קיים כבר בחי מ-v1, רץ רק בזמן טעינה אמיתית (.is-loading, שניות)
+   כמו ספינר מערכת, ונעצר ב-reduced-motion. אם רוצים 0 לולאות — להחליף בטקסט "טוען…" סטטי */
 html body #merchant-content button.mh-more.is-loading .mh-more-t::after {
     content: '…' !important; display: inline-block !important; width: 1.2em !important; text-align: start !important;
     animation: mhMoreDots 1s steps(3, end) infinite !important;
 }
 @keyframes mhMoreDots { 0% { clip-path: inset(0 100% 0 0); } 100% { clip-path: inset(0 0 0 0); } }
-html body #merchant-content button.mh-more.is-done { color: #6b7280 !important; border-color: rgba(0,0,0,.08) !important; box-shadow: none !important; cursor: default !important; }
+html body #merchant-content button.mh-more.is-done { color: var(--mh-ink-2) !important; background: var(--mh-bg) !important; cursor: default !important; }
 @media (prefers-reduced-motion: reduce) { html body #merchant-content button.mh-more, html body #merchant-content button.mh-more .mh-more-t::after { transition: none !important; animation: none !important; } }
 /* "צפה בהכל" של Hyperzod (div.scheme-pb-view-all) מוביל לדף קטגוריה שמציג 20 מוצרים בלבד — דרך ללא מוצא.
    מסתירים אותו רק בקטגוריה שבה יש לנו "הצג עוד" (המחלקה mh-has-more על הסקשן, מ-MH ShowMore).
@@ -4380,96 +4347,132 @@ html body #merchant-content [id^="cat_"].mh-has-more :is(.scheme-pb-view-all, .t
 /* mh-showmore-v1 */
 
 /* =========================================================
-   חלק 40: כרטיסי מוצר בדף העסק — MH Cards v1.0.0 | 2026-09-10 — Liquid Glass + אדום QLED
-   מחליף: חלקים 18 א+ב, 18ג, 19/20 (הוסרו). רקע: בבילד index-C04UkX5H (10.9) Hyperzod בנתה מחדש את
-   כרטיס המוצר: מסגרת תמונה ריבועית .product-image-frame (aspect 1:1, רקע #f5f5f5, רדיוס 8), כרטיס שקוף,
-   כפתור הוספה עגול 44px עם אייקון בלבד, שורת תיאור .product-description ותג .product-customizable-tag.
-   העיקרון: לא נוגעים בגודל/מיקום של .product-image או .v-img — Hyperzod ממלאת את המסגרת לבד.
-   סקופ: html body :is(.merchant-page .product-cards.merchant-grid-view, #ProductHighlights) .product-card-basic (גריד)
-         html body .merchant-page .product-card-slider (קרוסלה)
-         html body :is(.merchant-page, #ProductHighlights) .product-customizable-tag (התג; הטקסט מתורגם ב-MH Lang ב-custom-footer.js)
+   חלק 40: כרטיסי מוצר — MH Cards v2.0.0 | 2026-10-23 (v1.0.0: 10.9) — שפת העיצוב 2026 (capture/design-qa-22.10/DESIGN_SYSTEM.md §5)
+   הבעלים של:
+   (א) כותרת הקטגוריה בדף העסק — h3.text--prod_sec_title (Hyperzod: 16/600).
+   (ב) אריחי מוצר: רשת (.merchant-grid-view .product-card-basic) וקרוסלה (.product-card-slider) בדף העסק, בדף קטגוריה של העסק
+       (/m/<slug>/<id>/category/<cid> — .scheme-category-page-surface) ו-#ProductHighlights.
+   (ג) שורות מוצר (.product-card-horizontal): קטגוריה בתצוגת "רשימה" בדף העסק ובדף הקטגוריה (.merchant-list-view) והחיפוש בתוך חנות
+       (#MerchantSearchPage — עבר לכאן מחלק 62 ב-23.10; חלק 62 נשאר הבעלים של הראש, הגלולות והמצב הריק).
+   (ד) "+" ומונה הכמות בכל כרטיס מוצר: דף העסק ודף הקטגוריה, החיפוש בחנות, דף החיפוש (.searched-products-rail) וההמלצות
+       (.checkout-journey-sheet, .similar-items-panel — המיקום שלהם נשאר בחלק 64). מחליף את חלק 4 (גלובלי, הוסר 23.10).
+   השפה: אריח 1:1 לבן עם קו דק ורדיוס 14 · שם 15/600 · מחיר 15/600 שחור (מבצע: אדום-טקסט + המחיר הישן מחוק) ·
+   "+" = עיגול לבן 40 עם צל קטן וטבעת דקה, פלוס אדום-טקסט, בפינה התחתונה-שמאלית של התמונה · מונה = גלולה שחורה.
+   אדום מלא — אין כאן (שמור לבר העגלה / "הוספה לעגלה"). סגור/אזל — תמונה דהויה + שורה כתומה, בלי "+".
+   סקופ: :is() עם id/מחלקה של ההקשר (גובר על ‎.product-cards.merchant-grid-view … !important של Hyperzod).
+   לא נוגעים בגודל/מיקום של .product-image / .v-img באריח — Hyperzod ממלאת את המסגרת לבד.
    ========================================================= */
-/* מסגרת התמונה — רדיוס של שפת העיצוב, מסגרת עדינה; הגודל נשאר של Hyperzod */
-html body :is(.merchant-page .product-cards.merchant-grid-view, #ProductHighlights) .product-card-basic .product-image-frame,
-html body .merchant-page .product-card-slider .product-image-frame {
-    border-radius: 14px !important;
-    border: 1px solid #e6e8ec !important;
-    background: #f6f6f8 !important;
-    overflow: hidden !important;
+/* (א) כותרת קטגוריה */
+/* הרווח בין סקשנים (56 במובייל / 64 בדסקטופ מהמחיר האחרון לכותרת הבאה) נשאר: ה-pt-8 (32) של .cat-section הוא גם
+   המרווח שבו לחיצה על צ'יפ מנחיתה את הכותרת מתחת לסרגל (נמדד 23.10: 3px מתחת; עם 16 — 13px מתחת לסרגל). */
+html body .merchant-page h3.text--prod_sec_title { padding-bottom: 12px !important; font-size: 20px !important; line-height: 1.25 !important; font-weight: 700 !important; color: var(--mh-ink) !important; letter-spacing: 0 !important; text-wrap: balance; }
+
+/* (ב) אריחים — רשת + קרוסלה */
+html body :is(.merchant-page, .scheme-category-page-surface) .product-cards.merchant-grid-view { row-gap: 24px !important; }
+html body :is(.merchant-page .merchant-grid-view .product-card-basic, .scheme-category-page-surface .merchant-grid-view .product-card-basic, #ProductHighlights .product-card-basic, .merchant-page .product-card-slider) .product-image-frame { border: 1px solid var(--mh-line) !important; border-radius: 14px !important; background: var(--mh-bg) !important; overflow: hidden !important; }
+html body :is(.merchant-page .merchant-grid-view .product-card-basic, .scheme-category-page-surface .merchant-grid-view .product-card-basic, #ProductHighlights .product-card-basic, .merchant-page .product-card-slider) .product-name { margin: 0 !important; font-size: 15px !important; line-height: 20px !important; font-weight: 600 !important; color: var(--mh-ink) !important; letter-spacing: 0 !important; }
+html body :is(.merchant-page .merchant-grid-view .product-card-basic, .scheme-category-page-surface .merchant-grid-view .product-card-basic, #ProductHighlights .product-card-basic, .merchant-page .product-card-slider) .product-description { margin: 2px 0 0 !important; padding: 0 !important; font-size: 13px !important; line-height: 18px !important; font-weight: 400 !important; color: var(--mh-ink-2) !important; }
+html body :is(.merchant-page .merchant-grid-view .product-card-basic, .scheme-category-page-surface .merchant-grid-view .product-card-basic, #ProductHighlights .product-card-basic, .merchant-page .product-card-slider) .product-price { font-size: 15px !important; line-height: 20px !important; font-weight: 600 !important; color: var(--mh-ink) !important; letter-spacing: 0 !important; font-variant-numeric: tabular-nums; }
+/* קרוסלה: אריח בגודל של הרשת (Hyperzod: 292 — תמונה אחת ענקית במסך), הבא מציץ; המחירים בשורה אחת בתחתית */
+html body .merchant-page .product-card-slider .product-text-block { flex: 1 1 auto !important; min-height: 0 !important; }
+html body .merchant-page .product-card-slider .card-footer { margin-top: auto !important; }
+@media (max-width: 959px) {
+    html body .merchant-page .product-card-slider.merchant-carousel-card { width: 160px !important; }
 }
-/* שם המוצר */
-html body :is(.merchant-page .product-cards.merchant-grid-view, #ProductHighlights) .product-card-basic .product-name,
-html body .merchant-page .product-card-slider .product-name,
-html body .merchant-page .product-card-slider h3 {
-    color: #111 !important;
-    font-weight: 700 !important;
+@media (min-width: 960px) {
+    html body :is(.merchant-page .merchant-grid-view .product-card-basic, .scheme-category-page-surface .merchant-grid-view .product-card-basic, #ProductHighlights .product-card-basic, .merchant-page .product-card-slider) .product-name { font-size: 16px !important; line-height: 22px !important; }
+    html body :is(.merchant-page .merchant-grid-view .product-card-basic, .scheme-category-page-surface .merchant-grid-view .product-card-basic, #ProductHighlights .product-card-basic, .merchant-page .product-card-slider) .product-price { font-size: 16px !important; }
+    html body :is(.merchant-page, .scheme-category-page-surface) .product-cards.merchant-grid-view { row-gap: 32px !important; }
 }
-/* מחיר — אדום QLED (הנקודה האדומה של הכרטיס) */
-html body :is(.merchant-page .product-cards.merchant-grid-view, #ProductHighlights) .product-card-basic .product-price,
-html body .merchant-page .product-card-slider .product-price {
-    color: #c8151b !important;
-    font-weight: 800 !important;
+
+/* (ג) שורות — רשימה בדף העסק + החיפוש בתוך חנות (שורה צפופה: תמונה 88, קו מפריד) */
+html body :is(.merchant-page, .scheme-category-page-surface) .product-horizontal-cards.merchant-list-view { row-gap: 0 !important; column-gap: 24px !important; }
+/* Hyperzod ב-.merchant-list-view: לכרטיס height+min-height 155.8px (200 במחשב), ל-.pro-card-h min-width 155.8px — מאופסים */
+html body :is(#MerchantSearchPage, .merchant-page .merchant-list-view, .scheme-category-page-surface .merchant-list-view) .product-card-horizontal { height: auto !important; min-height: 0 !important; margin: 0 !important; border: 0 !important; border-bottom: 1px solid var(--mh-line) !important; border-radius: 0 !important; background: transparent !important; box-shadow: none !important; overflow: visible !important; -webkit-tap-highlight-color: transparent !important; }
+html body #MerchantSearchPage .product-card-horizontal:last-child { border-bottom: 0 !important; }
+html body :is(#MerchantSearchPage, .merchant-page .merchant-list-view, .scheme-category-page-surface .merchant-list-view) .product-card-horizontal > .v-card-text { padding: 12px 0 !important; }
+html body :is(#MerchantSearchPage, .merchant-page .merchant-list-view, .scheme-category-page-surface .merchant-list-view) .product-card-horizontal .v-card-text > .tw-grid { display: flex !important; height: auto !important; align-items: center !important; gap: 14px !important; }
+html body :is(#MerchantSearchPage, .merchant-page .merchant-list-view, .scheme-category-page-surface .merchant-list-view) .product-card-horizontal .v-card-text > .tw-grid > :first-child { flex: 1 1 auto !important; min-width: 0 !important; }
+html body :is(#MerchantSearchPage, .merchant-page .merchant-list-view, .scheme-category-page-surface .merchant-list-view) .product-card-horizontal .pro-card-h { flex: 0 0 88px !important; width: 88px !important; min-width: 0 !important; height: auto !important; min-height: 0 !important; align-items: center !important; }   /* Hyperzod: min-width 155.8px */
+html body :is(#MerchantSearchPage, .merchant-page .merchant-list-view, .scheme-category-page-surface .merchant-list-view) .product-card-horizontal .pro-card-h-img { flex: 0 0 88px !important; width: 88px !important; height: 88px !important; min-height: 0 !important; max-height: 88px !important; aspect-ratio: 1 / 1 !important; margin: 0 !important; border: 1px solid var(--mh-line) !important; border-radius: 14px !important; background: var(--mh-bg) !important; overflow: visible !important; box-shadow: none !important; box-sizing: border-box !important; }   /* מסגרת לכל אריח: רוב תמונות המוצר הן צילום על לבן ובלי מסגרת הן "צפות" */
+html body :is(#MerchantSearchPage, .merchant-page .merchant-list-view, .scheme-category-page-surface .merchant-list-view) .product-card-horizontal .pro-card-h-img .v-img { border-radius: 13px !important; overflow: hidden !important; }
+html body :is(#MerchantSearchPage, .merchant-page .merchant-list-view, .scheme-category-page-surface .merchant-list-view) .product-card-horizontal .pro-card-h-img .v-responsive__sizer { padding-bottom: 100% !important; }
+html body :is(#MerchantSearchPage, .merchant-page .merchant-list-view, .scheme-category-page-surface .merchant-list-view) .product-card-horizontal .add-product-btn > span { display: none !important; }   /* "שינוי תוספות" כפול מתחת לכפתור */
+/* "+" בפינה התחתונה החיצונית של האריח (במרכז הוא הסתיר את המנה באריח של 88px) */
+html body :is(#MerchantSearchPage, .merchant-page .merchant-list-view, .scheme-category-page-surface .merchant-list-view) .product-card-horizontal .pro-card-h-img > .tw-absolute { top: auto !important; bottom: -8px !important; left: -8px !important; right: auto !important; width: max-content !important; transform: none !important; z-index: 3 !important; }   /* max-content: המונה (100) נפתח ימינה, לא גולש מחוץ למסך */
+/* טקסט: שם ותיאור ברוחב מלא, מחיר ותג "שינוי תוספות" באותה שורה */
+html body :is(#MerchantSearchPage, .merchant-page .merchant-list-view, .scheme-category-page-surface .merchant-list-view) .product-card-horizontal .v-card-text > .tw-grid > :first-child > div { width: 100% !important; flex-direction: row !important; flex-wrap: wrap !important; align-items: center !important; justify-content: flex-start !important; column-gap: 8px !important; height: auto !important; }
+html body :is(#MerchantSearchPage, .merchant-page .merchant-list-view, .scheme-category-page-surface .merchant-list-view) .product-card-horizontal .rec-item-title { display: contents !important; }
+html body :is(#MerchantSearchPage, .merchant-page .merchant-list-view, .scheme-category-page-surface .merchant-list-view) .product-card-horizontal :is(.product-name, .product-description, .product-availability-message) { flex: 0 0 100% !important; }
+html body :is(#MerchantSearchPage, .merchant-page .merchant-list-view, .scheme-category-page-surface .merchant-list-view) .product-card-horizontal .price { order: 3 !important; }
+html body :is(#MerchantSearchPage, .merchant-page .merchant-list-view, .scheme-category-page-surface .merchant-list-view) .product-card-horizontal .product-customizable-tag { order: 4 !important; margin: 0 !important; }
+html body :is(#MerchantSearchPage, .merchant-page .merchant-list-view, .scheme-category-page-surface .merchant-list-view) .product-card-horizontal .product-name { margin: 0 0 3px !important; font-size: 15px !important; font-weight: 600 !important; line-height: 1.35 !important; color: var(--mh-ink) !important; letter-spacing: 0 !important; }
+html body :is(#MerchantSearchPage, .merchant-page .merchant-list-view, .scheme-category-page-surface .merchant-list-view) .product-card-horizontal .product-description { margin: 0 0 6px !important; font-size: 13px !important; line-height: 1.4 !important; color: var(--mh-ink-2) !important; -webkit-line-clamp: 2 !important; line-clamp: 2 !important; }
+html body #MerchantSearchPage .product-card-horizontal .product-description { -webkit-line-clamp: 1 !important; line-clamp: 1 !important; }   /* חיפוש: שורה אחת — 6–7 תוצאות במסך (חלק 62) */
+html body :is(#MerchantSearchPage, .merchant-page .merchant-list-view, .scheme-category-page-surface .merchant-list-view) .product-card-horizontal .price .product-price { margin: 0 !important; font-size: 15px !important; font-weight: 600 !important; line-height: 1.3 !important; color: var(--mh-ink) !important; letter-spacing: 0 !important; font-variant-numeric: tabular-nums; }
+html body :is(#MerchantSearchPage, .merchant-page .merchant-list-view, .scheme-category-page-surface .merchant-list-view) .product-card-horizontal .price .product-price:has(> small) { color: var(--mh-red-ink) !important; font-weight: 700 !important; }   /* מבצע בשורה: הכלל הכללי (מצבים) חלש מהכלל של השורה */
+html body :is(#MerchantSearchPage, .merchant-page .merchant-list-view, .scheme-category-page-surface .merchant-list-view) .product-card-horizontal:active { background: var(--mh-bg-2) !important; }
+@media (min-width: 900px) {
+    html body :is(#MerchantSearchPage, .merchant-page .merchant-list-view, .scheme-category-page-surface .merchant-list-view) .product-card-horizontal .pro-card-h { flex-basis: 112px !important; width: 112px !important; }
+    html body :is(#MerchantSearchPage, .merchant-page .merchant-list-view, .scheme-category-page-surface .merchant-list-view) .product-card-horizontal .pro-card-h-img { flex-basis: 112px !important; width: 112px !important; height: 112px !important; max-height: 112px !important; }
 }
-/* תיאור — משני, שתי שורות */
-html body :is(.merchant-page .product-cards.merchant-grid-view, #ProductHighlights) .product-card-basic .product-description {
-    color: #6b7280 !important;
-    font-size: 12.5px !important;
-    font-weight: 500 !important;
-    line-height: 1.35 !important;
+
+/* מצבים — אריחים ושורות */
+/* מבצע: מחיר אדום-טקסט + הישן מחוק (Hyperzod: <small class="tw-line-through"> בתוך המחיר) */
+html body :is(.merchant-page .merchant-grid-view .product-card-basic, .scheme-category-page-surface .merchant-grid-view .product-card-basic, #ProductHighlights .product-card-basic, .merchant-page .product-card-slider, #MerchantSearchPage .product-card-horizontal, .merchant-page .merchant-list-view .product-card-horizontal, .scheme-category-page-surface .merchant-list-view .product-card-horizontal) .product-price:has(> small) { color: var(--mh-red-ink) !important; font-weight: 700 !important; }
+html body :is(.merchant-page .merchant-grid-view .product-card-basic, .scheme-category-page-surface .merchant-grid-view .product-card-basic, #ProductHighlights .product-card-basic, .merchant-page .product-card-slider, #MerchantSearchPage .product-card-horizontal, .merchant-page .merchant-list-view .product-card-horizontal, .scheme-category-page-surface .merchant-list-view .product-card-horizontal) .product-price > small { margin: 0 !important; color: var(--mh-ink-3) !important; font-size: 13px !important; line-height: 1 !important; font-weight: 400 !important; text-decoration: line-through !important; }
+/* תג ההנחה על התמונה ("5% הנחה"): גוון אדום עדין, לא אדום מלא; בפינה השמאלית העליונה כמו ב-Hyperzod (בימנית יש לחנויות מדבקות בתמונה) */
+html body :is(.merchant-page .merchant-grid-view .product-card-basic, .scheme-category-page-surface .merchant-grid-view .product-card-basic, #ProductHighlights .product-card-basic, .merchant-page .product-card-slider, #MerchantSearchPage .product-card-horizontal, .merchant-page .merchant-list-view .product-card-horizontal, .scheme-category-page-surface .merchant-list-view .product-card-horizontal) .product-discount-badge { top: 8px !important; left: 8px !important; right: auto !important; z-index: 2 !important; padding: 3px 8px !important; border-radius: var(--mh-r-xs) !important; background: var(--mh-red-tint) !important; color: var(--mh-red-ink) !important; font-size: 12px !important; font-weight: 600 !important; line-height: 16px !important; }
+html body :is(#MerchantSearchPage, .merchant-page .merchant-list-view, .scheme-category-page-surface .merchant-list-view) .product-card-horizontal .product-discount-badge { top: 6px !important; left: 6px !important; }
+/* "שינוי תוספות" — תג שקט (טקסט הממשק מתורגם ב-MH Lang) */
+html body :is(.merchant-page, .scheme-category-page-surface, #ProductHighlights, #MerchantSearchPage) .product-customizable-tag { display: inline-flex !important; align-items: center !important; align-self: flex-start !important; height: 22px !important; margin-top: 6px !important; padding: 0 8px !important; border: 0 !important; border-radius: var(--mh-r-xs) !important; background: var(--mh-fill) !important; color: var(--mh-ink-2) !important; font-size: 12px !important; font-weight: 500 !important; line-height: 1 !important; letter-spacing: 0 !important; }
+/* אזל / ייפתח שוב: שורה כתומה (Hyperzod: .product-availability-message) + תמונה דהויה ומחיר אפור; "+" לא מוצג (Hyperzod) */
+html body :is(.merchant-page .merchant-grid-view .product-card-basic, .scheme-category-page-surface .merchant-grid-view .product-card-basic, #ProductHighlights .product-card-basic, .merchant-page .product-card-slider, #MerchantSearchPage .product-card-horizontal, .merchant-page .merchant-list-view .product-card-horizontal, .scheme-category-page-surface .merchant-list-view .product-card-horizontal) .product-availability-message { margin-top: 2px !important; color: var(--mh-amber) !important; font-size: 13px !important; line-height: 18px !important; font-weight: 500 !important; }
+html body :is(.merchant-page .merchant-grid-view .product-card-basic, .scheme-category-page-surface .merchant-grid-view .product-card-basic, #ProductHighlights .product-card-basic, .merchant-page .product-card-slider, #MerchantSearchPage .product-card-horizontal, .merchant-page .merchant-list-view .product-card-horizontal, .scheme-category-page-surface .merchant-list-view .product-card-horizontal).is-unavailable .product-image { opacity: 0.5 !important; }
+html body :is(.merchant-page .merchant-grid-view .product-card-basic, .scheme-category-page-surface .merchant-grid-view .product-card-basic, #ProductHighlights .product-card-basic, .merchant-page .product-card-slider, #MerchantSearchPage .product-card-horizontal, .merchant-page .merchant-list-view .product-card-horizontal, .scheme-category-page-surface .merchant-list-view .product-card-horizontal).is-unavailable .product-price { color: var(--mh-ink-2) !important; }   /* ink-2 (5.6:1); ink-3 רק למחיר המחוק */
+
+/* (ד) "+" ומונה הכמות — כל כרטיסי המוצר */
+html body :is(.merchant-page, .scheme-category-page-surface, #ProductHighlights, #MerchantSearchPage, .searched-products-rail, .checkout-journey-sheet, .similar-items-panel) .add-product-btn { margin: 0 !important; padding: 0 !important; }
+/* בתוך האריח: הפינה התחתונה-שמאלית (Hyperzod: ימנית) — כמו בחיפוש בחנות ובהמלצות */
+html body :is(.merchant-page .merchant-grid-view .product-card-basic, .scheme-category-page-surface .merchant-grid-view .product-card-basic) .grid-add-control,
+html body .merchant-page .product-card-slider .carousel-add-control,
+html body #ProductHighlights .product-card-basic .product-image-frame > .tw-absolute:has(> .add-product-btn) { top: auto !important; bottom: 8px !important; left: 8px !important; right: auto !important; }   /* בבית: .tw-absolute.tw-right-2.tw-bottom-2 בלי מחלקה משלו */
+html body :is(.merchant-page, .scheme-category-page-surface, #ProductHighlights, #MerchantSearchPage, .searched-products-rail, .checkout-journey-sheet, .similar-items-panel) .add-product-btn button.add-btn {
+    position: relative !important;
+    width: 40px !important; min-width: 40px !important; max-width: 40px !important;
+    height: 40px !important; min-height: 40px !important; max-height: 40px !important;
+    padding: 0 !important; margin: 0 !important;
+    border: 0 !important; border-radius: 999px !important;
+    background: var(--mh-bg) !important; color: var(--mh-red-ink) !important;
+    box-shadow: var(--mh-e1), 0 0 0 1px rgba(17, 17, 17, 0.06) !important;
+    -webkit-backdrop-filter: none !important; backdrop-filter: none !important;
+    font-size: 0 !important; letter-spacing: 0 !important;
+    transition: transform 0.15s var(--mh-ease), background-color 0.15s var(--mh-ease) !important;
+    -webkit-tap-highlight-color: transparent !important;
 }
-/* תג "ניתן להתאמה" — גלולה אדומה שקופה כמו תג "נדרש" בפופאפ */
-html body :is(.merchant-page, #ProductHighlights) .product-customizable-tag {
-    display: inline-flex !important;
-    align-items: center !important;
-    height: 20px !important;
-    padding: 0 8px !important;
-    border-radius: 999px !important;
-    background: rgba(227, 30, 36, 0.10) !important;
-    color: #c8151b !important;
-    font-size: 11px !important;
-    font-weight: 800 !important;
-    line-height: 1 !important;
+html body :is(.merchant-page, .scheme-category-page-surface, #ProductHighlights, #MerchantSearchPage, .searched-products-rail, .checkout-journey-sheet, .similar-items-panel) .add-product-btn button.add-btn::after { content: "" !important; position: absolute !important; inset: -4px !important; border-radius: 999px !important; }   /* שטח מגע 48 סביב עיגול של 40 */
+html body :is(.merchant-page, .scheme-category-page-surface, #ProductHighlights, #MerchantSearchPage, .searched-products-rail, .checkout-journey-sheet, .similar-items-panel) .add-product-btn button.add-btn svg { width: 14px !important; height: 14px !important; margin: 0 !important; color: var(--mh-red-ink) !important; }
+html body :is(.merchant-page, .scheme-category-page-surface, #ProductHighlights, #MerchantSearchPage, .searched-products-rail, .checkout-journey-sheet, .similar-items-panel) .add-product-btn button.add-btn :is(.v-btn__overlay, .v-btn__underlay) { display: none !important; }
+html body :is(.merchant-page, .scheme-category-page-surface, #ProductHighlights, #MerchantSearchPage, .searched-products-rail, .checkout-journey-sheet, .similar-items-panel) .add-product-btn button.add-btn:active { transform: scale(0.94) !important; }
+/* מוצר בלי תמונה (שורה): הכפתור בשורת המחיר — גלולה לבנה עם קו וטקסט */
+html body :is(.merchant-page, .scheme-category-page-surface, #MerchantSearchPage, .searched-products-rail, .checkout-journey-sheet) .price .add-product-btn button.add-btn { width: auto !important; min-width: 0 !important; max-width: none !important; height: 36px !important; min-height: 36px !important; max-height: 36px !important; padding: 0 14px !important; border: 1px solid var(--mh-line-2) !important; box-shadow: none !important; font-size: 14px !important; font-weight: 600 !important; }
+/* מונה הכמות: גלולה שחורה (Hyperzod: אדום הנושא, bg-button_normal) */
+html body :is(.merchant-page, .scheme-category-page-surface, #ProductHighlights, #MerchantSearchPage, .searched-products-rail, .checkout-journey-sheet, .similar-items-panel) .add-product-btn .counter-btn { height: 40px !important; border: 0 !important; border-radius: 999px !important; background: var(--mh-ink) !important; color: var(--mh-bg) !important; box-shadow: var(--mh-e1) !important; }
+html body :is(.merchant-page, .scheme-category-page-surface, #ProductHighlights, #MerchantSearchPage, .searched-products-rail, .checkout-journey-sheet, .similar-items-panel) .add-product-btn .counter-btn :is(.decrement-btn, .increment-btn) { width: 40px !important; height: 40px !important; padding: 0 !important; display: grid !important; place-items: center !important; background: transparent !important; color: var(--mh-bg) !important; }
+html body :is(.merchant-page, .scheme-category-page-surface, #ProductHighlights, #MerchantSearchPage, .searched-products-rail, .checkout-journey-sheet, .similar-items-panel) .add-product-btn .counter-btn .counter-input { height: 40px !important; background: transparent !important; color: var(--mh-bg) !important; font-size: 15px !important; font-weight: 600 !important; font-variant-numeric: tabular-nums; }
+html body :is(.merchant-page, .scheme-category-page-surface, #ProductHighlights, #MerchantSearchPage, .searched-products-rail, .checkout-journey-sheet, .similar-items-panel) .add-product-btn .counter-btn svg { color: var(--mh-bg) !important; }
+/* אריחים קטנים (140): "ייתכן שתאהבו גם" בצ'ק-אאוט ו"מוצרים נבחרים" בבית (תמונה 85 גובה) — עיגול ומונה 36.
+   ה-id בתוך :is() נותן לכללים משקל של הכלל המשותף למעלה (1,2,x) — והם אחריו, ולכן גוברים */
+html body :is(.similar-items-panel, #ProductHighlights) .add-product-btn button.add-btn { width: 36px !important; min-width: 36px !important; max-width: 36px !important; height: 36px !important; min-height: 36px !important; max-height: 36px !important; }
+html body :is(.similar-items-panel, #ProductHighlights) .add-product-btn .counter-btn,
+html body :is(.similar-items-panel, #ProductHighlights) .add-product-btn .counter-btn :is(.decrement-btn, .increment-btn, .counter-input) { height: 36px !important; }
+html body :is(.similar-items-panel, #ProductHighlights) .add-product-btn .counter-btn :is(.decrement-btn, .increment-btn) { width: 36px !important; }
+@media (hover: hover) {
+    html body :is(.merchant-page, .scheme-category-page-surface, #ProductHighlights, #MerchantSearchPage, .searched-products-rail, .checkout-journey-sheet, .similar-items-panel) .add-product-btn button.add-btn:hover { background: var(--mh-bg-2) !important; }
+    html body :is(#MerchantSearchPage, .merchant-page .merchant-list-view, .scheme-category-page-surface .merchant-list-view) .product-card-horizontal:hover { background: var(--mh-bg-2) !important; }
 }
-/* כפתור ההוספה בכרטיס — עגול, אייקון בלבד, כמו בגריד של Hyperzod. בלי זה הכלל הגלובלי של חלק 4
-   (html body .v-btn.add-btn: רדיוס 10, טקסט 13px) תופס את כפתור הקרוסלה ומציג "הוספה" חתוך בתוך 36px. */
-html body :is(.merchant-page .product-cards.merchant-grid-view, #ProductHighlights) .product-card-basic .add-product-btn button.add-btn,
-html body .merchant-page .product-card-slider .add-product-btn button.add-btn {
-    width: 36px !important;
-    height: 36px !important;
-    min-width: 36px !important;
-    max-width: 36px !important;
-    padding: 0 !important;
-    aspect-ratio: 1 / 1 !important;
-    border-radius: 999px !important;
-    border: 1px solid rgba(227, 30, 36, 0.22) !important;
-    background: #fff !important;
-    color: #e31e24 !important;
-    font-size: 0 !important;
-    line-height: 0 !important;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.10) !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-}
-html body :is(.merchant-page .product-cards.merchant-grid-view, #ProductHighlights) .product-card-basic .add-product-btn button.add-btn svg,
-html body .merchant-page .product-card-slider .add-product-btn button.add-btn svg {
-    width: 13px !important;
-    height: 13px !important;
-    margin: 0 !important;
-}
-html body :is(.merchant-page .product-cards.merchant-grid-view, #ProductHighlights) .product-card-basic .add-product-btn button.add-btn:active,
-html body .merchant-page .product-card-slider .add-product-btn button.add-btn:active {
-    transform: scale(0.92) !important;
-    background: #fff !important;
-}
-@media (min-width: 600px) {
-    html body :is(.merchant-page .product-cards.merchant-grid-view, #ProductHighlights) .product-card-basic .add-product-btn button.add-btn,
-    html body .merchant-page .product-card-slider .add-product-btn button.add-btn {
-        width: 44px !important;
-        height: 44px !important;
-        min-width: 44px !important;
-        max-width: 44px !important;
-    }
+@media (prefers-reduced-motion: reduce) {
+    html body :is(.merchant-page, .scheme-category-page-surface, #ProductHighlights, #MerchantSearchPage, .searched-products-rail, .checkout-journey-sheet, .similar-items-panel) .add-product-btn button.add-btn { transition: none !important; }
 }
 /* mh-cards-v1 */
 
@@ -5873,41 +5876,236 @@ html body .v-bottom-sheet__content > .v-card.tw-rounded-t-xl > .tw-px-4.tw-pb-8 
 /* mh-addresses-v1 */
 
 /* =========================================================
-   חלק 47: ראש דף עסק — MH MerchantHead v1.0.0 | 2026-09-23
+   חלק 47: ראש דף עסק — MH MerchantHead v2.0.0 | 2026-10-23 (v1.0.0: 2026-09-23)
    הבעלים היחיד של החלק העליון בדפי העסקים: #merchant-header-v3 (כיסוי, לוגו, שם, כתובת,
-   מרחק, תיאור), .merchant-cover-warning / .scheme-merchant-order-warning (תג "הפתיחה הבאה"),
+   מרחק/דירוג, תיאור), .merchant-cover-warning / .scheme-merchant-order-warning (סטטוס "הפתיחה הבאה"),
    .merchant-floating-actions (חזרה/סינון/חיפוש), .merchant-cover-header (כותרת בגלילה, מובייל)
    ו-#MerchantStickyHeader (כותרת דביקה, דסקטופ).
-   מה היה: Hyperzod מצפים לתמונת כיסוי שאין — נשאר מלבן לבן ריק, הלוגו צף באמצעו, ותג
-   "הפתיחה הבאה" נחת ממש על הלוגו. עכשיו: כיסוי בגרדיאנט QLED אדום (אם תוגדר תמונת כיסוי —
-   היא ממלאת אותו עם וילון כהה לקריאות), לוגו "סקוויקל" בטבעת לבנה שחופף את תחתית הכיסוי,
-   שם גדול, כתובת, גלולת מרחק, ותיאור (אלרגנים/כשרות) בכרטיס רך. התג = גלולת זכוכית כהה עם
-   נקודה ענברית, צפה על הכיסוי בין כפתורי הניווט ללוגו — לעולם לא נוגעת בלוגו, גם באפליקציה
-   (הגובה כולל --native-status-bar-height בדיוק כמו הכפתורים של Hyperzod).
-   מובייל = .merchant-page.merchant-mobile-view ; דסקטופ = .merchant-page:not(.merchant-mobile-view)
-   (בדסקטופ אין div כיסוי בכלל — הרצועה נבנית מ-::before של #merchant-header-v3, והתג המלא-רוחב
-   הענברי הופך לאותה גלולה מעל הרצועה). לא נוגע ב-.cover-scrolled (Hyperzod משקיפים את הכפתורים
-   כשהכותרת הלבנה מופיעה) ולא ב-opacity של הכותרת (מונפש מהגלילה).
+   v2 (סבב עיצוב 1ב, DESIGN_SYSTEM §8 — דוד 22.10: "ראש אדום, כרטיס לבן חתוך, גלולות תלויות"):
+   - בלי כיסוי אדום/גרדיאנט: אין תמונת כיסוי באף עסק → ראש לבן. ה-div של הכיסוי = רווח לשורת הכפתורים.
+   - כפתורי חזרה/סינון/חיפוש: עיגול 40 --mh-fill (אזור מגע 44), אייקון --mh-ink, בלי זכוכית וצל.
+   - לוגו באריח 72 (88 בדסקטופ) רדיוס 18/20 עם קו דק בצד ההתחלה; לידו שם 24/700 (28 בדסקטופ),
+     "כתובת · קטגוריה" ושורת מטא אחת בטקסט "★ 5 · 0.70 קילומטר" — בלי גלולות ובלי אייקון מיקום.
+     פריסה: grid על המעטפת (.tw-px-3 / .tw-px-5); המעטפת הפנימית של Hyperzod (לוגו+שם) ב-display:contents.
+   - סטטוס ("הפתיחה הבאה מחר ב- 08:00"): טקסט --mh-amber עם נקודה, שורה מעל השם בעמודת הטקסט.
+     ה-div של Hyperzod ממוקם absolute מחוץ לראש → המקום מעל השם נשמר רק כשיש הודעה (:has), והגובה עד
+     ראש עמודת הטקסט קבוע (מובייל: פס שעון + 56 + 8; דסקטופ: 97 + 4) — לא תלוי באורך השם.
+   - תיאור (אלרגנים/כשרות/"להמחשה"): בלוק --mh-bg-2 רדיוס 12, 13px --mh-ink-2, בלי מסגרת.
+   - תמונת כיסוי (אם תוגדר במובייל): ברוחב מלא, רדיוס 20 בתחתית, הלוגו חופף אותה ב-36; הכפתורים עליה לבן 92% + --mh-e1.
+   - כותרת הגלילה (מובייל) והכותרת הדביקה (דסקטופ): לבן אטום + קו 1px, שם 17/700.
+   מובייל = .merchant-page.merchant-mobile-view ; דסקטופ = .merchant-page:not(.merchant-mobile-view).
+   לא נוגע ב-opacity של כותרת הגלילה (מונפש מהגלילה) ולא ב-top של סרגל הקטגוריות (inline, 53 + פס שעון).
    ========================================================= */
-/* ---------- מובייל ---------- */
-html body .merchant-page.merchant-mobile-view #merchant-header-v3 {
-    padding-top: 0 !important;
-    background: #fff !important;
+/* ---------- משותף (מובייל + דסקטופ) ---------- */
+html body .merchant-page #merchant-header-v3 {
+    border-radius: 0 !important;
+    background: var(--mh-bg) !important;
     box-shadow: none !important;
 }
-/* הכיסוי: ה-div עם מחלקות aspect של Hyperzod (ריק אצלנו, או עם <img> אם תוגדר תמונה) */
+html body .merchant-page #merchant-header-v3 > div:not([class*="aspect"]) {
+    display: grid !important;
+    grid-template-rows: auto 1fr auto !important;   /* הלוגו חוצה שורות 1–2; עודף הגובה נבלע בשורה 2 */
+    align-items: start !important;
+}
+html body .merchant-page #merchant-header-v3 .merchant-header-img {
+    grid-column: 1 !important;
+    grid-row: 1 / 3 !important;
+    position: relative !important;
+    top: auto !important;
+    z-index: 2 !important;
+    margin: 0 !important;
+    box-sizing: border-box !important;
+    border: 1px solid var(--mh-line) !important;
+    background: var(--mh-bg) !important;
+    box-shadow: none !important;
+}
+html body .merchant-page #merchant-header-v3 .merchant-header-img img {
+    border-radius: 0 !important;
+    object-fit: cover !important;
+}
+html body .merchant-page #merchant-header-v3 .header-content {
+    grid-column: 2 !important;
+    grid-row: 1 !important;
+    min-width: 0 !important;
+    margin: 0 !important;
+    width: auto !important;
+    overflow: visible !important;
+}
+html body .merchant-page #merchant-header-v3 .header-content .v-card-text > div {
+    margin: 0 !important;
+}
+/* שם (שורה מלאה), ואחריו באותה שורה: כתובת · קטגוריה */
+html body .merchant-page #merchant-header-v3 .header-content .v-card-text > div > div {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    align-items: baseline !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    text-align: start !important;
+}
+html body .merchant-page #merchant-header-v3 h1.store-name {
+    flex: 0 0 100% !important;
+    margin: 0 !important;
+    font-size: 24px !important;
+    line-height: 1.2 !important;
+    font-weight: 700 !important;
+    letter-spacing: 0 !important;
+    color: var(--mh-ink) !important;
+    text-transform: none !important;
+    text-align: start !important;
+    text-wrap: balance !important;
+}
+html body .merchant-page #merchant-header-v3 h1.store-name ~ div {
+    display: block !important;
+    flex: 0 1 auto !important;
+    min-width: 0 !important;
+    margin: 4px 0 0 !important;
+    font-size: 13px !important;
+    line-height: 1.4 !important;
+    font-weight: 400 !important;
+    color: var(--mh-ink-2) !important;
+    text-transform: none !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    -webkit-line-clamp: unset !important;
+}
+/* שורת המטא: דירוג, זמן, מרחק — טקסט אחד עם "·" */
+html body .merchant-page #merchant-header-v3 > div > .tw-flex.tw-items-center.tw-gap-2 {
+    grid-column: 2 !important;
+    grid-row: 2 !important;
+    display: flex !important;
+    flex-wrap: wrap !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    gap: 0 !important;
+    margin: 4px 0 0 !important;
+    font-size: 13px !important;
+    line-height: 1.4 !important;
+    font-weight: 500 !important;
+    color: var(--mh-ink-2) !important;
+    font-variant-numeric: tabular-nums !important;
+}
+html body .merchant-page #merchant-header-v3 > div > .tw-flex.tw-items-center.tw-gap-2 > div {
+    display: inline-flex !important;
+    align-items: center !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: none !important;
+    white-space: nowrap !important;
+}
+html body .merchant-page #merchant-header-v3 h1.store-name ~ div ~ div::before,
+html body .merchant-page #merchant-header-v3 > div > .tw-flex.tw-items-center.tw-gap-2 > div + div::before {
+    content: '·' !important;
+    margin: 0 6px !important;
+    color: var(--mh-ink-3) !important;
+}
+html body .merchant-page #merchant-header-v3 > div > .tw-flex.tw-items-center.tw-gap-2 span {
+    position: static !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    font-weight: 500 !important;
+}
+/* "30 mins" (זמן משלוח, באנגלית מ-Hyperzod) — בלי זה ה-RTL הופך ל-"mins 30" */
+html body .merchant-page #merchant-header-v3 > div > .tw-flex.tw-items-center.tw-gap-2 > div:not([id]) span {
+    unicode-bidi: plaintext !important;
+}
+html body .merchant-page #merchant-header-v3 #MerchantRating,
+html body .merchant-page #merchant-header-v3 #MerchantRating span {
+    color: var(--mh-ink) !important;
+    font-weight: 600 !important;
+}
+html body .merchant-page #merchant-header-v3 #MerchantRating svg {
+    width: 12px !important;
+    height: 12px !important;
+    margin: 0 0 1px !important;
+    margin-inline-end: 3px !important;
+}
+html body .merchant-page #merchant-header-v3 #MerchantRating svg path {
+    fill: var(--mh-ink) !important;
+}
+html body .merchant-page #merchant-header-v3 #MerchantDistance img {
+    display: none !important;
+}
+/* תיאור העסק (אלרגנים / כשרות / "התמונות להמחשה") — בלוק מידע שקט */
+html body .merchant-page #merchant-header-v3 div.tw-w-full.tw-border.tw-text-center,
+html body .merchant-page #merchant-header-v3 div.tw-inline-block.tw-font-semibold.tw-text-sm {
+    grid-row: 3 !important;
+    white-space: pre-line !important;
+    margin: 16px 0 0 !important;
+    padding: 10px 12px !important;
+    border: 0 !important;
+    border-radius: var(--mh-r-sm) !important;
+    background: var(--mh-bg-2) !important;
+    font-size: 13px !important;
+    font-weight: 400 !important;
+    line-height: 1.5 !important;
+    color: var(--mh-ink-2) !important;
+    text-align: start !important;
+}
+/* סטטוס: טקסט ענברי עם נקודה (Hyperzod: גלולה כתומה במובייל / פס מלא בדסקטופ) */
+html body .merchant-page .scheme-merchant-order-warning {
+    display: flex !important;
+    width: auto !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    transform: none !important;
+}
+html body .merchant-page .scheme-merchant-order-warning > div {
+    justify-content: flex-start !important;
+    min-width: 0 !important;
+    padding: 0 !important;
+    gap: 0 !important;
+}
+html body .merchant-page .scheme-merchant-order-warning__text {
+    min-width: 0 !important;
+    color: var(--mh-amber) !important;
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    line-height: 18px !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    font-variant-numeric: tabular-nums !important;
+}
+html body .merchant-page .scheme-merchant-order-warning__text::before {
+    content: '' !important;
+    display: inline-block !important;
+    width: 6px !important;
+    height: 6px !important;
+    border-radius: 50% !important;
+    background: currentColor !important;
+    margin-inline-end: 6px !important;
+    vertical-align: 2px !important;
+}
+
+/* ---------- מובייל (אפליקציה + ווב בנייד) ---------- */
+html body .merchant-page.merchant-mobile-view #merchant-header-v3 {
+    padding-top: 0 !important;
+}
+/* ה"כיסוי" של Hyperzod (div עם מחלקות aspect, ריק אצלנו) = רווח לשורת הכפתורים (5 + 44 + 7) */
 html body .merchant-page.merchant-mobile-view #merchant-header-v3 > div[class*="aspect"] {
     position: relative !important;
     overflow: hidden !important;
     margin: 0 !important;
     width: 100% !important;
     aspect-ratio: auto !important;
-    height: calc(176px + var(--native-status-bar-height, 0px)) !important;
-    border-radius: 0 0 28px 28px !important;
-    background:
-        radial-gradient(120% 90% at 85% 0%, rgba(255, 255, 255, 0.30) 0%, rgba(255, 255, 255, 0) 55%),
-        radial-gradient(90% 80% at 10% 100%, rgba(0, 0, 0, 0.30) 0%, rgba(0, 0, 0, 0) 60%),
-        linear-gradient(135deg, #ff3b41 0%, #c8151b 100%) !important;
+    height: calc(56px + var(--native-status-bar-height, 0px)) !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+}
+/* אם תוגדר תמונת כיסוי: ברוחב מלא, רדיוס 20 בתחתית, הלוגו חופף אותה */
+html body .merchant-page.merchant-mobile-view #merchant-header-v3 > div[class*="aspect"]:has(img) {
+    height: calc(200px + var(--native-status-bar-height, 0px)) !important;
+    border-radius: 0 0 var(--mh-r-lg) var(--mh-r-lg) !important;
+    background: var(--mh-fill) !important;
 }
 html body .merchant-page.merchant-mobile-view #merchant-header-v3 > div[class*="aspect"] img {
     display: block !important;
@@ -5915,295 +6113,191 @@ html body .merchant-page.merchant-mobile-view #merchant-header-v3 > div[class*="
     height: 100% !important;
     object-fit: cover !important;
 }
-html body .merchant-page.merchant-mobile-view #merchant-header-v3 > div[class*="aspect"]:has(img)::after {
-    content: '' !important;
-    position: absolute !important;
-    inset: 0 !important;
-    pointer-events: none !important;
-    background: linear-gradient(180deg, rgba(0, 0, 0, 0.30) 0%, rgba(0, 0, 0, 0) 45%, rgba(0, 0, 0, 0.32) 100%) !important;
+html body .merchant-page.merchant-mobile-view #merchant-header-v3 > div[class*="aspect"]:has(img) + .tw-px-3 .merchant-header-img {
+    margin-top: -36px !important;
+    box-shadow: var(--mh-e2) !important;
 }
-/* המעטפת מתחת לכיסוי: הלוגו נכנס לזרימה וחופף את הכיסוי ב-44px */
 html body .merchant-page.merchant-mobile-view #merchant-header-v3 > .tw-px-3 {
-    padding: 0 16px 8px !important;
+    grid-template-columns: 72px minmax(0, 1fr) !important;
+    column-gap: 12px !important;
+    padding: 8px 16px 16px !important;
 }
-html body .merchant-page.merchant-mobile-view #merchant-header-v3 > .tw-px-3 > .tw-flex {
-    margin-top: 0 !important;
+html body .merchant-page.merchant-mobile-view #merchant-header-v3 > .tw-px-3 > .tw-flex.tw-flex-col {
+    display: contents !important;
 }
 html body .merchant-page.merchant-mobile-view #merchant-header-v3 .merchant-header-img {
-    position: relative !important;
-    top: auto !important;
-    z-index: 2 !important;
-    margin: -44px 0 0 !important;
-    width: 88px !important;
-    height: 88px !important;
-    box-sizing: border-box !important;
-    border-radius: 24px !important;
-    border: 3px solid #fff !important;
-    background: #fff !important;
-    box-shadow: 0 10px 26px rgba(200, 21, 27, 0.22), 0 2px 6px rgba(0, 0, 0, 0.14) !important;
+    width: 72px !important;
+    height: 72px !important;
+    border-radius: 18px !important;
 }
-html body .merchant-page.merchant-mobile-view #merchant-header-v3 .merchant-header-img img {
-    border-radius: 20px !important;
-    object-fit: cover !important;
-}
-html body .merchant-page.merchant-mobile-view #merchant-header-v3 h1.store-name {
-    margin-top: 10px !important;
-    font-size: 22px !important;
-    line-height: 1.2 !important;
-    font-weight: 800 !important;
-    letter-spacing: -0.01em !important;
-    color: #111 !important;
-    text-transform: none !important;
-}
-html body .merchant-page.merchant-mobile-view #merchant-header-v3 #MerchantAddress {
-    margin-top: 4px !important;
-    font-size: 13px !important;
-    font-weight: 500 !important;
-    color: #6b7280 !important;
-    text-transform: none !important;
-}
-html body .merchant-page.merchant-mobile-view #merchant-header-v3 > .tw-px-3 > .tw-flex.tw-items-center.tw-gap-2 > div {
-    display: inline-flex !important;
-    align-items: center !important;
-    gap: 6px !important;
-    background: #f5f5f7 !important;
-    border-radius: 999px !important;
-    padding: 5px 12px !important;
-    font-size: 12.5px !important;
-    font-weight: 700 !important;
-    color: #374151 !important;
-}
-/* שורת המטא: מרחק, דירוג (כוכב) וכל ילד אחר — אותה גלולה */
-html body .merchant-page.merchant-mobile-view #merchant-header-v3 #MerchantDistance img {
-    margin: 0 !important;
-    width: 13px !important;
-    opacity: 0.8 !important;
-}
-html body .merchant-page.merchant-mobile-view #merchant-header-v3 #MerchantDistance span {
-    margin: 0 !important;
-    top: 0 !important;
-}
-/* תיאור העסק (אלרגנים / כשרות / "התמונות להמחשה") — שלוש שורות בכרטיס רך, לא גלולה */
 html body .merchant-page.merchant-mobile-view #merchant-header-v3 div.tw-w-full.tw-border.tw-text-center {
-    white-space: pre-line !important;
-    margin: 12px 0 2px !important;
-    padding: 10px 14px !important;
-    border-radius: 16px !important;
-    border: 1px solid #ececef !important;
-    background: #fafafa !important;
-    font-size: 13px !important;
-    font-weight: 500 !important;
-    line-height: 1.55 !important;
-    color: #4b5563 !important;
+    grid-column: 1 / -1 !important;
 }
-/* התג ("הפתיחה הבאה…"): מתחת לשורת הכפתורים (8–48), מעל הלוגו (מתחיל ב-132) */
+/* סטטוס: בראש עמודת הטקסט (56 + 8 מתחת לפס השעון; העמודה מתחילה ב-16+72+12 = 100 מצד ההתחלה) */
 html body .merchant-page.merchant-mobile-view .merchant-cover-warning {
-    top: calc(var(--native-status-bar-height, 0px) + 60px) !important;
-    left: 0 !important;
-    right: 0 !important;
-    padding: 0 16px !important;
-    z-index: 7 !important;
-}
-html body .merchant-page.merchant-mobile-view .merchant-cover-warning .scheme-merchant-order-warning {
-    margin: 0 !important;
-    padding: 0 14px !important;
-    min-height: 34px !important;
-    max-width: 100% !important;
-    border-radius: 999px !important;
-    border: 1px solid rgba(255, 255, 255, 0.22) !important;
-    background: rgba(24, 24, 27, 0.58) !important;
-    -webkit-backdrop-filter: blur(12px) saturate(140%) !important;
-    backdrop-filter: blur(12px) saturate(140%) !important;
-    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.20) !important;
-}
-html body .merchant-page.merchant-mobile-view .merchant-cover-warning .scheme-merchant-order-warning > div {
+    top: calc(64px + var(--native-status-bar-height, 0px)) !important;
+    inset-inline-start: 100px !important;
+    inset-inline-end: 16px !important;
+    justify-content: flex-start !important;
     padding: 0 !important;
-    gap: 8px !important;
 }
-html body .merchant-page.merchant-mobile-view .merchant-cover-warning .scheme-merchant-order-warning__text {
-    max-width: calc(100vw - 64px) !important;
-    color: #fff !important;
-    font-size: 12.5px !important;
-    font-weight: 700 !important;
-    line-height: 34px !important;
-    white-space: nowrap !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
+/* יש כיסוי? — שרשרת ילדים + :not(:empty) ולא "img" צאצא: .merchant-page מכיל ~1000 תמונות מוצר (Milk), ו-:has עם img צאצא על אב כזה נבדק מחדש בכל תמונה שנטענת */
+html body .merchant-page.merchant-mobile-view:has(> .page-builder-section-surface > #merchant-header-v3 > div[class*="aspect"]:not(:empty)) .merchant-cover-warning {
+    top: calc(208px + var(--native-status-bar-height, 0px)) !important;
 }
-html body .merchant-page.merchant-mobile-view .merchant-cover-warning .scheme-merchant-order-warning__text::before {
-    content: '' !important;
-    display: inline-block !important;
-    width: 8px !important;
-    height: 8px !important;
+html body .merchant-page.merchant-mobile-view:has(> .merchant-cover-warning .scheme-merchant-order-warning) #merchant-header-v3 .header-content {
+    padding-top: 22px !important;
+}
+/* כפתורי חזרה/סינון/חיפוש: עיגול 40 אפור-חם + מסגרת שקופה 2px = אזור מגע 44, בשני המצבים
+   (גם כשכותרת הגלילה מופיעה). הכותרת של Hyperzod בגובה 54 וסרגל הקטגוריות נדבק ב-53 (inline) —
+   לכן השורה מתחילה ב-5 (במקום 8): העיגול ממורכז בכותרת. */
+html body .merchant-page.merchant-mobile-view .merchant-floating-actions {
+    top: calc(5px + var(--native-status-bar-height, 0px)) !important;
+    padding: 0 14px !important;
+}
+html body .merchant-page.merchant-mobile-view .merchant-floating-actions .tw-flex.tw-gap-2 {
+    gap: 4px !important;
+}
+html body .merchant-page.merchant-mobile-view .merchant-floating-actions .merchant-floating-btn {
+    width: 44px !important;
+    height: 44px !important;
+    box-sizing: border-box !important;
     border-radius: 50% !important;
-    background: #ffb020 !important;
-    box-shadow: 0 0 0 3px rgba(255, 176, 32, 0.28) !important;
-    margin-inline-end: 8px !important;
-    vertical-align: 1px !important;
+    border: 2px solid transparent !important;
+    background: var(--mh-fill) padding-box !important;
+    box-shadow: none !important;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+    color: var(--mh-ink) !important;
+    -webkit-tap-highlight-color: transparent !important;
+    transition: transform .15s var(--mh-ease), background-color .15s var(--mh-ease) !important;
 }
-/* כפתורי חזרה/סינון/חיפוש מעל הכיסוי: זכוכית לבנה (בגלילה Hyperzod משקיפים אותם — לא נוגעים) */
-html body .merchant-page.merchant-mobile-view .merchant-floating-actions:not(.cover-scrolled) .merchant-floating-btn {
-    background: rgba(255, 255, 255, 0.90) !important;
-    -webkit-backdrop-filter: blur(10px) saturate(150%) !important;
-    backdrop-filter: blur(10px) saturate(150%) !important;
-    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18), 0 0 0 1px rgba(255, 255, 255, 0.35) !important;
+html body .merchant-page.merchant-mobile-view .merchant-floating-actions .merchant-floating-btn:active {
+    transform: scale(.94) !important;
+    background: var(--mh-line) padding-box !important;
 }
-/* הכותרת שמופיעה בגלילה: זכוכית לבנה */
+html body .merchant-page.merchant-mobile-view .merchant-floating-actions .merchant-floating-btn:focus-visible {
+    outline: 2px solid var(--mh-ink) !important;
+    outline-offset: 0 !important;
+}
+@media (hover: hover) {
+    html body .merchant-page.merchant-mobile-view .merchant-floating-actions .merchant-floating-btn:hover {
+        background: var(--mh-line) padding-box !important;
+    }
+}
+html body .merchant-page.merchant-mobile-view .merchant-floating-actions .merchant-floating-btn svg {
+    width: 20px !important;
+    height: 20px !important;
+}
+html body .merchant-page.merchant-mobile-view .merchant-floating-actions .merchant-floating-btn svg path[fill="black"] {
+    fill: var(--mh-ink) !important;
+}
+html body .merchant-page.merchant-mobile-view .merchant-floating-actions .merchant-floating-btn svg [stroke]:not([stroke="none"]) {
+    stroke: var(--mh-ink) !important;
+}
+/* על תמונת כיסוי (אם תוגדר): לבן 92% + צל קטן */
+html body .merchant-page.merchant-mobile-view:has(> .page-builder-section-surface > #merchant-header-v3 > div[class*="aspect"]:not(:empty)) .merchant-floating-actions:not(.cover-scrolled) .merchant-floating-btn {
+    background: rgba(255, 255, 255, 0.92) padding-box !important;
+    box-shadow: var(--mh-e1) !important;
+}
+/* כותרת הגלילה: לבן אטום + קו, שם 17/700 בצד ההתחלה — בין החזרה (16+40) לסינון/חיפוש (16+40+8+40),
+   כך ששם ארוך לא נכנס מתחת לכפתורים (Hyperzod: ממורכז עם 100px מכל צד, inline) */
 html body .merchant-page.merchant-mobile-view .merchant-cover-header {
-    background: rgba(255, 255, 255, 0.84) !important;
-    -webkit-backdrop-filter: blur(18px) saturate(160%) !important;
-    backdrop-filter: blur(18px) saturate(160%) !important;
-    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.06) !important;
+    justify-content: flex-start !important;
+    background: var(--mh-bg) !important;
+    background-image: none !important;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+    border-bottom: 0 !important;
+    box-shadow: 0 1px 0 var(--mh-line) !important;
 }
 html body .merchant-page.merchant-mobile-view .merchant-cover-header__name {
+    width: 100% !important;
+    padding-inline: 68px 120px !important;
+    text-align: start !important;
+    font-family: inherit !important;
+    font-size: 17px !important;
+    line-height: 1.3 !important;
     font-weight: 700 !important;
-    color: #111 !important;
+    letter-spacing: 0 !important;
+    color: var(--mh-ink) !important;
 }
 
 /* ---------- דסקטופ ---------- */
 html body .merchant-page:not(.merchant-mobile-view) #merchant-header-v3 {
     position: relative !important;
-    margin-top: 81px !important;   /* 65 סרגל עליון + 16 */
-    padding-top: 232px !important; /* 200 רצועה + 32 */
-    background: #fff !important;
-    box-shadow: none !important;
+    margin-top: 0 !important;      /* padding ולא margin: margin של הילד הראשון "בורח" ל-.merchant-page ומזיז את הסטטוס */
+    padding-top: 97px !important;  /* 65 סרגל עליון + 32 */
 }
-html body .merchant-page:not(.merchant-mobile-view) #merchant-header-v3::before {
-    content: '' !important;
-    position: absolute !important;
-    top: 0 !important;
-    left: 20px !important;
-    right: 20px !important;
-    height: 200px !important;
-    border-radius: 28px !important;
-    background:
-        radial-gradient(70% 120% at 90% 0%, rgba(255, 255, 255, 0.30) 0%, rgba(255, 255, 255, 0) 55%),
-        radial-gradient(60% 100% at 8% 100%, rgba(0, 0, 0, 0.30) 0%, rgba(0, 0, 0, 0) 60%),
-        linear-gradient(135deg, #ff3b41 0%, #c8151b 100%) !important;
+html body .merchant-page:not(.merchant-mobile-view) #merchant-header-v3 > .tw-px-5 {
+    grid-template-columns: 88px minmax(0, 1fr) !important;
+    column-gap: 20px !important;
+    padding: 0 24px 24px !important;
+}
+html body .merchant-page:not(.merchant-mobile-view) #merchant-header-v3 > .tw-px-5 > .tw-relative {
+    display: contents !important;
 }
 html body .merchant-page:not(.merchant-mobile-view) #merchant-header-v3 .merchant-header-img {
-    margin-top: -96px !important; /* חופף את הרצועה ב-60px */
-    width: 120px !important;
-    height: 120px !important;
-    box-sizing: border-box !important;
-    border-radius: 30px !important;
-    border: 4px solid #fff !important;
-    background: #fff !important;
-    box-shadow: 0 14px 34px rgba(200, 21, 27, 0.22), 0 2px 8px rgba(0, 0, 0, 0.14) !important;
-}
-html body .merchant-page:not(.merchant-mobile-view) #merchant-header-v3 .merchant-header-img img {
-    border-radius: 24px !important;
-    object-fit: cover !important;
-}
-html body .merchant-page:not(.merchant-mobile-view) #merchant-header-v3 .header-content .tw-relative {
-    margin-top: 0 !important;
-    margin-inline-start: 148px !important;
+    width: 88px !important;
+    height: 88px !important;
+    border-radius: var(--mh-r-lg) !important;
 }
 html body .merchant-page:not(.merchant-mobile-view) #merchant-header-v3 h1.store-name {
     font-size: 28px !important;
-    line-height: 1.2 !important;
-    font-weight: 800 !important;
-    letter-spacing: -0.01em !important;
-    color: #111 !important;
-    text-transform: none !important;
 }
-html body .merchant-page:not(.merchant-mobile-view) #merchant-header-v3 #MerchantAddress {
-    margin-top: 4px !important;
+html body .merchant-page:not(.merchant-mobile-view) #merchant-header-v3 h1.store-name ~ div,
+html body .merchant-page:not(.merchant-mobile-view) #merchant-header-v3 > div > .tw-flex.tw-items-center.tw-gap-2 {
     font-size: 14px !important;
-    font-weight: 500 !important;
-    color: #6b7280 !important;
-    text-transform: none !important;
 }
-html body .merchant-page:not(.merchant-mobile-view) #merchant-header-v3 > .tw-px-5 > .tw-flex.tw-items-center.tw-gap-2 {
-    margin-inline-start: 148px !important;
-    margin-top: 10px !important;
-}
-html body .merchant-page:not(.merchant-mobile-view) #merchant-header-v3 > .tw-px-5 > .tw-flex.tw-items-center.tw-gap-2 > div {
-    display: inline-flex !important;
-    align-items: center !important;
-    gap: 6px !important;
-    background: #f5f5f7 !important;
-    border-radius: 999px !important;
-    padding: 6px 14px !important;
-    font-size: 13px !important;
-    font-weight: 700 !important;
-    color: #374151 !important;
-}
-html body .merchant-page:not(.merchant-mobile-view) #merchant-header-v3 #MerchantDistance img {
-    margin: 0 !important;
-    width: 13px !important;
-    opacity: 0.8 !important;
-}
-html body .merchant-page:not(.merchant-mobile-view) #merchant-header-v3 #MerchantDistance span {
-    margin: 0 !important;
-    top: 0 !important;
-}
-/* תיאור העסק בדסקטופ (היה בבלוק "תיאור החנות בראש דף המרצ'נט" — pre-line נשמר) */
+/* תיאור בדסקטופ: בעמודת הטקסט, ברוחב התוכן (עד 640) */
 html body .merchant-page:not(.merchant-mobile-view) #merchant-header-v3 div.tw-inline-block.tw-font-semibold.tw-text-sm {
-    white-space: pre-line !important;
-    text-align: right !important;
-    margin: 12px 148px 4px 0 !important;
+    grid-column: 2 !important;
+    justify-self: start !important;
+    max-width: 640px !important;
     padding: 10px 14px !important;
-    border-radius: 16px !important;
-    border: 1px solid #ececef !important;
-    background: #fafafa !important;
-    font-size: 13.5px !important;
-    font-weight: 500 !important;
-    line-height: 1.55 !important;
-    color: #4b5563 !important;
+    font-size: 14px !important;
 }
-/* התג בדסקטופ: מפס ענברי מלא-רוחב לגלולת זכוכית כהה מעל הרצועה */
+/* סטטוס בדסקטופ: מהפס הענברי מלא-הרוחב (בזרימה) לשורה מעל השם (24 + 88 + 20 = 132 מצד ההתחלה) */
 html body .merchant-page:not(.merchant-mobile-view) > .scheme-merchant-order-warning {
     position: absolute !important;
-    top: 40px !important;
-    left: 50% !important;
-    transform: translateX(-50%) !important;
-    width: fit-content !important;
-    max-width: calc(100% - 80px) !important;
-    margin: 0 !important;
-    padding: 0 18px !important;
-    min-height: 40px !important;
-    display: flex !important;
-    align-items: center !important;
+    top: 101px !important;   /* 97 + 4 */
+    inset-inline-start: 132px !important;
+    inset-inline-end: 24px !important;
     z-index: 8 !important;
-    border-radius: 999px !important;
-    border: 1px solid rgba(255, 255, 255, 0.22) !important;
-    background: rgba(24, 24, 27, 0.58) !important;
-    -webkit-backdrop-filter: blur(12px) saturate(140%) !important;
-    backdrop-filter: blur(12px) saturate(140%) !important;
-    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.20) !important;
-}
-html body .merchant-page:not(.merchant-mobile-view) > .scheme-merchant-order-warning > div {
-    padding: 0 !important;
-    gap: 8px !important;
 }
 html body .merchant-page:not(.merchant-mobile-view) > .scheme-merchant-order-warning .scheme-merchant-order-warning__text {
-    color: #fff !important;
     font-size: 14px !important;
-    font-weight: 700 !important;
-    line-height: 40px !important;
-    white-space: nowrap !important;
+    line-height: 20px !important;
 }
-html body .merchant-page:not(.merchant-mobile-view) > .scheme-merchant-order-warning .scheme-merchant-order-warning__text::before {
-    content: '' !important;
-    display: inline-block !important;
-    width: 9px !important;
-    height: 9px !important;
-    border-radius: 50% !important;
-    background: #ffb020 !important;
-    box-shadow: 0 0 0 3px rgba(255, 176, 32, 0.28) !important;
-    margin-inline-end: 9px !important;
-    vertical-align: 1px !important;
+html body .merchant-page:not(.merchant-mobile-view):has(> .scheme-merchant-order-warning) #merchant-header-v3 .header-content {
+    padding-top: 24px !important;
 }
-/* הכותרת הדביקה בגלילה (דסקטופ): זכוכית לבנה */
+/* הכותרת הדביקה בגלילה (דסקטופ): לבן אטום + קו */
 html body .merchant-page:not(.merchant-mobile-view) #MerchantStickyHeader {
-    background: rgba(255, 255, 255, 0.86) !important;
-    -webkit-backdrop-filter: blur(18px) saturate(160%) !important;
-    backdrop-filter: blur(18px) saturate(160%) !important;
-    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.06), 0 8px 24px rgba(0, 0, 0, 0.06) !important;
+    background: var(--mh-bg) !important;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+    box-shadow: 0 1px 0 var(--mh-line) !important;
+}
+html body .merchant-page:not(.merchant-mobile-view) #MerchantStickyHeader .merchant-sticky-header-content .v-img {
+    width: 48px !important;
+    height: 48px !important;
+    border: 1px solid var(--mh-line) !important;
+    border-radius: var(--mh-r-sm) !important;
+    box-shadow: none !important;
+}
+html body .merchant-page:not(.merchant-mobile-view) #MerchantStickyHeader .v-icon.text-rate {
+    color: var(--mh-ink) !important;   /* הכוכב: כמו בשורת המטא בראש (Hyperzod: ענבר) */
+}
+html body .merchant-page:not(.merchant-mobile-view) #MerchantStickyHeader .store-name {
+    font-size: 17px !important;
+    font-weight: 700 !important;
+    letter-spacing: 0 !important;
+    color: var(--mh-ink) !important;
 }
 @media (prefers-reduced-motion: reduce) {
-    html body .merchant-page .merchant-header-img { transition: none !important; }
+    html body .merchant-page .merchant-floating-btn { transition: none !important; }
+    html body .merchant-page .merchant-floating-btn:active { transform: none !important; }
 }
 /* mh-merchanthead-v1 */
 
@@ -7076,9 +7170,10 @@ html.mh-aw-on body #checkout { padding-bottom: var(--mh-aw-pad, 0px) !important;
 html body .merchant-page .product-card-basic h4.product-price[data-mh-from]::before,
 html body .merchant-page .product-card-slider h4.product-price[data-mh-from]::before {
     content: "החל מ-" !important;
-    font-size: 0.78em !important;
-    font-weight: 600 !important;
-    color: #6b7280 !important;
+    margin-inline-end: 3px !important;
+    font-size: 12px !important;            /* 23.10: היה 0.78em — מתחת ל-12 כשהמחיר 15 (חלק 40 v2) */
+    font-weight: 500 !important;
+    color: var(--mh-ink-2) !important;
 }
 /* שבת (v1.1.0, 7.10): הודעה בראש הצ'ק-אאוט כשהעגלה של דליה — ה-JS יוצר את #mh-dalia-shabbat רק בשבת */
 html body #checkout #mh-dalia-shabbat {
@@ -7734,8 +7829,8 @@ html body #payment-card[data-mh-nocash] .payment-method[data-test-id$="-cod"] { 
    חלק 62: החיפוש בתוך חנות — MH StoreSearch v1.0.1 | 2026-10-20 (דוד: "שיהיה נוח לחוויית משתמש"; v1.0.1 21.10: באפליקציה שורת החיפוש נשארת מתחת לפס השעון בגלילה)
    הבעלים של #MerchantSearchPage (נתיב merchant-search, הזכוכית בראש דף העסק): שורת החיפוש, גלולות המיון והסינון,
    שורות התוצאות, המצב הריק ו"אין תוצאות". התנהגות (×, חיפושים אחרונים, טקסטים): JS "MH StoreSearch".
-   עקרונות: שורה צפופה (6–7 תוצאות במסך במקום 4–5), תמונה 88px (DriveImg מוריד אותה בגודל הזה — זיכרון),
-   מחיר באדום כמו בכרטיסי החנות, בלי זכוכית/טשטוש בראש הנדבק (זיכרון באייפון), שדה 17px (בלי זום של iOS).
+   עקרונות: שורה צפופה (6–7 תוצאות במסך במקום 4–5), תמונה 88px (DriveImg מוריד אותה בגודל הזה — זיכרון) — השורות עצמן
+   בבעלות חלק 40 מ-23.10; בלי זכוכית/טשטוש בראש הנדבק (זיכרון באייפון), שדה 17px (בלי זום של iOS).
    ========================================================= */
 html body #MerchantSearchPage { background: #fff !important; }
 html body #MerchantSearchPage .scheme-merchant-search-header { background: #fff !important; padding-bottom: 4px !important; box-shadow: 0 1px 0 rgba(17, 17, 17, 0.06) !important; }
@@ -7792,33 +7887,7 @@ html body #MerchantSearchPage .recent-searches .label-chip { height: 40px !impor
 /* התוצאות: רשימה צפופה במקום רשת של כרטיסים */
 html body #MerchantSearchPage .scheme-merchant-search-content { padding-top: 2px !important; }
 html body #MerchantSearchPage .product-horizontal-cards { display: block !important; }
-/* Hyperzod ב-.merchant-list-view: לכרטיס height+min-height 155.8px (200 במחשב), ל-.pro-card-h min-width 155.8px — מאופסים */
-html body #MerchantSearchPage .product-card-horizontal { height: auto !important; min-height: 0 !important; margin: 0 !important; border: 0 !important; border-bottom: 1px solid #f0ece8 !important; border-radius: 0 !important; background: transparent !important; box-shadow: none !important; overflow: visible !important; -webkit-tap-highlight-color: transparent !important; }
-html body #MerchantSearchPage .product-card-horizontal:last-child { border-bottom: 0 !important; }
-html body #MerchantSearchPage .product-card-horizontal > .v-card-text { padding: 10px 0 !important; }
-html body #MerchantSearchPage .product-card-horizontal .v-card-text > .tw-grid { display: flex !important; height: auto !important; align-items: center !important; gap: 14px !important; }
-html body #MerchantSearchPage .product-card-horizontal .v-card-text > .tw-grid > :first-child { flex: 1 1 auto !important; min-width: 0 !important; }
-html body #MerchantSearchPage .product-card-horizontal .pro-card-h { flex: 0 0 88px !important; width: 88px !important; min-width: 0 !important; height: auto !important; min-height: 0 !important; align-items: center !important; }   /* Hyperzod: min-width 155.8px */
-html body #MerchantSearchPage .product-card-horizontal .pro-card-h-img { flex: 0 0 88px !important; width: 88px !important; height: 88px !important; min-height: 0 !important; max-height: 88px !important; aspect-ratio: 1 / 1 !important; margin: 0 !important; border: 1px solid #ece8e3 !important; border-radius: 16px !important; background: #fff !important; overflow: visible !important; box-shadow: none !important; box-sizing: border-box !important; }   /* מסגרת לכל אריח: רוב תמונות המוצר הן צילום על לבן ובלי מסגרת הן "צפות" */
-html body #MerchantSearchPage .product-card-horizontal .pro-card-h-img .v-img { border-radius: 15px !important; overflow: hidden !important; }
-html body #MerchantSearchPage .product-card-horizontal .pro-card-h-img .v-responsive__sizer { padding-bottom: 100% !important; }
-html body #MerchantSearchPage .product-card-horizontal .add-product-btn > span { display: none !important; }   /* "שינוי תוספות" כפול מתחת לכפתור */
-/* "+" בפינה התחתונה החיצונית של האריח (במרכז הוא הסתיר את המנה באריח של 88px) */
-html body #MerchantSearchPage .product-card-horizontal .pro-card-h-img > .tw-absolute { top: auto !important; bottom: -8px !important; left: -8px !important; right: auto !important; transform: none !important; z-index: 3 !important; }
-html body #MerchantSearchPage .product-card-horizontal .add-product-btn { margin: 0 !important; padding: 0 !important; }
-html body #MerchantSearchPage .product-card-horizontal .add-product-btn button.add-btn { width: 40px !important; min-width: 40px !important; max-width: 40px !important; height: 40px !important; min-height: 40px !important; max-height: 40px !important; background: #fff !important; -webkit-backdrop-filter: none !important; backdrop-filter: none !important; box-shadow: 0 2px 8px rgba(17, 17, 17, 0.14), 0 0 0 1px rgba(17, 17, 17, 0.06) !important; }   /* עיגול לבן מלא (Vuetify נותן min-height 40 — 36 רוחב יצא אליפסה; הזכוכית השקופה נעלמה על הלבן שמחוץ לאריח, ו-20 blur ברשימה גוללת = עומס גרפי) */
-/* טקסט: שם ותיאור ברוחב מלא, מחיר ותג "שינוי תוספות" באותה שורה */
-html body #MerchantSearchPage .product-card-horizontal .v-card-text > .tw-grid > :first-child > div { width: 100% !important; flex-direction: row !important; flex-wrap: wrap !important; align-items: center !important; justify-content: flex-start !important; column-gap: 8px !important; height: auto !important; }
-html body #MerchantSearchPage .product-card-horizontal .rec-item-title { display: contents !important; }
-html body #MerchantSearchPage .product-card-horizontal :is(.product-name, .product-description) { flex: 0 0 100% !important; }
-html body #MerchantSearchPage .product-card-horizontal .price { order: 3 !important; }
-html body #MerchantSearchPage .product-card-horizontal .product-discount-badge { top: 6px !important; inset-inline-start: 6px !important; z-index: 2 !important; padding: 2px 7px !important; border-radius: 999px !important; font-size: 11px !important; font-weight: 800 !important; line-height: 16px !important; }
-html body #MerchantSearchPage .product-card-horizontal .product-name { margin: 0 0 3px !important; font-size: 15px !important; font-weight: 700 !important; line-height: 1.35 !important; color: #111 !important; }
-html body #MerchantSearchPage .product-card-horizontal .product-description { margin: 0 0 6px !important; font-size: 13px !important; line-height: 1.4 !important; color: #6b7280 !important; -webkit-line-clamp: 1 !important; line-clamp: 1 !important; }
-html body #MerchantSearchPage .product-card-horizontal .product-customizable-tag { order: 4 !important; display: inline-block !important; margin: 0 !important; padding: 2px 8px !important; border-radius: 999px !important; background: #f3f1ee !important; font-size: 11.5px !important; font-weight: 600 !important; line-height: 16px !important; color: #6b7280 !important; }
-html body #MerchantSearchPage .product-card-horizontal .price .product-price { margin: 0 !important; font-size: 16px !important; font-weight: 800 !important; line-height: 1.25 !important; color: #c8151b !important; }
-html body #MerchantSearchPage .product-card-horizontal .price .product-price small { margin-inline-start: 6px !important; font-size: 13px !important; font-weight: 500 !important; color: #9ca3af !important; }
-html body #MerchantSearchPage .product-card-horizontal:active { background: #faf8f6 !important; }
+/* השורות (.product-card-horizontal: אריח 88, "+" בפינה, שם/תיאור/מחיר, מונה) — עברו 23.10 ל"חלק 40: MH Cards" (בעלים אחד לשורת מוצר, גם לרשימה בדף העסק). */
 /* "אין תוצאות": הטקסט של Hyperzod (אנגלית) → עברית עם המילה שחיפשו (JS: data-mh-ss-none + data-mh-ss-title) */
 html body #MerchantSearchPage [data-mh-ss-none] { margin: 44px 24px 0 !important; font-size: 0 !important; line-height: 0 !important; text-align: center !important; }
 html body #MerchantSearchPage [data-mh-ss-none]::before { content: attr(data-mh-ss-title) !important; display: block !important; font-size: 17px !important; font-weight: 800 !important; line-height: 1.4 !important; color: #111 !important; overflow-wrap: anywhere !important; }
@@ -7829,11 +7898,8 @@ html body:has(#AppBar) #MerchantSearchPage .scheme-merchant-search-header { top:
 /* מחשב: עמודה אחת ממורכזת ברוחב קריאה */
 @media (min-width: 900px) {
     html body #MerchantSearchPage { max-width: 760px !important; margin-inline: auto !important; }
-    html body #MerchantSearchPage .product-card-horizontal .pro-card-h { flex-basis: 112px !important; width: 112px !important; }
-    html body #MerchantSearchPage .product-card-horizontal .pro-card-h-img { flex-basis: 112px !important; width: 112px !important; height: 112px !important; max-height: 112px !important; }
 }
 @media (hover: hover) {
-    html body #MerchantSearchPage .product-card-horizontal:hover { background: #faf8f6 !important; }
     html body #MerchantSearchPage #mh-ss-empty .mh-ss-chip:hover { background: #f3f1ee !important; }
 }
 /* mh-storesearch-v1 */
@@ -7862,6 +7928,7 @@ html body .merchant-page .v-card__loader > .v-progress-linear:not(.v-progress-li
    וטשטוש — פאנל לבן "תקוע" בתוך מסגרת אפורה — וגם לכל כרטיס מוצר בתוכה; כפתור החזרה עלה על הכותרת; "+" מרובע אדום בצ'ק-אאוט.
    עכשיו: שורות כמו בחיפוש בתוך חנות (חלק 62) — אריח 88 עם קו דק, שם, תיאור בשורה, מחיר, "+" עיגול לבן בפינת האריח —
    כותרת עם חזרה מתחת לפס השעון, וכפתור "המשך לתשלום" מלא ברוחב. בלי זכוכית, בלי צללים.
+   23.10: ה-"+" ומונה הכמות (מראה וגודל) — בבעלות "חלק 40: MH Cards" (כמו בכל כרטיס מוצר); כאן רק המיקום. מחיר שחור, שם 600.
    ========================================================= */
 /* ---------- (א) החלונית שלפני התשלום ---------- */
 html body .v-bottom-sheet__content > .v-card:has(> .checkout-journey-sheet) { padding: 0 !important; border: 0 !important; border-radius: 0 !important; background: #fff !important; box-shadow: none !important; -webkit-backdrop-filter: none !important; backdrop-filter: none !important; }
@@ -7874,33 +7941,26 @@ html body .checkout-journey-sheet button.v-btn.v-btn--icon.checkout-journey-back
 html body .checkout-journey-sheet > div:first-child h2 { margin: 0 !important; font-size: 21px !important; font-weight: 800 !important; line-height: 1.25 !important; color: #111 !important; letter-spacing: 0 !important; }
 /* הרשימה */
 html body .checkout-journey-sheet .product-horizontal-cards { display: block !important; }
-html body .v-overlay .checkout-journey-sheet .product-horizontal-cards .product-card-horizontal.scheme-recommended-product-card { height: auto !important; min-height: 0 !important; aspect-ratio: auto !important; margin: 0 !important; border-style: solid !important; border-color: #f0ece8 !important; border-width: 0 0 1px !important; border-radius: 0 !important; background: transparent !important; box-shadow: none !important; overflow: visible !important; padding: 0 !important; -webkit-tap-highlight-color: transparent !important; }
+html body .v-overlay .checkout-journey-sheet .product-horizontal-cards .product-card-horizontal.scheme-recommended-product-card { height: auto !important; min-height: 0 !important; aspect-ratio: auto !important; margin: 0 !important; border-style: solid !important; border-color: var(--mh-line) !important; border-width: 0 0 1px !important; border-radius: 0 !important; background: transparent !important; box-shadow: none !important; overflow: visible !important; padding: 0 !important; -webkit-tap-highlight-color: transparent !important; }
 html body .v-overlay .checkout-journey-sheet .product-horizontal-cards .product-card-horizontal.scheme-recommended-product-card:last-child { border-bottom: 0 !important; }
 html body .v-overlay .checkout-journey-sheet .product-horizontal-cards .product-card-horizontal.scheme-recommended-product-card > .v-card-text { padding: 12px 0 !important; }
 html body .v-overlay .checkout-journey-sheet .product-horizontal-cards .product-card-horizontal.scheme-recommended-product-card .v-card-text > .tw-grid { display: flex !important; height: auto !important; align-items: center !important; gap: 14px !important; }
 html body .v-overlay .checkout-journey-sheet .product-horizontal-cards .product-card-horizontal.scheme-recommended-product-card .v-card-text > .tw-grid > :first-child { flex: 1 1 auto !important; min-width: 0 !important; }
 html body .v-overlay .checkout-journey-sheet .product-horizontal-cards .product-card-horizontal.scheme-recommended-product-card .rec-item-title { max-width: none !important; }
-html body .v-overlay .checkout-journey-sheet .product-horizontal-cards .product-card-horizontal.scheme-recommended-product-card .product-name { margin: 0 0 2px !important; font-size: 15px !important; font-weight: 700 !important; line-height: 1.35 !important; color: #111 !important; }
-html body .v-overlay .checkout-journey-sheet .product-horizontal-cards .product-card-horizontal.scheme-recommended-product-card .product-description { margin: 0 0 4px !important; font-size: 13px !important; line-height: 1.4 !important; color: #6b7280 !important; -webkit-line-clamp: 1 !important; line-clamp: 1 !important; }
+html body .v-overlay .checkout-journey-sheet .product-horizontal-cards .product-card-horizontal.scheme-recommended-product-card .product-name { margin: 0 0 2px !important; font-size: 15px !important; font-weight: 600 !important; line-height: 1.35 !important; color: var(--mh-ink) !important; }
+html body .v-overlay .checkout-journey-sheet .product-horizontal-cards .product-card-horizontal.scheme-recommended-product-card .product-description { margin: 0 0 4px !important; font-size: 13px !important; line-height: 1.4 !important; color: var(--mh-ink-2) !important; -webkit-line-clamp: 1 !important; line-clamp: 1 !important; }
 html body .v-overlay .checkout-journey-sheet .product-horizontal-cards .product-card-horizontal.scheme-recommended-product-card .product-description:empty { display: none !important; }
-html body .v-overlay .checkout-journey-sheet .product-horizontal-cards .product-card-horizontal.scheme-recommended-product-card .product-price { margin: 0 !important; font-size: 16px !important; font-weight: 800 !important; line-height: 1.25 !important; color: #c8151b !important; }
-html body .v-overlay .checkout-journey-sheet .product-horizontal-cards .product-card-horizontal.scheme-recommended-product-card .product-price small { margin-inline-start: 6px !important; font-size: 13px !important; font-weight: 500 !important; color: #9ca3af !important; }
+html body .v-overlay .checkout-journey-sheet .product-horizontal-cards .product-card-horizontal.scheme-recommended-product-card .product-price { margin: 0 !important; font-size: 15px !important; font-weight: 600 !important; line-height: 1.3 !important; color: var(--mh-ink) !important; font-variant-numeric: tabular-nums; }
+html body .v-overlay .checkout-journey-sheet .product-horizontal-cards .product-card-horizontal.scheme-recommended-product-card .product-price:has(> small) { color: var(--mh-red-ink) !important; font-weight: 700 !important; }
+html body .v-overlay .checkout-journey-sheet .product-horizontal-cards .product-card-horizontal.scheme-recommended-product-card .product-price small { margin-inline-start: 6px !important; font-size: 13px !important; font-weight: 400 !important; color: var(--mh-ink-3) !important; text-decoration: line-through !important; }
 /* אריח התמונה */
 html body .v-overlay .checkout-journey-sheet .product-horizontal-cards .product-card-horizontal.scheme-recommended-product-card .pro-card-h { flex: 0 0 88px !important; width: 88px !important; min-width: 0 !important; height: auto !important; min-height: 0 !important; }
-html body .v-overlay .checkout-journey-sheet .product-horizontal-cards .product-card-horizontal.scheme-recommended-product-card .pro-card-h-img { width: 88px !important; height: 88px !important; min-height: 0 !important; max-height: 88px !important; aspect-ratio: 1 / 1 !important; margin: 0 !important; border: 1px solid #ece8e3 !important; border-radius: 16px !important; background: #fff !important; box-shadow: none !important; overflow: visible !important; box-sizing: border-box !important; }
+html body .v-overlay .checkout-journey-sheet .product-horizontal-cards .product-card-horizontal.scheme-recommended-product-card .pro-card-h-img { width: 88px !important; height: 88px !important; min-height: 0 !important; max-height: 88px !important; aspect-ratio: 1 / 1 !important; margin: 0 !important; border: 1px solid var(--mh-line) !important; border-radius: 14px !important; background: var(--mh-bg) !important; box-shadow: none !important; overflow: visible !important; box-sizing: border-box !important; }
 html body .v-overlay .checkout-journey-sheet .product-horizontal-cards .product-card-horizontal.scheme-recommended-product-card .pro-card-h-img > .tw-cursor-pointer { position: absolute !important; inset: 0 !important; width: 100% !important; height: 100% !important; }   /* העטיפה הצטמקה ל-46×38 */
-html body .v-overlay .checkout-journey-sheet .product-horizontal-cards .product-card-horizontal.scheme-recommended-product-card .pro-card-h-img .v-img { width: 100% !important; height: 100% !important; border-radius: 15px !important; overflow: hidden !important; }
-/* "+" / מונה — בפינה התחתונה החיצונית של האריח */
-html body .v-overlay .checkout-journey-sheet .product-horizontal-cards .product-card-horizontal.scheme-recommended-product-card .pro-card-h-img > .tw-absolute { top: auto !important; bottom: -8px !important; left: -8px !important; right: auto !important; width: max-content !important; transform: none !important; z-index: 3 !important; }   /* max-content: מונה הכמות (96) לא גולש שמאלה מחוץ למסך ב-RTL */
+html body .v-overlay .checkout-journey-sheet .product-horizontal-cards .product-card-horizontal.scheme-recommended-product-card .pro-card-h-img .v-img { width: 100% !important; height: 100% !important; border-radius: 13px !important; overflow: hidden !important; }
+/* "+" / מונה — בפינה התחתונה החיצונית של האריח (המראה: חלק 40) */
+html body .v-overlay .checkout-journey-sheet .product-horizontal-cards .product-card-horizontal.scheme-recommended-product-card .pro-card-h-img > .tw-absolute { top: auto !important; bottom: -8px !important; left: -8px !important; right: auto !important; width: max-content !important; transform: none !important; z-index: 3 !important; }   /* max-content: מונה הכמות (100) לא גולש שמאלה מחוץ למסך ב-RTL */
 html body .v-overlay .checkout-journey-sheet .product-horizontal-cards .product-card-horizontal.scheme-recommended-product-card :is(.v-card__overlay, .v-card__underlay) { display: none !important; }
-html body .v-overlay .checkout-journey-sheet .product-horizontal-cards .product-card-horizontal.scheme-recommended-product-card .add-product-btn { margin: 0 !important; padding: 0 !important; }
-html body .v-overlay .checkout-journey-sheet .product-horizontal-cards .product-card-horizontal.scheme-recommended-product-card .pro-card-h-img button.add-btn { width: 40px !important; min-width: 40px !important; max-width: 40px !important; height: 40px !important; min-height: 40px !important; max-height: 40px !important; padding: 0 !important; border: 0 !important; border-radius: 999px !important; background: #fff !important; color: #e31e24 !important; -webkit-backdrop-filter: none !important; backdrop-filter: none !important; box-shadow: 0 2px 8px rgba(17, 17, 17, 0.14), 0 0 0 1px rgba(17, 17, 17, 0.06) !important; font-size: 0 !important; }
-html body .v-overlay .checkout-journey-sheet .product-horizontal-cards .product-card-horizontal.scheme-recommended-product-card .pro-card-h-img button.add-btn svg { width: 15px !important; height: 15px !important; margin: 0 !important; color: #e31e24 !important; }
-html body .v-overlay .checkout-journey-sheet .product-horizontal-cards .product-card-horizontal.scheme-recommended-product-card .counter-btn { width: 96px !important; height: 36px !important; border: 0 !important; border-radius: 999px !important; background: #e31e24 !important; box-shadow: 0 2px 8px rgba(17, 17, 17, 0.14) !important; }
-html body .v-overlay .checkout-journey-sheet .product-horizontal-cards .product-card-horizontal.scheme-recommended-product-card .counter-btn :is(.decrement-btn, .increment-btn) { width: 34px !important; height: 36px !important; padding: 0 !important; display: grid !important; place-items: center !important; background: transparent !important; }
-html body .v-overlay .checkout-journey-sheet .product-horizontal-cards .product-card-horizontal.scheme-recommended-product-card .counter-btn .counter-input { background: transparent !important; font-size: 15px !important; font-weight: 800 !important; }
-/* מוצר בלי תמונה: הכפתור בשורת המחיר — גלולה לבנה עם קו */
-html body .v-overlay .checkout-journey-sheet .product-horizontal-cards .product-card-horizontal.scheme-recommended-product-card .price.tw-flex button.add-btn { width: auto !important; min-width: 0 !important; max-width: none !important; height: 36px !important; min-height: 36px !important; max-height: 36px !important; padding: 0 14px !important; border: 1px solid #e6e2dd !important; border-radius: 999px !important; background: #fff !important; color: #c8151b !important; box-shadow: none !important; -webkit-backdrop-filter: none !important; backdrop-filter: none !important; font-size: 14px !important; font-weight: 700 !important; }
 html body .v-overlay .checkout-journey-sheet .product-horizontal-cards .product-card-horizontal.scheme-recommended-product-card .v-card-text > .tw-grid > :first-child > .tw-flex { align-items: stretch !important; }
 html body .v-overlay .checkout-journey-sheet .product-horizontal-cards .product-card-horizontal.scheme-recommended-product-card .price.tw-flex { justify-content: space-between !important; align-items: center !important; gap: 10px !important; width: 100% !important; }
 html body .v-overlay .checkout-journey-sheet .product-horizontal-cards .product-card-horizontal.scheme-recommended-product-card .price.tw-flex > .tw-relative { position: static !important; top: 0 !important; }   /* Hyperzod: .price > .tw-relative absolute — עלה על השם */
@@ -7909,25 +7969,23 @@ html body .checkout-journey-sheet__footer { padding-top: 12px !important; paddin
 html body .checkout-journey-sheet__footer .v-btn { width: 100% !important; height: 52px !important; border-radius: 14px !important; background: #e31e24 !important; color: #fff !important; box-shadow: none !important; font-size: 17px !important; font-weight: 700 !important; letter-spacing: 0 !important; text-transform: none !important; }
 html body .checkout-journey-sheet__footer .v-btn .v-btn__overlay { opacity: 0 !important; }
 html body .checkout-journey-sheet__footer .v-btn:active { background: #c8151b !important; }
-html body .v-overlay .checkout-journey-sheet .product-horizontal-cards .product-card-horizontal.scheme-recommended-product-card:active { background: #faf8f6 !important; }
+html body .v-overlay .checkout-journey-sheet .product-horizontal-cards .product-card-horizontal.scheme-recommended-product-card:active { background: var(--mh-bg-2) !important; }
 
 /* ---------- (ב) "ייתכן שתאהבו גם" בצ'ק-אאוט ---------- */
 html body .similar-items-panel .similar-items-wrap > div:first-child h1 { margin: 0 !important; font-size: 17px !important; font-weight: 800 !important; line-height: 1.3 !important; color: #111 !important; }
 html body .similar-items-panel .similar-items-wrap > div:first-child { margin: 2px 0 12px !important; }
 html body .similar-items-panel .slider-inner-container { gap: 12px !important; padding-bottom: 4px !important; }
 html body .similar-items-panel .product-card-basic { background: transparent !important; border: 0 !important; box-shadow: none !important; border-radius: 0 !important; overflow: visible !important; }
-html body .similar-items-panel .product-card-basic .product-image-frame { border: 1px solid #ece8e3 !important; border-radius: 16px !important; background: #fff !important; overflow: visible !important; box-shadow: none !important; }
-html body .similar-items-panel .product-card-basic .product-image-frame .v-img { border-radius: 15px !important; background: #fff !important; }
-html body .similar-items-panel .product-card-basic .product-image-frame > .tw-absolute { right: auto !important; left: 6px !important; bottom: 6px !important; }
-html body .similar-items-panel .product-card-basic .add-product-btn { margin: 0 !important; padding: 0 !important; }
-html body .similar-items-panel .product-card-basic button.add-btn { width: 36px !important; min-width: 36px !important; max-width: 36px !important; height: 36px !important; min-height: 36px !important; max-height: 36px !important; margin: 0 !important; padding: 0 !important; border: 0 !important; border-radius: 999px !important; background: #fff !important; color: #e31e24 !important; -webkit-backdrop-filter: none !important; backdrop-filter: none !important; box-shadow: 0 2px 8px rgba(17, 17, 17, 0.14), 0 0 0 1px rgba(17, 17, 17, 0.06) !important; }
-html body .similar-items-panel .product-card-basic button.add-btn svg { width: 14px !important; height: 14px !important; color: #e31e24 !important; }
-html body .similar-items-panel .product-card-basic .counter-btn { height: 34px !important; border: 0 !important; border-radius: 999px !important; background: #e31e24 !important; box-shadow: 0 2px 8px rgba(17, 17, 17, 0.14) !important; }
+html body .similar-items-panel .product-card-basic .product-image-frame { border: 1px solid var(--mh-line) !important; border-radius: 14px !important; background: var(--mh-bg) !important; overflow: visible !important; box-shadow: none !important; }
+html body .similar-items-panel .product-card-basic .product-image-frame .v-img { border-radius: 13px !important; background: var(--mh-bg) !important; }
+html body .similar-items-panel .product-card-basic .product-image-frame > .tw-absolute { right: auto !important; left: 6px !important; bottom: 6px !important; }   /* המיקום; המראה של "+"/המונה — חלק 40 */
 html body .similar-items-panel .product-card-basic .v-card-text { padding: 8px 2px 4px !important; }
-html body .similar-items-panel .product-card-basic .product-name { font-size: 13.5px !important; font-weight: 600 !important; line-height: 1.35 !important; color: #111 !important; }
-html body .similar-items-panel .product-card-basic .product-price { font-size: 14.5px !important; font-weight: 800 !important; color: #c8151b !important; }
+html body .similar-items-panel .product-card-basic .product-name { font-size: 14px !important; font-weight: 600 !important; line-height: 1.35 !important; color: var(--mh-ink) !important; }
+html body .similar-items-panel .product-card-basic .product-price { font-size: 15px !important; font-weight: 600 !important; color: var(--mh-ink) !important; font-variant-numeric: tabular-nums; }
+html body .similar-items-panel .product-card-basic .product-price:has(> small) { color: var(--mh-red-ink) !important; font-weight: 700 !important; }
+html body .similar-items-panel .product-card-basic .product-price small { margin-inline-start: 6px !important; font-size: 13px !important; font-weight: 400 !important; color: var(--mh-ink-3) !important; text-decoration: line-through !important; }
 @media (hover: hover) {
-    html body .v-overlay .checkout-journey-sheet .product-horizontal-cards .product-card-horizontal.scheme-recommended-product-card:hover { background: #faf8f6 !important; }
+    html body .v-overlay .checkout-journey-sheet .product-horizontal-cards .product-card-horizontal.scheme-recommended-product-card:hover { background: var(--mh-bg-2) !important; }
     html body .checkout-journey-sheet__footer .v-btn:hover { background: #c8151b !important; }
 }
 /* mh-recs-v1 */
