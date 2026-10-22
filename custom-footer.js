@@ -4364,7 +4364,7 @@ log('פעיל');
   var CARD = 'mh-kafit-addr';
   var NEED = 'mh-kafit-needaddr';                   /* על <html>: אין כתובת → הכפתור אפור */
   var MIN = 3;                                      /* כמה תווים (בלי רווחים בקצוות) נחשבים "כתבו כתובת" */
-  var MSG = 'כתבו כתובת למשלוח — היא מודפסת למסעדה על ההזמנה';
+  var MSG = 'כתבו כתובת למשלוח כדי להשלים את ההזמנה';   /* דוד 22.10: בלי "מודפסת למסעדה" — לא לעיני הלקוח */
   var IS_ORDER = /\/store\/v1\/order(\?|$)/;
   var BTNS = '.place-order .v-btn, #OrderPlaceButton';   /* נייד/אפליקציה: הסרגל הצף; מחשב: הכפתור בכרטיס העגלה */
   var stats = { version: VERSION, tagged: 0, filled: 0, scans: 0, merchant: null, nudged: 0, blocked: 0, errors: 0 };
