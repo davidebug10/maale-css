@@ -4339,16 +4339,18 @@ log('פעיל');
 })();
 
 /* ============================================================
-   הדגשת שדה "הזנת כתובת ידנית" בצ'ק-אאוט של קפית — MH KafitAddr  |  v1.0.0 | 2026-09-10
+   שדה "הזנת כתובת ידנית" בצ'ק-אאוט של קפית — MH KafitAddr  |  v1.1.0 | 2026-10-22 (v1.0.0: 10.9)
    הבעיה: לקפית אין כרטיס כתובת (שני סוגי המשלוח שלה מוגדרים אצל Hyperzod
-   כ-requires_address:false), ולכן הכתובת נכתבת בשדה טקסט חופשי שלקוחות מפספסים.
-   הבלוק מאתר את הכרטיס לפי **הטקסט** ("הזנת כתובת ידנית") ולא לפי מחלקה של Hyperzod,
-   כי השדה מוגדר בצד המסעדן ואין לו id יציב. מוסיף מחלקות בלבד — ה-CSS בחלק 42.
-   סקופ כפול ונעול:
-     1. רק בדף הצ'ק-אאוט (#checkout קיים)
-     2. רק כשעסק העגלה הוא קפית (MERCHANT), לפי getCartMerchant
-   לא נוגע בהתנהגות: לא חוסם הזמנה, לא משנה ערכים, לא מוסיף required. עיצוב בלבד.
-   נכשל-פתוח: לא נמצא כרטיס → לא קורה כלום.
+   כ-requires_address:false), ולכן הכתובת נכתבת בשדה טקסט חופשי — והיא מודפסת להם על הקבלה
+   (הם עושים את המשלוח). לקוחות עדיין שוכחים לכתוב אותה.
+   v1.0.0 (עיצוב): הבלוק מאתר את הכרטיס לפי **הטקסט** ("הזנת כתובת ידנית") ולא לפי מחלקה של Hyperzod
+   (השדה מוגדר בצד המסעדן ואין לו id יציב) ומתייג אותו — ה-CSS בחלק 42.
+   v1.1.0 (דוד 22.10: "להאפיר את כפתור התשלום אם לא הזינו כתובת — אבל יפה"):
+     - כל עוד השדה ריק (פחות מ-MIN תווים): html.mh-kafit-needaddr → כפתור "בצע הזמנה" אפור + שורת הסבר (CSS).
+     - לחיצה על הכפתור במצב הזה לא שולחת — גוללת לשדה, פותחת מקלדת ומאירה את הכרטיס לרגע.
+     - שכבת ביטחון: POST /store/v1/order של קפית עם שדה ריק נחסם לפני שהוא יוצא (כמו MH NoCash).
+     - נכשל-פתוח: כרטיס לא נמצא (Hyperzod/המסעדן שינו את השדה) → שום חסימה, הכול כרגיל.
+   סקופ כפול ונעול: רק בדף הצ'ק-אאוט (#checkout) ורק כשעסק העגלה הוא קפית (getCartMerchant).
    בדיקה: window.MH_KAFITADDR.stats()
    ============================================================ */
 (function () {
@@ -4356,17 +4358,22 @@ log('פעיל');
   if (window.__MH_KAFITADDR__) { return; }
   window.__MH_KAFITADDR__ = true;
 
-  var VERSION = '1.0.0';
+  var VERSION = '1.1.0';
   var MERCHANT = '6a95042205b27b504d058bc5';        /* קפית אגם אדומים */
   var NEEDLE = 'הזנת כתובת ידנית';                   /* התחלה של הכותרת; סובלני לניקוד/סימני פיסוק */
   var CARD = 'mh-kafit-addr';
-  var stats = { version: VERSION, tagged: 0, filled: 0, scans: 0, merchant: null };
+  var NEED = 'mh-kafit-needaddr';                   /* על <html>: אין כתובת → הכפתור אפור */
+  var MIN = 3;                                      /* כמה תווים (בלי רווחים בקצוות) נחשבים "כתבו כתובת" */
+  var MSG = 'כתבו כתובת למשלוח — היא מודפסת למסעדה על ההזמנה';
+  var IS_ORDER = /\/store\/v1\/order(\?|$)/;
+  var BTNS = '.place-order .v-btn, #OrderPlaceButton';   /* נייד/אפליקציה: הסרגל הצף; מחשב: הכפתור בכרטיס העגלה */
+  var stats = { version: VERSION, tagged: 0, filled: 0, scans: 0, merchant: null, nudged: 0, blocked: 0, errors: 0 };
 
+  function store() { try { return document.getElementById('app').__vue_app__.config.globalProperties.$store; } catch (e) { return null; } }
   function onCheckout() { return !!document.getElementById('checkout'); }
   function isKafit() {
     try {
-      var st = document.getElementById('app').__vue_app__.config.globalProperties.$store;
-      var m = st.getters.getCartMerchant;
+      var m = store().getters.getCartMerchant;
       var id = m && (m.merchant_id || m._id || m.id);
       stats.merchant = id || null;
       return id === MERCHANT;
@@ -4382,40 +4389,121 @@ log('פעיל');
     }
     return null;
   }
-
-  function sync() {
-    stats.scans++;
-    if (!onCheckout() || !isKafit()) {
-      var old = document.querySelector('.' + CARD);
-      if (old) { old.classList.remove(CARD, CARD + '-filled'); }
-      return;
-    }
+  function findCard() {
     var co = document.getElementById('checkout');
+    if (!co) { return null; }
     var heads = co.querySelectorAll('h1, h2, h3, h4, h5, p, span, div, label');
-    var head = null;
     for (var i = 0; i < heads.length; i++) {
       var e = heads[i];
       if (e.children.length) { continue; }                       /* אלמנט עלה בלבד */
       if ((e.textContent || '').indexOf(NEEDLE) === -1) { continue; }
-      head = e; break;
+      return cardOf(e);
     }
-    if (!head) { return; }
-    var card = cardOf(head);
-    if (!card) { return; }
+    return null;
+  }
+  /* null = לא קפית / אין כרטיס גלוי → לא נוגעים (נכשל-פתוח) */
+  function state() {
+    if (!onCheckout() || !isKafit()) { return null; }
+    var card = findCard();
+    if (!card || !card.getClientRects().length) { return null; }
+    var input = card.querySelector('input, textarea');
+    if (!input) { return null; }
+    return { card: card, input: input, empty: String(input.value || '').trim().length < MIN };
+  }
+  function setNeed(on) {
+    var h = document.documentElement;
+    if (h.classList.contains(NEED) !== on) { h.classList.toggle(NEED, on); }
+    var btns = document.querySelectorAll(BTNS);
+    for (var i = 0; i < btns.length; i++) { var btn = btns[i]; if (on) { btn.setAttribute('aria-disabled', 'true'); } else if (btn.getAttribute('aria-disabled') === 'true') { btn.removeAttribute('aria-disabled'); } }
+  }
+
+  function sync() {
+    stats.scans++;
+    var s = state();
+    if (!s) {
+      var old = document.querySelector('.' + CARD);
+      if (old) { old.classList.remove(CARD, CARD + '-filled'); }
+      setNeed(false);
+      return;
+    }
+    var card = s.card;
     if (!card.classList.contains(CARD)) { card.classList.add(CARD); stats.tagged++; }
     /* מצב "מולא" — כדי שההדגשה תירגע אחרי שהלקוח כתב */
-    var input = card.querySelector('input, textarea');
-    var filled = !!(input && String(input.value || '').trim().length > 1);
+    var filled = !s.empty;
     if (card.classList.contains(CARD + '-filled') !== filled) {
       card.classList.toggle(CARD + '-filled', filled);
       if (filled) { stats.filled++; }
     }
-    if (input && !input.__mhKafitBound) {
-      input.__mhKafitBound = true;
-      input.addEventListener('input', schedule);
-      input.addEventListener('blur', schedule);
+    setNeed(s.empty);
+    if (!s.input.__mhKafitBound) {
+      s.input.__mhKafitBound = true;
+      s.input.addEventListener('input', function () { try { sync(); } catch (e) {} });   /* מיידי: הכפתור חוזר לאדום תוך כדי הקלדה */
+      s.input.addEventListener('blur', schedule);
     }
   }
+
+  /* לחיצה על "בצע הזמנה" בלי כתובת: לא שולחים — מקלדת על השדה, גלילה אליו והארה קצרה */
+  function nudge(s) {
+    stats.nudged++;
+    try { s.input.focus({ preventScroll: true }); } catch (e) { try { s.input.focus(); } catch (e2) {} }   /* בתוך הלחיצה — אחרת iOS לא פותח מקלדת */
+    try { s.card.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch (e) { s.card.scrollIntoView(); }
+    s.card.classList.remove(CARD + '-nudge'); void s.card.offsetWidth; s.card.classList.add(CARD + '-nudge');
+    setTimeout(function () { s.card.classList.remove(CARD + '-nudge'); }, 1300);
+  }
+  document.addEventListener('click', function (e) {
+    try {
+      if (!document.documentElement.classList.contains(NEED)) { return; }
+      var t = e.target;
+      if (!t || !t.closest || !t.closest('.place-order, #OrderPlaceButton')) { return; }
+      var s = state();
+      if (!s || !s.empty) { sync(); return; }                    /* כבר כתבו / לא קפית → ממשיכים כרגיל */
+      e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation();
+      nudge(s);
+    } catch (er) { stats.errors++; }
+  }, true);
+
+  /* שכבת ביטחון: הבקשה עצמה. true = מותר לשלוח */
+  function guard(body) {
+    if (typeof body !== 'string') { return true; }
+    var o; try { o = JSON.parse(body); } catch (e) { return true; }
+    if (!o || o.merchant_id !== MERCHANT) { return true; }
+    var s = state();
+    if (!s || !s.empty) { return true; }
+    stats.blocked++;
+    console.warn('[MH KafitAddr] 🛑 הזמנה בלי כתובת נחסמה');
+    setTimeout(function () { try { var st = store(); if (st) { st.commit('setToast', { message: MSG, color: 'red', show: true }); } } catch (e) {} try { nudge(s); } catch (e) {} }, 200);
+    return false;
+  }
+  try {
+    var XP = XMLHttpRequest.prototype, _o = XP.open, _s = XP.send;
+    XP.open = function (m, url) {
+      try { this.__mhKafitOrder = String(m).toUpperCase() === 'POST' && IS_ORDER.test(String(url || '')); } catch (e) {}
+      return _o.apply(this, arguments);
+    };
+    XP.send = function (b) {
+      if (this.__mhKafitOrder) {
+        var ok = true;
+        try { ok = guard(b); } catch (e) { stats.errors++; ok = true; }
+        if (!ok) { throw new Error('MH KafitAddr: חסרה כתובת למשלוח'); }
+      }
+      return _s.apply(this, arguments);
+    };
+  } catch (e) { stats.errors++; }
+  try {
+    var _f = window.fetch;
+    if (typeof _f === 'function') {
+      window.fetch = function (input, init) {
+        try {
+          var u = typeof input === 'string' ? input : ((input && input.url) || '');
+          var M = String((init && init.method) || (input && input.method) || 'GET').toUpperCase();
+          if (M === 'POST' && IS_ORDER.test(u) && init && typeof init.body === 'string' && !guard(init.body)) {
+            return Promise.reject(new Error('MH KafitAddr: חסרה כתובת למשלוח'));
+          }
+        } catch (e) { stats.errors++; }
+        return _f.apply(this, arguments);
+      };
+    }
+  } catch (e) { stats.errors++; }
 
   var pending = false;
   function schedule() { if (pending) { return; } pending = true; setTimeout(function () { pending = false; try { sync(); } catch (e) {} }, 180); }
@@ -4426,7 +4514,7 @@ log('פעיל');
     window.addEventListener('load', schedule); schedule();
   } catch (e) { console.warn('[MH KafitAddr] disabled:', e); }
 
-  window.MH_KAFITADDR = { version: VERSION, sync: sync, merchant: MERCHANT, stats: function () { return JSON.parse(JSON.stringify(stats)); } };
+  window.MH_KAFITADDR = { version: VERSION, sync: sync, merchant: MERCHANT, state: function () { var s = state(); return s ? { empty: s.empty } : null; }, stats: function () { return JSON.parse(JSON.stringify(stats)); } };
   /* mh-kafitaddr-v1 */
 })();
 
