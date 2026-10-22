@@ -4069,6 +4069,12 @@ html body main#MultiVendorSearch .tab-item-merchant .mh-why::before {
    ל"חנויות"/"מוצרים" (נמדד 9.10: ב-1024 וב-1280 tabs top 10 < header bottom 71; במובייל אין AppBar) */
 html body:has(#AppBar) main#MultiVendorSearch { padding-top: 72px !important; }
 
+/* 14. "קניות לפי קטגוריות" מוסתר (דוד 22.10: "לא בשימוש כרגע"). בדף החיפוש בלי מילה, בתוך .scheme-global-search-recent
+   (אותו בלוק של "חיפוש אחרון" — הוא נשאר): כותרת (.tw-pt-3.tw-mb-5, shopByCategories) + רשת של .category-img.
+   להחזרה: למחוק את שני הכללים. העיצוב הישן של .category-img (חלק 26 הישן) נשאר עד ניקוי הקוד הישן */
+html body main#MultiVendorSearch .scheme-global-search-recent > .tw-pt-3.tw-mb-5,
+html body main#MultiVendorSearch .scheme-global-search-recent > div:has(> .tw-cursor-pointer > .category-img) { display: none !important; }
+
 /* 13. זמני משלוח מוסתרים בדף החיפוש (דוד 9.10: "הזמנים האלה אמורים להיות מוסתרים!!"). Hyperzod מציגה בכותרת קבוצת
    המוצרים delivery_data.time בלי לבדוק show_delivery_time (בכל מקום אחר היא בודקת), ובכרטיס החנות — כשהדגל דלוק
    (כפר אדומים "עד שעה", חומוס אדומים "בערך חצי שעה"). נשאר רק המרחק. הטקסט בכותרת הוא צומת טקסט — מתרוקן ב-MH Search */
@@ -8403,3 +8409,82 @@ html body:has(#AppBar) #MerchantSearchPage .scheme-merchant-search-header { top:
 html body .merchant-bottom-sheet > .v-overlay__content[class*="-leave-active"] { transition: none !important; animation: none !important; }
 html body .merchant-page .v-card__loader > .v-progress-linear:not(.v-progress-linear--active) .v-progress-linear__indeterminate { display: none !important; }
 /* mh-sheetexit-v1 */
+
+/* =========================================================
+   חלק 64: ההמלצות של Hyperzod — "ייתכן שתאהבו גם" — MH Recs v1.0.0 | 2026-10-22 (דוד הפעיל 22.10: Last Minute Add ons + Checkout Upsell)
+   הבעלים של: (א) החלונית שלפני התשלום — .checkout-journey-sheet (נפתחת מ"המשך לתשלום" כש-recommendations.similar_items.last_minute דלוק;
+   חלון v-bottom-sheet במסך מלא: כותרת + חזרה, רשימת .scheme-recommended-product-card, ו-.checkout-journey-sheet__footer עם "המשך לתשלום");
+   (ב) הפס בצ'ק-אאוט — .similar-items-panel (קרוסלה של .product-card-basic ברוחב 140, כש-similar_items.checkout דלוק).
+   מה היה: כלל ישן לא ממוקד (".v-bottom-sheet__content .v-card", "2. עיצוב ה-Bottom Sheet") נתן לחלונית ריפוד 24/20, פינות 32
+   וטשטוש — פאנל לבן "תקוע" בתוך מסגרת אפורה — וגם לכל כרטיס מוצר בתוכה; כפתור החזרה עלה על הכותרת; "+" מרובע אדום בצ'ק-אאוט.
+   עכשיו: שורות כמו בחיפוש בתוך חנות (חלק 62) — אריח 88 עם קו דק, שם, תיאור בשורה, מחיר, "+" עיגול לבן בפינת האריח —
+   כותרת עם חזרה מתחת לפס השעון, וכפתור "המשך לתשלום" מלא ברוחב. בלי זכוכית, בלי צללים.
+   ========================================================= */
+/* ---------- (א) החלונית שלפני התשלום ---------- */
+html body .v-bottom-sheet__content > .v-card:has(> .checkout-journey-sheet) { padding: 0 !important; border: 0 !important; border-radius: 0 !important; background: #fff !important; box-shadow: none !important; -webkit-backdrop-filter: none !important; backdrop-filter: none !important; }
+html body .checkout-journey-sheet { background: #fff !important; }
+html body .v-bottom-sheet:not(.v-dialog--fullscreen) > .v-bottom-sheet__content > .v-card:has(> .checkout-journey-sheet) { border-radius: 16px 16px 0 0 !important; overflow: hidden !important; }   /* מחשב: חלונית צפה, לא מסך מלא */
+/* כותרת: חזרה (44, עיגול אפור) + שם */
+html body .checkout-journey-sheet > div:first-child { gap: 10px !important; padding: 12px 16px !important; border-bottom: 1px solid #f0ece8 !important; }   /* החלונית עצמה כבר מתחת לפס השעון (Hyperzod) */
+html body .checkout-journey-sheet button.v-btn.v-btn--icon.checkout-journey-back { position: static !important; flex: 0 0 44px !important; width: 44px !important; height: 44px !important; min-width: 44px !important; margin: 0 !important; border-radius: 999px !important; background: #f3f1ee !important; color: #111 !important; box-shadow: none !important; transform: none !important; border: 0 !important; -webkit-backdrop-filter: none !important; backdrop-filter: none !important; }   /* חלק 12ג (ישן, גלובלי לכל כפתור אייקון בחלונית) נתן בועה לבנה שעלתה על הכותרת */
+html body .checkout-journey-sheet button.v-btn.v-btn--icon.checkout-journey-back .v-icon { font-size: 26px !important; width: 26px !important; height: 26px !important; color: #111 !important; }
+html body .checkout-journey-sheet > div:first-child h2 { margin: 0 !important; font-size: 21px !important; font-weight: 800 !important; line-height: 1.25 !important; color: #111 !important; letter-spacing: 0 !important; }
+/* הרשימה */
+html body .checkout-journey-sheet .product-horizontal-cards { display: block !important; }
+html body .v-overlay .checkout-journey-sheet .product-horizontal-cards .product-card-horizontal.scheme-recommended-product-card { height: auto !important; min-height: 0 !important; aspect-ratio: auto !important; margin: 0 !important; border-style: solid !important; border-color: #f0ece8 !important; border-width: 0 0 1px !important; border-radius: 0 !important; background: transparent !important; box-shadow: none !important; overflow: visible !important; padding: 0 !important; -webkit-tap-highlight-color: transparent !important; }
+html body .v-overlay .checkout-journey-sheet .product-horizontal-cards .product-card-horizontal.scheme-recommended-product-card:last-child { border-bottom: 0 !important; }
+html body .v-overlay .checkout-journey-sheet .product-horizontal-cards .product-card-horizontal.scheme-recommended-product-card > .v-card-text { padding: 12px 0 !important; }
+html body .v-overlay .checkout-journey-sheet .product-horizontal-cards .product-card-horizontal.scheme-recommended-product-card .v-card-text > .tw-grid { display: flex !important; height: auto !important; align-items: center !important; gap: 14px !important; }
+html body .v-overlay .checkout-journey-sheet .product-horizontal-cards .product-card-horizontal.scheme-recommended-product-card .v-card-text > .tw-grid > :first-child { flex: 1 1 auto !important; min-width: 0 !important; }
+html body .v-overlay .checkout-journey-sheet .product-horizontal-cards .product-card-horizontal.scheme-recommended-product-card .rec-item-title { max-width: none !important; }
+html body .v-overlay .checkout-journey-sheet .product-horizontal-cards .product-card-horizontal.scheme-recommended-product-card .product-name { margin: 0 0 2px !important; font-size: 15px !important; font-weight: 700 !important; line-height: 1.35 !important; color: #111 !important; }
+html body .v-overlay .checkout-journey-sheet .product-horizontal-cards .product-card-horizontal.scheme-recommended-product-card .product-description { margin: 0 0 4px !important; font-size: 13px !important; line-height: 1.4 !important; color: #6b7280 !important; -webkit-line-clamp: 1 !important; line-clamp: 1 !important; }
+html body .v-overlay .checkout-journey-sheet .product-horizontal-cards .product-card-horizontal.scheme-recommended-product-card .product-description:empty { display: none !important; }
+html body .v-overlay .checkout-journey-sheet .product-horizontal-cards .product-card-horizontal.scheme-recommended-product-card .product-price { margin: 0 !important; font-size: 16px !important; font-weight: 800 !important; line-height: 1.25 !important; color: #c8151b !important; }
+html body .v-overlay .checkout-journey-sheet .product-horizontal-cards .product-card-horizontal.scheme-recommended-product-card .product-price small { margin-inline-start: 6px !important; font-size: 13px !important; font-weight: 500 !important; color: #9ca3af !important; }
+/* אריח התמונה */
+html body .v-overlay .checkout-journey-sheet .product-horizontal-cards .product-card-horizontal.scheme-recommended-product-card .pro-card-h { flex: 0 0 88px !important; width: 88px !important; min-width: 0 !important; height: auto !important; min-height: 0 !important; }
+html body .v-overlay .checkout-journey-sheet .product-horizontal-cards .product-card-horizontal.scheme-recommended-product-card .pro-card-h-img { width: 88px !important; height: 88px !important; min-height: 0 !important; max-height: 88px !important; aspect-ratio: 1 / 1 !important; margin: 0 !important; border: 1px solid #ece8e3 !important; border-radius: 16px !important; background: #fff !important; box-shadow: none !important; overflow: visible !important; box-sizing: border-box !important; }
+html body .v-overlay .checkout-journey-sheet .product-horizontal-cards .product-card-horizontal.scheme-recommended-product-card .pro-card-h-img > .tw-cursor-pointer { position: absolute !important; inset: 0 !important; width: 100% !important; height: 100% !important; }   /* העטיפה הצטמקה ל-46×38 */
+html body .v-overlay .checkout-journey-sheet .product-horizontal-cards .product-card-horizontal.scheme-recommended-product-card .pro-card-h-img .v-img { width: 100% !important; height: 100% !important; border-radius: 15px !important; overflow: hidden !important; }
+/* "+" / מונה — בפינה התחתונה החיצונית של האריח */
+html body .v-overlay .checkout-journey-sheet .product-horizontal-cards .product-card-horizontal.scheme-recommended-product-card .pro-card-h-img > .tw-absolute { top: auto !important; bottom: -8px !important; left: -8px !important; right: auto !important; width: max-content !important; transform: none !important; z-index: 3 !important; }   /* max-content: מונה הכמות (96) לא גולש שמאלה מחוץ למסך ב-RTL */
+html body .v-overlay .checkout-journey-sheet .product-horizontal-cards .product-card-horizontal.scheme-recommended-product-card :is(.v-card__overlay, .v-card__underlay) { display: none !important; }
+html body .v-overlay .checkout-journey-sheet .product-horizontal-cards .product-card-horizontal.scheme-recommended-product-card .add-product-btn { margin: 0 !important; padding: 0 !important; }
+html body .v-overlay .checkout-journey-sheet .product-horizontal-cards .product-card-horizontal.scheme-recommended-product-card .pro-card-h-img button.add-btn { width: 40px !important; min-width: 40px !important; max-width: 40px !important; height: 40px !important; min-height: 40px !important; max-height: 40px !important; padding: 0 !important; border: 0 !important; border-radius: 999px !important; background: #fff !important; color: #e31e24 !important; -webkit-backdrop-filter: none !important; backdrop-filter: none !important; box-shadow: 0 2px 8px rgba(17, 17, 17, 0.14), 0 0 0 1px rgba(17, 17, 17, 0.06) !important; font-size: 0 !important; }
+html body .v-overlay .checkout-journey-sheet .product-horizontal-cards .product-card-horizontal.scheme-recommended-product-card .pro-card-h-img button.add-btn svg { width: 15px !important; height: 15px !important; margin: 0 !important; color: #e31e24 !important; }
+html body .v-overlay .checkout-journey-sheet .product-horizontal-cards .product-card-horizontal.scheme-recommended-product-card .counter-btn { width: 96px !important; height: 36px !important; border: 0 !important; border-radius: 999px !important; background: #e31e24 !important; box-shadow: 0 2px 8px rgba(17, 17, 17, 0.14) !important; }
+html body .v-overlay .checkout-journey-sheet .product-horizontal-cards .product-card-horizontal.scheme-recommended-product-card .counter-btn :is(.decrement-btn, .increment-btn) { width: 34px !important; height: 36px !important; padding: 0 !important; display: grid !important; place-items: center !important; background: transparent !important; }
+html body .v-overlay .checkout-journey-sheet .product-horizontal-cards .product-card-horizontal.scheme-recommended-product-card .counter-btn .counter-input { background: transparent !important; font-size: 15px !important; font-weight: 800 !important; }
+/* מוצר בלי תמונה: הכפתור בשורת המחיר — גלולה לבנה עם קו */
+html body .v-overlay .checkout-journey-sheet .product-horizontal-cards .product-card-horizontal.scheme-recommended-product-card .price.tw-flex button.add-btn { width: auto !important; min-width: 0 !important; max-width: none !important; height: 36px !important; min-height: 36px !important; max-height: 36px !important; padding: 0 14px !important; border: 1px solid #e6e2dd !important; border-radius: 999px !important; background: #fff !important; color: #c8151b !important; box-shadow: none !important; -webkit-backdrop-filter: none !important; backdrop-filter: none !important; font-size: 14px !important; font-weight: 700 !important; }
+html body .v-overlay .checkout-journey-sheet .product-horizontal-cards .product-card-horizontal.scheme-recommended-product-card .v-card-text > .tw-grid > :first-child > .tw-flex { align-items: stretch !important; }
+html body .v-overlay .checkout-journey-sheet .product-horizontal-cards .product-card-horizontal.scheme-recommended-product-card .price.tw-flex { justify-content: space-between !important; align-items: center !important; gap: 10px !important; width: 100% !important; }
+html body .v-overlay .checkout-journey-sheet .product-horizontal-cards .product-card-horizontal.scheme-recommended-product-card .price.tw-flex > .tw-relative { position: static !important; top: 0 !important; }   /* Hyperzod: .price > .tw-relative absolute — עלה על השם */
+/* כפתור "המשך לתשלום" */
+html body .checkout-journey-sheet__footer { padding-top: 12px !important; padding-inline: 16px !important; box-shadow: none !important; border-top: 1px solid #f0ece8 !important; background: #fff !important; }
+html body .checkout-journey-sheet__footer .v-btn { width: 100% !important; height: 52px !important; border-radius: 14px !important; background: #e31e24 !important; color: #fff !important; box-shadow: none !important; font-size: 17px !important; font-weight: 700 !important; letter-spacing: 0 !important; text-transform: none !important; }
+html body .checkout-journey-sheet__footer .v-btn .v-btn__overlay { opacity: 0 !important; }
+html body .checkout-journey-sheet__footer .v-btn:active { background: #c8151b !important; }
+html body .v-overlay .checkout-journey-sheet .product-horizontal-cards .product-card-horizontal.scheme-recommended-product-card:active { background: #faf8f6 !important; }
+
+/* ---------- (ב) "ייתכן שתאהבו גם" בצ'ק-אאוט ---------- */
+html body .similar-items-panel .similar-items-wrap > div:first-child h1 { margin: 0 !important; font-size: 17px !important; font-weight: 800 !important; line-height: 1.3 !important; color: #111 !important; }
+html body .similar-items-panel .similar-items-wrap > div:first-child { margin: 2px 0 12px !important; }
+html body .similar-items-panel .slider-inner-container { gap: 12px !important; padding-bottom: 4px !important; }
+html body .similar-items-panel .product-card-basic { background: transparent !important; border: 0 !important; box-shadow: none !important; border-radius: 0 !important; overflow: visible !important; }
+html body .similar-items-panel .product-card-basic .product-image-frame { border: 1px solid #ece8e3 !important; border-radius: 16px !important; background: #fff !important; overflow: visible !important; box-shadow: none !important; }
+html body .similar-items-panel .product-card-basic .product-image-frame .v-img { border-radius: 15px !important; background: #fff !important; }
+html body .similar-items-panel .product-card-basic .product-image-frame > .tw-absolute { right: auto !important; left: 6px !important; bottom: 6px !important; }
+html body .similar-items-panel .product-card-basic .add-product-btn { margin: 0 !important; padding: 0 !important; }
+html body .similar-items-panel .product-card-basic button.add-btn { width: 36px !important; min-width: 36px !important; max-width: 36px !important; height: 36px !important; min-height: 36px !important; max-height: 36px !important; margin: 0 !important; padding: 0 !important; border: 0 !important; border-radius: 999px !important; background: #fff !important; color: #e31e24 !important; -webkit-backdrop-filter: none !important; backdrop-filter: none !important; box-shadow: 0 2px 8px rgba(17, 17, 17, 0.14), 0 0 0 1px rgba(17, 17, 17, 0.06) !important; }
+html body .similar-items-panel .product-card-basic button.add-btn svg { width: 14px !important; height: 14px !important; color: #e31e24 !important; }
+html body .similar-items-panel .product-card-basic .counter-btn { height: 34px !important; border: 0 !important; border-radius: 999px !important; background: #e31e24 !important; box-shadow: 0 2px 8px rgba(17, 17, 17, 0.14) !important; }
+html body .similar-items-panel .product-card-basic .v-card-text { padding: 8px 2px 4px !important; }
+html body .similar-items-panel .product-card-basic .product-name { font-size: 13.5px !important; font-weight: 600 !important; line-height: 1.35 !important; color: #111 !important; }
+html body .similar-items-panel .product-card-basic .product-price { font-size: 14.5px !important; font-weight: 800 !important; color: #c8151b !important; }
+@media (hover: hover) {
+    html body .v-overlay .checkout-journey-sheet .product-horizontal-cards .product-card-horizontal.scheme-recommended-product-card:hover { background: #faf8f6 !important; }
+    html body .checkout-journey-sheet__footer .v-btn:hover { background: #c8151b !important; }
+}
+/* mh-recs-v1 */
