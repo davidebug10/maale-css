@@ -9,17 +9,43 @@
    The original global.css is retained in the repo as a historical backup.
    ============================================================ */
 
+/* =========================================================
+   חלק 0: אסימוני העיצוב — MH Tokens v1.0.0 | 2026-10-22 (שפת העיצוב 2026: אטום, קווים דקים, אדום אחד במסך)
+   ערכים בלבד (custom properties) — לא מעצב שום רכיב בעצמו. כל חלק חדש/מעוצב מחדש משתמש בהם.
+   המקור והנימוקים: capture/design-qa-22.10/DESIGN_SYSTEM.md ו-DESIGN_METHOD.md §8.
+   ‏-webkit-backdrop-filter בספארי לא מקבל var() — שם ערכים קשיחים.
+   ========================================================= */
+html body {
+    --mh-ink: #1b1c1f;          /* טקסט ראשי, כותרות, מחיר רגיל */
+    --mh-ink-2: #6b6866;        /* משני: תיאור, מטא */
+    --mh-ink-3: #a19d99;        /* שלישוני: מושבת, מחיר מחוק */
+    --mh-bg: #ffffff;
+    --mh-bg-2: #f6f5f3;         /* רקע מקובץ (הגדרות, צ'ק-אאוט, בלוק מידע) */
+    --mh-fill: #f2f0ed;         /* שדה, צ'יפ לא פעיל, כפתור אייקון */
+    --mh-line: #ebe8e4;         /* קו דק */
+    --mh-line-2: #e3dfda;       /* קו בולט מעט (מסגרת כרטיס לחיץ) */
+    --mh-red: #e31e24;          /* רק הפעולה הראשית במסך */
+    --mh-red-press: #c8151b;
+    --mh-red-ink: #b3141a;      /* טקסט אדום: מבצע, "+", קישור פעולה */
+    --mh-red-tint: #fdeeee;
+    --mh-green: #16794a;
+    --mh-amber: #9a5b00;
+    --mh-r-xs: 8px; --mh-r-sm: 12px; --mh-r-md: 16px; --mh-r-lg: 20px;
+    --mh-e1: 0 1px 2px rgba(17, 17, 17, 0.06), 0 1px 1px rgba(17, 17, 17, 0.04);
+    --mh-e2: 0 4px 16px rgba(17, 17, 17, 0.08);
+    --mh-float: 0 8px 28px rgba(17, 17, 17, 0.14);
+    --mh-ease: cubic-bezier(.2, .8, .2, 1);
+    --mh-ease-sheet: cubic-bezier(.32, .72, 0, 1);
+}
+/* mh-tokens-v1 */
+
 /* ============================================================
    מעלה המשלוחים - CORE LOGIC & TRANSLATIONS (NO COLORS)
    ============================================================ */
 
 /* --- 1. תרגומים ועברות ממשק (חלק 8, 11) --- */
 
-/* תרגום כותרת חיפוש מיקום */
-html body #mobileLocationSearch .tw-sticky .tw-truncate { font-size: 0 !important; }
-html body #mobileLocationSearch .tw-sticky .tw-truncate::before { 
-    content: "בחירת מיקום" !important; font-size: 16px !important; visibility: visible !important; 
-}
+/* תרגום כותרת חיפוש מיקום (#mobileLocationSearch .tw-sticky .tw-truncate) — הוסר 22.10 (מת: אין tw-sticky במודאל של היום). ההיסטוריה ב-git. */
 /* תרגום: השתמש במיקום נוכחי */
 html body #mobileLocationSearch .locate-me span.tw-font-medium { font-size: 0 !important; }
 html body #mobileLocationSearch .locate-me span.tw-font-medium::before { 
@@ -80,23 +106,7 @@ html body #payment-card .method-icon img.v-img__img {
 }
 
 
-/* ============================================================
-   מערכת עיצוב - מעלה המשלוחים (RED & WHITE LIQUID GLASS V2)
-   ============================================================ */
-
-/* --- 1. תיקונים גלובליים והגדרות בסיס --- */
-
-/* ביטול המרווח הלבן המציק בתחתית האתר */
-html body .tw-mb-\[55px\] { margin-bottom: 0 !important; }
-
-/* ניקוי אלמנטים מיותרים - מוגן מודאל */
-html body :not(.product-popup) .v-btn__overlay, 
-html body :not(.product-popup) .v-btn__underlay, 
-html body :not(.product-popup) .v-card__underlay,
-html body :not(.product-popup) .v-field__overlay,
-html body :not(.product-popup) .v-ripple__container {
-    display: none !important;
-}
+/* "מערכת עיצוב V2 / 1. תיקונים גלובליים" — הוסר 22.10 (כפילות מילה במילה של שורות 50 ו-68–74 למעלה). ההיסטוריה ב-git. */
 
 /* =========================================================
    Bottom Navigation - הוסר 2026-05-01 לקראת עיצוב מחדש מאפס
@@ -438,16 +448,7 @@ html body .c-table tbody td {
 
 /* 6. כפתורי פעולה בתחתית הכרטיס */
 
-/* כפתור "להזמין מחדש" - THE POWER RED CAPSULE */
-html body button.track-btn.tw-bg-black {
-    background: linear-gradient(135deg, #e31e24 0%, #b3161b 100%) !important;
-    border-radius: 50px !important; /* קפסולה מלאה */
-    color: #ffffff !important;
-    font-weight: 800 !important;
-    border: none !important;
-    box-shadow: 0 6px 15px rgba(227, 30, 36, 0.3) !important;
-    height: 38px !important;
-}
+/* כפתור "להזמין מחדש" (button.track-btn.tw-bg-black) — הוסר 22.10 (מת: בבילד הכפתור הוא bg-button_normal, אין tw-bg-black). ההיסטוריה ב-git. */
 
 /* כפתור "דרג" - CRYSTAL SECONDARY */
 html body button.track-btn.tw-bg-\[#F3F3F4\] {
@@ -707,23 +708,7 @@ html body #sl-inner-instruction-slider .v-card__underlay {
 
 /* --- Part 8f: עיצוב בחירת סוג הזמנה - פריסת רוחב רגילה --- */
 
-/* 1. קונטיינר חיצוני - הסרת מגבלת ה-max-width */
-[data-v-77884587].tw-mt-\[10px\].tw-border.tw-bg-white {
-    background: rgba(255, 255, 255, 0.8) !important;
-    backdrop-filter: blur(45px) saturate(210%) !important;
-    -webkit-backdrop-filter: blur(45px) saturate(210%) !important;
-    border: 1px solid rgba(0, 0, 0, 0.05) !important;
-    border-radius: 24px !important;
-    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.03) !important;
-    padding: 20px !important;
-    /* החזרת רוחב רגיל */
-    width: 100% !important;
-    max-width: none !important; 
-    position: relative !important;
-    margin-top: 16px !important;
-    margin-bottom: 16px !important;
-    transition: all 0.4s ease !important;
-}
+/* 1. קונטיינר חיצוני ([data-v-77884587]) — הוסר 22.10 (מת: hash של Vue שכבר לא קיים בבילד). ההיסטוריה ב-git. */
 
 /* 2. כותרת הסקשן - יישור לימין ושיפור נוכחות */
 #mbOrderTypeSelect h2 {
@@ -794,17 +779,7 @@ html body #sl-inner-instruction-slider .v-card__underlay {
 
 /* --- Part 8z: עיצוב פרטי חשבון ופירוט מחירים --- */
 
-/* 1. כרטיס הטריגר (השורה שמובילה לפירוט) */
-[data-v-77884587].tw-mt-\[10px\].tw-border.tw--mb-0.tw-bg-white {
-    background: rgba(255, 255, 255, 0.75) !important;
-    backdrop-filter: blur(45px) saturate(210%) !important;
-    -webkit-backdrop-filter: blur(45px) saturate(210%) !important;
-    border: 1px solid rgba(0, 0, 0, 0.05) !important;
-    border-radius: 24px !important;
-    padding: 18px !important;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03) !important;
-    transition: all 0.3s ease !important;
-}
+/* 1. כרטיס הטריגר ([data-v-77884587]) — הוסר 22.10 (מת: hash של Vue שכבר לא קיים בבילד). ההיסטוריה ב-git. */
 
 /* כותרת קטנה מעל הטבלה */
 #summary span.tw-text-black.tw-uppercase {
@@ -826,12 +801,20 @@ html body #sl-inner-instruction-slider .v-card__underlay {
     fill: #e31e24 !important; /* צבע מותג לאייקון הקבלה */
 }
 
-/* 2. עיצוב ה-Bottom Sheet (החלונית שנפתחת) */
-.v-overlay__content.v-bottom-sheet__content {
+/* 2. עיצוב ה-Bottom Sheet (החלונית שנפתחת) — הקליפה הכללית של כל חלונית תחתונה.
+   22.10 (QA דליפות): היה ".v-bottom-sheet__content …" בלי שום עוגן, ונגע גם במקומות שאינם חלונית. עכשיו אותן הצהרות בדיוק,
+   באותה ספציפיות (העוגן עטוף ב-:where, ולכן כל בעלים שגבר עליו עד היום — 22י, 41, 44, 46, 49, 56, 64 — עדיין גובר), עם שלוש החרגות:
+   (1) .merchant-bottom-sheet = חלון החנות באפליקציה (מסך מלא, לא חלונית): כרטיס השם בראש החנות נחתך (לבן, פינות 32 רק למעלה,
+       ריפוד 24/20) וכל כרטיס מוצר קיבל ריפוד + טשטוש.
+   (2) .scheme-location-search-host = חלון המיקום (מסך מלא): ה-⋮ של כל כתובת שמורה קיבל את "בועת ה-X" של חלק 12ג.
+   (3) .v-card בתוך .v-card — הקליפה (ריפוד, פינות עליונות, זכוכית) היא של הכרטיס של החלונית עצמה, לא של כרטיסים שבתוכו:
+       בעגלה באפליקציה כפתור "המשך לתשלום" (.v-card--link) נצבע לבן על טקסט לבן = בלתי נראה, ופריטי העגלה ישבו בכרטיסים מקוננים;
+       ב"ייתכן שתאהבו גם" הטשטוש של כרטיס המוצר האחרון צבע פס ורוד מאחורי "המשך לתשלום". */
+:where(html body .v-bottom-sheet:not(.merchant-bottom-sheet):not(.scheme-location-search-host)) > .v-overlay__content.v-bottom-sheet__content {
     background: transparent !important;
 }
 
-.v-bottom-sheet__content .v-card {
+:where(html body .v-bottom-sheet:not(.merchant-bottom-sheet):not(.scheme-location-search-host)) > .v-bottom-sheet__content .v-card:where(:not(.v-card .v-card)) {
     background: rgba(255, 255, 255, 0.9) !important;
     backdrop-filter: blur(50px) saturate(210%) !important;
     -webkit-backdrop-filter: blur(50px) saturate(210%) !important;
@@ -842,64 +825,57 @@ html body #sl-inner-instruction-slider .v-card__underlay {
 }
 
 /* כותרת החלונית */
-.v-bottom-sheet__content .v-card-title {
+:where(html body .v-bottom-sheet:not(.merchant-bottom-sheet):not(.scheme-location-search-host)) > .v-bottom-sheet__content .v-card-title {
     padding: 0 0 20px 0 !important;
     border-bottom: 1px solid rgba(0, 0, 0, 0.04) !important;
     margin-bottom: 20px !important;
 }
 
-.v-bottom-sheet__content .v-card-title span {
+:where(html body .v-bottom-sheet:not(.merchant-bottom-sheet):not(.scheme-location-search-host)) > .v-bottom-sheet__content .v-card-title span {
     font-size: 17px !important;
     font-weight: 800 !important;
     color: #000 !important;
 }
 
 /* האייקון בכותרת החלונית */
-.v-bottom-sheet__content .v-card-title svg path {
+:where(html body .v-bottom-sheet:not(.merchant-bottom-sheet):not(.scheme-location-search-host)) > .v-bottom-sheet__content .v-card-title svg path {
     fill: #e31e24 !important;
 }
 
 /* כפתור הסגירה (X) */
-.v-bottom-sheet__content .v-btn--icon {
+:where(html body .v-bottom-sheet:not(.merchant-bottom-sheet):not(.scheme-location-search-host)) > .v-bottom-sheet__content .v-btn--icon {
     background: rgba(0, 0, 0, 0.04) !important;
     border-radius: 50% !important;
     transition: transform 0.2s ease !important;
 }
 
-.v-bottom-sheet__content .v-btn--icon:active {
+:where(html body .v-bottom-sheet:not(.merchant-bottom-sheet):not(.scheme-location-search-host)) > .v-bottom-sheet__content .v-btn--icon:active {
     transform: scale(0.9) !important;
 }
 
 /* 3. טבלת הפירוט בתוך החלונית */
-.v-bottom-sheet__content table.summary-card {
+html body .v-bottom-sheet__content table.summary-card {
     border-collapse: separate !important;
     border-spacing: 0 12px !important; /* מרווח בין השורות */
 }
 
-.v-bottom-sheet__content table.summary-card td {
+html body .v-bottom-sheet__content table.summary-card td {
     font-size: 15px !important;
     color: #444 !important;
     font-weight: 500 !important;
 }
 
 /* שורת ה"סה"כ לתשלום" הסופית */
-.v-bottom-sheet__content .tw-border-t {
+:where(html body .v-bottom-sheet:not(.merchant-bottom-sheet):not(.scheme-location-search-host)) > .v-bottom-sheet__content .tw-border-t {
     border-top: 2px solid #f0f0f0 !important;
     padding-top: 20px !important;
 }
+/* ".tw-border-t td" (19px / 900 / אדום) — הוסר 22.10: מעולם לא חל — הפסיד בספציפיות לכלל "table.summary-card td" שלמעלה,
+   ולכן ה"סה"כ" מוצג היום באותו גופן כמו שאר השורות. */
 
-.v-bottom-sheet__content .tw-border-t td {
-    font-size: 19px !important;
-    font-weight: 900 !important;
-    color: #e31e24 !important; /* המחיר הסופי באדום מותג */
-}
-
-/* יישור טקסט בטבלה */
-.text-end, .tw-text-end {
-    text-align: left !important; /* תיקון RTL במידה ויש בעיה במובייל */
-}
-
-[dir="rtl"] .text-end, [dir="rtl"] .tw-text-end {
+/* יישור הסכומים בטבלת הפירוט (בחלונית, בכרטיס #summary ובחלון של המחשב).
+   22.10: היה גלובלי (".text-end, .tw-text-end" בכל האתר) — ב-RTL זה זהה ל-end, אבל באיים LTR הפך ימין לשמאל. */
+html body table.summary-card :is(.text-end, .tw-text-end) {
     text-align: left !important;
 }
 
@@ -1119,10 +1095,7 @@ html body #payment-card .payment-method[data-test-id$="-cod"]:is(.mh-pay-on, :ha
    מטרה: תרגום מלא, עיצוב קריסטלי וציר זמן יוקרתי
    ========================================================= */
 
-/* 1. רקע הדף וניקוי כללי */
-#app-router-view div[data-v-ea7a4b37].tw-bg-\[#f7f7f7\] {
-    background: radial-gradient(circle at top, #ffffff 0%, #f8f8f8 100%) !important;
-}
+/* 1. רקע הדף ([data-v-ea7a4b37]) — הוסר 22.10 (מת: hash של Vue שכבר לא קיים בבילד). ההיסטוריה ב-git. */
 
 /* 2. הדר אישור הזמנה (Sticky Order Header) */
 .native-top-notch-padding {
@@ -1146,18 +1119,7 @@ html body #payment-card .payment-method[data-test-id$="-cod"]:is(.mh-pay-on, :ha
     visibility: visible !important;
 }
 
-/* 3. כרטיס סטטוס ההזמנה (למשל: בוטלה/בוצע) */
-.tw-px-2.tw-mt-\[-25px\] .tw-bg-white {
-    background: rgba(255, 255, 255, 0.8) !important;
-    backdrop-filter: blur(30px) !important;
-    border-radius: 24px !important;
-    border: 2px solid rgba(227, 30, 36, 0.15) !important; /* מסגרת מודגשת לסטטוס */
-    box-shadow: 0 10px 30px rgba(227, 30, 36, 0.05) !important;
-}
-
-/* צביעת האייקון של הסטטוס באדום מותג */
-.tw-px-2.tw-mt-\[-25px\] svg rect[fill="#FFE2E4"] { fill: rgba(227, 30, 36, 0.1) !important; }
-.tw-px-2.tw-mt-\[-25px\] svg rect[fill="#DB5354"] { fill: #e31e24 !important; }
+/* 3. כרטיס סטטוס ההזמנה (.tw-px-2.tw-mt-[-25px], 3 כללים) — הוסר 22.10 (מת: tw-mt-[-25px] לא קיים בבילד וגם לא ב-CSS שלו). ההיסטוריה ב-git. */
 
 /* 4. כרטיס פרטי החנות והמוצרים */
 .tw-px-2.tw-mt-\[7px\] .tw-bg-white {
@@ -1175,16 +1137,7 @@ html body #payment-card .payment-method[data-test-id$="-cod"]:is(.mh-pay-on, :ha
     border-bottom: 1px solid rgba(227, 30, 36, 0.1) !important;
 }
 
-/* תרגום Inclusive (מע"מ) */
-.c-table span:contains("(Inclusive)") {
-    font-size: 0 !important;
-}
-
-.c-table span:contains("(Inclusive)")::before {
-    content: "(כולל)" !important;
-    font-size: 11px !important;
-    visibility: visible !important;
-}
+/* תרגום Inclusive (.c-table span:contains(...)) — הוסר 22.10 (CSS לא תקין: :contains לא קיים בדפדפנים, שני הכללים מעולם לא חלו). ההיסטוריה ב-git. */
 
 /* 5. ציר הזמן למעקב (Timeline Tracking) */
 .track-delivery {
@@ -1267,26 +1220,12 @@ a[href^="tel:"] svg path {
 /* "תרגום Placeholder בשדה החיפוש" הוסר 6.10.2026: הוא הפך את ה-placeholder לשקוף, וה-::before על input
    לא מצויר בדפדפנים — כך שהשדה היה ריק. ה-placeholder של Hyperzod כבר בעברית ("הזן כתובת"); השדה בבעלות חלק 44. */
 
-/* תרגום כותרת "Recent Searches" - תיקון הסלקטור השבור */
-#mobileLocationSearch .tw-font-inter.tw-font-semibold.tw-text-gray-900 { font-size: 0 !important; }
-#mobileLocationSearch .tw-font-inter.tw-font-semibold.tw-text-gray-900::before {
-    content: "חיפושים אחרונים" !important;
-    font-size: 16px !important;
-    visibility: visible !important;
-    font-weight: 800 !important;
-    color: #000 !important;
-}
+/* תרגום "Recent Searches" (.tw-font-inter.tw-font-semibold.tw-text-gray-900) — הוסר 22.10 (מת: אין tw-text-gray-900 במודאל). ההיסטוריה ב-git. */
 
 /* העלמת הכפילות באנגלית מתחת לחיפושים */
 #mobileLocationSearch h3.tw-font-inter:not(.scheme-location-results-heading) { display: none !important; } /* 6.10: כותרת "תוצאות חיפוש" (מתורגמת ע"י MH Lang) מוצגת — חלק 44 */
 
-/* תיקון תווית "Phone:" בכתובות שמורות */
-#mobileLocationSearch .tw-text-gray-500 { font-size: 0 !important; }
-#mobileLocationSearch .tw-text-gray-500::before {
-    content: "טלפון: " !important;
-    font-size: 11px !important;
-    visibility: visible !important;
-}
+/* תווית "Phone:" (#mobileLocationSearch .tw-text-gray-500) — הוסר 22.10 (מת: אין tw-text-gray-500 במודאל). ההיסטוריה ב-git. */
 
 /* --- 12ג: עיצוב "השתמש במיקום נוכחי" (The Action Island) --- */
 .locate-me {
@@ -1309,8 +1248,7 @@ a[href^="tel:"] svg path {
 }
 
 /* --- 12ד: כרטיסי כתובות וחיפושים (Floating Glass Islands) --- */
-#mobileLocationSearch .tw-bg-white.tw-border:not(.scheme-location-results-list), /* 6.10: רשימת התוצאות בבעלות חלק 44 */
-#mobileLocationSearch .tw-p-4.tw-bg-white {
+#mobileLocationSearch .tw-bg-white.tw-border:not(.scheme-location-results-list) { /* 6.10: רשימת התוצאות בבעלות חלק 44. 22.10: ".tw-p-4.tw-bg-white" הוסר מהרשימה (מת) */
     background: rgba(255, 255, 255, 0.75) !important;
     backdrop-filter: blur(45px) saturate(210%) !important;
     -webkit-backdrop-filter: blur(45px) saturate(210%) !important;
@@ -1321,24 +1259,12 @@ a[href^="tel:"] svg path {
     padding: 20px !important;
 }
 
-/* באדג' ה-"מטרים/קילומטרים" וה-"פעיל" */
-.tw-bg-green-100 { 
-    background: rgba(1, 194, 103, 0.1) !important; 
-    color: #01C267 !important; 
-    font-weight: 800 !important;
-    border-radius: 12px !important;
-}
+/* באדג' ".tw-bg-green-100" (גלובלי) — הוסר 22.10 (מת: המחלקה לא קיימת בבילד). ההיסטוריה ב-git. */
 
 /* --- 12ה: שורת החיפוש — הוסר 6.10.2026; השדה ורשימת התוצאות במודאל בבעלות "חלק 44: MH AddrEditor" --- */
 
-/* --- 12ו: דף הבית (Merchant & Product Cards) --- */
-.merchant-card {  /* 10.9.2026: .product-card-basic הוסר מהסלקטור — כרטיסי המוצר החדשים שקופים בכוונה (חלק 40). 9.10: באוספי דף הבית ובדף "הכול" — חלק 59 מבטל את זה (שם הבעלים) */
-    background: rgba(255, 255, 255, 0.75) !important;
-    backdrop-filter: blur(45px) saturate(210%) !important;
-    border-radius: 32px !important;
-    border: 1px solid rgba(255, 255, 255, 0.4) !important;
-    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.06) !important;
-}
+/* --- 12ו: ".merchant-card" גלובלי (זכוכית, רדיוס 32) — הוסר 22.10. נגע בכל כרטיס עסק באתר; באוספי דף הבית ובדף "הכול"
+   חלק 59 ביטל אותו. המראה עבר כמו שהוא ל"חלק 26ב" (סעיף 15): דף החיפוש, עוזר הקניות וסקשני Page Builder של עסקים. ההיסטוריה ב-git. --- */
 
 /* כותרת "קולקציות נבחרות" ל-CollectionGrid--172265 — הוסרה 9.10.2026: הסקשן כבר לא קיים בדף הבית (QA). */
 
@@ -1351,10 +1277,13 @@ a[href^="tel:"] svg path {
 /* =========================================================
    חלק 12ג: עיצוב מחדש לכפתור הסגירה (The X Button)
    מטרה: תיקון נראות ה-X, הפיכתו לאדום מותג ויצירת מראה בועה
+   22.10 (QA דליפות): אותן הצהרות ואותה ספציפיות, עם אותו עוגן ואותן החרגות של "2. עיצוב ה-Bottom Sheet" (חלק 8z):
+   לא בחלון החנות באפליקציה ולא בחלון המיקום (שם ה-⋮ של כתובת שמורה קיבל את הבועה). ב"אפשרויות כתובת" חלק 46 מבטל את הבועה
+   ואת הפילטר האדום על ה-X שלו (הוא הבעלים של ה-X שם).
    ========================================================= */
 
 /* --- 1. עיצוב המעטפת (הבועה החיצונית) --- */
-.v-bottom-sheet__content .v-btn--icon.v-btn--variant-text {
+:where(html body .v-bottom-sheet:not(.merchant-bottom-sheet):not(.scheme-location-search-host)) > .v-bottom-sheet__content .v-btn--icon.v-btn--variant-text {
     background: rgba(255, 255, 255, 0.9) !important; /* לבן כמעט מלא לנראות שיא */
     backdrop-filter: blur(10px) !important;
     border: 1px solid rgba(227, 30, 36, 0.1) !important; /* מסגרת אדומה דקיקה */
@@ -1366,7 +1295,7 @@ a[href^="tel:"] svg path {
 }
 
 /* אפקט ריחוף ולחיצה */
-.v-bottom-sheet__content .v-btn--icon:active {
+:where(html body .v-bottom-sheet:not(.merchant-bottom-sheet):not(.scheme-location-search-host)) > .v-bottom-sheet__content .v-btn--icon:active {
     transform: scale(0.9) !important;
     background: rgba(227, 30, 36, 0.05) !important;
 }
@@ -1374,7 +1303,7 @@ a[href^="tel:"] svg path {
 /* --- 2. תיקון ה-X (הזרקת צבע אדום לאייקון) --- */
 
 /* כאן אנחנו משתמשים ב-Filter כדי להכריח את ה-SVG להפוך לאדום מותג */
-.v-bottom-sheet__content .v-btn--icon .v-img__img {
+:where(html body .v-bottom-sheet:not(.merchant-bottom-sheet):not(.scheme-location-search-host)) > .v-bottom-sheet__content .v-btn--icon .v-img__img {
     filter: brightness(0) saturate(100%) invert(18%) sepia(88%) saturate(5427%) hue-rotate(352deg) brightness(91%) contrast(92%) !important;
     opacity: 1 !important;
     visibility: visible !important;
@@ -1382,18 +1311,18 @@ a[href^="tel:"] svg path {
 }
 
 /* --- 3. ניקוי שכבות המערכת שחוסמות את ה-X --- */
-.v-bottom-sheet__content .v-btn__overlay,
-.v-bottom-sheet__content .v-btn__underlay {
+:where(html body .v-bottom-sheet:not(.merchant-bottom-sheet):not(.scheme-location-search-host)) > .v-bottom-sheet__content .v-btn__overlay,
+:where(html body .v-bottom-sheet:not(.merchant-bottom-sheet):not(.scheme-location-search-host)) > .v-bottom-sheet__content .v-btn__underlay {
     display: none !important; /* הסרת שכבות אפורות של Vuetify */
 }
 
 /* --- 3. ניקוי שכבות המערכת שחוסמות את ה-X בלבד --- */
-.v-bottom-sheet__content .v-btn--icon .v-responsive__sizer {
+:where(html body .v-bottom-sheet:not(.merchant-bottom-sheet):not(.scheme-location-search-host)) > .v-bottom-sheet__content .v-btn--icon .v-responsive__sizer {
     display: none !important;
 }
 
 /* וידוא שהאייקון ממורכז אופטית */
-.v-bottom-sheet__content .v-btn__content {
+:where(html body .v-bottom-sheet:not(.merchant-bottom-sheet):not(.scheme-location-search-host)) > .v-bottom-sheet__content .v-btn__content {
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
@@ -1406,149 +1335,9 @@ a[href^="tel:"] svg path {
    ========================================================= */
 
 
-/* =========================================================
-   חלק 17: תיקון שדה טלפון - THE CRYSTAL PHONE INPUT
-   מטרה: פתרון התנגשות הספרות והדגל + מראה Liquid Glass
-   ========================================================= */
-
-/* 1. הפיכת שדה ה-Input לקופסת זכוכית שלמה (במקום קו תחתון) */
-[data-v-bd9430d0] .v-field--variant-underlined {
-    background: rgba(255, 255, 255, 0.7) !important;
-    backdrop-filter: blur(25px) saturate(210%) !important;
-    -webkit-backdrop-filter: blur(25px) saturate(210%) !important;
-    border: 1px solid rgba(255, 255, 255, 0.5) !important;
-    border-radius: 20px !important; /* פינות מעוגלות מאוד */
-    padding: 8px 16px !important;
-    display: flex !important;
-    align-items: center !important;
-    height: 56px !important;
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.04) !important;
-    overflow: hidden !important;
-}
-
-/* ביטול הקו התחתון המקורי והאנימציה שלו */
-[data-v-bd9430d0] .v-field__outline,
-[data-v-bd9430d0] .v-field--variant-underlined .v-field__overlay {
-    display: none !important;
-}
-
-/* 2. סידור ה-Prepend (הדגל והקידומת +972) */
-[data-v-bd9430d0] .v-field__prepend-inner {
-    padding-top: 0 !important;
-    align-items: center !important;
-    margin-inline-start: 0 !important;
-    z-index: 10 !important;
-}
-
-/* תיקון המכולה הפנימית של הקידומת */
-[data-v-bd9430d0] .v-field__prepend-inner .tw-flex.tw-items-center {
-    margin-left: 0 !important; /* איפוס הזזה שגויה */
-    gap: 10px !important;
-    padding-left: 10px !important;
-    border-left: 1px solid rgba(227, 30, 36, 0.2) !important; /* קו הפרדה עדין באדום מותג */
-}
-
-/* 3. נעילת הקידומת +972 (מניעת התהפכות ב-RTL) */
-[data-v-bd9430d0] span.tw-mr-2.tw-text-\[14px\] {
-    direction: ltr !important;
-    display: inline-block !important;
-    font-weight: 700 !important;
-    color: #1A1A1A !important;
-    margin: 0 !important;
-}
-
-/* 4. עיצוב שדה הקלט (Input) ומניעת התנגשות */
-[data-v-bd9430d0] input#contactPhoneNumber {
-    direction: ltr !important; /* מספר טלפון נכתב תמיד משמאל לימין */
-    text-align: left !important;
-    padding-left: 15px !important; /* רווח מהקו המפריד של הקידומת */
-    font-size: 16px !important;
-    font-weight: 600 !important;
-    letter-spacing: 1px !important;
-    width: 100% !important;
-}
-
-/* 5. תיקון ה-Placeholder (תרגום להוראה) */
-[data-v-bd9430d0] input#contactPhoneNumber::placeholder {
-    direction: rtl !important;
-    text-align: right !important;
-    font-size: 14px !important;
-    opacity: 0.5 !important;
-    color: #767C8F !important;
-}
-
-/* 6. מצב פוקוס (הילה אדומה עדינה) */
-[data-v-bd9430d0] .v-field--focused.v-field--variant-underlined {
-    border-color: rgba(227, 30, 36, 0.4) !important;
-    background: #ffffff !important;
-    box-shadow: 0 10px 35px rgba(227, 30, 36, 0.1) !important;
-}
-
-
-/* =========================================================
-   חלק 17ב: עיצוב פוטר שמירה - THE CRYSTAL ANCHOR
-   מטרה: מרכוז מוחלט, דריסת הלבן הקשיח ועיצוב Liquid Glass
-   ========================================================= */
-
-/* 1. מכולת הפוטר (ה-Wrapper הלבן במקור) */
-[data-v-bd9430d0].tw-absolute.tw-bottom-0.tw-w-full.tw-bg-white {
-    /* Centering Logic - תיקון RTL/Left-shift */
-    position: fixed !important;
-    bottom: 0 !important;
-    left: 0 !important;
-    right: 0 !important;
-    margin: 0 auto !important;
-    width: 100% !important;
-    max-width: 500px !important; /* נעילה לרוחב המובייל למניעת ציפה */
-
-    /* Liquid Glass DNA */
-    background: rgba(255, 255, 255, 0.65) !important; /* זכוכית שקופה */
-    backdrop-filter: blur(35px) saturate(210%) !important;
-    -webkit-backdrop-filter: blur(35px) saturate(210%) !important;
-    border-top: 1px solid rgba(255, 255, 255, 0.4) !important;
-    box-shadow: 0 -15px 40px rgba(0, 0, 0, 0.08) !important;
-    
-    /* מרווחים */
-    padding: 16px 20px 32px 20px !important;
-    z-index: 1000 !important;
-}
-
-/* 2. כפתור "שמור כתובת" (The Master Action) */
-[data-v-bd9430d0] button.v-btn--size-x-large {
-    /* זהות המותג - אדום מעלה המשלוחים */
-    background: linear-gradient(135deg, #e31e24 0%, #b31419 100%) !important;
-    color: #ffffff !important;
-    
-    /* צורה ועומק */
-    border-radius: 20px !important;
-    height: 62px !important;
-    border: 1px solid rgba(255, 255, 255, 0.2) !important;
-    box-shadow: 0 10px 25px rgba(227, 30, 36, 0.3) !important;
-    
-    /* טקסט */
-    font-size: 19px !important;
-    font-weight: 900 !important;
-    letter-spacing: 0.5px !important;
-    text-transform: none !important;
-    
-    /* יישור פנימי */
-    display: flex !important;
-    justify-content: center !important;
-    align-items: center !important;
-    width: 100% !important;
-}
-
-/* אפקט לחיצה (Feedback) */
-[data-v-bd9430d0] button.v-btn--size-x-large:active {
-    transform: scale(0.96) !important;
-    box-shadow: 0 4px 15px rgba(227, 30, 36, 0.4) !important;
-    transition: all 0.1s ease !important;
-}
-
-/* 3. ניקוי צללים ישנים שמתנגשים עם הזכוכית */
-div[style*="box-shadow: rgba(0, 0, 0, 0.05) 0px 0px 24px 5px;"] {
-    box-shadow: none !important;
-}
+/* חלק 17 (שדה הטלפון, [data-v-bd9430d0]) — הוסר 22.10 (מת: hash של Vue שכבר לא קיים בבילד; השדה בבעלות חלק 44). ההיסטוריה ב-git. */
+/* חלק 17ב (פוטר "שמור כתובת", [data-v-bd9430d0]) — הוסר 22.10 (מת: אותו hash). השורה החיה היחידה בו (ביטול הצל ה-inline של
+   .scheme-address-editor__mobile-footer) עברה כמו שהיא לחלק 44, סעיף 7. ההיסטוריה ב-git. */
 
 /* =========================================================
    חלקים 18 א+ב, 18ג, 19/20 (כרטיסי מוצר בדף העסק: תמונה 128px אבסולוטית, זכוכית על
@@ -1716,129 +1505,8 @@ div[style*="box-shadow: rgba(0, 0, 0, 0.05) 0px 0px 24px 5px;"] {
     display: none !important;
 }
 
-/* =========================================================
-   חלק 27: פופאפ בחירת כתובת למשלוח - LIQUID GLASS
-   Scope: v-bottom-sheet that contains "בחירת כתובת למשלוח"
-   Selector: .v-bottom-sheet__content:has(.location-search-custom-height.dashed-border)
-   Date: 2026-03-14 | Updated: 2026-04-27 (narrowed scope to prevent leak into "בחירת מיקום" modal)
-   6.10.2026: שדה החיפוש של מודאל "בחר את המיקום שלך" נושא גם הוא .location-search-custom-height.dashed-border,
-   כך שהחלק הזה דלף אליו (blur על כרטיס החיפוש → רשימת התוצאות נמעכה ל-16px, "לא רואים תוצאות").
-   :not(:has(.scheme-location-search)) מוציא את המודאל; את השדה והתוצאות שם מעצב חלק 44.
-   ========================================================= */
-/* 1. The Glass Card */
-.v-bottom-sheet__content:has(.location-search-custom-height.dashed-border):not(:has(.scheme-location-search)) .v-card {
-    background: rgba(255, 255, 255, 0.8) !important;
-    backdrop-filter: blur(50px) saturate(220%) !important;
-    -webkit-backdrop-filter: blur(50px) saturate(220%) !important;
-    border-radius: 32px 32px 0 0 !important;
-    border: none !important;
-    border-top: 1.5px solid rgba(255, 255, 255, 0.7) !important;
-    box-shadow: 0 -20px 60px rgba(0, 0, 0, 0.12) !important;
-    padding: 24px 20px 32px 20px !important;
-    overflow: visible !important;
-}
-/* 2. Kill v-card layers */
-.v-bottom-sheet__content:has(.location-search-custom-height.dashed-border):not(:has(.scheme-location-search)) .v-card__underlay,
-.v-bottom-sheet__content:has(.location-search-custom-height.dashed-border):not(:has(.scheme-location-search)) .v-card__loader,
-.v-bottom-sheet__content:has(.location-search-custom-height.dashed-border):not(:has(.scheme-location-search)) .v-card .v-card__underlay,
-.v-bottom-sheet__content:has(.location-search-custom-height.dashed-border):not(:has(.scheme-location-search)) .v-field__overlay {
-    display: none !important;
-}
-/* 3. Title - fix broken text + QLED styling */
-.v-bottom-sheet__content:has(.location-search-custom-height.dashed-border):not(:has(.scheme-location-search)) .v-card-title {
-    padding: 0 0 16px 0 !important;
-    border-bottom: none !important;
-    display: flex !important;
-    justify-content: center !important;
-    align-items: center !important;
-}
-.v-bottom-sheet__content:has(.location-search-custom-height.dashed-border):not(:has(.scheme-location-search)) .v-card-title div:first-child {
-    font-size: 19px !important;
-    font-weight: 900 !important;
-    color: #1a1a1a !important;
-    letter-spacing: -0.3px !important;
-    text-align: center !important;
-    word-spacing: normal !important;
-    white-space: normal !important;
-}
-/* 4. Hide the divider line */
-.v-bottom-sheet__content:has(.location-search-custom-height.dashed-border):not(:has(.scheme-location-search)) hr.v-divider {
-    display: none !important;
-}
-/* 5. Search field - Crystal Capsule */
-.v-bottom-sheet__content:has(.location-search-custom-height.dashed-border):not(:has(.scheme-location-search)) .location-search-custom-height .v-field {
-    background: rgba(255, 255, 255, 0.7) !important;
-    backdrop-filter: blur(20px) !important;
-    -webkit-backdrop-filter: blur(20px) !important;
-    border: 1.5px solid rgba(227, 30, 36, 0.12) !important;
-    border-radius: 20px !important;
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.05) !important;
-    transition: all 0.3s ease !important;
-}
-.v-bottom-sheet__content:has(.location-search-custom-height.dashed-border):not(:has(.scheme-location-search)) .location-search-custom-height .v-field--focused {
-    background: #ffffff !important;
-    border-color: #e31e24 !important;
-    box-shadow: 0 10px 30px rgba(227, 30, 36, 0.1) !important;
-}
-/* Search field cleanup */
-.v-bottom-sheet__content:has(.location-search-custom-height.dashed-border):not(:has(.scheme-location-search)) .v-field__outline,
-.v-bottom-sheet__content:has(.location-search-custom-height.dashed-border):not(:has(.scheme-location-search)) .l-search .v-card__underlay {
-    display: none !important;
-}
-/* Search field background card */
-.v-bottom-sheet__content:has(.location-search-custom-height.dashed-border):not(:has(.scheme-location-search)) .l-search {
-    background: transparent !important;
-    box-shadow: none !important;
-}
-/* Search icon - QLED red */
-.v-bottom-sheet__content:has(.location-search-custom-height.dashed-border):not(:has(.scheme-location-search)) .search-icon-mobile {
-    filter: brightness(0) saturate(100%) invert(18%) sepia(88%) saturate(5427%) hue-rotate(352deg) brightness(91%) contrast(92%) !important;
-    opacity: 0.7 !important;
-}
-/* Back arrow icon - QLED red */
-.v-bottom-sheet__content:has(.location-search-custom-height.dashed-border):not(:has(.scheme-location-search)) .v-icon {
-    color: #e31e24 !important;
-}
-/* Placeholder text */
-.v-bottom-sheet__content:has(.location-search-custom-height.dashed-border):not(:has(.scheme-location-search)) input::placeholder {
-    color: rgba(0, 0, 0, 0.35) !important;
-    font-weight: 500 !important;
-}
-/* Input text */
-.v-bottom-sheet__content:has(.location-search-custom-height.dashed-border):not(:has(.scheme-location-search)) input {
-    font-weight: 700 !important;
-    color: #1a1a1a !important;
-}
-/* 6. The "-או-" separator text */
-.v-bottom-sheet__content:has(.location-search-custom-height.dashed-border):not(:has(.scheme-location-search)) p.tw-text-center.tw-my-4 {
-    color: #bbb !important;
-    font-weight: 600 !important;
-    font-size: 13px !important;
-    margin: 20px 0 !important;
-}
-/* 7. "סמן על המפה" button - Crystal QLED */
-.v-bottom-sheet__content:has(.location-search-custom-height.dashed-border):not(:has(.scheme-location-search)) a.v-btn {
-    background: linear-gradient(135deg, #e31e24 0%, #b3161b 100%) !important;
-    color: #ffffff !important;
-    border-radius: 18px !important;
-    height: 58px !important;
-    font-size: 17px !important;
-    font-weight: 900 !important;
-    letter-spacing: 0.3px !important;
-    text-transform: none !important;
-    box-shadow: 0 10px 30px rgba(227, 30, 36, 0.3) !important;
-    border: 1px solid rgba(255, 255, 255, 0.2) !important;
-    transition: all 0.3s ease !important;
-}
-.v-bottom-sheet__content:has(.location-search-custom-height.dashed-border):not(:has(.scheme-location-search)) a.v-btn:active {
-    transform: scale(0.97) !important;
-    box-shadow: 0 4px 15px rgba(227, 30, 36, 0.2) !important;
-}
-/* Kill button overlays */
-.v-bottom-sheet__content:has(.location-search-custom-height.dashed-border):not(:has(.scheme-location-search)) a.v-btn .v-btn__overlay,
-.v-bottom-sheet__content:has(.location-search-custom-height.dashed-border):not(:has(.scheme-location-search)) a.v-btn .v-btn__underlay {
-    display: none !important;
-}
+/* חלק 27 (חלונית "בחירת כתובת למשלוח", עוגן .v-bottom-sheet__content:has(.location-search-custom-height.dashed-border):not(:has(.scheme-location-search))) —
+   הוסר 22.10 (מת: בבילד dashed-border קיים רק בתוך .scheme-location-search, שהעוגן עצמו מוציא — הכלל לא יכול לחול). ההיסטוריה ב-git. */
 
 /* =========================================================
    חלק 28 (דף הוספת/עריכת כתובת — OVERHAUL) — הוסר.
@@ -2370,24 +2038,8 @@ html body .v-overlay__content.v-bottom-sheet__content:has(.v-card.tw-pt-0.tw-bor
                 JS listener על #MultiVendorHome (לא window!) מנהל את ה-class "mh-scrolled" על body
    ========================================================= */
 
-/* === 1. WRAPPER STICKY חיצוני - זכוכית לבנה (לפני גלילה) === */
-html body div[data-v-aee55508].tw-z-\[9999\].bg-header_bg.tw-sticky {
-    background: transparent !important;
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
-    border-bottom: none !important;
-    box-shadow: none !important;
-    transition: background 0.3s ease, backdrop-filter 0.3s ease, box-shadow 0.3s ease !important;
-}
-
-/* הזכוכית עוברת לילדים: ההדר העליון + עטיפת החיפוש - כדי למנוע פס לבן ביניהם */
-html body div[data-v-aee55508].tw-z-\[9999\].bg-header_bg.tw-sticky #MultiVendorHeader,
-html body div[data-v-aee55508].tw-z-\[9999\].bg-header_bg.tw-sticky div[data-v-aee55508].d-md-none.tw-w-full {
-    background: rgba(255, 255, 255, 0.65) !important;
-    backdrop-filter: blur(40px) saturate(200%) !important;
-    -webkit-backdrop-filter: blur(40px) saturate(200%) !important;
-    transition: background 0.3s ease, backdrop-filter 0.3s ease, box-shadow 0.3s ease !important;
-}
+/* === 1. WRAPPER STICKY חיצוני + הזכוכית בילדים === */
+/* 22.10: הכללים כאן נכתבו על [data-v-aee55508] — hash של Vue שכבר לא קיים בבילד (מת) — והוסרו. ההיסטוריה ב-git. */
 
 /* === 2. ניקוי הדר עליון === */
 html body #MultiVendorHeader,
@@ -2410,41 +2062,8 @@ html body #MultiVendorHeader .v-toolbar__content {
     height: 56px !important;
 }
 
-/* === 3. הילה אדומה עדינה בקצה התחתון של החיפוש === */
-html body div[data-v-aee55508].tw-z-\[9999\].bg-header_bg.tw-sticky div[data-v-aee55508].d-md-none.tw-w-full {
-    border-bottom: 1px solid rgba(227, 30, 36, 0.08) !important;
-    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.04) !important;
-    position: relative !important;
-    padding-top: 8px !important;
-    padding-bottom: 12px !important;
-    margin-top: 0 !important;
-}
-
-html body div[data-v-aee55508].tw-z-\[9999\].bg-header_bg.tw-sticky div[data-v-aee55508].d-md-none.tw-w-full::after {
-    content: '' !important;
-    position: absolute !important;
-    bottom: -1px !important;
-    left: 10% !important;
-    right: 10% !important;
-    height: 1px !important;
-    background: linear-gradient(90deg, transparent 0%, rgba(227, 30, 36, 0.3) 50%, transparent 100%) !important;
-    pointer-events: none !important;
-}
-
-/* === 4. לוגו - CRYSTAL ORB === */
-html body #MultiVendorHeader [data-v-aee55508].tw-w-\[40px\].tw-h-\[40px\].tw-rounded-full {
-    width: 42px !important;
-    height: 42px !important;
-    border: 1.5px solid rgba(227, 30, 36, 0.2) !important;
-    box-shadow:
-        0 4px 12px rgba(227, 30, 36, 0.12),
-        inset 0 1px 2px rgba(255, 255, 255, 0.8) !important;
-    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
-}
-
-html body #MultiVendorHeader [data-v-aee55508].tw-w-\[40px\].tw-h-\[40px\].tw-rounded-full:active {
-    transform: scale(0.93) !important;
-}
+/* === 3. הילה אדומה בקצה החיפוש + 4. לוגו CRYSTAL ORB === */
+/* 22.10: הכללים כאן נכתבו על [data-v-aee55508] — hash של Vue שכבר לא קיים בבילד (מת) — והוסרו. ההיסטוריה ב-git. */
 
 /* === 5. אזור מיקום - "בית" + כתובת === */
 html body #CurrentLocationBtn span.text,
@@ -2496,10 +2115,7 @@ html body #MobileSearchFilterBtn:active .icon-stroke {
 }
 
 /* === 7. שורת חיפוש - LIQUID GLASS PREMIUM === */
-html body div[data-v-aee55508].d-md-none.tw-w-full.px-4.py-2.tw-sticky {
-    padding: 4px 16px 14px 16px !important;
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
-}
+/* 22.10: כלל על [data-v-aee55508] (hash מת) הוסר כאן. */
 
 html body .home-mobile-search-input .v-field {
     background: rgba(255, 255, 255, 0.85) !important;
@@ -2553,18 +2169,13 @@ html body.mh-scrolled div.bg-header_bg.tw-sticky {
     border-bottom: none !important;
     border: none !important;
 }
-
-html body.mh-scrolled div[data-v-aee55508].tw-z-\[9999\].bg-header_bg.tw-sticky::before,
-html body.mh-scrolled div[data-v-aee55508].tw-z-\[9999\].bg-header_bg.tw-sticky::after {
-    display: none !important;
-}
+/* 22.10: כלל על [data-v-aee55508] (hash מת) הוסר כאן. */
 
 /* ההדר העליון - שקוף לחלוטין */
 html body.mh-scrolled #MultiVendorHeader,
 html body.mh-scrolled .Header--134917,
 html body.mh-scrolled #AppBar,
-html body.mh-scrolled #MultiVendorHeader .v-toolbar__content,
-html body.mh-scrolled div[data-v-aee55508].tw-z-\[9999\].bg-header_bg.tw-sticky #MultiVendorHeader {
+html body.mh-scrolled #MultiVendorHeader .v-toolbar__content {
     background: transparent !important;
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
@@ -2573,23 +2184,7 @@ html body.mh-scrolled div[data-v-aee55508].tw-z-\[9999\].bg-header_bg.tw-sticky 
 }
 
 /* עטיפת החיפוש - שקוף לחלוטין */
-html body.mh-scrolled div[data-v-aee55508].d-md-none.tw-w-full.tw-sticky,
-html body.mh-scrolled div[data-v-aee55508].tw-z-\[9999\].bg-header_bg.tw-sticky div[data-v-aee55508].d-md-none.tw-w-full {
-    width: auto !important;
-    background: transparent !important;
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
-    box-shadow: none !important;
-    border-bottom: none !important;
-    border: none !important;
-    padding: 6px 16px 8px !important;
-    display: flex !important;
-    justify-content: flex-end !important;
-}
-
-html body.mh-scrolled div[data-v-aee55508].d-md-none.tw-w-full.tw-sticky::after {
-    display: none !important;
-}
+/* 22.10: שני הכללים כאן נכתבו על [data-v-aee55508] (hash מת) — הוסרו. */
 
 /* טרנזישן חלק */
 html body.mh-scrolled .home-mobile-search-input,
@@ -2758,25 +2353,8 @@ html body #MultiVendorBottomNav #ongoingOrders .ongoing-order {
   position: relative !important;
 }
 
-/* 3. תמונה עגולה - הילה אדומה מתפעמת (LIVE indicator) */
-html body #MultiVendorBottomNav #ongoingOrders .ongoing-order .[v-img.tw](http://v-img.tw)-rounded-full {
-  border: 2px solid #e31e24 !important;
-  position: relative !important;
-  animation: mh-live-pulse 2s ease-in-out infinite !important;
-}
-
-@keyframes mh-live-pulse {
-  0%, 100% {
-    box-shadow:
-      0 0 0 0 rgba(227, 30, 36, 0.5),
-      0 0 8px rgba(227, 30, 36, 0.3);
-  }
-  50% {
-    box-shadow:
-      0 0 0 6px rgba(227, 30, 36, 0),
-      0 0 12px rgba(227, 30, 36, 0.4);
-  }
-}
+/* 3. "הילה מתפעמת" על התמונה + @keyframes mh-live-pulse — הוסרו 22.10 (מת: הסלקטור הושחת בהדבקה
+   ".[v-img.tw](http://v-img.tw)-rounded-full" — CSS לא תקין, הכלל מעולם לא חל, והאנימציה לא שימשה בשום מקום). ההיסטוריה ב-git. */
 
 /* 4. נקודת LIVE אדומה מהבהבת בפינת התמונה */
 html body #MultiVendorBottomNav #ongoingOrders .ongoing-order > div:first-child::after {
@@ -3046,28 +2624,8 @@ html body #merchants_by_category .hide-scrollbar .tw-bg-\[#212121\] {
    אותו כ-track-btn שאינו האדום (עמיד לשינויי class עתידיים).
    ========================================================= */
 
-/* כפתור "להזמין מחדש" - קפסולה אדומה שמתאימה לרוחב הטקסט (בלי חיתוך) */
-html body button.track-btn.tw-bg-black {
-    max-width: none !important;
-    width: fit-content !important;
-    min-width: 0 !important;
-    flex: 0 0 auto !important;
-    padding: 0 20px !important;
-    height: 42px !important;
-    border-radius: 50px !important;
-    overflow: visible !important;
-    background: linear-gradient(135deg, #e31e24 0%, #b3161b 100%) !important;
-    box-shadow: 0 6px 16px rgba(227, 30, 36, 0.32) !important;
-}
-html body button.track-btn.tw-bg-black .v-btn__content {
-    overflow: visible !important;
-    max-width: none !important;
-}
-html body button.track-btn.tw-bg-black .tw-truncate {
-    overflow: visible !important;
-    text-overflow: clip !important;
-    max-width: none !important;
-}
+/* כפתור "להזמין מחדש" (button.track-btn.tw-bg-black, 3 כללים) — הוסר 22.10 (מת: בבילד הכפתור הוא bg-button_normal, אין tw-bg-black).
+   שימו לב: בגלל זה הכלל שלמטה (:not(.tw-bg-black)) חל היום על שני הכפתורים — עניין לעיצוב מחדש של דף ההזמנות, לא שונה כאן. ההיסטוריה ב-git. */
 
 /* כפתור "דרג" - כל track-btn שאינו האדום */
 html body button.track-btn:not(.tw-bg-black) {
@@ -3926,6 +3484,21 @@ html body main#MultiVendorSearch #mh-search-note {
     font-size: 13.5px;
     font-weight: 700;
 }
+
+/* 15. כרטיס עסק בטאב "חנויות" (.merchant-card): זכוכית לבנה, פינות 32. עבר לכאן 22.10 כמו שהוא מ"חלק 12ו" —
+   הכלל הגלובלי שם נגע בכל כרטיס עסק באתר; כאן נשאר רק במקומות שבהם הוא נראה עד היום, בלי שינוי במראה: דף החיפוש,
+   כרטיס עסק בעוזר הקניות של Hyperzod (.shopping-assistant-merchant-card), וסקשני Page Builder "Nearby Merchants" /
+   "Merchant Recommendation" (לא פעילים היום — אם יופעלו, ייראו כמו עד היום). באוספי דף הבית ובדף "הכול" חלק 59 הוא הבעלים. */
+html body main#MultiVendorSearch .merchant-card,
+html body .shopping-assistant-merchant-card .merchant-card,
+html body #NearbyMerchants .merchant-card,
+html body #MerchantRecommendations .merchant-card {
+    background: rgba(255, 255, 255, 0.75) !important;
+    backdrop-filter: blur(45px) saturate(210%) !important;
+    border-radius: 32px !important;
+    border: 1px solid rgba(255, 255, 255, 0.4) !important;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.06) !important;
+}
 /* mh-search-v2 */
 
 /* =========================================================
@@ -4297,6 +3870,13 @@ html body .product-popup .v-carousel-item .v-responsive__content .v-card {
 }
 html body .product-popup .v-carousel-item .v-card__loader,
 html body .product-popup .v-carousel-item .v-card__underlay { display: none !important; }
+/* בחלונית (נייד/אפליקציה) — פינות עליונות 32 + טשטוש לכרטיס שסביב התמונה. עד 22.10 הגיעו מהקליפה הכללית של החלונית (חלק 8z),
+   שחלה היום רק על הכרטיס של החלונית עצמה ולא על כרטיסים שבתוכו; בלי זה מאחורי פינות התמונה מופיע ריבוע אפור. במחשב (חלון) אין שינוי. */
+html body .v-bottom-sheet__content .product-popup .v-carousel-item .v-card {
+    border-radius: 32px 32px 0 0 !important;
+    -webkit-backdrop-filter: blur(50px) saturate(210%) !important;
+    backdrop-filter: blur(50px) saturate(210%) !important;
+}
 html body .product-popup .v-carousel-item .v-img.image {
     width: 100% !important;
     max-width: 100% !important;
@@ -5788,6 +5368,11 @@ html body .scheme-address-editor .scheme-address-editor__mobile-footer {
     background: linear-gradient(to top, #fff 70%, rgba(255, 255, 255, 0)) !important;
     padding: 14px 16px calc(14px + env(safe-area-inset-bottom)) !important;
 }
+/* הצל ה-inline של Hyperzod על הפוטר (style="box-shadow: 0 0 24px 5px #0000000d" — בבילד רק על האלמנט הזה) — עבר לכאן 22.10 מחלק 17ב,
+   שם היה סלקטור גלובלי div[style*="…24px 5px"] */
+html body .scheme-address-editor__mobile-footer {
+    box-shadow: none !important;
+}
 html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) .scheme-address-editor__submit,
 html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) .v-btn.v-btn--block.v-btn--size-x-large,
 html body .v-navigation-drawer:has(.address-panel-swap) .v-btn.v-btn--block.v-btn--size-x-large,
@@ -6191,10 +5776,16 @@ html body .v-bottom-sheet__content > .v-card.tw-rounded-t-xl:has(> .tw-px-4.tw-p
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
+    border: 0 !important;              /* 22.10: בלי הבועה של "חלק 12ג" (קו אדום, צל, טשטוש) — ה-X כאן של חלק 46 */
+    box-shadow: none !important;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
 }
 html body .v-bottom-sheet__content > .v-card.tw-rounded-t-xl:has(> .tw-px-4.tw-pb-8 > .tw-border.tw-rounded-xl > .tw-h-\[44px\].tw-cursor-pointer) > .v-card-title .v-btn img {
     width: 22px !important;
     height: 22px !important;
+    filter: none !important;           /* 22.10: בלי הפילטר האדום והריווח של "חלק 12ג" (x אדום זעיר) */
+    padding: 0 !important;
 }
 html body .v-bottom-sheet__content > .v-card.tw-rounded-t-xl:has(> .tw-px-4.tw-pb-8 > .tw-border.tw-rounded-xl > .tw-h-\[44px\].tw-cursor-pointer) > .v-card-title .v-btn__overlay,
 html body .v-bottom-sheet__content > .v-card.tw-rounded-t-xl:has(> .tw-px-4.tw-pb-8 > .tw-border.tw-rounded-xl > .tw-h-\[44px\].tw-cursor-pointer) > .v-card-title .v-btn__underlay {
@@ -7281,7 +6872,7 @@ html body #MultiVendorBottomNav .floating-nav-pill > .mh-lens {
 }
 html body #MultiVendorBottomNav .floating-nav-pill > .mh-lens::after { content: none !important; }
 html body #MultiVendorBottomNav .floating-nav-pill > .mh-lens.mh-lens-off { opacity: 0 !important; }
-html body #MultiVendorBottomNav .floating-nav-pill > .mh-active-pill { display: none !important; }   /* האינדיקטור הישן (חלק 31), אם נשאר במטמון */
+/* .mh-active-pill (האינדיקטור הישן של חלק 31) — הוסר 22.10 (מת: MH NavGlass ב-custom-footer.js מוחק את האלמנט אם הוא קיים). */
 
 /* ---- הטאבים ---- */
 html body #MultiVendorBottomNav .floating-nav-pill > .v-badge { position: relative !important; z-index: 3 !important; }
@@ -8026,7 +7617,7 @@ html body #mh-home-film.mhf-in .mhf-cta { animation: mhfFade 0.8s cubic-bezier(0
    חלק 59: אוספי העסקים בדף הבית + דף "הכול" — MH Collections v1.0.0 | 2026-10-09
    הבעלים היחיד של #MerchantCollection (סקשני "Merchant Collection" מהאדמין: כותרת, "הכול", קרוסלה, כרטיס עסק)
    ושל כרטיסי העסקים בדף שנפתח מ"הכול" (#merchants_by_category). התנהגות: JS "MH Collections".
-   מחליף את הכלל הגלובלי הישן של .merchant-card (חלק 12ו — זכוכית, רדיוס 32) באזורים האלה.
+   החליף את הכלל הגלובלי הישן של .merchant-card (חלק 12ו — זכוכית, רדיוס 32; הוסר 22.10) באזורים האלה.
    עקרונות (מחקר 9.10, Wolt/Uber Eats/10bis נמדדו חי בשבת): התמונה היא הכרטיס (בלי "כרטיס בתוך כרטיס"),
    **התמונה נשארת בצבע גם כשסגור** (אף אחד מהם לא מאפיר — בשבת דף אפור נראה מת); הסטטוס בגלולה אחת בתחתית
    התמונה ("נפתח במוצ״ש 20:30"), מתג ידני = גלולה לבנה שקטה "בקרוב נפתח"; מתחת לתמונה שורה לשם ושורה אחת
@@ -8049,10 +7640,10 @@ html body [id="MerchantCollection"] .nm-see-all-btn::after { content: "" !import
 /* הקרוסלה: שוליים 16, רווח 12, הכרטיס הבא מציץ */
 html body [id="MerchantCollection"] .nm-carousel { gap: 12px !important; padding: 2px 16px 10px !important; scroll-padding-inline: 16px !important; }
 html body [id="MerchantCollection"] .nm-carousel:not(.nm-carousel--rows-2) .nm-carousel-slide { flex: 0 0 78% !important; max-width: 300px !important; }
-/* הכרטיס: התמונה היא הכרטיס. מבטל את הזכוכית של 12ו (רקע, טשטוש, רדיוס 32, צל, מסגרת) */
+/* הכרטיס: התמונה היא הכרטיס — בלי רקע, בלי פינות, בלי חיתוך. 22.10: 12ו (הזכוכית הגלובלית) הוסר, ואיתו הביטולים שלו כאן
+   (טשטוש, מסגרת, צל — ב-Hyperzod הם ממילא כבויים: tw-border-0 tw-shadow-none). נשאר מה שבאמת שונה מ-Hyperzod. */
 html body :is([id="MerchantCollection"], #merchants_by_category) .merchant-card {
-    background: transparent !important; -webkit-backdrop-filter: none !important; backdrop-filter: none !important;
-    border: 0 !important; border-radius: 0 !important; box-shadow: none !important; overflow: visible !important; -webkit-tap-highlight-color: transparent !important; }
+    background: transparent !important; border-radius: 0 !important; overflow: visible !important; -webkit-tap-highlight-color: transparent !important; }
 html body :is([id="MerchantCollection"], #merchants_by_category) .merchant-card .cover-img { height: auto !important; aspect-ratio: 16 / 9 !important; border: 0 !important; border-radius: 18px !important; overflow: hidden !important; background: #f3f1ee !important; box-shadow: inset 0 0 0 1px rgba(17, 17, 17, 0.05) !important; transform: translateZ(0) !important; }
 html body :is([id="MerchantCollection"], #merchants_by_category) .merchant-card .cover-img { transition: transform 0.12s cubic-bezier(0.2, 0, 0, 1) !important; }
 html body :is([id="MerchantCollection"], #merchants_by_category) .merchant-card:active .cover-img { transform: scale(0.98) !important; }   /* באייפון :active עובד רק עם מאזין touchstart — ב-JS */
