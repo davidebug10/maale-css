@@ -904,247 +904,81 @@ html body #sl-inner-instruction-slider .v-card__underlay {
 }
 
 
-/* --- Part 8h (v2): אמצעי תשלום — MH Pay v1.0.0 | 2026-09-06 ---
-   המטרה: שיהיה ברור לחלוטין מה נבחר. אשראי/BIT נבחר = כרטיס ירוק + "✓ נבחר";
-   מזומן נבחר = כרטיס כתום + אזהרה אדומה "שים לב: בחרת לשלם במזומן לשליח".
-   זיהוי "נבחר": CSS טהור (:has על v-selection-control--dirty / input:checked) וגם המחלקה
-   mh-pay-on שמוסיף הבלוק MH Pay ב-custom-footer.js (גיבוי לדפדפנים ישנים בלי :has).
-   כרטיס המזומן מזוהה לפי data-test-id שמסתיים ב--cod (שם אמצעי התשלום ב-Hyperzod). */
+/* --- Part 8h (v3): אמצעי תשלום — MH Pay v1.1.0 | 2026-10-22 (v1.0.0: 6.9) ---
+   v1.1.0 (דוד 22.10: "לוגואים קטנים של כל האופציות שיש בדף התשלום... ושיעוצב יותר כמו שצריך"):
+   כרטיסים לבנים נקיים בשפה החדשה (קו דק, פינות 14, בלי צללים), נבחר = מסגרת שחורה + עיגול שחור עם ✓,
+   ובכרטיס האשראי (custompg = Grow) שורת לוגואים: Apple Pay · Visa · Mastercard · Diners · bit · PayBox
+   (SVG אחד מוטמע; המקורות: simple-icons 13.21 ו-bit/PayBox הרשמיים — capture/design-qa-22.10/paylogos/mkstrip.py).
+   מזומן נבחר = כתום + האזהרה (הטקסטים המוזרקים בלי שינוי). זיהוי "נבחר": המחלקה mh-pay-on (JS MH Pay)
+   או :has(.v-selection-control--dirty) — בלי :has(input:checked) (ספארי לא מרענן).
+   כרטיס המזומן מזוהה לפי data-test-id שמסתיים ב--cod, האשראי ב--custompg. */
 
-/* 1. הקונטיינר */
-html body #payment-card {
-    background: #ffffff !important;
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
-    border: 1px solid rgba(0, 0, 0, 0.06) !important;
-    border-radius: 24px !important;
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.05) !important;
-    padding: 22px 14px 14px !important;
-    margin-top: 20px !important;
-    position: relative !important;
-    overflow: hidden !important;
-}
+/* 1. הקונטיינר + כותרת */
+html body #payment-card { background: #fff !important; -webkit-backdrop-filter: none !important; backdrop-filter: none !important; border: 1px solid #ebe8e4 !important; border-radius: 16px !important; box-shadow: none !important; padding: 18px 14px 14px !important; margin-top: 16px !important; position: relative !important; overflow: hidden !important; }
+html body #payment-card h3.heading { display: flex !important; flex-direction: column !important; align-items: flex-start !important; gap: 3px !important; margin: 0 4px 14px !important; padding: 0 !important; }
+html body #payment-card h3.heading span { font-size: 19px !important; font-weight: 700 !important; color: #1b1c1f !important; letter-spacing: 0 !important; text-transform: none !important; }
+html body #payment-card h3.heading::after { content: "איך תרצו לשלם? בחרו אפשרות אחת"; font-size: 13px !important; font-weight: 400 !important; color: #6b6866 !important; text-transform: none !important; letter-spacing: 0 !important; }
 
-/* 2. כותרת + שורת הנחיה */
-html body #payment-card h3.heading {
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: flex-start !important;
-    gap: 4px !important;
-    margin: 0 8px 16px !important;
-    padding: 0 !important;
-}
-html body #payment-card h3.heading span {
-    font-size: 19px !important;
-    font-weight: 900 !important;
-    color: #111111 !important;
-    letter-spacing: -0.2px !important;
-    text-transform: none !important;
-}
-html body #payment-card h3.heading::after {
-    content: "איך תרצו לשלם? בחרו אפשרות אחת";
-    font-size: 13px !important;
-    font-weight: 600 !important;
-    color: #6b7280 !important;
-    text-transform: none !important;
-    letter-spacing: 0 !important;
-}
-
-/* 3. הכרטיסים (מזומן / אשראי) — מצב רגיל: לבן עם מסגרת אפורה */
+/* 2. הכרטיסים — רגיל: לבן עם קו */
 /* קבוצת הרדיו של Vuetify היא shrink-to-fit — בלי זה רוחב הכרטיסים משתנה לפי אורך הטקסט */
 html body #payment-card .v-input__control > .v-selection-control-group,
-html body #payment-card .payment-methods {
-    display: flex !important;
-    flex-direction: column !important;
-    flex: 1 1 100% !important;
-    width: 100% !important;
-    min-width: 0 !important;
-    gap: 10px !important;
-}
-html body #payment-card .payment-method { width: 100% !important; }
-html body #payment-card .payment-method {
-    position: relative !important;
-    background: #ffffff !important;
-    border: 2px solid #e2e8f0 !important;
-    border-radius: 18px !important;
-    margin: 0 !important;
-    box-shadow: none !important;
-    transform: none !important;
-    overflow: hidden !important;
-    transition: border-color 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease !important;
-}
+html body #payment-card .payment-methods { display: flex !important; flex-direction: column !important; flex: 1 1 100% !important; width: 100% !important; min-width: 0 !important; gap: 10px !important; }
+html body #payment-card .payment-method { position: relative !important; width: 100% !important; background: #fff !important; border: 1.5px solid #e6e2dd !important; border-radius: 14px !important; margin: 0 !important; box-shadow: none !important; transform: none !important; overflow: hidden !important; transition: border-color .2s ease, background-color .2s ease !important; -webkit-tap-highlight-color: transparent !important; }
+html body #payment-card .payment-method:active { transform: scale(.99) !important; }
 @media (hover: hover) {
-    html body #payment-card .payment-method:hover { border-color: #cbd5e1 !important; }
+    html body #payment-card .payment-method:hover { border-color: #cfc9c2 !important; }
 }
-html body #payment-card .payment-method .v-card-text > div {
-    border: 0 !important;
-    margin: 0 !important;
-    padding: 0 !important;
-}
-html body #payment-card .payment-method label {
-    display: flex !important;
-    align-items: center !important;
-    justify-content: space-between !important;
-    gap: 12px !important;
-    min-height: 76px !important;
-    padding: 12px 16px !important;
-    margin: 0 !important;
-    cursor: pointer !important;
-}
-html body #payment-card .payment-method label > div:first-child {
-    display: flex !important;
-    align-items: center !important;
-    gap: 14px !important;
-    height: auto !important;
-    margin: 0 !important;
-    min-width: 0 !important;
-}
+html body #payment-card .payment-method .v-card-text > div { border: 0 !important; margin: 0 !important; padding: 0 !important; }
+html body #payment-card .payment-method label { display: flex !important; flex-wrap: wrap !important; align-items: center !important; justify-content: space-between !important; gap: 0 12px !important; min-height: 72px !important; padding: 14px !important; margin: 0 !important; cursor: pointer !important; }
+html body #payment-card .payment-method label > div:first-child { display: flex !important; align-items: center !important; gap: 12px !important; height: auto !important; margin: 0 !important; min-width: 0 !important; flex: 1 1 0 !important; }
 
-/* 4. אייקון בעיגול */
-html body #payment-card .method-icon {
-    width: 54px !important;
-    height: 54px !important;
-    flex: 0 0 54px !important;
-    border-radius: 50% !important;
-    background: #f1f5f9 !important;
-    isolation: isolate !important; /* התמונה ב-Vuetify היא z-index:-1 — בלי זה היא נעלמת מאחורי העיגול */
-    filter: none !important;
-    transform: none !important;
-    transition: background-color 0.2s ease !important;
-}
-html body #payment-card .method-icon img.v-img__img {
-    padding: 13px !important;
-}
+/* 3. אייקון באריח */
+html body #payment-card .method-icon { width: 44px !important; height: 44px !important; flex: 0 0 44px !important; border-radius: 12px !important; background: #f2f0ed !important; isolation: isolate !important; /* התמונה ב-Vuetify היא z-index:-1 — בלי זה היא נעלמת מאחורי הרקע */ filter: none !important; transform: none !important; }
+html body #payment-card .method-icon img.v-img__img { padding: 10px !important; }
 
-/* 5. טקסטים */
-html body #payment-card .payment-method .name.tw-text-\[13px\] {
-    font-size: 17px !important;
-    font-weight: 800 !important;
-    color: #111111 !important;
-    line-height: 1.25 !important;
-    padding-inline-start: 0 !important;
-    min-width: 0 !important;
-}
-html body #payment-card .payment-method .name.tw-text-xs {
-    font-size: 13px !important;
-    font-weight: 500 !important;
-    color: #6b7280 !important;
-    line-height: 1.3 !important;
-    margin-top: 4px !important;
-    -webkit-line-clamp: 2 !important;
-}
+/* 4. טקסטים */
+html body #payment-card .payment-method .name.tw-text-\[13px\] { font-size: 15px !important; font-weight: 600 !important; color: #1b1c1f !important; line-height: 1.3 !important; padding-inline-start: 0 !important; min-width: 0 !important; }
+html body #payment-card .payment-method .name.tw-text-xs { font-size: 13px !important; font-weight: 400 !important; color: #6b6866 !important; line-height: 1.35 !important; margin-top: 3px !important; -webkit-line-clamp: 2 !important; }
 
-/* 6. עיגול הבחירה (במקום הרדיו הקטן) — 30px, ריק כשלא נבחר, מלא עם ✓ כשנבחר */
+/* 5. לוגואים בכרטיס האשראי — שורה משלו מתחת לשם, מיושרת לטקסט (אחרי האייקון) */
+html body #payment-card .payment-method[data-test-id$="-custompg"] label::after { content: "" !important; order: 3 !important; flex: 0 0 calc(100% - 56px) !important; margin: 10px 56px 0 0 !important; height: 21px !important; background: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22258%22 height=%2224%22 viewBox=%220 0 258 24%22%3E%3Cg%3E%3Cpath transform=%22translate(0.00 -7.00) scale(1.5833)%22 fill=%22%23000%22 d=%22M2.15 4.318a42.16 42.16 0 0 0-.454.003c-.15.005-.303.013-.452.04a1.44 1.44 0 0 0-1.06.772c-.07.138-.114.278-.14.43-.028.148-.037.3-.04.45A10.2 10.2 0 0 0 0 6.222v11.557c0 .07.002.138.003.207.004.15.013.303.04.452.027.15.072.291.142.429a1.436 1.436 0 0 0 .63.63c.138.07.278.115.43.142.148.027.3.036.45.04l.208.003h20.194l.207-.003c.15-.004.303-.013.452-.04.15-.027.291-.071.428-.141a1.432 1.432 0 0 0 .631-.631c.07-.138.115-.278.141-.43.027-.148.036-.3.04-.45.002-.07.003-.138.003-.208l.001-.246V6.221c0-.07-.002-.138-.004-.207a2.995 2.995 0 0 0-.04-.452 1.446 1.446 0 0 0-1.2-1.201 3.022 3.022 0 0 0-.452-.04 10.448 10.448 0 0 0-.453-.003zm0 .512h19.942c.066 0 .131.002.197.003.115.004.25.01.375.032.109.02.2.05.287.094a.927.927 0 0 1 .407.407.997.997 0 0 1 .094.288c.022.123.028.258.031.374.002.065.003.13.003.197v11.552c0 .065 0 .13-.003.196-.003.115-.009.25-.032.375a.927.927 0 0 1-.5.693 1.002 1.002 0 0 1-.286.094 2.598 2.598 0 0 1-.373.032l-.2.003H1.906c-.066 0-.133-.002-.196-.003a2.61 2.61 0 0 1-.375-.032c-.109-.02-.2-.05-.288-.094a.918.918 0 0 1-.406-.407 1.006 1.006 0 0 1-.094-.288 2.531 2.531 0 0 1-.032-.373 9.588 9.588 0 0 1-.002-.197V6.224c0-.065 0-.131.002-.197.004-.114.01-.248.032-.375.02-.108.05-.199.094-.287a.925.925 0 0 1 .407-.406 1.03 1.03 0 0 1 .287-.094c.125-.022.26-.029.375-.032.065-.002.131-.002.196-.003zm4.71 3.7c-.3.016-.668.199-.88.456-.191.22-.36.58-.316.918.338.03.675-.169.888-.418.205-.258.345-.603.308-.955zm2.207.42v5.493h.852v-1.877h1.18c1.078 0 1.835-.739 1.835-1.812 0-1.07-.742-1.805-1.808-1.805zm.852.719h.982c.739 0 1.161.396 1.161 1.089 0 .692-.422 1.092-1.164 1.092h-.979zm-3.154.3c-.45.01-.83.28-1.05.28-.235 0-.593-.264-.981-.257a1.446 1.446 0 0 0-1.23.747c-.527.908-.139 2.255.374 2.995.249.366.549.769.944.754.373-.014.52-.242.973-.242.454 0 .586.242.98.235.41-.007.667-.366.915-.733.286-.417.403-.82.41-.841-.007-.008-.79-.308-.797-1.209-.008-.754.615-1.113.644-1.135-.352-.52-.9-.578-1.09-.593a1.123 1.123 0 0 0-.092-.002zm8.204.397c-.99 0-1.606.533-1.652 1.256h.777c.072-.358.369-.586.845-.586.502 0 .803.266.803.711v.309l-1.097.064c-.951.054-1.488.484-1.488 1.184 0 .72.548 1.207 1.332 1.207.526 0 1.032-.281 1.264-.727h.019v.659h.788v-2.76c0-.803-.62-1.317-1.591-1.317zm1.94.072l1.446 4.009c0 .003-.073.24-.073.247-.125.41-.33.571-.711.571-.069 0-.206 0-.267-.015v.666c.06.011.267.019.335.019.83 0 1.226-.312 1.568-1.283l1.5-4.214h-.868l-1.012 3.259h-.015l-1.013-3.26zm-1.167 2.189v.316c0 .521-.45.917-1.024.917-.442 0-.731-.228-.731-.579 0-.342.278-.56.769-.593z%22/%3E%3C/g%3E%3Cg transform=%22translate(44 0)%22%3E%3Crect x=%22.5%22 y=%22.5%22 width=%2237%22 height=%2223%22 rx=%225.5%22 fill=%22%23fff%22 stroke=%22%23e3dfda%22/%3E%3Cpath transform=%22translate(4.00 -3.00) scale(1.2500)%22 fill=%22%231A1F71%22 d=%22M9.112 8.262L5.97 15.758H3.92L2.374 9.775c-.094-.368-.175-.503-.461-.658C1.447 8.864.677 8.627 0 8.479l.046-.217h3.3a.904.904 0 01.894.764l.817 4.338 2.018-5.102zm8.033 5.049c.008-1.979-2.736-2.088-2.717-2.972.006-.269.262-.555.822-.628a3.66 3.66 0 011.913.336l.34-1.59a5.207 5.207 0 00-1.814-.333c-1.917 0-3.266 1.02-3.278 2.479-.012 1.079.963 1.68 1.698 2.04.756.367 1.01.603 1.006.931-.005.504-.602.725-1.16.734-.975.015-1.54-.263-1.992-.473l-.351 1.642c.453.208 1.289.39 2.156.398 2.037 0 3.37-1.006 3.377-2.564m5.061 2.447H24l-1.565-7.496h-1.656a.883.883 0 00-.826.55l-2.909 6.946h2.036l.405-1.12h2.488zm-2.163-2.656l1.02-2.815.588 2.815zm-8.16-4.84l-1.603 7.496H8.34l1.605-7.496z%22/%3E%3C/g%3E%3Cg transform=%22translate(88 0)%22%3E%3Crect x=%22.5%22 y=%22.5%22 width=%2237%22 height=%2223%22 rx=%225.5%22 fill=%22%23fff%22 stroke=%22%23e3dfda%22/%3E%3Ccircle cx=%2215.5%22 cy=%2212%22 r=%226.2%22 fill=%22%23EB001B%22/%3E%3Ccircle cx=%2222.5%22 cy=%2212%22 r=%226.2%22 fill=%22%23F79E1B%22/%3E%3Cpath d=%22M19 6.88a6.2 6.2 0 0 1 0 10.24a6.2 6.2 0 0 1 0-10.24z%22 fill=%22%23FF5F00%22/%3E%3C/g%3E%3Cg transform=%22translate(132 0)%22%3E%3Crect x=%22.5%22 y=%22.5%22 width=%2237%22 height=%2223%22 rx=%225.5%22 fill=%22%23fff%22 stroke=%22%23e3dfda%22/%3E%3Cpath transform=%22translate(10.00 3.00) scale(0.7500)%22 fill=%22%23004C97%22 d=%22M16.506 11.982a6.026 6.026 0 0 0-3.866-5.618V17.6a6.025 6.025 0 0 0 3.866-5.618zM8.33 17.598V6.365a6.03 6.03 0 0 0-3.863 5.617 6.028 6.028 0 0 0 3.863 5.616zm2.156-15.113A9.497 9.497 0 0 0 .99 11.982a9.495 9.495 0 0 0 9.495 9.494c5.245 0 9.495-4.25 9.496-9.494a9.499 9.499 0 0 0-9.496-9.497Zm-.023 19.888C4.723 22.4 0 17.75 0 12.09 0 5.905 4.723 1.626 10.463 1.627h2.69C18.822 1.627 24 5.903 24 12.09c0 5.658-5.176 10.283-10.848 10.283%22/%3E%3C/g%3E%3Cg transform=%22translate(176 0)%22%3E%3Crect x=%22.5%22 y=%22.5%22 width=%2237%22 height=%2223%22 rx=%225.5%22 fill=%22%2300444B%22 stroke=%22%2300444B%22/%3E%3Cpath transform=%22translate(7.34 5.50) scale(0.3824)%22 fill=%22%233DEEF8%22 d=%22M43.9737 28.9823C42.5499 31.4056 40.3083 32.6173 37.2489 32.6173C35.2799 32.6173 33.6138 32.1023 32.2507 31.0724C30.8876 30.0425 29.9788 28.4673 29.5244 26.3469C28.343 28.3764 26.4498 29.9213 23.8447 30.9815C21.2396 32.0417 18.3467 32.5718 15.1661 32.5718C7.07815 32.5718 3.03418 28.7854 3.03418 21.2124V4.26408C3.03418 3.62795 3.24622 3.09784 3.67031 2.67375C4.12469 2.21938 4.66994 1.99219 5.30607 1.99219C5.9422 1.99219 6.47231 2.21938 6.89639 2.67375C7.35077 3.09784 7.57796 3.62795 7.57796 4.26408V13.079C9.18343 11.4433 11.1827 10.6254 13.5758 10.6254C15.4538 10.6254 17.1199 11.0798 18.5739 11.9885C20.0582 12.867 21.2093 14.0938 22.0272 15.669C22.8754 17.2441 23.2994 19.0314 23.2994 21.0306C23.2994 22.4544 23.0874 23.7872 22.6633 25.0292C22.2392 26.2711 21.6182 27.3616 20.8004 28.3007C23.1934 27.6646 25.117 26.468 26.571 24.7111C28.025 22.9542 28.752 20.8489 28.752 18.3952V12.8973C28.752 12.2611 28.964 11.731 29.3881 11.3069C29.8425 10.8526 30.3877 10.6254 31.0239 10.6254C31.66 10.6254 32.1901 10.8526 32.6142 11.3069C33.0686 11.731 33.2958 12.2611 33.2958 12.8973V22.5301C33.2958 24.6202 33.629 26.1651 34.2954 27.1647C34.9618 28.1644 36.0069 28.6642 37.4306 28.6642C39.0664 28.6642 40.3235 28.0886 41.202 26.9375C42.1107 25.7562 42.5651 24.075 42.5651 21.894V14.9874H39.6571C39.0209 14.9874 38.4757 14.7754 38.0213 14.3513C37.5972 13.9272 37.3852 13.4122 37.3852 12.8064C37.3852 12.2006 37.5972 11.6856 38.0213 11.2615C38.4757 10.8374 39.0209 10.6254 39.6571 10.6254H42.5651V4.30952C42.5651 3.67339 42.7771 3.14328 43.2012 2.71919C43.6556 2.26481 44.2008 2.03762 44.837 2.03762C45.4731 2.03762 46.0032 2.26481 46.4273 2.71919C46.8817 3.14328 47.1089 3.67339 47.1089 4.30952V10.6254H53.0158C53.6519 10.6254 54.182 10.8374 54.6061 11.2615C55.0605 11.6856 55.2877 12.2006 55.2877 12.8064C55.2877 13.4122 55.0605 13.9272 54.6061 14.3513C54.182 14.7754 53.6519 14.9874 53.0158 14.9874H47.1089V22.4846C47.1089 26.2105 48.1539 28.0735 50.2441 28.0735C51.274 28.0735 52.1222 27.6797 52.7886 26.8921C53.1521 26.468 53.4853 26.15 53.7882 25.9379C54.0911 25.6956 54.4395 25.5744 54.8333 25.5744C55.4694 25.5744 55.9995 25.7865 56.4236 26.2105C56.8477 26.6043 57.0598 27.1193 57.0598 27.7554C57.0598 28.543 56.7417 29.3155 56.1056 30.0728C55.4694 30.8301 54.6213 31.4359 53.561 31.8903C52.5008 32.3749 51.38 32.6173 50.1986 32.6173C48.8052 32.6173 47.5784 32.2992 46.5182 31.6631C45.4883 31.0572 44.6401 30.1636 43.9737 28.9823ZM32.796 6.26334C32.3113 6.74801 31.7206 6.99035 31.0239 6.99035C30.3272 6.99035 29.7365 6.74801 29.2518 6.26334C28.7671 5.77867 28.5248 5.20313 28.5248 4.53671C28.5248 3.83999 28.7671 3.2493 29.2518 2.76463C29.7668 2.27996 30.3575 2.03762 31.0239 2.03762C31.7206 2.03762 32.3113 2.27996 32.796 2.76463C33.2806 3.2493 33.523 3.83999 33.523 4.53671C33.523 5.20313 33.2806 5.77867 32.796 6.26334ZM9.21372 26.3014C10.3042 27.4828 11.6674 28.0735 13.3031 28.0735C14.848 28.0735 16.1354 27.4828 17.1653 26.3014C18.1953 25.12 18.7102 23.56 18.7102 21.6213C18.7102 19.7129 18.1801 18.1529 17.1199 16.9412C16.0597 15.7296 14.742 15.1237 13.1668 15.1237C11.5916 15.1237 10.2739 15.7144 9.21372 16.8958C8.15351 18.0772 7.6234 19.6221 7.6234 21.5304C7.6234 23.4994 8.15351 25.0897 9.21372 26.3014Z%22/%3E%3C/g%3E%3Cg transform=%22translate(220 0)%22%3E%3Crect x=%22.5%22 y=%22.5%22 width=%2237%22 height=%2223%22 rx=%225.5%22 fill=%22%2300B8F6%22 stroke=%22%2300B8F6%22/%3E%3Cg fill=%22none%22 stroke=%22%23fff%22 stroke-width=%221.7%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Ccircle cx=%2219%22 cy=%227.2%22 r=%222.5%22/%3E%3Cpath d=%22M15.2 10.6v5.4a1.6 1.6 0 0 0 1.6 1.6h4.4a1.6 1.6 0 0 0 1.6-1.6v-5.4%22/%3E%3Cpath d=%22M15.2 10.6l-2.4-2.9M22.8 10.6l2.4-2.9%22/%3E%3C/g%3E%3C/g%3E%3C/svg%3E") right center / auto 21px no-repeat !important; }
+html body #payment-card .payment-method[data-test-id$="-custompg"] label > div:last-child { order: 2 !important; }
+html body #payment-card .payment-method[data-test-id$="-custompg"] .name.tw-text-xs { display: none !important; }   /* דוד 22.10: "כולל apple pay..." מיותר — יש לוגואים (הטקסט עצמו מהאדמין, לא נמחק) */
+
+/* 6. עיגול הבחירה — 26px: ריק כשלא נבחר, מלא עם ✓ כשנבחר */
 html body #payment-card .custom-v-radio,
 html body #payment-card .custom-v-radio .v-selection-control__wrapper,
-html body #payment-card .custom-v-radio .v-selection-control__input {
-    width: 30px !important;
-    height: 30px !important;
-    flex: 0 0 30px !important;
-}
+html body #payment-card .custom-v-radio .v-selection-control__input { width: 26px !important; height: 26px !important; flex: 0 0 26px !important; }
 html body #payment-card .custom-v-radio .v-selection-control__input { position: relative !important; }
 html body #payment-card .custom-v-radio i.v-icon { display: none !important; }
-html body #payment-card .custom-v-radio .v-selection-control__input::before {
-    content: "" !important;
-    position: absolute !important;
-    inset: 0 !important;
-    width: auto !important;
-    height: auto !important;
-    box-sizing: border-box !important;
-    border-radius: 50% !important;
-    border: 2px solid #cbd5e1 !important;
-    background: #ffffff !important;
-    opacity: 1 !important;
-    transition: background-color 0.2s ease, border-color 0.2s ease !important;
-}
-html body #payment-card .custom-v-radio .v-selection-control__input::after {
-    content: "" !important;
-    position: absolute !important;
-    left: 50% !important;
-    top: 50% !important;
-    width: 8px !important;
-    height: 14px !important;
-    border: solid #ffffff !important;
-    border-width: 0 3px 3px 0 !important;
-    transform: translate(-50%, -60%) rotate(45deg) scale(0) !important;
-    transition: transform 0.2s ease !important;
-}
-html body #payment-card .custom-v-radio.v-selection-control--dirty .v-selection-control__input::before {
-    border-color: #16a34a !important;
-    background: #16a34a !important;
-}
-html body #payment-card .custom-v-radio.v-selection-control--dirty .v-selection-control__input::after {
-    transform: translate(-50%, -60%) rotate(45deg) scale(1) !important;
-}
-html body #payment-card .payment-method[data-test-id$="-cod"] .custom-v-radio.v-selection-control--dirty .v-selection-control__input::before {
-    border-color: #f59e0b !important;
-    background: #f59e0b !important;
-}
+html body #payment-card .custom-v-radio .v-selection-control__input::before { content: "" !important; position: absolute !important; inset: 0 !important; width: auto !important; height: auto !important; box-sizing: border-box !important; border-radius: 50% !important; border: 2px solid #cfc9c2 !important; background: #fff !important; opacity: 1 !important; transition: background-color .2s ease, border-color .2s ease !important; }
+html body #payment-card .custom-v-radio .v-selection-control__input::after { content: "" !important; position: absolute !important; left: 50% !important; top: 50% !important; width: 6px !important; height: 11px !important; border: solid #fff !important; border-width: 0 2.5px 2.5px 0 !important; transform: translate(-50%, -60%) rotate(45deg) scale(0) !important; transition: transform .2s ease !important; }
+html body #payment-card .custom-v-radio.v-selection-control--dirty .v-selection-control__input::before { border-color: #1b1c1f !important; background: #1b1c1f !important; }
+html body #payment-card .custom-v-radio.v-selection-control--dirty .v-selection-control__input::after { transform: translate(-50%, -60%) rotate(45deg) scale(1) !important; }
+html body #payment-card .payment-method[data-test-id$="-cod"] .custom-v-radio.v-selection-control--dirty .v-selection-control__input::before { border-color: #d97706 !important; background: #d97706 !important; }
 
-/* 7. כרטיס נבחר — אשראי/BIT: ירוק */
-html body #payment-card .payment-method:is(.mh-pay-on, :has(.v-selection-control--dirty), :has(input:checked)) {
-    border-color: #16a34a !important;
-    background: #f0fdf4 !important;
-    box-shadow: 0 10px 28px rgba(22, 163, 74, 0.16) !important;
-}
-html body #payment-card .payment-method:is(.mh-pay-on, :has(.v-selection-control--dirty), :has(input:checked)) .method-icon {
-    background: #dcfce7 !important;
-}
-html body #payment-card .payment-method:is(.mh-pay-on, :has(.v-selection-control--dirty), :has(input:checked)) .name.tw-text-xs {
-    color: #374151 !important;
-}
-/* שורת אישור מתחת לכרטיס הנבחר */
-html body #payment-card .payment-method .v-card-text > div::after {
-    display: none;
-}
-html body #payment-card .payment-method:is(.mh-pay-on, :has(.v-selection-control--dirty), :has(input:checked)) .v-card-text > div::after {
-    content: "✓  נבחר: תשלום באשראי / BIT (לא במזומן)";
-    display: block;
-    margin: 0 16px 16px;
-    padding: 11px 14px;
-    border-radius: 12px;
-    background: #dcfce7;
-    color: #14532d;
-    font-size: 14px;
-    font-weight: 800;
-    line-height: 1.35;
-    text-align: start;
-}
+/* 7. כרטיס נבחר — אשראי/BIT: מסגרת שחורה + שורת אישור ירקרקה */
+html body #payment-card .payment-method:is(.mh-pay-on, :has(.v-selection-control--dirty)) { border-color: #1b1c1f !important; border-width: 2px !important; background: #fff !important; }
+html body #payment-card .payment-method .v-card-text > div::after { display: none; }
+html body #payment-card .payment-method:is(.mh-pay-on, :has(.v-selection-control--dirty)) .v-card-text > div::after { content: "✓  נבחר: תשלום באשראי / BIT (לא במזומן)"; display: block; margin: 0 14px 14px; padding: 10px 12px; border-radius: 10px; background: #edf7f1; color: #16794a; font-size: 13.5px; font-weight: 600; line-height: 1.35; text-align: start; }
 
-/* 8. כרטיס נבחר — מזומן: כתום + אזהרה אדומה */
-html body #payment-card .payment-method[data-test-id$="-cod"]:is(.mh-pay-on, :has(.v-selection-control--dirty), :has(input:checked)) {
-    border-color: #f59e0b !important;
-    background: #fffbeb !important;
-    box-shadow: 0 10px 28px rgba(245, 158, 11, 0.18) !important;
-}
-html body #payment-card .payment-method[data-test-id$="-cod"]:is(.mh-pay-on, :has(.v-selection-control--dirty), :has(input:checked)) .method-icon {
-    background: #fef3c7 !important;
-}
-html body #payment-card .payment-method[data-test-id$="-cod"]:is(.mh-pay-on, :has(.v-selection-control--dirty), :has(input:checked)) .v-card-text > div::after {
-    content: "⚠️ שים לב: בחרת לשלם במזומן לשליח";
-    background: #fff1f2;
-    color: #d90429;
-    border: 1.5px solid #fda4af;
-    animation: mhPayPulse 0.9s ease-out 1;
-}
+/* 8. כרטיס נבחר — מזומן: כתום + אזהרה */
+html body #payment-card .payment-method[data-test-id$="-cod"]:is(.mh-pay-on, :has(.v-selection-control--dirty)) { border-color: #d97706 !important; background: #fffbf3 !important; }
+html body #payment-card .payment-method[data-test-id$="-cod"]:is(.mh-pay-on, :has(.v-selection-control--dirty)) .method-icon { background: #fdefd5 !important; }
+html body #payment-card .payment-method[data-test-id$="-cod"]:is(.mh-pay-on, :has(.v-selection-control--dirty)) .v-card-text > div::after { content: "⚠️ שים לב: בחרת לשלם במזומן לשליח"; background: #fff1e0; color: #9a3412; border: 0; font-weight: 700; animation: mhPayPulse .6s cubic-bezier(.2, .8, .2, 1) 1; }
 @keyframes mhPayPulse {
-    0%   { transform: scale(0.97); box-shadow: 0 0 0 0 rgba(217, 4, 41, 0.35); }
-    60%  { transform: scale(1.01); box-shadow: 0 0 0 10px rgba(217, 4, 41, 0); }
-    100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(217, 4, 41, 0); }
+    0%   { transform: scale(.98); opacity: .6; }
+    100% { transform: none; opacity: 1; }
 }
 @media (prefers-reduced-motion: reduce) {
     html body #payment-card .payment-method .v-card-text > div::after { animation: none !important; }
 }
 
-/* 9. מובייל */
-@media (max-width: 480px) {
-    html body #payment-card { padding: 18px 10px 10px !important; border-radius: 20px !important; }
-    html body #payment-card h3.heading span { font-size: 18px !important; }
-    html body #payment-card .payment-method label { padding: 10px 12px !important; min-height: 72px !important; }
-    html body #payment-card .method-icon { width: 48px !important; height: 48px !important; flex-basis: 48px !important; }
-    html body #payment-card .method-icon img.v-img__img { padding: 11px !important; }
-    html body #payment-card .payment-method .name.tw-text-\[13px\] { font-size: 16px !important; }
-    html body #payment-card .payment-method .v-card-text > div::after { margin: 0 12px 12px; font-size: 13.5px; }
+/* 9. מובייל צר */
+@media (max-width: 360px) {
+    html body #payment-card { padding: 16px 10px 10px !important; }
+    html body #payment-card .payment-method label { padding: 12px !important; }
+    html body #payment-card .payment-method[data-test-id$="-custompg"] label::after { height: 18px !important; background-size: auto 18px !important; }
 }
 
 /* ניקוי שכבות מיותרות של Hyperzod (נשאר כפי שהיה ב-Part 8h המקורי) */

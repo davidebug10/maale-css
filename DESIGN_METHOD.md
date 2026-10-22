@@ -44,7 +44,7 @@
 | מפת הקטגוריות (חנויות עם 8+ קטגוריות) | "חלק 38: MH CatMap" | + JS `MH CatMap`. תוספת לחלק 33, לא החלפה — הסרגל האופקי נשאר |
 | טעינת כל דפי התפריט (15+ קטגוריות) | JS בלבד: `MH MenuLoad` | אין CSS. קורא ל-`loadMore()` של Hyperzod עד דף חלקי |
 | "הצג עוד" בקטגוריה חתוכה (is_paginated) | "חלק 39: MH ShowMore" | + JS `MH ShowMore`. סקופ `#merchant-content button.mh-more` |
-| אמצעי תשלום בצ'ק-אאוט | "Part 8h (v2): MH Pay" | + JS `MH Pay`, `MH Pay NoPreselect`, `MH PayIntent` |
+| אמצעי תשלום בצ'ק-אאוט | "Part 8h (v3): MH Pay" v1.1.0 (22.10) | + JS `MH Pay`, `MH Pay NoPreselect`, `MH PayIntent`. v1.1.0 (דוד 22.10): שפה חדשה (לבן+קו, נבחר = מסגרת ועיגול שחורים, מזומן = כתום + אזהרה), **לוגואים** בכרטיס האשראי (`-custompg`): Apple Pay · Visa · Mastercard · Diners · bit · PayBox — SVG מוטמע ב-`label::after` (מקור: `capture/design-qa-22.10/paylogos/mkstrip.py`; simple-icons 13.21 + bit/PayBox רשמיים), והתיאור "כולל apple pay..." של האדמין מוסתר שם. כותרת = `alias` של אמצעי התשלום (עד 30 תווים בנייד), תיאור = `language_translation[key=description]`. בלי `:has(input:checked)` |
 | קופונים בצ'ק-אאוט | "mh-coupon-v2" | |
 | חלונית "בחר כתובת" בצ'ק-אאוט | "חלק 41: MH AddrPick" | עוגן `#SelectAddress` (id ייחודי). מנטרל לוקאלית את הריפוד הגנרי של bottom-sheet |
 | אזהרת כתובת המשלוח בצ'ק-אאוט (`#mh-addrwarn`, מעל `.address-card`) | "חלק 53: MH AddrWarn" v1.1.0 (בסוף הקובץ) | + JS `MH AddrWarn` (יוצר את הכרטיס; 3 מצבים: אין כתובת = כרטיס / כתובת נבחרה = **שורה דקה בלבד, בלי לחזור על הכתובת** / כתובת = נקודת ברירת המחדל = פס אדום קומפקטי; בתוך פוטר fixed מוסיף ל-#checkout ריפוד תחתון בגובה הכרטיס). רק למחובר + סוג הזמנה עם `requires_address`. טקסט בלבד, לחיצה = לחיצה על הרכיב של Hyperzod. בדיקות: `window.MH_ADDRWARN_FAKE` + מוק של `.address-card` |
