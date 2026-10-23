@@ -573,11 +573,13 @@ if (!window.__MH_FOOTER__) { window.__MH_FOOTER__ = true;
    - המרת שעה מפורמט 12ש עברי ל-24 שעות (order-status)
    - תרגום "Delivery" ל-"משלוח לבית" (order-type)
    - תרגום "Rating:" ל-"הדירוג שלי:" (span.review)
-   - "להזמין מחדש" מלא (button.track-btn.tw-bg-black) — הוסר 23.10: מת. בבילד הכפתור הוא "bg-button_normal track-btn"
-     (בלי tw-bg-black), ולכן הלולאה לא מצאה אף כפתור מאז שהבילד השתנה. ההיסטוריה ב-git.
+   - "להזמין מחדש" מלא (Hyperzod קוצצת ל-10 תווים: "להזמין מחד..."). 23.10: היה לפי button.track-btn.tw-bg-black —
+     מת מאז שהבילד השתנה (היום bg-button_normal); עכשיו לפי הטקסט המקוצר עצמו. העיצוב שתלוי בו — חלק 37.
    ========================================================= */
 (function () {
     'use strict';
+
+    var REORDER_FULL = 'להזמין מחדש';
 
     function to24(text) {
         return text.replace(
@@ -593,6 +595,14 @@ if (!window.__MH_FOOTER__) { window.__MH_FOOTER__ = true;
     }
 
     function applyFixes() {
+        // 23.10: היה 'button.track-btn.tw-bg-black' — המחלקה נעלמה מהבילד (היום bg-button_normal), והטקסט נשאר "להזמין מחד...".
+        // מזהים לפי הטקסט המקוצר עצמו, לא לפי מחלקת צבע.
+        document.querySelectorAll('button.track-btn .tw-truncate').forEach(function (label) {
+            var t = label.textContent.trim();
+            if (t !== REORDER_FULL && t.indexOf('להזמין מח') === 0) {
+                label.textContent = REORDER_FULL;
+            }
+        });
         document.querySelectorAll('.order-status').forEach(function (el) {
             var t = el.textContent, n = to24(t);
             if (n !== t) { el.textContent = n; }

@@ -302,19 +302,29 @@ html body #ProfileSideBar .v-list-item.navigation-item {
     backdrop-filter: blur(15px) !important;
     border: 1px solid rgba(0, 0, 0, 0.05) !important;
     border-radius: 16px !important;
+    margin-top: 0 !important;          /* 23.10: השורות שלנו ("דברו איתנו", תקנון/פרטיות/נגישות — custom-footer.js) הגיעו עם margin-top 16 */
     margin-bottom: 12px !important;
+    margin-inline: 0 !important;       /* 23.10: ובמחשב היו רחבות ב-8px מכל צד משורות Hyperzod */
+    min-height: 54px !important;       /* 23.10: אותו גובה לכל השורות (היו 50 ו-54 לסירוגין) */
     padding: 14px 16px !important;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.02) !important;
 }
 
-/* אפקט Hover/Active - הבלטה באדום */
-html body #ProfileSideBar .v-list-item.navigation-item:active,
-html body #ProfileSideBar .v-list-item.navigation-item:hover {
+/* אפקט לחיצה/ריחוף - הבלטה באדום. 23.10: ה-hover רק במכשיר עם עכבר — בטלפון הוא נתקע על השורה האחרונה שנלחצה */
+html body #ProfileSideBar .v-list-item.navigation-item:active {
     background: rgba(255, 255, 255, 0.9) !important;
     border-color: rgba(227, 30, 36, 0.4) !important;
     transform: scale(0.98) !important;
     box-shadow: 0 8px 20px rgba(227, 30, 36, 0.08) !important;
+}
+@media (hover: hover) {
+    html body #ProfileSideBar .v-list-item.navigation-item:hover {
+        background: rgba(255, 255, 255, 0.9) !important;
+        border-color: rgba(227, 30, 36, 0.4) !important;
+        transform: scale(0.98) !important;
+        box-shadow: 0 8px 20px rgba(227, 30, 36, 0.08) !important;
+    }
 }
 
 /* טקסט בתוך השורות */
@@ -337,13 +347,163 @@ html body #ProfileSideBar .FvDmIs7p0Tcc svg path {
     fill: #b3161b !important;
 }
 
-/* 5. ניקוי קווים מפרידים (Dividers) */
-html body #profile hr.v-divider {
+/* 5. ניקוי קווים מפרידים (Dividers). 23.10: לא בפרטי ההזמנה (.scheme-order-divider) — שם ה-20px מעל ומתחת לכל קו
+   פתחו חורים של 40–70px בכרטיס (בין שם העסק לטבלה, בין הסכומים לכפתורים); שם חוזרים הריווחים של Hyperzod */
+html body #profile hr.v-divider:not(.scheme-order-divider) {
     border-color: rgba(227, 30, 36, 0.1) !important;
     margin: 20px 0 !important;
 }
 
 /* 6. הסרת שכבות מערכת מיותרות — הוסר 23.10: כפילות ("4. ניקוי לוגי" בראש הקובץ + ".v-list-item__overlay" בחלק 8f). */
+
+/* 7. כפתור החזרה בכל דפי האזור האישי (23.10, ליטוש): עיגול ורדרד 36 עם חץ ">" אדום — כמו שהיה עד היום רק ב"ניהול כתובות"
+   (עבר לכאן מחלק 46) ובמסך הוספת כתובת. בשפה, ארנק, הפניות, עזרה ובפרטי הזמנה היה "←" שחור — ב-RTL הכיוון ההפוך לחזרה.
+   האייקון של Hyperzod (חץ svg או v-icon) מוסתר, וה-">" מצויר במסכה — אותו ציור בכל הדפים. בלי JS. */
+html body .scheme-profile-page .scheme-mobile-page-header .back-btn,
+html body .scheme-order-tracking-header .back-btn {
+    width: 36px !important;
+    height: 36px !important;
+    min-width: 36px !important;
+    min-height: 36px !important;
+    padding: 0 !important;
+    border-radius: 999px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background: rgba(227, 30, 36, 0.08) !important;
+}
+html body .scheme-profile-page .scheme-mobile-page-header .back-btn {
+    margin-inline-start: 14px !important;
+}
+html body .scheme-profile-page .scheme-mobile-page-header .back-btn > :is(svg, .v-icon),
+html body .scheme-order-tracking-header .back-btn > svg {
+    display: none !important;
+}
+html body .scheme-profile-page .scheme-mobile-page-header .back-btn::before,
+html body .scheme-order-tracking-header .back-btn::before {
+    content: "" !important;
+    width: 24px !important;
+    height: 24px !important;
+    background: #e31e24 !important;
+    -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M8.59 16.58 13.17 12 8.59 7.41 10 6l6 6-6 6z'/%3E%3C/svg%3E") center / 24px 24px no-repeat !important;
+    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M8.59 16.58 13.17 12 8.59 7.41 10 6l6 6-6 6z'/%3E%3C/svg%3E") center / 24px 24px no-repeat !important;
+}
+
+/* 8. מחשב: ה-AppBar קבוע (71px) והדף התחיל ב-48 — הכותרת ("בחר שפה", "ניהול כתובות"), ראש כרטיס הארנק ושם המשתמש
+   ישבו מתחתיו (23.10). לפי ה-mt-md-8 של Hyperzod (רק ≥960), ורק כשה-AppBar באמת בדף: #MultiVendorHeaderRoot (האח שלפני
+   הדף, ב-.v-application__wrap) מכיל #AppBar — באייפד/אפליקציה ברוחב כזה בלי AppBar אין תוספת. :has על אלמנט קטן (הכותרת) */
+@media (min-width: 960px) {
+    html body #MultiVendorHeaderRoot:has(#AppBar) ~ .scheme-profile-page > .v-container.mt-md-8 {
+        margin-top: 72px !important;
+    }
+}
+
+/* 9. דף השפה (#Languages): כפתורי הבחירה באדום של האתר (בכרום כחול, בספארי אפור-שחור — ברירת המחדל של הדפדפן), 22px.
+   מצוירים בעצמנו (appearance:none) — accent-color לא נצבע ב-WebKit. :checked על ה-input עצמו (לא :has) מתעדכן גם בספארי */
+html body #Languages input.radio {
+    -webkit-appearance: none !important;
+    appearance: none !important;
+    width: 22px !important;
+    height: 22px !important;
+    margin: 0 !important;
+    border-radius: 50% !important;
+    border: 2px solid #c9ccd3 !important;
+    background: #fff !important;
+    flex-shrink: 0 !important;
+}
+html body #Languages input.radio:checked {
+    border-color: #e31e24 !important;
+    background: #e31e24 !important;
+    box-shadow: inset 0 0 0 4px #fff !important;
+}
+
+/* 10. הארנק (.scheme-wallet-page): כרטיס היתרה בגרדיאנט האדום במקום שחור, וכפתור "ממש כרטיס מתנה" כמו כפתורי הפעולה —
+   בשורה אחת (נשבר לשתיים), פינות 14. כבוי (אין קוד) — ורוד בהיר עם טקסט אדום כהה (למטה) */
+html body .scheme-wallet-page .scheme-wallet-balance {
+    background: linear-gradient(135deg, #ff3b41 0%, #c8151b 100%) !important;
+    border-radius: 18px !important;
+    box-shadow: 0 12px 30px rgba(227, 30, 36, 0.25) !important;
+}
+/* "יתרה זמינה": Hyperzod נותנת לבן 70% — על האדום יצא ורוד חלש (ניגודיות ~2:1) */
+html body .scheme-wallet-page .scheme-wallet-balance .scheme-wallet-balance__caption {
+    color: rgba(255, 255, 255, 0.9) !important;
+}
+/* נייד: הכרטיס נמתח מקצה לקצה — הפינות והזוהר נחתכו בשולי המסך */
+@media (max-width: 959px) {
+    html body .scheme-wallet-page .scheme-wallet-balance {
+        margin-inline: 16px !important;
+    }
+}
+html body .scheme-wallet-page button.tw-bg-black {
+    background: linear-gradient(135deg, #ff3b41 0%, #c8151b 100%) !important;
+    border-radius: 14px !important;
+    white-space: nowrap !important;
+    padding: 0 16px !important;
+    min-height: 44px !important;
+}
+/* כבוי (אין קוד): Hyperzod מחווירה ל-50% — על הגרדיאנט יצא לבן על ורוד חיוור, לא קריא. כבוי = ורוד בהיר עם טקסט אדום כהה */
+html body .scheme-wallet-page button.tw-bg-black:disabled {
+    opacity: 1 !important;
+    background: rgba(227, 30, 36, 0.1) !important;
+    color: rgba(200, 21, 27, 0.75) !important;
+    box-shadow: none !important;
+}
+html body .scheme-wallet-page input[type="text"] {
+    border-radius: 14px !important;
+    min-height: 44px !important;
+    min-width: 0 !important;
+}
+
+/* 11. חלונית "ערוך פרופיל" (.scheme-edit-profile-actions): "שמור"/"סגור" היו קישורי טקסט כחולים בגובה 36 —
+   "שמור" (.scheme-edit-profile-primary) עכשיו כפתור הפעולה האדום, "סגור" (.scheme-edit-profile-secondary) לבן עם קו דק, שניהם 46
+   ובאותו רוחב. "מחיקת חשבון לצמיתות" (הכפתור השלישי, בלי מחלקה שלנו) — קישור כמו שהיה (14/500), בשורה משלו מתחת לכפתורים.
+   השורה מיושרת לעמודת השדות (padding-inline). לפי המחלקות של Hyperzod, לא לפי מיקום — סדר אחר לא יצבע את המחיקה באדום. */
+html body .scheme-edit-profile-actions {
+    flex-wrap: wrap !important;
+    gap: 8px 10px !important;
+    padding-inline: 28px !important;
+}
+@media (min-width: 960px) {   /* במחשב החלונית היא מגירה צדדית — השדות 20px מהקצה */
+    html body .scheme-edit-profile-actions {
+        padding-inline: 20px !important;
+    }
+}
+html body .scheme-edit-profile-actions > .v-spacer {
+    display: none !important;
+}
+html body .scheme-edit-profile-actions > .v-btn:is(.scheme-edit-profile-primary, .scheme-edit-profile-secondary) {
+    flex: 1 1 0 !important;
+    height: 46px !important;
+    border-radius: 14px !important;
+    padding: 0 20px !important;
+    margin: 0 !important;
+    font-size: 15px !important;
+    letter-spacing: 0 !important;
+    text-transform: none !important;
+}
+html body .scheme-edit-profile-actions > .v-btn.scheme-edit-profile-primary {
+    background: linear-gradient(135deg, #ff3b41 0%, #c8151b 100%) !important;
+    color: #fff !important;
+    font-weight: 800 !important;
+    box-shadow: 0 8px 20px rgba(227, 30, 36, 0.28) !important;
+}
+html body .scheme-edit-profile-actions > .v-btn.scheme-edit-profile-secondary {
+    background: #fff !important;
+    border: 1px solid rgba(0, 0, 0, 0.12) !important;
+    color: #111 !important;
+    font-weight: 700 !important;
+}
+html body .scheme-edit-profile-actions > .v-btn:not(.scheme-edit-profile-primary, .scheme-edit-profile-secondary) {
+    order: 2 !important;
+    flex: 1 1 100% !important;
+    margin: 0 !important;
+    letter-spacing: 0 !important;
+    text-transform: none !important;
+}
+html body .scheme-edit-profile-actions .v-btn__overlay,
+html body .scheme-edit-profile-actions .v-btn__underlay {
+    display: none !important;
+}
 
 /* =========================================================
    חלק 7: דף "ההזמנות שלי" - CRYSTAL ORDER HISTORY
@@ -352,11 +512,12 @@ html body #profile hr.v-divider {
 
 /* 1. טיהור הרקע הכללי - חיסול ה-f7f7f7 האפרורי
    23.10 (ניקוי): "#orders .tw-bg-\[#f7f7f7\]" הוסר מהרשימה — מעולם לא חל (# לא מוברח = id "f7f7f7]"). */
-html body #custom-scroll-orders,
-html body #profile.tw-relative {
+html body #custom-scroll-orders {
     background-color: #ffffff !important;
     background: radial-gradient(circle at center, #ffffff 0%, #f8f8f8 100%) !important;
 }
+/* "#profile.tw-relative" — הוצא 23.10: #profile הוא המעטפת של כל דפי האזור האישי ובגובה התוכן בלבד, אז הגרדיאנט נגמר באמצע המסך
+   (שפה, ארנק, הפניות, עזרה; בפרטי ההזמנה — פס לבן בתחתית) — קופסה אפורה עם קצה חד. בלי הגרדיאנט: הלבן של הדף עד למטה */
 
 /* 2. הדר הדף (ההזמנות שלי) - Liquid Glass Sticky */
 html body #checkout .position-fixed.tw-top-0,
@@ -483,6 +644,8 @@ html body #checkout .back-btn svg path {
     stroke: #e31e24 !important;
     transition: transform 0.2s ease !important;
 }
+/* 23.10: ב-RTL "חזרה" מצביע ימינה — Hyperzod מציירת "←" (כמו בראש דף העסק, בחיפוש ובאזור האישי) */
+html body #checkout .back-btn svg { transform: scaleX(-1) !important; }
 
 /* 5. ניקוי שכבות ה-Underlay — הוסר 23.10: כפילות של "4. ניקוי לוגי" בראש הקובץ. */
 
@@ -806,8 +969,8 @@ html body #sl-inner-instruction-slider p.tw-m-0 {
     fill: #e31e24 !important;
 }
 
-/* כפתור הסגירה (X) */
-:where(html body .v-bottom-sheet:not(.merchant-bottom-sheet):not(.scheme-location-search-host)) > .v-bottom-sheet__content .v-btn--icon {
+/* כפתור הסגירה (X). 23.10: לא כוכבי הדירוג (.v-rating) — גם הם v-btn--icon, וקיבלו כל אחד בועה אפורה של 64px (חמש בועות צמודות) */
+:where(html body .v-bottom-sheet:not(.merchant-bottom-sheet):not(.scheme-location-search-host)) > .v-bottom-sheet__content .v-btn--icon:where(:not(.v-rating .v-btn)) {
     background: rgba(0, 0, 0, 0.04) !important;
     border-radius: 50% !important;
     transition: transform 0.2s ease !important;
@@ -834,6 +997,15 @@ html body .v-bottom-sheet__content table.summary-card td {
 }
 /* ".tw-border-t td" (19px / 900 / אדום) — הוסר 22.10: מעולם לא חל — הפסיד בספציפיות לכלל "table.summary-card td" שלמעלה,
    ולכן ה"סה"כ" מוצג היום באותו גופן כמו שאר השורות. */
+/* חלונית "פרטי חשבון" (23.10): (1) הריפוד/הקו/השוליים של כותרת החלונית הכללית (למעלה) ניפחו את הכותרת ל-53px — ה-X ישב 20px מתחתיה
+   ונוסף קו קצר שני מתחת לכותרת; כאן הקו היחיד = של השורה של Hyperzod. (2) שורת הסה"כ: התווית ירדה 12px מתחת לסכום (tw-mt-3) —
+   מיושרת, מודגשת, והסכום אדום כמו כל מחיר באתר. (3) הטבלה הלבנה — פינות 16 כמו כל כרטיס. סכומים וטקסטים — בלי שינוי. */
+html body .v-bottom-sheet__content > .v-card:has(table.summary-card) > .tw-border-b.tw-justify-between { padding-bottom: 14px !important; margin-bottom: 14px !important; }
+html body .v-bottom-sheet__content > .v-card:has(table.summary-card) > .tw-border-b.tw-justify-between > .v-card-title { padding: 0 !important; margin: 0 !important; border: 0 !important; }
+html body .v-bottom-sheet__content > .v-card:has(table.summary-card) > .v-list { border-radius: 16px !important; }
+html body .v-bottom-sheet__content table.summary-card tr.tw-border-t .tw-mt-3 { margin-top: 0 !important; }
+html body .v-bottom-sheet__content table.summary-card tr.tw-border-t td { padding-top: 14px !important; vertical-align: middle !important; font-size: 16px !important; font-weight: 800 !important; color: #111 !important; }
+html body .v-bottom-sheet__content table.summary-card tr.tw-border-t td:is(.text-end, .tw-text-end) { font-size: 18px !important; font-weight: 900 !important; color: #c8151b !important; }
 
 /* יישור הסכומים בטבלת הפירוט (בחלונית, בכרטיס #summary ובחלון של המחשב).
    22.10: היה גלובלי (".text-end, .tw-text-end" בכל האתר) — ב-RTL זה זהה ל-end, אבל באיים LTR הפך ימין לשמאל. */
@@ -1016,10 +1188,21 @@ html body #payment-card .payment-method[data-test-id$="-cod"]:is(.mh-pay-on, :ha
     font-weight: 600 !important;
 }
 
-/* 5. כפתור ביצוע הזמנה (The Ultimate CTA) */
+/* 5. כפתור ביצוע הזמנה (The Ultimate CTA) — 23.10: גרדיאנט QLED ופינות 16 כמו "הוספה" ו"המשך לתשלום"; גם "בחר כתובת" שבמקומו
+   (לפני שנבחרה כתובת) — היה מלבן אדום שטוח בפינות 4 וטקסט דק. המצב האפור של קפית (חלק 42) גובר בספציפיות — בלי שינוי. */
+html body .place-order .add-address-btn {
+    height: 54px !important;
+    border-radius: 16px !important;
+    background: linear-gradient(135deg, #ff3b41 0%, #c8151b 100%) !important;
+    box-shadow: 0 10px 26px rgba(227, 30, 36, 0.28) !important;
+    font-size: 16px !important;
+    font-weight: 800 !important;
+    letter-spacing: 0 !important;
+}
+html body .place-order .add-address-btn:active { transform: scale(0.98) !important; }
 .mobile-place-order-btn {
-    background: #e31e24 !important; /* אדום מותג דומיננטי */
-    border-radius: 20px !important;
+    background: linear-gradient(135deg, #ff3b41 0%, #c8151b 100%) !important; /* אדום מותג דומיננטי */
+    border-radius: 16px !important;
     box-shadow: 0 8px 25px rgba(227, 30, 36, 0.3) !important;
     height: 60px !important;
     transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
@@ -1136,9 +1319,15 @@ a[href^="tel:"] svg path {
     fill: white !important;
 }
 
-/* 7. הדגשת המחיר הסופי */
-.grand-total td {
+/* 7. הדגשת המחיר הסופי. 23.10: היה ".grand-total td" — הפסיד בספציפיות ל-"html body .c-table tbody td" של חלק 7 (אפור 444, משקל 500),
+   ולכן "סה"כ לתשלום" יצא אפור וחלש כמו שאר השורות. עכשיו: הכותרת כהה ומודגשת, הסכום באדום כמו המחיר בכרטיס ההזמנה ברשימה */
+html body .c-table tr.grand-total td {
     font-size: 18px !important;
+    font-weight: 800 !important;
+    color: #111 !important;
+}
+html body .c-table tr.grand-total td:last-child {
+    font-size: 20px !important;
     font-weight: 900 !important;
     color: #e31e24 !important;
 }
@@ -1170,24 +1359,48 @@ a[href^="tel:"] svg path {
 
 /* תווית "Phone:" (#mobileLocationSearch .tw-text-gray-500) — הוסר 22.10 (מת: אין tw-text-gray-500 במודאל). ההיסטוריה ב-git. */
 
-/* --- 12ג: עיצוב "השתמש במיקום נוכחי" (The Action Island) --- */
-.locate-me {
-    background: rgba(255, 255, 255, 0.8) !important;
-    backdrop-filter: blur(10px) !important;
-    border-radius: 24px !important;
-    border: 1px solid rgba(227, 30, 36, 0.15) !important;
-    padding: 18px !important;
-    margin: 15px 0 !important;
-    box-shadow: 0 8px 25px rgba(227, 30, 36, 0.05) !important;
-    transition: all 0.3s ease !important;
+/* --- 12ג: "השתמש במיקום נוכחי" — שורה בתוך כרטיס הזכוכית של 12ד (23.10) ---
+   היה "אי" זכוכית משלו (רקע, מסגרת אדומה, צל, פינות 24) בתוך הכרטיס של 12ד — כרטיס בתוך כרטיס עם צל כפול, והתוכן
+   ממורכז. עכשיו שורה כמו "הוסף כתובת חדשה" שמתחתיה: אייקון בימין בקו אחד עם ה-+, טקסט אדום, החץ בקצה השורה.
+   סקופ: #mobileLocationSearch (המודאל "בחר את המיקום שלך", נייד ומחשב) — היה .locate-me גלובלי; Hyperzod משתמשת
+   במחלקה גם לכפתור אייקון בתוך שדה (append-inner), שלא מופיע באתר היום, וזה כבר לא נוגע בו. */
+html body #mobileLocationSearch .locate-me {
+    background: transparent !important;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+    border: 0 !important;
+    border-radius: 14px !important;
+    padding: 7px 0 14px !important;   /* 7 למעלה = מה שיש מתחת לעיגול של "הוסף כתובת חדשה" (שורה 50, עיגול 36) — אותו ריווח בראש ובתחתית הכרטיס */
+    margin: 0 !important;
+    box-shadow: none !important;
+    transition: background-color 0.2s ease !important;
 }
+html body #mobileLocationSearch .locate-me > .v-btn__content { flex: 1 1 auto !important; width: 100% !important; justify-content: flex-start !important; }
+html body #mobileLocationSearch .locate-me > .v-btn__content > div { padding-inline: 12px 0 !important; }   /* האייקון בקו אחד עם ה-+ של "הוסף כתובת חדשה" */
+html body #mobileLocationSearch .locate-me .scheme-colorable-icon--gps { flex: 0 0 36px !important; width: 36px !important; height: 36px !important; margin: 0 !important; }   /* v-img: ברוחב מלא הוא נמתח ל-79px */
+/* שני האייקונים (מיקום נוכחי, "+" של "הוסף כתובת חדשה") — עיגול ורדרד 36 עם אייקון אדום 20, כמו ב"ניהול כתובות" (חלק 46) */
+html body #mobileLocationSearch .locate-me .scheme-colorable-icon--gps,
+html body #mobileLocationSearch .scheme-location-search__action:not(.locate-me) .v-btn__content > div > div:first-child {
+    border-radius: 999px !important;
+    background: rgba(227, 30, 36, 0.08) !important;
+}
+html body #mobileLocationSearch .scheme-location-search__action:not(.locate-me) .v-btn__content > div > div:first-child {
+    width: 36px !important;
+    height: 36px !important;
+    transform: none !important;
+}
+html body #mobileLocationSearch .locate-me .scheme-colorable-icon--gps img { inset: 8px !important; width: 20px !important; height: 20px !important; }
+html body #mobileLocationSearch :is(.scheme-colorable-icon--gps, .scheme-colorable-icon--plus) img {
+    filter: invert(20%) sepia(96%) saturate(5600%) hue-rotate(350deg) brightness(88%) !important;   /* אדום — אותו פילטר כמו ה-+ ב"ניהול כתובות" */
+}
+html body #mobileLocationSearch .locate-me > .v-btn__content > div > .tw-flex-col { flex: 1 1 auto !important; align-self: center !important; }   /* החץ לקצה השורה; הטקסט במרכז העיגול */
+html body #mobileLocationSearch .locate-me > .v-btn__content > div > .tw-flex-col > * { text-align: start !important; }   /* הכתובת: tw-text-left של Hyperzod */
+html body #mobileLocationSearch .locate-me > .v-btn__content > div > i.v-icon > svg { transform: scaleX(-1) !important; }   /* "‹" בקצה השורה — כמו "הכול ‹" (Hyperzod: "›") */
+html body #mobileLocationSearch .locate-me:active { background: rgba(227, 30, 36, 0.04) !important; }
 
-.locate-me:active { transform: scale(0.98) !important; background: rgba(227, 30, 36, 0.03) !important; }
-
-.locate-me span.tw-font-medium { 
-    color: #e31e24 !important; 
-    font-weight: 800 !important; 
-    font-size: 15px !important;
+html body #mobileLocationSearch .locate-me span.tw-font-medium {   /* הגודל — מהתרגום בראש הקובץ (font-size 0 + ::before 15px) */
+    color: #e31e24 !important;
+    font-weight: 800 !important;
 }
 
 /* --- 12ד: כרטיסי כתובות וחיפושים (Floating Glass Islands) --- */
@@ -1238,7 +1451,7 @@ a[href^="tel:"] svg path {
 }
 
 /* אפקט ריחוף ולחיצה */
-:where(html body .v-bottom-sheet:not(.merchant-bottom-sheet):not(.scheme-location-search-host)) > .v-bottom-sheet__content .v-btn--icon:active {
+:where(html body .v-bottom-sheet:not(.merchant-bottom-sheet):not(.scheme-location-search-host)) > .v-bottom-sheet__content .v-btn--icon:where(:not(.v-rating .v-btn)):active {   /* 23.10: לא כוכבי הדירוג (כמו בבועת ה-X ב-8z) */
     transform: scale(0.9) !important;
     background: rgba(227, 30, 36, 0.05) !important;
 }
@@ -2124,6 +2337,19 @@ html body.mh-scrolled .home-mobile-search-input .v-input__control {
     width: 50px !important;
 }
 
+/* כפתור הסינון בגלילה: אותו עיגול קריסטלי לבן כמו החיפוש שלידו (23.10 — היה מרובע מעוגל שקוף-למחצה,
+   והכותרות שגוללות מתחתיו נקראו דרכו). רק מצב הגלילה; לפני הגלילה הכפתור כמו קודם */
+html body.mh-scrolled #MobileSearchFilterBtn { border-radius: 50% !important; }
+html body.mh-scrolled #MobileSearchFilterBtn:not(:active) {   /* בלחיצה — האדום של :active (חלק 2+3.6) נשאר */
+    background: #ffffff !important;
+    border: 1.5px solid rgba(255, 255, 255, 0.55) !important;
+    box-shadow:
+        inset 0 2px 1px rgba(255, 255, 255, 1),
+        inset 0 -2px 3px rgba(227, 30, 36, 0.08),
+        0 4px 10px rgba(0, 0, 0, 0.08),
+        0 12px 30px rgba(227, 30, 36, 0.18) !important;
+}
+
 /* === 9. העיגול הקריסטלי - LIQUID GLASS עמוק === */
 html body.mh-scrolled .home-mobile-search-input .v-field {
     width: 50px !important;
@@ -2543,9 +2769,10 @@ html body #merchants_by_category .hide-scrollbar .v-btn {
    ========================================================= */
 
 /* כפתור "להזמין מחדש" (button.track-btn.tw-bg-black, 3 כללים) — הוסר 22.10 (מת: בבילד הכפתור הוא bg-button_normal, אין tw-bg-black).
-   שימו לב: בגלל זה הכלל שלמטה (:not(.tw-bg-black)) חל היום על שני הכפתורים — עניין לעיצוב מחדש של דף ההזמנות, לא שונה כאן. ההיסטוריה ב-git. */
+   הכלל שלמטה (:not(.tw-bg-black)) חל על כל כפתורי הכרטיס: "להזמין מחדש", "דרג", "מעקב הזמנה" (ברשימה ובפרטי ההזמנה). */
 
-/* כפתור "דרג" - כל track-btn שאינו האדום */
+/* כפתורי הכרטיס - כל track-btn שאינו האדום.
+   23.10 (ליטוש): רוחב מינימלי אחיד וטקסט ממורכז — היו 89/128/141px באותה שורה, ו"להזמין מחדש" מיושר לקצה */
 html body button.track-btn:not(.tw-bg-black) {
     background: #ffffff !important;
     border: 1.5px solid rgba(227, 30, 36, 0.4) !important;
@@ -2554,6 +2781,41 @@ html body button.track-btn:not(.tw-bg-black) {
     font-weight: 700 !important;
     height: 42px !important;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05) !important;
+    min-width: 128px !important;
+    max-width: none !important;
+    padding: 0 22px !important;
+    justify-content: center !important;
+}
+/* 23.10: אייקון העגלה של "להזמין מחדש" צויר לבן על הכפתור הלבן — בלתי נראה, אבל תפס 24px ודחק את הטקסט ל"להזמין מחד…".
+   עכשיו באדום של הכפתור (currentColor), עם רווח בצד הטקסט (ב-RTL ה-mr-2 של Hyperzod יושב בצד החיצוני). */
+html body button.track-btn:not(.tw-bg-black) > .v-btn__content > svg {
+    margin: 0 !important;
+    margin-inline-end: 6px !important;
+}
+html body button.track-btn:not(.tw-bg-black) > .v-btn__content > svg path {
+    stroke: currentColor !important;
+}
+html body button.track-btn:not(.tw-bg-black) > .v-btn__content > svg circle {
+    fill: currentColor !important;
+    stroke: currentColor !important;
+}
+
+/* חלונית "דרג את ההזמנה שלך" (#RateOrder, טופס .rate-form בחלונית תחתונה) — 23.10 (ליטוש):
+   ה-X ישב צמוד לקצה המסך (right:0 של Hyperzod; ה-ma-2 שלה לא קיים ב-Tailwind עם התחילית) ונראה חתוך בפינה המעוגלת;
+   "שלח" היה מלבן אדום שטוח בפינות 4 — עכשיו כפתור הפעולה של האתר (גרדיאנט, פינות 14, 50). */
+html body #RateOrder > .back-btn {
+    right: 16px !important;
+    top: 16px !important;
+}
+html body #RateOrder .rate-form > .v-btn {
+    height: 50px !important;
+    border-radius: 14px !important;
+    background: linear-gradient(135deg, #ff3b41 0%, #c8151b 100%) !important;
+    box-shadow: 0 8px 20px rgba(227, 30, 36, 0.28) !important;
+    font-size: 16px !important;
+    font-weight: 800 !important;
+    letter-spacing: 0 !important;
+    text-transform: none !important;
 }
 
 /* קפסולת "הדירוג שלי" (span.review) - זכוכית אדומה עדינה */
@@ -3087,7 +3349,7 @@ html body nav.scheme-coupon-panel .scheme-coupon-content p.tw-text-\[12px\] {
    סקופ קשיח: כל כלל כאן מתחיל ב-html body main#MultiVendorSearch (דף החיפוש הגלובלי בלבד).
    לא נוגע בדף המרצ'נט, בדף הבית, בפופאפ מוצר או בצ'ק-אאוט — גם אם שם יש אותם קלאסים.
    מה זה עושה: טאבים "מוצרים/חנויות" (תיקון "מוצרs"), קבוצת מרצ'נט ככרטיס לבן, רשימת מוצרים
-   אנכית במובייל (במקום קרוסלה חתוכה) וגריד בדסקטופ, כרטיס מוצר קומפקטי עם תמונה 96px.
+   אנכית במובייל (במקום קרוסלה חתוכה) וגריד בדסקטופ. כרטיס המוצר עצמו — חלק 62 (23.10).
    טקסטים ("mins" → דק׳, "קילומטר" → ק״מ, "לא מדורג" מוסתר, "No merchants found") — בבלוק MH Search ב-custom-footer.js.
    ========================================================= */
 
@@ -3099,6 +3361,9 @@ html body main#MultiVendorSearch .scheme-global-search-mobile-header {
     border-bottom: 1px solid rgba(0, 0, 0, 0.06) !important;
     padding: 10px 0 !important;
 }
+
+/* 1ב. חזרה (החץ בתוך השדה, מימין): ב-RTL מצביע ימינה — Hyperzod מציירת mdi-chevron-left (23.10, כמו בחלק 47 ובדף "הכול") */
+html body main#MultiVendorSearch .v-field__prepend-inner > .v-icon--clickable > svg { transform: scaleX(-1) !important; }
 
 /* 2. טאבים — בורר מקטע (מוצרים | חנויות) */
 html body main#MultiVendorSearch .scheme-global-search-tabs {
@@ -3212,7 +3477,7 @@ html body main#MultiVendorSearch .scheme-global-search-product-group .simple-sli
 html body main#MultiVendorSearch .scheme-global-search-product-group .slider-inner-container {
     display: flex !important;
     flex-direction: column !important;
-    gap: 10px !important;
+    gap: 0 !important;   /* 23.10: שורות עם קו ביניהן (חלק 62), לא כרטיסים נפרדים */
     padding: 0 !important;
     margin: 0 !important;
     overflow: visible !important;
@@ -3232,67 +3497,8 @@ html body main#MultiVendorSearch .scheme-global-search-product-group .slider-inn
 /* חצי הקרוסלה / הבלוק הריק אחריה — לא רלוונטיים ברשימה אנכית */
 html body main#MultiVendorSearch .scheme-global-search-product-group > .tw-flex[class*="tw-col-span-4"] { display: none !important; }
 
-/* 6. כרטיס מוצר קומפקטי */
-html body main#MultiVendorSearch .product-horizontal-card {
-    background: #ffffff !important;
-    border: 1px solid #eceef1 !important;
-    border-radius: 14px !important;
-    box-shadow: none !important;
-    min-height: 0 !important;
-    height: auto !important;
-}
-html body main#MultiVendorSearch .product-horizontal-card > .v-card-text { padding: 10px 12px !important; }
-html body main#MultiVendorSearch .product-horizontal-card .tw-grid.tw-grid-cols-12 {
-    display: flex !important;
-    gap: 12px !important;
-    align-items: stretch !important;
-}
-html body main#MultiVendorSearch .product-horizontal-card .tw-col-span-7 { flex: 1 1 auto !important; min-width: 0 !important; }
-html body main#MultiVendorSearch .product-horizontal-card .pro-card-h {
-    flex: 0 0 96px !important;
-    width: 96px !important;
-    padding: 0 !important;
-}
-html body main#MultiVendorSearch .product-horizontal-card .pro-card-h-img {
-    width: 96px !important;
-    height: 96px !important;
-    border-radius: 12px !important;
-    margin: 0 0 22px !important;
-    box-shadow: none !important;
-    border: 1px solid #f0f0f0 !important;
-}
-html body main#MultiVendorSearch .product-horizontal-card .rec-item-title h4 {
-    font-size: 15px !important;
-    font-weight: 800 !important;
-    color: #111111 !important;
-    line-height: 1.3 !important;
-    margin: 0 0 3px !important;
-    white-space: normal !important;
-    overflow: hidden !important;
-    display: -webkit-box !important;
-    -webkit-box-orient: vertical !important;
-    -webkit-line-clamp: 2 !important;
-}
-html body main#MultiVendorSearch .product-horizontal-card .description {
-    font-size: 12.5px !important;
-    font-weight: 500 !important;
-    color: #6b7280 !important;
-    line-height: 1.35 !important;
-    margin: 0 !important;
-    -webkit-line-clamp: 2 !important;
-    max-height: 2.8em !important;
-}
-html body main#MultiVendorSearch .product-horizontal-card .price h4 {
-    font-size: 16px !important;
-    font-weight: 800 !important;
-    color: #111111 !important;
-    margin-top: 6px !important;
-}
-html body main#MultiVendorSearch .product-horizontal-card .add-product-btn > span {
-    font-size: 10px !important;
-    color: #9ca3af !important;
-    bottom: -11px !important;
-}
+/* 6. כרטיס מוצר — עבר 23.10 ל"חלק 62: MH StoreSearch" (אותו רכיב .product-card-horizontal כמו בחיפוש בתוך חנות: שורה, אריח 88, מחיר אדום).
+   כאן נשארו רק הקבוצה (4), הרשימה (5) והרשת במחשב (7). ההיסטוריה ב-git. */
 
 /* 7. דסקטופ — שני טורים (ומעל 1280px שלושה) */
 @media (min-width: 768px) {
@@ -3403,6 +3609,14 @@ html body main#MultiVendorSearch #mh-search-note {
     font-weight: 700;
 }
 
+/* 16. גלולות המיון/הסינון (כפתור הסינון, רלוונטיות, דירוג, סוג הזמנה, קטגוריות) — אותה גלולה כמו בחיפוש בתוך חנות
+   (חלק 62): 40px, פינות 999, קו חם, 14/600 (23.10; היו מלבנים 36 עם פינות 8 של Hyperzod — לבד בכל האתר).
+   פעיל (.scheme-global-search-filter--active, Hyperzod גם צובעת את הקו inline) = "נבחר" של שפת העיצוב: קו אדום, רקע ורוד, טקסט אדום */
+html body main#MultiVendorSearch .v-btn.scheme-global-search-filter { height: 40px !important; min-width: 40px !important; padding: 0 14px !important; border: 1px solid #e6e2dd !important; border-radius: 999px !important; background: #fff !important; color: #111 !important; box-shadow: none !important; font-size: 14px !important; font-weight: 600 !important; letter-spacing: 0 !important; text-transform: none !important; }
+html body main#MultiVendorSearch .v-btn.scheme-global-search-filter[style*="order: -2"] { width: 40px !important; padding: 0 !important; }   /* כפתור הסינון (אייקון בלבד) */
+html body main#MultiVendorSearch .v-btn.scheme-global-search-filter.scheme-global-search-filter--active { border-color: #e31e24 !important; background: #fff5f5 !important; color: #c8151b !important; }
+html body main#MultiVendorSearch .v-btn.scheme-global-search-filter.scheme-global-search-filter--active .v-icon { color: #c8151b !important; }
+
 /* 15. כרטיס עסק בטאב "חנויות" (.merchant-card): זכוכית לבנה, פינות 32. עבר לכאן 22.10 כמו שהוא מ"חלק 12ו" —
    הכלל הגלובלי שם נגע בכל כרטיס עסק באתר; כאן נשאר רק במקומות שבהם הוא נראה עד היום, בלי שינוי במראה: דף החיפוש,
    כרטיס עסק בעוזר הקניות של Hyperzod (.shopping-assistant-merchant-card), וסקשני Page Builder "Nearby Merchants" /
@@ -3484,6 +3698,9 @@ html body .product-popup .scheme-product-options-card .v-list-item {
     cursor: pointer !important;
     transition: border-color 0.18s ease, background-color 0.18s ease, box-shadow 0.18s ease !important;
 }
+/* רבעי הפיצה: את הצ'קבוקסים המקוריים הגלגל מסתיר ב-.mhq-hidden (absolute, שקוף). ה-position:relative של השורה (למעלה) גבר עליו,
+   והם נשארו בזרימה כשורות שקופות — ~8,000px ריקים מתחת לגלגל (מגש M של Bens, 23.10). כאן רק מחזירים להם את ה-absolute; כללי mhq לא נגעו. */
+html body .product-popup .scheme-product-options-card .v-list-item.mhq-hidden { position: absolute !important; top: 0 !important; margin: 0 !important; }   /* top:0 — בלי זה הן ישבו במקום הזרימה, מתחת לתחתית הרשימה, וגרמו לגלילה פנימית של ~66px */
 /* שכבות ה-hover/active של Vuetify — נדבקות במגע, מכובות */
 html body .product-popup .scheme-product-options-card .v-list-item__overlay,
 html body .product-popup .scheme-product-options-card .v-list-item__underlay,
@@ -3692,6 +3909,34 @@ html body .product-popup {
     display: flex !important;
     flex-direction: column !important;
 }
+/* במחשב החלון (.product-dialog) של Hyperzod הוא שתי עמודות — תמונה | פרטים. העמודה האחת שלמעלה כיווצה את התמונה לאפס
+   (נשארה רק הממוזערת של 64px מעל ריק לבן) — 23.10: חוזרים לשורה, הפינות של החלון עצמו (14) */
+html body .product-dialog > .product-popup {
+    flex-direction: row !important;
+    border-radius: 0 !important;
+}
+/* עמודת התמונה: ריבוע בגובה החלון פחות פס הממוזערות (72). של Hyperzod (aspect-square + flex-1) יוצא ברוחב 0 גם בלי ה-CSS שלנו */
+html body .product-dialog > .product-popup > #productImages {
+    width: calc(50% - 72px) !important;
+    background: transparent !important;
+}
+html body .product-dialog > .product-popup #imageContainer {
+    flex: 0 0 auto !important;
+    width: 100% !important;
+    height: auto !important;
+    aspect-ratio: 1 / 1 !important;
+}
+/* ה-X של החלון צף מעל רשימת האופציות בגלילה — בועת זכוכית, כדי שלא יישב "על" שורה */
+html body .product-dialog > .product-popup .v-card-text > button.v-btn--icon {
+    width: 40px !important;
+    height: 40px !important;
+    border-radius: 50% !important;
+    background: rgba(255, 255, 255, 0.92) !important;
+    -webkit-backdrop-filter: blur(12px) !important;
+    backdrop-filter: blur(12px) !important;
+    border: 1px solid rgba(0, 0, 0, 0.06) !important;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12) !important;
+}
 html body .product-popup .v-card__loader,
 html body .product-popup > .v-card__underlay { display: none !important; }
 
@@ -3855,6 +4100,18 @@ html body .product-popup .product-price {
     background-clip: text !important;
     -webkit-text-fill-color: transparent !important;
     text-shadow: 0 6px 18px rgba(227, 30, 36, 0.18) !important;
+}
+/* המחיר הקודם במבצע — אפור ומחוק, כמו בכרטיס המוצר (Hyperzod: tw-text-neutral-400). הגרדיאנט של המחיר (background-clip:text) צבע גם אותו באדום, 23.10 */
+html body .product-popup .product-price small.tw-line-through {
+    color: #9ca3af !important;
+    -webkit-text-fill-color: #9ca3af !important;
+    text-shadow: none !important;
+    font-weight: 700 !important;
+}
+/* "ראה עוד" בתיאור — אדום כהה של האתר במקום הכחול של Hyperzod */
+html body .product-popup #ProductDescription .tw-text-primary {
+    color: #c8151b !important;
+    font-weight: 700 !important;
 }
 html body .product-popup .product-description {
     color: #555555 !important;
@@ -4441,19 +4698,20 @@ html body #SelectAddress .v-card-title > div:first-child {
     color: #111 !important;
     line-height: 1.2 !important;
 }
-/* כפתור הסגירה — עיגול זכוכית */
+/* כפתור הסגירה — בועה לבנה עם X ברור, כמו ב"פרטי חשבון". 23.10: האייקון של Hyperzod הוא עיגול עם X — מוקטן ל-15px בתוך העיגול
+   האפור שלנו יצא "עיגול בתוך עיגול" עם X של 5px. האייקון מוסתר, וה-X מצויר כאן (אותו כפתור, אותה לחיצה) */
 html body #SelectAddress .close-btn {
-    width: 34px !important;
-    height: 34px !important;
-    min-width: 34px !important;
+    width: 36px !important;
+    height: 36px !important;
+    min-width: 36px !important;
     border-radius: 999px !important;
-    background: rgba(0, 0, 0, 0.05) !important;
-    border: 0 !important;
-    box-shadow: none !important;
+    background: rgba(255, 255, 255, 0.9) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'%3E%3Cpath d='M3.5 3.5l9 9M12.5 3.5l-9 9' stroke='%23111' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E") center / 16px 16px no-repeat !important;
+    border: 1px solid rgba(227, 30, 36, 0.1) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
 }
 html body #SelectAddress .close-btn .v-btn__overlay,
 html body #SelectAddress .close-btn .v-btn__underlay { display: none !important; }
-html body #SelectAddress .close-btn img { width: 15px !important; height: 15px !important; opacity: .55 !important; }
+html body #SelectAddress .close-btn img { opacity: 0 !important; }
 
 /* "הוסף כתובת חדשה" — גלולת פעולה אדומה */
 html body #SelectAddress .scheme-address-select-add {
@@ -5456,19 +5714,7 @@ html body .scheme-profile-page:has(#addresses) .scheme-mobile-page-header__title
     letter-spacing: -0.2px !important;
     padding-inline: 56px 20px !important;
 }
-html body .scheme-profile-page:has(#addresses) .scheme-mobile-page-header .back-btn {
-    width: 36px !important;
-    height: 36px !important;
-    border-radius: 999px !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    background: rgba(227, 30, 36, 0.08) !important;
-    margin-inline-start: 14px !important;
-}
-html body .scheme-profile-page:has(#addresses) .scheme-mobile-page-header .back-btn .v-icon {
-    color: #e31e24 !important;
-}
+/* כפתור החזרה (עיגול ורדרד + ">" אדום) — עבר 23.10 לחלק 6 §7, שם הוא חל על כל דפי האזור האישי ולא רק כאן */
 
 /* 2. גוף הדף: לבן שקט, בלי המסגרות של Vuetify */
 html body #addresses,
@@ -5587,6 +5833,8 @@ html body #addresses .tw-w-full > div.tw-mb-\[12px\] > .tw-w-\[36px\] span {
     font-weight: 700 !important;
     color: #8a8f98 !important;
     line-height: 1 !important;
+    direction: ltr !important;         /* 23.10: "906 m" הוצג "m 906" (RTL הפך את הסדר) */
+    unicode-bidi: isolate !important;
 }
 /* טקסטים */
 html body #addresses .tw-w-full > div.tw-mb-\[12px\] .tw-flex-1 > div:first-child {
@@ -5706,6 +5954,8 @@ html body .v-bottom-sheet__content > .v-card.tw-rounded-t-xl:has(> .tw-px-4.tw-p
     height: 22px !important;
     filter: none !important;           /* 22.10: בלי הפילטר האדום והריווח של "חלק 12ג" (x אדום זעיר) */
     padding: 0 !important;
+    inset: 0 !important;               /* 23.10: ה-img של Vuetify ממוקם absolute בפינה — ה-22px ישבו למעלה-שמאלה בעיגול, לא במרכז */
+    margin: auto !important;
 }
 html body .v-bottom-sheet__content > .v-card.tw-rounded-t-xl:has(> .tw-px-4.tw-pb-8 > .tw-border.tw-rounded-xl > .tw-h-\[44px\].tw-cursor-pointer) > .v-card-title .v-btn__overlay,
 html body .v-bottom-sheet__content > .v-card.tw-rounded-t-xl:has(> .tw-px-4.tw-pb-8 > .tw-border.tw-rounded-xl > .tw-h-\[44px\].tw-cursor-pointer) > .v-card-title .v-btn__underlay {
@@ -5968,6 +6218,9 @@ html body .merchant-page.merchant-mobile-view .merchant-floating-actions:not(.co
     backdrop-filter: blur(10px) saturate(150%) !important;
     box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18), 0 0 0 1px rgba(255, 255, 255, 0.35) !important;
 }
+/* חזרה: ב-RTL החץ מצביע ימינה (Apple HIG; כמו בדף "הכול", בחיפוש בתוך חנות ובחלון המיקום). Hyperzod מציירת "←".
+   כפתור החזרה = הילד הישיר היחיד מסוג button (סינון/חיפוש בתוך div). אותו כפתור גם בכותרת שבגלילה (23.10) */
+html body .merchant-page.merchant-mobile-view .merchant-floating-actions > button.merchant-floating-btn > svg { transform: scaleX(-1) !important; }
 /* הכותרת שמופיעה בגלילה: זכוכית לבנה */
 html body .merchant-page.merchant-mobile-view .merchant-cover-header {
     background: rgba(255, 255, 255, 0.84) !important;
@@ -7438,10 +7691,10 @@ html body .product-popup #mh-greet .mh-gr-count {
 }
 html body .product-popup #mh-greet .mh-gr-help {
     margin: 6px 2px 0 !important;
-    font-size: 11.5px !important;
+    font-size: 12.5px !important;   /* 23.10: היה 11.5px אפור בהיר על הרקע הוורוד (ניגודיות ~2.4) — הסבר שהלקוח צריך לקרוא */
     font-weight: 500 !important;
     line-height: 1.45 !important;
-    color: #9ca3af !important;
+    color: #6b7280 !important;
 }
 @media (prefers-reduced-motion: reduce) {
     html body .product-popup #mh-greet .mh-gr-card {
@@ -7653,6 +7906,9 @@ html body #payment-card[data-mh-nocash] .payment-method[data-test-id$="-cod"] { 
    חלק 62: החיפוש בתוך חנות — MH StoreSearch v1.0.1 | 2026-10-20 (דוד: "שיהיה נוח לחוויית משתמש"; v1.0.1 21.10: באפליקציה שורת החיפוש נשארת מתחת לפס השעון בגלילה)
    הבעלים של #MerchantSearchPage (נתיב merchant-search, הזכוכית בראש דף העסק): שורת החיפוש, גלולות המיון והסינון,
    שורות התוצאות, המצב הריק ו"אין תוצאות". התנהגות (×, חיפושים אחרונים, טקסטים): JS "MH StoreSearch".
+   23.10: גם הבעלים של שורת המוצר בטאב "מוצרים" של החיפוש הכללי (main#MultiVendorSearch) — אותו רכיב, אותה שורה (26ב.6 הוסר).
+   בסלקטור: :is(#MerchantSearchPage, #MultiVendorSearch) — בלי "main": :is() לוקח את הספציפיות של הארגומנט החזק, ו-main העלה
+   את כל הכללים מעל כללי המחשב (112px מ-900) שלמטה.
    עקרונות: שורה צפופה (6–7 תוצאות במסך במקום 4–5), תמונה 88px (DriveImg מוריד אותה בגודל הזה — זיכרון),
    מחיר באדום כמו בכרטיסי החנות, בלי זכוכית/טשטוש בראש הנדבק (זיכרון באייפון), שדה 17px (בלי זום של iOS).
    ========================================================= */
@@ -7687,9 +7943,9 @@ html body #MerchantSearchPage .scheme-merchant-search-header .full-bleed-scroll 
 html body #MerchantSearchPage .scheme-merchant-search-header .full-bleed-scroll > .v-btn { height: 40px !important; min-width: 40px !important; padding: 0 14px !important; border: 1px solid #e6e2dd !important; border-radius: 999px !important; background: #fff !important; color: #111 !important; box-shadow: none !important; font-size: 14px !important; font-weight: 600 !important; letter-spacing: 0 !important; text-transform: none !important; }
 html body #MerchantSearchPage .scheme-merchant-search-header .full-bleed-scroll > .v-btn { width: auto !important; flex: 0 0 auto !important; }
 html body #MerchantSearchPage .scheme-merchant-search-header .full-bleed-scroll > .v-btn[style*="order: -2"] { width: 40px !important; padding: 0 !important; }   /* כפתור הסינון (אייקון בלבד) — לשלושתם אותה מחלקה */
-/* פעיל: Hyperzod מסמנת במחלקה (סינון) או במסגרת שחורה inline (מיון/קטגוריות) — אצלנו מילוי כהה */
-html body #MerchantSearchPage .scheme-merchant-search-header .full-bleed-scroll > .v-btn:is(.scheme-merchant-search-filter--active, [style*="border-color: rgb(0, 0, 0)"]) { background: #111 !important; border-color: #111 !important; color: #fff !important; }
-html body #MerchantSearchPage .scheme-merchant-search-header .full-bleed-scroll > .v-btn:is(.scheme-merchant-search-filter--active, [style*="border-color: rgb(0, 0, 0)"]) svg { filter: invert(1) !important; }
+/* פעיל: Hyperzod מסמנת במחלקה (סינון) או במסגרת שחורה inline (מיון/קטגוריות). 23.10: "נבחר" של שפת העיצוב — קו אדום, רקע ורוד,
+   טקסט אדום — כמו בחיפוש הכללי (26ב.16; היה מילוי שחור ואייקון מהופך ללבן). האייקונים נשארים כהים על הרקע הבהיר */
+html body #MerchantSearchPage .scheme-merchant-search-header .full-bleed-scroll > .v-btn:is(.scheme-merchant-search-filter--active, [style*="border-color: rgb(0, 0, 0)"]) { background: #fff5f5 !important; border-color: #e31e24 !important; color: #c8151b !important; }
 /* מצב ריק: מה מחפשים + חיפושים אחרונים (JS: #mh-ss-empty[data-on]) */
 html body #MerchantSearchPage #mh-ss-empty { display: none !important; padding: 36px 20px 8px !important; text-align: center !important; }
 html body #MerchantSearchPage #mh-ss-empty[data-on] { display: block !important; }
@@ -7712,32 +7968,50 @@ html body #MerchantSearchPage .recent-searches .label-chip { height: 40px !impor
 html body #MerchantSearchPage .scheme-merchant-search-content { padding-top: 2px !important; }
 html body #MerchantSearchPage .product-horizontal-cards { display: block !important; }
 /* Hyperzod ב-.merchant-list-view: לכרטיס height+min-height 155.8px (200 במחשב), ל-.pro-card-h min-width 155.8px — מאופסים */
-html body #MerchantSearchPage .product-card-horizontal { height: auto !important; min-height: 0 !important; margin: 0 !important; border: 0 !important; border-bottom: 1px solid #f0ece8 !important; border-radius: 0 !important; background: transparent !important; box-shadow: none !important; overflow: visible !important; -webkit-tap-highlight-color: transparent !important; }
-html body #MerchantSearchPage .product-card-horizontal:last-child { border-bottom: 0 !important; }
-html body #MerchantSearchPage .product-card-horizontal > .v-card-text { padding: 10px 0 !important; }
-html body #MerchantSearchPage .product-card-horizontal .v-card-text > .tw-grid { display: flex !important; height: auto !important; align-items: center !important; gap: 14px !important; }
-html body #MerchantSearchPage .product-card-horizontal .v-card-text > .tw-grid > :first-child { flex: 1 1 auto !important; min-width: 0 !important; }
-html body #MerchantSearchPage .product-card-horizontal .pro-card-h { flex: 0 0 88px !important; width: 88px !important; min-width: 0 !important; height: auto !important; min-height: 0 !important; align-items: center !important; }   /* Hyperzod: min-width 155.8px */
-html body #MerchantSearchPage .product-card-horizontal .pro-card-h-img { flex: 0 0 88px !important; width: 88px !important; height: 88px !important; min-height: 0 !important; max-height: 88px !important; aspect-ratio: 1 / 1 !important; margin: 0 !important; border: 1px solid #ece8e3 !important; border-radius: 16px !important; background: #fff !important; overflow: visible !important; box-shadow: none !important; box-sizing: border-box !important; }   /* מסגרת לכל אריח: רוב תמונות המוצר הן צילום על לבן ובלי מסגרת הן "צפות" */
-html body #MerchantSearchPage .product-card-horizontal .pro-card-h-img .v-img { border-radius: 15px !important; overflow: hidden !important; }
-html body #MerchantSearchPage .product-card-horizontal .pro-card-h-img .v-responsive__sizer { padding-bottom: 100% !important; }
-html body #MerchantSearchPage .product-card-horizontal .add-product-btn > span { display: none !important; }   /* "שינוי תוספות" כפול מתחת לכפתור */
+html body :is(#MerchantSearchPage, #MultiVendorSearch) .product-card-horizontal { height: auto !important; min-height: 0 !important; margin: 0 !important; border: 0 !important; border-bottom: 1px solid #f0ece8 !important; border-radius: 0 !important; background: transparent !important; box-shadow: none !important; overflow: visible !important; -webkit-tap-highlight-color: transparent !important; }
+html body :is(#MerchantSearchPage, #MultiVendorSearch) .product-card-horizontal:last-child { border-bottom: 0 !important; }
+html body :is(#MerchantSearchPage, #MultiVendorSearch) .product-card-horizontal > .v-card-text { padding: 10px 0 !important; }
+html body :is(#MerchantSearchPage, #MultiVendorSearch) .product-card-horizontal .v-card-text > .tw-grid { display: flex !important; height: auto !important; align-items: center !important; gap: 14px !important; }
+html body :is(#MerchantSearchPage, #MultiVendorSearch) .product-card-horizontal .v-card-text > .tw-grid > :first-child { flex: 1 1 auto !important; min-width: 0 !important; }
+html body :is(#MerchantSearchPage, #MultiVendorSearch) .product-card-horizontal .pro-card-h { flex: 0 0 88px !important; width: 88px !important; min-width: 0 !important; height: auto !important; min-height: 0 !important; align-items: center !important; }   /* Hyperzod: min-width 155.8px */
+html body :is(#MerchantSearchPage, #MultiVendorSearch) .product-card-horizontal .pro-card-h-img { flex: 0 0 88px !important; width: 88px !important; height: 88px !important; min-height: 0 !important; max-height: 88px !important; aspect-ratio: 1 / 1 !important; margin: 0 !important; border: 1px solid #ece8e3 !important; border-radius: 16px !important; background: #fff !important; overflow: visible !important; box-shadow: none !important; box-sizing: border-box !important; }   /* מסגרת לכל אריח: רוב תמונות המוצר הן צילום על לבן ובלי מסגרת הן "צפות" */
+html body :is(#MerchantSearchPage, #MultiVendorSearch) .product-card-horizontal .pro-card-h-img .v-img { border-radius: 15px !important; overflow: hidden !important; }
+html body :is(#MerchantSearchPage, #MultiVendorSearch) .product-card-horizontal .pro-card-h-img .v-responsive__sizer { padding-bottom: 100% !important; }
+html body :is(#MerchantSearchPage, #MultiVendorSearch) .product-card-horizontal .add-product-btn > span { display: none !important; }   /* "שינוי תוספות" כפול מתחת לכפתור */
 /* "+" בפינה התחתונה החיצונית של האריח (במרכז הוא הסתיר את המנה באריח של 88px) */
-html body #MerchantSearchPage .product-card-horizontal .pro-card-h-img > .tw-absolute { top: auto !important; bottom: -8px !important; left: -8px !important; right: auto !important; transform: none !important; z-index: 3 !important; }
-html body #MerchantSearchPage .product-card-horizontal .add-product-btn { margin: 0 !important; padding: 0 !important; }
-html body #MerchantSearchPage .product-card-horizontal .add-product-btn button.add-btn { width: 40px !important; min-width: 40px !important; max-width: 40px !important; height: 40px !important; min-height: 40px !important; max-height: 40px !important; background: #fff !important; -webkit-backdrop-filter: none !important; backdrop-filter: none !important; box-shadow: 0 2px 8px rgba(17, 17, 17, 0.14), 0 0 0 1px rgba(17, 17, 17, 0.06) !important; }   /* עיגול לבן מלא (Vuetify נותן min-height 40 — 36 רוחב יצא אליפסה; הזכוכית השקופה נעלמה על הלבן שמחוץ לאריח, ו-20 blur ברשימה גוללת = עומס גרפי) */
+html body :is(#MerchantSearchPage, #MultiVendorSearch) .product-card-horizontal .pro-card-h-img > .tw-absolute { top: auto !important; bottom: -8px !important; left: -8px !important; right: auto !important; transform: none !important; z-index: 3 !important; }
+html body :is(#MerchantSearchPage, #MultiVendorSearch) .product-card-horizontal .add-product-btn { margin: 0 !important; padding: 0 !important; }
+html body :is(#MerchantSearchPage, #MultiVendorSearch) .product-card-horizontal .add-product-btn button.add-btn { width: 40px !important; min-width: 40px !important; max-width: 40px !important; height: 40px !important; min-height: 40px !important; max-height: 40px !important; background: #fff !important; -webkit-backdrop-filter: none !important; backdrop-filter: none !important; box-shadow: 0 2px 8px rgba(17, 17, 17, 0.14), 0 0 0 1px rgba(17, 17, 17, 0.06) !important; }   /* עיגול לבן מלא (Vuetify נותן min-height 40 — 36 רוחב יצא אליפסה; הזכוכית השקופה נעלמה על הלבן שמחוץ לאריח, ו-20 blur ברשימה גוללת = עומס גרפי) */
 /* טקסט: שם ותיאור ברוחב מלא, מחיר ותג "שינוי תוספות" באותה שורה */
-html body #MerchantSearchPage .product-card-horizontal .v-card-text > .tw-grid > :first-child > div { width: 100% !important; flex-direction: row !important; flex-wrap: wrap !important; align-items: center !important; justify-content: flex-start !important; column-gap: 8px !important; height: auto !important; }
-html body #MerchantSearchPage .product-card-horizontal .rec-item-title { display: contents !important; }
-html body #MerchantSearchPage .product-card-horizontal :is(.product-name, .product-description) { flex: 0 0 100% !important; }
-html body #MerchantSearchPage .product-card-horizontal .price { order: 3 !important; }
-html body #MerchantSearchPage .product-card-horizontal .product-discount-badge { top: 6px !important; inset-inline-start: 6px !important; z-index: 2 !important; padding: 2px 7px !important; border-radius: 999px !important; font-size: 11px !important; font-weight: 800 !important; line-height: 16px !important; }
-html body #MerchantSearchPage .product-card-horizontal .product-name { margin: 0 0 3px !important; font-size: 15px !important; font-weight: 700 !important; line-height: 1.35 !important; color: #111 !important; }
-html body #MerchantSearchPage .product-card-horizontal .product-description { margin: 0 0 6px !important; font-size: 13px !important; line-height: 1.4 !important; color: #6b7280 !important; -webkit-line-clamp: 1 !important; line-clamp: 1 !important; }
-html body #MerchantSearchPage .product-card-horizontal .product-customizable-tag { order: 4 !important; display: inline-block !important; margin: 0 !important; padding: 2px 8px !important; border-radius: 999px !important; background: #f3f1ee !important; font-size: 11.5px !important; font-weight: 600 !important; line-height: 16px !important; color: #6b7280 !important; }
-html body #MerchantSearchPage .product-card-horizontal .price .product-price { margin: 0 !important; font-size: 16px !important; font-weight: 800 !important; line-height: 1.25 !important; color: #c8151b !important; }
-html body #MerchantSearchPage .product-card-horizontal .price .product-price small { margin-inline-start: 6px !important; font-size: 13px !important; font-weight: 500 !important; color: #9ca3af !important; }
-html body #MerchantSearchPage .product-card-horizontal:active { background: #faf8f6 !important; }
+html body :is(#MerchantSearchPage, #MultiVendorSearch) .product-card-horizontal .v-card-text > .tw-grid > :first-child > div { width: 100% !important; flex-direction: row !important; flex-wrap: wrap !important; align-items: center !important; justify-content: flex-start !important; column-gap: 8px !important; height: auto !important; }
+html body :is(#MerchantSearchPage, #MultiVendorSearch) .product-card-horizontal .rec-item-title { display: contents !important; }
+html body :is(#MerchantSearchPage, #MultiVendorSearch) .product-card-horizontal :is(.product-name, .product-description) { flex: 0 0 100% !important; }
+html body :is(#MerchantSearchPage, #MultiVendorSearch) .product-card-horizontal .price { order: 3 !important; }
+/* מוצר בלי תמונה (.tw-col-span-12): Hyperzod שמה את ה-"+" בתוך שורת המחיר — השורה ברוחב מלא, המחיר מימין וה-"+" בקצה
+   (23.10: ה-"+" כיסה את סוף המחיר — "₪7" במקום "₪7.90" בחיפוש הכללי) */
+html body :is(#MerchantSearchPage, #MultiVendorSearch) .product-card-horizontal .price.tw-flex { flex: 1 1 100% !important; display: flex !important; justify-content: space-between !important; align-items: center !important; gap: 10px !important; }
+html body :is(#MerchantSearchPage, #MultiVendorSearch) .product-card-horizontal .price.tw-flex > .tw-relative { position: static !important; top: 0 !important; margin-inline-end: -7px !important; }   /* Hyperzod: absolute — עלה על השם/המחיר (כמו בחלק 64). -7 = אותו טור כמו ה-"+" בפינת האריח (נמדד; בחיפוש הכללי -12/-6 — למטה) */
+html body :is(#MerchantSearchPage, #MultiVendorSearch) .product-card-horizontal .tw-grid > .tw-col-span-12 { padding-inline-end: 0 !important; }   /* מוצר בלי תמונה: העמודה היחידה, הריפוד של Hyperzod (12) דחף את ה-"+" פנימה מהטור של שאר השורות */
+html body :is(#MerchantSearchPage, #MultiVendorSearch) .product-card-horizontal .product-discount-badge { top: 6px !important; inset-inline-start: 6px !important; z-index: 2 !important; padding: 2px 7px !important; border-radius: 999px !important; font-size: 11px !important; font-weight: 800 !important; line-height: 16px !important; }
+html body :is(#MerchantSearchPage, #MultiVendorSearch) .product-card-horizontal .product-name { margin: 0 0 3px !important; font-size: 15px !important; font-weight: 700 !important; line-height: 1.35 !important; color: #111 !important; }
+html body :is(#MerchantSearchPage, #MultiVendorSearch) .product-card-horizontal .product-description { margin: 0 0 6px !important; font-size: 13px !important; line-height: 1.4 !important; color: #6b7280 !important; -webkit-line-clamp: 1 !important; line-clamp: 1 !important; }
+html body :is(#MerchantSearchPage, #MultiVendorSearch) .product-card-horizontal .product-customizable-tag { order: 4 !important; display: inline-block !important; margin: 0 !important; padding: 2px 8px !important; border-radius: 999px !important; background: #f3f1ee !important; font-size: 11.5px !important; font-weight: 600 !important; line-height: 16px !important; color: #6b7280 !important; }
+html body :is(#MerchantSearchPage, #MultiVendorSearch) .product-card-horizontal .price .product-price { margin: 0 !important; font-size: 16px !important; font-weight: 800 !important; line-height: 1.25 !important; color: #c8151b !important; }
+html body :is(#MerchantSearchPage, #MultiVendorSearch) .product-card-horizontal .price .product-price small { margin-inline-start: 6px !important; font-size: 13px !important; font-weight: 500 !important; color: #9ca3af !important; }
+html body :is(#MerchantSearchPage, #MultiVendorSearch) .product-card-horizontal:active { background: #faf8f6 !important; }
+/* דף החיפוש הכללי (main#MultiVendorSearch, טאב "מוצרים", 23.10): אותה שורה בדיוק, בתוך כרטיס העסק של חלק 26ב (עד היום: כרטיס
+   בתוך כרטיס, אריח 96×156 מתוח — min-width 155.8px של Hyperzod גבר — ומחיר שחור). כל כרטיס עטוף ב-.tw-py-2 משלו (תמיד :last-child),
+   ולכן הקו בין השורות על העטיפה. במחשב (26ב.7: רשת 2–3 טורים) — כרטיס עם קו דק לכל מוצר במקום קווים בין שורות */
+html body main#MultiVendorSearch .scheme-global-search-product-group .slider-inner-container > .tw-py-2 + .tw-py-2 { border-top: 1px solid #f0ece8 !important; }
+html body main#MultiVendorSearch .product-card-horizontal .product-name.text-truncate { white-space: normal !important; display: -webkit-box !important; -webkit-box-orient: vertical !important; -webkit-line-clamp: 2 !important; line-clamp: 2 !important; overflow: hidden !important; }   /* כאן השם עם text-truncate (שורה אחת) — "3%" / "1%" נחתכו */
+html body main#MultiVendorSearch .product-card-horizontal.product-horizontal-card > .v-card-text { padding-inline-end: 8px !important; }   /* ה-"+" בפינת האריח לא נוגע בקו של כרטיס העסק */
+html body main#MultiVendorSearch .product-card-horizontal .price.tw-flex > .tw-relative { margin-inline-end: -12px !important; }   /* בלי תמונה: הטור של ה-"+" בפינת האריח (כאן האריח בולט 4px מהעמודה) */
+@media (min-width: 768px) {
+    html body main#MultiVendorSearch .scheme-global-search-product-group .slider-inner-container > .tw-py-2 + .tw-py-2 { border-top: 0 !important; }
+    html body main#MultiVendorSearch .product-card-horizontal.product-horizontal-card { border: 1px solid #eceef1 !important; border-radius: 14px !important; }
+    html body main#MultiVendorSearch .product-card-horizontal.product-horizontal-card > .v-card-text { padding: 10px 12px !important; }
+    html body main#MultiVendorSearch .product-card-horizontal.product-horizontal-card .price.tw-flex > .tw-relative { margin-inline-end: -6px !important; }   /* בלי תמונה: ה-"+" בתוך הכרטיס, בקו של ה-"+" שבפינת האריח בכרטיס שלידו */
+}
 /* "אין תוצאות": הטקסט של Hyperzod (אנגלית) → עברית עם המילה שחיפשו (JS: data-mh-ss-none + data-mh-ss-title) */
 html body #MerchantSearchPage [data-mh-ss-none] { margin: 44px 24px 0 !important; font-size: 0 !important; line-height: 0 !important; text-align: center !important; }
 html body #MerchantSearchPage [data-mh-ss-none]::before { content: attr(data-mh-ss-title) !important; display: block !important; font-size: 17px !important; font-weight: 800 !important; line-height: 1.4 !important; color: #111 !important; overflow-wrap: anywhere !important; }
@@ -7752,7 +8026,7 @@ html body:has(#AppBar) #MerchantSearchPage .scheme-merchant-search-header { top:
     html body #MerchantSearchPage .product-card-horizontal .pro-card-h-img { flex-basis: 112px !important; width: 112px !important; height: 112px !important; max-height: 112px !important; }
 }
 @media (hover: hover) {
-    html body #MerchantSearchPage .product-card-horizontal:hover { background: #faf8f6 !important; }
+    html body :is(#MerchantSearchPage, #MultiVendorSearch) .product-card-horizontal:hover { background: #faf8f6 !important; }
     html body #MerchantSearchPage #mh-ss-empty .mh-ss-chip:hover { background: #f3f1ee !important; }
 }
 /* mh-storesearch-v1 */
@@ -7789,7 +8063,7 @@ html body .v-bottom-sheet:not(.v-dialog--fullscreen) > .v-bottom-sheet__content 
 /* כותרת: חזרה (44, עיגול אפור) + שם */
 html body .checkout-journey-sheet > div:first-child { gap: 10px !important; padding: 12px 16px !important; border-bottom: 1px solid #f0ece8 !important; }   /* החלונית עצמה כבר מתחת לפס השעון (Hyperzod) */
 html body .checkout-journey-sheet button.v-btn.v-btn--icon.checkout-journey-back { position: static !important; flex: 0 0 44px !important; width: 44px !important; height: 44px !important; min-width: 44px !important; margin: 0 !important; border-radius: 999px !important; background: #f3f1ee !important; color: #111 !important; box-shadow: none !important; transform: none !important; border: 0 !important; -webkit-backdrop-filter: none !important; backdrop-filter: none !important; }   /* חלק 12ג (ישן, גלובלי לכל כפתור אייקון בחלונית) נתן בועה לבנה שעלתה על הכותרת */
-html body .checkout-journey-sheet button.v-btn.v-btn--icon.checkout-journey-back .v-icon { font-size: 26px !important; width: 26px !important; height: 26px !important; color: #111 !important; }
+html body .checkout-journey-sheet button.v-btn.v-btn--icon.checkout-journey-back .v-icon { font-size: 26px !important; width: 26px !important; height: 26px !important; color: #111 !important; transform: scaleX(-1) !important; }   /* 23.10: "‹" → "›" (חזרה ב-RTL מצביעה ימינה) */
 html body .checkout-journey-sheet > div:first-child h2 { margin: 0 !important; font-size: 21px !important; font-weight: 800 !important; line-height: 1.25 !important; color: #111 !important; letter-spacing: 0 !important; }
 /* הרשימה */
 html body .checkout-journey-sheet .product-horizontal-cards { display: block !important; }
@@ -7825,9 +8099,10 @@ html body .v-overlay .checkout-journey-sheet .product-horizontal-cards .product-
 html body .v-overlay .checkout-journey-sheet .product-horizontal-cards .product-card-horizontal.scheme-recommended-product-card .price.tw-flex > .tw-relative { position: static !important; top: 0 !important; }   /* Hyperzod: .price > .tw-relative absolute — עלה על השם */
 /* כפתור "המשך לתשלום" */
 html body .checkout-journey-sheet__footer { padding-top: 12px !important; padding-inline: 16px !important; box-shadow: none !important; border-top: 1px solid #f0ece8 !important; background: #fff !important; }
-html body .checkout-journey-sheet__footer .v-btn { width: 100% !important; height: 52px !important; border-radius: 14px !important; background: #e31e24 !important; color: #fff !important; box-shadow: none !important; font-size: 17px !important; font-weight: 700 !important; letter-spacing: 0 !important; text-transform: none !important; }
+/* 23.10: גרדיאנט QLED + זוהר ופינות 16 — כמו "הוספה" בחלון המוצר (היה אדום שטוח מסבב "השחור") */
+html body .checkout-journey-sheet__footer .v-btn { width: 100% !important; height: 52px !important; border-radius: 16px !important; background: linear-gradient(135deg, #ff3b41 0%, #c8151b 100%) !important; color: #fff !important; box-shadow: 0 10px 26px rgba(227, 30, 36, 0.28) !important; font-size: 17px !important; font-weight: 800 !important; letter-spacing: 0 !important; text-transform: none !important; transition: transform .15s ease, box-shadow .15s ease !important; }
 html body .checkout-journey-sheet__footer .v-btn .v-btn__overlay { opacity: 0 !important; }
-html body .checkout-journey-sheet__footer .v-btn:active { background: #c8151b !important; }
+html body .checkout-journey-sheet__footer .v-btn:active { transform: scale(0.98) !important; box-shadow: 0 4px 12px rgba(227, 30, 36, 0.25) !important; }
 html body .v-overlay .checkout-journey-sheet .product-horizontal-cards .product-card-horizontal.scheme-recommended-product-card:active { background: #faf8f6 !important; }
 
 /* ---------- (ב) "ייתכן שתאהבו גם" בצ'ק-אאוט ---------- */
@@ -7847,6 +8122,47 @@ html body .similar-items-panel .product-card-basic .product-name { font-size: 13
 html body .similar-items-panel .product-card-basic .product-price { font-size: 14.5px !important; font-weight: 800 !important; color: #c8151b !important; }
 @media (hover: hover) {
     html body .v-overlay .checkout-journey-sheet .product-horizontal-cards .product-card-horizontal.scheme-recommended-product-card:hover { background: #faf8f6 !important; }
-    html body .checkout-journey-sheet__footer .v-btn:hover { background: #c8151b !important; }
+    html body .checkout-journey-sheet__footer .v-btn:hover { box-shadow: 0 12px 30px rgba(227, 30, 36, 0.36) !important; }
 }
 /* mh-recs-v1 */
+
+/* =========================================================
+   חלק 65: חלון האישור "כן / לא" של Hyperzod (.scheme-confirmation-popup) — MH Confirm v1.0.0 | 2026-10-23 (ליטוש)
+   למשל "להחליף פריט בעגלה?" אחרי "להזמין מחדש" כשיש כבר משהו בעגלה. עד היום בלי עיצוב שלנו: "כן" שחור (bg-black),
+   פינות 8 — הכפתור השחור היחיד באפליקציה. עכשיו כמו שאר כפתורי הפעולה: "כן" בגרדיאנט האדום, "לא" אפור בהיר,
+   פינות 14, חלון בפינות 18. טקסטים והתנהגות — של Hyperzod, בלי שינוי. בלי JS.
+   ========================================================= */
+html body .scheme-confirmation-popup {
+    border: 0 !important;
+    border-radius: 18px !important;
+    box-shadow: 0 18px 50px rgba(0, 0, 0, 0.18) !important;
+}
+html body .scheme-confirmation-popup p {
+    font-size: 17px !important;
+    font-weight: 800 !important;
+    color: #111 !important;
+    padding-top: 6px !important;
+}
+html body .scheme-confirmation-popup :is(.scheme-confirmation-primary, .scheme-confirmation-secondary) {
+    height: 48px !important;
+    border-radius: 14px !important;
+    font-size: 16px !important;
+    letter-spacing: 0 !important;
+    text-transform: none !important;
+}
+html body .scheme-confirmation-popup .scheme-confirmation-primary {
+    background: linear-gradient(135deg, #ff3b41 0%, #c8151b 100%) !important;
+    color: #fff !important;
+    font-weight: 800 !important;
+    box-shadow: 0 8px 20px rgba(227, 30, 36, 0.28) !important;
+}
+html body .scheme-confirmation-popup .scheme-confirmation-secondary {
+    background: #f5f5f7 !important;
+    color: #111 !important;
+    font-weight: 700 !important;
+}
+html body .scheme-confirmation-popup .v-btn__overlay,
+html body .scheme-confirmation-popup .v-btn__underlay {
+    display: none !important;
+}
+/* mh-confirm-v1 */
