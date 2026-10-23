@@ -4222,7 +4222,9 @@ log('פעיל');
     { sel: '.scheme-location-results-heading', text: { 'Search Results': 'תוצאות חיפוש' } },
     /* (6.10) מסך "אישור מקום" אחרי בחירת תוצאה במודאל המיקום: כפתור החזרה לחיפוש (מחרוזת קשיחה באנגלית) */
     { sel: '#SearchLocationBackBtn + span', text: { 'Search Location': 'חזרה לחיפוש' } },
-    { sel: '#AddressSelectType label', text: { 'Save address as': 'לשמור את הכתובת בתור', 'SAVE ADDRESS AS': 'לשמור את הכתובת בתור' } },
+    /* 23.10 (ניקוי 2): המפתח 'SAVE ADDRESS AS' הוסר — בבילד התווית היא המחרוזת הקבועה "Save address as" (האותיות הגדולות הן
+       text-transform של CSS, ה-textContent לא משתנה); "SAVE ADDRESS AS" לא קיים בשום chunk */
+    { sel: '#AddressSelectType label', text: { 'Save address as': 'לשמור את הכתובת בתור' } },
     /* (29.9) השדה שנפתח ב"אחרים": שתי התוויות של Vuetify — במנוחה (#OtherType-label) והצפה (בתוך .v-field__outline) */
     /* \n = שבירת שורה בתווית במנוחה (white-space: pre-line בחלק 44); בתווית הצפה היא נהיית רווח */
     { sel: '[data-ref="OtherType"] .v-field-label', text: { 'Save as': 'אחר - מה הכתובת הזאת בשבילך?\n(לדוגמא - הבית של משה)' } },

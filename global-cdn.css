@@ -93,7 +93,8 @@ html body #AddressCard .v-select__selection {
 /* --- 4. ניקוי לוגי (העלמת שכבות כפולות) - מוגן מודאל ---
    בפועל חל על כל האתר (ה-:not(.product-popup) נבדק על כל אב, ו-#app עצמו אינו .product-popup).
    23.10: זה הבעלים של "display:none" על השכבות האלה — 11 העתקים בחלקים הישנים (4, 5, 6, 7, 8א, 8ד, 8h, 8i, 12ג, 30×2)
-   הוסרו כמיותרים. אין בשום CSS (שלנו, Hyperzod, Vuetify) display אחר על השכבות האלה, כך שאין שינוי. */
+   הוסרו כמיותרים. אין בשום CSS (שלנו, Hyperzod, Vuetify) display אחר על השכבות האלה, כך שאין שינוי.
+   23.10 (ניקוי 2): עוד 56 סלקטורים כפולים ב-30 כללים בחלקים החדשים הוסרו באותו נימוק (הרשימה: capture/design-qa-22.10/cand/c2/clean/CHANGES.md). */
 html body :not(.product-popup) .v-btn__overlay, 
 html body :not(.product-popup) .v-btn__underlay, 
 html body :not(.product-popup) .v-card__underlay,
@@ -189,7 +190,6 @@ html body .v-btn.add-btn .tw-ms-1 {
    23.10 (ניקוי): "#app-router-view .tw-bg-\[#f7f7f7\]" הוסר מהרשימה — מעולם לא חל: ה-# לא היה מוברח, ולכן הדפדפן
    קרא אותו כמחלקה "tw-bg-[" + id "f7f7f7]" (אין כזה). ההיסטוריה ב-git. */
 html body #checkout.tw-relative {
-    background-color: #ffffff !important;
     background: radial-gradient(circle at top, #ffffff 0%, #fcfcfc 100%) !important;
 }
 
@@ -268,7 +268,6 @@ html body #checkout .v-btn--icon i.v-icon svg {
 /* 1. טיהור רקע הדף - לבן קריסטל רענן
    23.10 (ניקוי): ".v-container.tw--mt-3.tw-bg-\[#fff\]" הוסר מהרשימה — מעולם לא חל (# לא מוברח = id "fff]"). */
 html body #app-router-view .tw-min-h-svh {
-    background-color: #ffffff !important;
     background: radial-gradient(circle at 50% 0%, #ffffff 0%, #f9f9f9 100%) !important;
 }
 
@@ -378,6 +377,20 @@ html body .scheme-profile-page .scheme-mobile-page-header .back-btn {
 html body .scheme-profile-page .scheme-mobile-page-header .back-btn > :is(svg, .v-icon),
 html body .scheme-order-tracking-header .back-btn > svg {
     display: none !important;
+}
+/* 23.10 (ניקוי 2, מגע): העיגול 36px — שטח לחיצה 44 בלי שינוי נראה: ::after שקוף, 4px מכל צד (ה-::before הוא ה-">").
+   בפרטי ההזמנה הכפתור static — position:relative רק כדי שה-::after יימדד ממנו (אין לו ילדים ממוקמים, שום דבר לא זז) */
+html body .scheme-order-tracking-header .back-btn {
+    position: relative !important;
+}
+html body .scheme-profile-page .scheme-mobile-page-header .back-btn::after,
+html body .scheme-order-tracking-header .back-btn::after {
+    content: "" !important;
+    position: absolute !important;
+    top: -4px !important;
+    right: -4px !important;
+    bottom: -4px !important;
+    left: -4px !important;
 }
 html body .scheme-profile-page .scheme-mobile-page-header .back-btn::before,
 html body .scheme-order-tracking-header .back-btn::before {
@@ -500,10 +513,7 @@ html body .scheme-edit-profile-actions > .v-btn:not(.scheme-edit-profile-primary
     letter-spacing: 0 !important;
     text-transform: none !important;
 }
-html body .scheme-edit-profile-actions .v-btn__overlay,
-html body .scheme-edit-profile-actions .v-btn__underlay {
-    display: none !important;
-}
+/* 23.10 (ניקוי 2): הסתרת .v-btn__overlay/.v-btn__underlay כאן הוסרה — כפילות של "4. ניקוי לוגי" בראש הקובץ */
 
 /* =========================================================
    חלק 7: דף "ההזמנות שלי" - CRYSTAL ORDER HISTORY
@@ -513,7 +523,6 @@ html body .scheme-edit-profile-actions .v-btn__underlay {
 /* 1. טיהור הרקע הכללי - חיסול ה-f7f7f7 האפרורי
    23.10 (ניקוי): "#orders .tw-bg-\[#f7f7f7\]" הוסר מהרשימה — מעולם לא חל (# לא מוברח = id "f7f7f7]"). */
 html body #custom-scroll-orders {
-    background-color: #ffffff !important;
     background: radial-gradient(circle at center, #ffffff 0%, #f8f8f8 100%) !important;
 }
 /* "#profile.tw-relative" — הוצא 23.10: #profile הוא המעטפת של כל דפי האזור האישי ובגובה התוכן בלבד, אז הגרדיאנט נגמר באמצע המסך
@@ -646,6 +655,16 @@ html body #checkout .back-btn svg path {
 }
 /* 23.10: ב-RTL "חזרה" מצביע ימינה — Hyperzod מציירת "←" (כמו בראש דף העסק, בחיפוש ובאזור האישי) */
 html body #checkout .back-btn svg { transform: scaleX(-1) !important; }
+/* 23.10 (ניקוי 2, מגע): החץ הוא כפתור של 24×20 — שטח לחיצה 44×44 בלי שינוי נראה: ::before שקוף (10px לצדדים, 12px למעלה ולמטה;
+   הכפתור כבר absolute בראש הדף, מסביבו רק הכותרת) */
+html body #checkout .back-btn::before {
+    content: "" !important;
+    position: absolute !important;
+    top: -12px !important;
+    right: -10px !important;
+    bottom: -12px !important;
+    left: -10px !important;
+}
 
 /* 5. ניקוי שכבות ה-Underlay — הוסר 23.10: כפילות של "4. ניקוי לוגי" בראש הקובץ. */
 
@@ -1233,8 +1252,12 @@ html body .place-order .add-address-btn:active { transform: scale(0.98) !importa
 
 /* 1. רקע הדף ([data-v-ea7a4b37]) — הוסר 22.10 (מת: hash של Vue שכבר לא קיים בבילד). ההיסטוריה ב-git. */
 
-/* 2. הדר אישור הזמנה (Sticky Order Header) */
-.native-top-notch-padding {
+/* 2. הדר אישור הזמנה (Sticky Order Header).
+   23.10 (ניקוי 2): היה ".native-top-notch-padding" גלובלי — Hyperzod שמה את המחלקה גם על #AppBar וגם על סקשן "Product Banners"
+   (#HomePageBanners, שיש בו h1 כשמוגדרת כותרת) — הכותרת של באנר הייתה מתחלפת ב"פרטי הזמנה" ומקבלת זכוכית וקו אדום.
+   עכשיו רק ההדר של פרטי ההזמנה (.scheme-order-tracking-header, במובייל) ו-#AppBar (שם הכלל חל היום: ריפוד 15 מתחת ו-blur — נשמר
+   בדיוק כמו שהוא). :where() משאיר את הספציפיות (0,1,0)/(0,1,1) כמו קודם — אותו מנצח בכל מקום. */
+:where(.scheme-order-tracking-header, #AppBar).native-top-notch-padding {
     background: rgba(255, 255, 255, 0.6) !important;
     backdrop-filter: blur(40px) saturate(200%) !important;
     -webkit-backdrop-filter: blur(40px) saturate(200%) !important;
@@ -1242,12 +1265,12 @@ html body .place-order .add-address-btn:active { transform: scale(0.98) !importa
     padding-bottom: 15px !important;
 }
 
-/* תרגום כותרת "Order #" */
-.native-top-notch-padding h1 {
+/* תרגום כותרת "Order #" — רק בהדר של פרטי ההזמנה (ב-#AppBar אין h1) */
+:where(.scheme-order-tracking-header).native-top-notch-padding h1 {
     font-size: 0 !important; /* העלמת המקור */
 }
 
-.native-top-notch-padding h1::before {
+:where(.scheme-order-tracking-header).native-top-notch-padding h1::before {
     content: "פרטי הזמנה " !important;
     font-size: 16px !important;
     font-weight: 900 !important;
@@ -1257,8 +1280,9 @@ html body .place-order .add-address-btn:active { transform: scale(0.98) !importa
 
 /* 3. כרטיס סטטוס ההזמנה (.tw-px-2.tw-mt-[-25px], 3 כללים) — הוסר 22.10 (מת: tw-mt-[-25px] לא קיים בבילד וגם לא ב-CSS שלו). ההיסטוריה ב-git. */
 
-/* 4. כרטיס פרטי החנות והמוצרים */
-.tw-px-2.tw-mt-\[7px\] .tw-bg-white {
+/* 4. כרטיס פרטי החנות והמוצרים (בהזמנה שבוטלה: tw-mt-[7px] רק שם). 23.10 (ניקוי 2): בתוך .scheme-order-details בלבד —
+   בבילד הצירוף tw-px-2 + tw-mt-[7px] קיים רק בפרטי ההזמנה; :where() — אותה ספציפיות כמו קודם */
+:where(.scheme-order-details) .tw-px-2.tw-mt-\[7px\] .tw-bg-white {
     background: rgba(255, 255, 255, 0.7) !important;
     backdrop-filter: blur(45px) !important;
     border-radius: 28px !important;
@@ -1281,28 +1305,31 @@ html body .place-order .add-address-btn:active { transform: scale(0.98) !importa
     margin-top: 20px !important;
 }
 
-/* עיצוב הקווים המחברים ב-Timeline */
-.v-timeline-divider__before, .v-timeline-divider__after {
+/* עיצוב הקווים המחברים ב-Timeline.
+   23.10 (ניקוי 2): כללי ה-v-timeline היו גלובליים — בבילד יש VTimeline אחד בלבד, בתוך רכיב track-delivery, ולכן הסקופ
+   :where(.track-delivery) תופס בדיוק את אותם אלמנטים באותה ספציפיות. מונע דליפה (למשל "כתובת למשלוח" על כל tw-capitalize
+   בציר זמן עתידי של Hyperzod). */
+:where(.track-delivery) .v-timeline-divider__before, :where(.track-delivery) .v-timeline-divider__after {
     background-color: rgba(227, 30, 36, 0.2) !important; /* קו אדום עדין */
 }
 
 /* עיצוב האייקונים בתוך ה-Timeline */
-.v-timeline-divider__inner-dot {
+:where(.track-delivery) .v-timeline-divider__inner-dot {
     background-color: white !important;
     border: 2px solid #e31e24 !important;
     box-shadow: 0 0 15px rgba(227, 30, 36, 0.2) !important;
 }
 
-.v-timeline-divider__inner-dot svg path {
+:where(.track-delivery) .v-timeline-divider__inner-dot svg path {
     fill: #e31e24 !important;
 }
 
 /* תרגום כותרת הכתובת "home" */
-.v-timeline-item__body .tw-capitalize {
+:where(.track-delivery) .v-timeline-item__body .tw-capitalize {
     font-size: 0 !important;
 }
 
-.v-timeline-item__body .tw-capitalize::before {
+:where(.track-delivery) .v-timeline-item__body .tw-capitalize::before {
     content: "כתובת למשלוח" !important;
     font-size: 14px !important;
     font-weight: 900 !important;
@@ -1449,6 +1476,23 @@ html body #mobileLocationSearch .locate-me span.tw-font-medium {   /* הגודל
     width: 36px !important;
     height: 36px !important;
 }
+/* 23.10 (ניקוי 2, מגע): הבועה 36px — שטח הלחיצה 44px בלי שינוי נראה: ::before שקוף שבולט 4px מכל צד (5 מתוך המסגרת של 1px;
+   ה-v-btn כבר position:relative; ה-::after שלו תפוס — טבעת הפוקוס של Vuetify). נבדק ב-elementFromPoint: לא לוקח לחיצות משכן. */
+/* (לא בחץ החזרה של "ייתכן שתאהבו גם" — הוא כבר 44 ו-position:static אצלנו בחלק 64, וה-::before היה נמדד מהכותרת כולה) */
+:where(html body .v-bottom-sheet:not(.merchant-bottom-sheet):not(.scheme-location-search-host)) > .v-bottom-sheet__content .v-btn--icon.v-btn--variant-text:where(:not(.checkout-journey-back))::before {
+    content: "" !important;
+    position: absolute !important;
+    top: -5px !important;
+    right: -5px !important;
+    bottom: -5px !important;
+    left: -5px !important;
+}
+/* ה-X של חלונית ההתחברות יושב בפינה העליונה-ימנית של ה-.v-card-title (tw--mb-5 — רק שם בבילד), שחותך (overflow:hidden של Vuetify)
+   כל מה שמעליו ומימינו — ה-8px הולכים שמאלה ולמטה, לשטח הריק של הכותרת */
+:where(html body .v-bottom-sheet:not(.merchant-bottom-sheet):not(.scheme-location-search-host)) > .v-bottom-sheet__content .v-card-title.tw--mb-5 .v-btn--icon.v-btn--variant-text::before {
+    bottom: -9px !important;
+    left: -9px !important;
+}
 
 /* אפקט ריחוף ולחיצה */
 :where(html body .v-bottom-sheet:not(.merchant-bottom-sheet):not(.scheme-location-search-host)) > .v-bottom-sheet__content .v-btn--icon:where(:not(.v-rating .v-btn)):active {   /* 23.10: לא כוכבי הדירוג (כמו בבועת ה-X ב-8z) */
@@ -1542,7 +1586,7 @@ html body #mobileLocationSearch .locate-me span.tw-font-medium {   /* הגודל
     box-shadow: 0 10px 30px rgba(227, 30, 36, 0.1) !important;
 }
 /* ניקוי שכבות Vuetify */
-#MultiVendorSearch .mobile-search-input .v-field__overlay,
+/* 23.10 (ניקוי 2): .v-field__overlay הוסר מהרשימה — כפילות של "4. ניקוי לוגי" בראש הקובץ */
 #MultiVendorSearch .mobile-search-input .v-field__outline {
     display: none !important;
 }
@@ -1643,9 +1687,8 @@ html body #mobileLocationSearch .locate-me span.tw-font-medium {   /* הגודל
     margin-top: 8px !important;
 }
 /* 7. ניקוי שכבות מערכת */
-#MultiVendorSearch .v-field__loader,
-#MultiVendorSearch .v-btn__overlay,
-#MultiVendorSearch .v-btn__underlay {
+/* 23.10 (ניקוי 2): .v-btn__overlay/.v-btn__underlay הוסר מהרשימה — כפילות של "4. ניקוי לוגי" בראש הקובץ */
+#MultiVendorSearch .v-field__loader {
     display: none !important;
 }
 
@@ -2285,8 +2328,8 @@ html body img.home-mobile-search-icon {
     transition: transform 0.3s ease !important;
 }
 
-html body .home-mobile-search-input .v-field__outline,
-html body .home-mobile-search-input .v-field__overlay {
+/* 23.10 (ניקוי 2): .v-field__overlay הוסר מהרשימה — כפילות של "4. ניקוי לוגי" בראש הקובץ */
+html body .home-mobile-search-input .v-field__outline {
     display: none !important;
 }
 
@@ -2298,7 +2341,6 @@ html body.mh-scrolled div.bg-header_bg.tw-sticky {
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
     box-shadow: none !important;
-    border-bottom: none !important;
     border: none !important;
 }
 /* 22.10: כלל על [data-v-aee55508] (hash מת) הוסר כאן. */
@@ -2807,6 +2849,15 @@ html body #RateOrder > .back-btn {
     right: 16px !important;
     top: 16px !important;
 }
+/* 23.10 (ניקוי 2, מגע): ה-X הוא 40px — שטח לחיצה 44 (::before שקוף, 2px מכל צד; ה-v-btn כבר absolute) */
+html body #RateOrder > .back-btn::before {
+    content: "" !important;
+    position: absolute !important;
+    top: -2px !important;
+    right: -2px !important;
+    bottom: -2px !important;
+    left: -2px !important;
+}
 html body #RateOrder .rate-form > .v-btn {
     height: 50px !important;
     border-radius: 14px !important;
@@ -3312,8 +3363,7 @@ html body span.review img {
     transition: transform 0.15s ease, box-shadow 0.15s ease !important;
 }
 :is(html body nav.scheme-coupon-panel, html body .v-overlay .v-bottom-sheet__content) .scheme-coupon-input button:active { transform: scale(0.96) !important; }
-:is(html body nav.scheme-coupon-panel, html body .v-overlay .v-bottom-sheet__content) .scheme-coupon-input button .v-btn__overlay,
-:is(html body nav.scheme-coupon-panel, html body .v-overlay .v-bottom-sheet__content) .scheme-coupon-input button .v-btn__underlay { display: none !important; }
+/* 23.10 (ניקוי 2): הסתרת .v-btn__overlay/.v-btn__underlay כאן הוסרה — כפילות של "4. ניקוי לוגי" בראש הקובץ */
 /* "סנן" → "החל": מכבים את הטקסט המקורי ומציירים תווית חדשה (התבנית של התרגומים בקובץ הזה) */
 :is(html body nav.scheme-coupon-panel, html body .v-overlay .v-bottom-sheet__content) .scheme-coupon-input button .v-btn__content,
 :is(html body nav.scheme-coupon-panel, html body .v-overlay .v-bottom-sheet__content) .scheme-coupon-input button > span {
@@ -3402,9 +3452,8 @@ html body main#MultiVendorSearch .scheme-global-search-tabs .v-btn.v-tab.v-tab--
     color: #ffffff !important;
     box-shadow: 0 6px 16px rgba(227, 30, 36, 0.25) !important;
 }
-html body main#MultiVendorSearch .scheme-global-search-tabs .v-tab__slider,
-html body main#MultiVendorSearch .scheme-global-search-tabs .v-btn__overlay,
-html body main#MultiVendorSearch .scheme-global-search-tabs .v-btn__underlay { display: none !important; }
+/* 23.10 (ניקוי 2): .v-btn__overlay/.v-btn__underlay הוסר מהרשימה — כפילות של "4. ניקוי לוגי" בראש הקובץ */
+html body main#MultiVendorSearch .scheme-global-search-tabs .v-tab__slider { display: none !important; }
 /* Hyperzod מדביקה "s" לתרגום ("מוצרs", "חנותs") — מציירים את התווית מחדש */
 html body main#MultiVendorSearch .scheme-global-search-tabs .v-btn.v-tab .v-btn__content { font-size: 0 !important; color: inherit !important; }
 html body main#MultiVendorSearch #search-product-tab .v-btn__content::before { content: "מוצרים"; font-size: 15px; font-weight: 800; }
@@ -3937,8 +3986,8 @@ html body .product-dialog > .product-popup .v-card-text > button.v-btn--icon {
     border: 1px solid rgba(0, 0, 0, 0.06) !important;
     box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12) !important;
 }
-html body .product-popup .v-card__loader,
-html body .product-popup > .v-card__underlay { display: none !important; }
+/* 23.10 (ניקוי 2): .v-card__underlay הוסר מהרשימה — כפילות של "4. ניקוי לוגי" בראש הקובץ */
+html body .product-popup .v-card__loader { display: none !important; }
 
 /* 2. ההדר — רוחב מלא, זכוכית אטומה, כפתור חזרה QLED */
 html body .product-popup .v-card-title {
@@ -3988,11 +4037,19 @@ html body .product-popup .v-card-title button {
     transition: transform 0.15s ease, box-shadow 0.15s ease !important;
 }
 html body .product-popup .v-card-title button:active { transform: translateY(-50%) scale(0.94) !important; box-shadow: 0 3px 8px rgba(227, 30, 36, 0.3) !important; }
+/* 23.10 (ניקוי 2, מגע): ה-X הוא 40px — שטח לחיצה 44 בלי שינוי נראה (::before שקוף, 2px מחוץ למסגרת; הכפתור כבר absolute) */
+html body .product-popup .v-card-title button::before {
+    content: "" !important;
+    position: absolute !important;
+    top: -3px !important;
+    right: -3px !important;
+    bottom: -3px !important;
+    left: -3px !important;
+}
 html body .product-popup .v-card-title button .v-icon,
 html body .product-popup .v-card-title button svg,
 html body .product-popup .v-card-title button svg path { color: #ffffff !important; fill: #ffffff !important; }
-html body .product-popup .v-card-title button .v-btn__overlay,
-html body .product-popup .v-card-title button .v-btn__underlay { display: none !important; }
+/* 23.10 (ניקוי 2): הסתרת .v-btn__overlay/.v-btn__underlay כאן הוסרה — כפילות של "4. ניקוי לוגי" בראש הקובץ */
 
 /* 3. אזור הגלילה */
 html body .product-popup .v-card-text {
@@ -4031,8 +4088,8 @@ html body .product-popup .v-carousel-item .v-responsive__content .v-card {
     padding: 0 !important;
     aspect-ratio: unset !important;
 }
-html body .product-popup .v-carousel-item .v-card__loader,
-html body .product-popup .v-carousel-item .v-card__underlay { display: none !important; }
+/* 23.10 (ניקוי 2): .v-card__underlay הוסר מהרשימה — כפילות של "4. ניקוי לוגי" בראש הקובץ */
+html body .product-popup .v-carousel-item .v-card__loader { display: none !important; }
 /* בחלונית (נייד/אפליקציה) — פינות עליונות 32 + טשטוש לכרטיס שסביב התמונה. עד 22.10 הגיעו מהקליפה הכללית של החלונית (חלק 8z),
    שחלה היום רק על הכרטיס של החלונית עצמה ולא על כרטיסים שבתוכו; בלי זה מאחורי פינות התמונה מופיע ריבוע אפור. במחשב (חלון) אין שינוי. */
 html body .v-bottom-sheet__content .product-popup .v-carousel-item .v-card {
@@ -4189,8 +4246,7 @@ html body .product-popup .v-card-actions button.add-btn *,
 html body .product-popup #add_to_cart_hide_from_mobile_app button.add-btn * { color: #ffffff !important; }
 html body .product-popup .v-card-actions button.add-btn:active,
 html body .product-popup #add_to_cart_hide_from_mobile_app button.add-btn:active { transform: scale(0.97) !important; box-shadow: 0 4px 12px rgba(227, 30, 36, 0.25) !important; }
-html body .product-popup .v-card-actions button.add-btn .v-btn__overlay,
-html body .product-popup .v-card-actions button.add-btn .v-btn__underlay { display: none !important; }
+/* 23.10 (ניקוי 2): הסתרת .v-btn__overlay/.v-btn__underlay כאן הוסרה — כפילות של "4. ניקוי לוגי" בראש הקובץ */
 html body .product-popup .product-quantity-control,
 html body .product-popup #add_to_cart_hide_from_mobile_app .tw-flex-none.tw-border {
     flex: 0 0 auto !important;
@@ -4219,7 +4275,7 @@ html body .product-popup input#quantity {
     background: transparent !important;
     text-align: center !important;
 }
-html body .product-popup #add_to_cart_hide_from_mobile_app .v-field__overlay,
+/* 23.10 (ניקוי 2): .v-field__overlay הוסר מהרשימה — כפילות של "4. ניקוי לוגי" בראש הקובץ */
 html body .product-popup #add_to_cart_hide_from_mobile_app .v-field__outline { display: none !important; }
 /* mh-product-v1 */
 
@@ -4709,8 +4765,7 @@ html body #SelectAddress .close-btn {
     border: 1px solid rgba(227, 30, 36, 0.1) !important;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
 }
-html body #SelectAddress .close-btn .v-btn__overlay,
-html body #SelectAddress .close-btn .v-btn__underlay { display: none !important; }
+/* 23.10 (ניקוי 2): הסתרת .v-btn__overlay/.v-btn__underlay כאן הוסרה — כפילות של "4. ניקוי לוגי" בראש הקובץ */
 html body #SelectAddress .close-btn img { opacity: 0 !important; }
 
 /* "הוסף כתובת חדשה" — גלולת פעולה אדומה */
@@ -4727,8 +4782,7 @@ html body #SelectAddress .add-address-btn {
     box-shadow: none !important;
     justify-content: center !important;
 }
-html body #SelectAddress .add-address-btn .v-btn__overlay,
-html body #SelectAddress .add-address-btn .v-btn__underlay { display: none !important; }
+/* 23.10 (ניקוי 2): הסתרת .v-btn__overlay/.v-btn__underlay כאן הוסרה — כפילות של "4. ניקוי לוגי" בראש הקובץ */
 html body #SelectAddress .add-address-btn > .v-btn__content > div {
     justify-content: center !important;
     padding: 0 !important;
@@ -5040,9 +5094,8 @@ html body .v-bottom-sheet__content > #locationConfirm {
     border-radius: 22px 22px 0 0 !important;
     overflow: hidden !important;
 }
-html body .scheme-address-editor .v-card__loader,
-html body .scheme-address-editor .v-card__underlay,
-html body .v-navigation-drawer .address-panel-swap .v-card__underlay {
+/* 23.10 (ניקוי 2): .v-card__underlay הוסר מהרשימה — כפילות של "4. ניקוי לוגי" בראש הקובץ */
+html body .scheme-address-editor .v-card__loader {
     display: none !important;
 }
 
@@ -5097,8 +5150,8 @@ html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap, 
     border-color: #e31e24 !important;
     box-shadow: 0 0 0 4px rgba(227, 30, 36, 0.10) !important;
 }
-html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap, .scheme-location-search) .scheme-location-master .v-field__outline,
-html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap, .scheme-location-search) .scheme-location-master .v-field__overlay {
+/* 23.10 (ניקוי 2): .v-field__overlay הוסר מהרשימה — כפילות של "4. ניקוי לוגי" בראש הקובץ */
+html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap, .scheme-location-search) .scheme-location-master .v-field__outline {
     display: none !important;
 }
 html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap, .scheme-location-search) .scheme-location-master input#search {
@@ -5282,12 +5335,7 @@ html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) 
 html body .v-bottom-sheet__content > #locationConfirm #CurrentLocationButton .v-icon {
     color: #e31e24 !important;
 }
-html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) #CurrentLocationButton .v-btn__overlay,
-html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) #CurrentLocationButton .v-btn__underlay,
-html body .v-bottom-sheet__content > #locationConfirm #CurrentLocationButton .v-btn__overlay,
-html body .v-bottom-sheet__content > #locationConfirm #CurrentLocationButton .v-btn__underlay {
-    display: none !important;
-}
+/* 23.10 (ניקוי 2): הסתרת .v-btn__overlay/.v-btn__underlay כאן הוסרה — כפילות של "4. ניקוי לוגי" בראש הקובץ */
 
 /* 4ב. מסך "אישור מקום" (6.10) — אחרי בחירת תוצאה במודאל "בחר את המיקום שלך" (sidePanel locationConfirm):
       #locationConfirm יושב ישר בגיליון, עם הדר "חזרה לחיפוש" (MH Lang), מפה גמישה, פאנל כתובת וכפתור #ConfirmLocationBtn.
@@ -5354,8 +5402,8 @@ html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) 
     border-color: #e31e24 !important;
     box-shadow: 0 0 0 4px rgba(227, 30, 36, 0.10) !important;
 }
+/* 23.10 (ניקוי 2): .v-field__overlay הוסר מהרשימה — כפילות של "4. ניקוי לוגי" בראש הקובץ */
 html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) #addAddressForm .v-field__outline,
-html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) #addAddressForm .v-field__overlay,
 html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) #addAddressForm .v-field__loader {
     display: none !important;
 }
@@ -5577,14 +5625,7 @@ html body .v-bottom-sheet__content > #locationConfirm #ConfirmLocationBtn:active
     transform: scale(0.985) !important;
     box-shadow: 0 4px 12px rgba(227, 30, 36, 0.25) !important;
 }
-html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) .scheme-address-editor__submit .v-btn__overlay,
-html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) .scheme-address-editor__submit .v-btn__underlay,
-html body .v-navigation-drawer:has(.address-panel-swap) .v-btn.v-btn--block.v-btn--size-x-large .v-btn__overlay,
-html body .v-navigation-drawer:has(.address-panel-swap) .v-btn.v-btn--block.v-btn--size-x-large .v-btn__underlay,
-html body .v-bottom-sheet__content > #locationConfirm #ConfirmLocationBtn .v-btn__overlay,
-html body .v-bottom-sheet__content > #locationConfirm #ConfirmLocationBtn .v-btn__underlay {
-    display: none !important;
-}
+/* 23.10 (ניקוי 2): הסתרת .v-btn__overlay/.v-btn__underlay כאן הוסרה — כפילות של "4. ניקוי לוגי" בראש הקובץ */
 @media (prefers-reduced-motion: reduce) {
     html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap, .scheme-location-search) .scheme-location-result,
     html body :is(.scheme-address-editor, .v-navigation-drawer .address-panel-swap) .scheme-address-editor__submit,
@@ -5747,10 +5788,7 @@ html body #addresses .tw-px-1 > .tw-border .v-btn {
     border-radius: 18px !important;
     text-transform: none !important;
 }
-html body #addresses .tw-px-1 > .tw-border .v-btn__overlay,
-html body #addresses .tw-px-1 > .tw-border .v-btn__underlay {
-    display: none !important;
-}
+/* 23.10 (ניקוי 2): הסתרת .v-btn__overlay/.v-btn__underlay כאן הוסרה — כפילות של "4. ניקוי לוגי" בראש הקובץ */
 html body #addresses .tw-px-1 > .tw-border .v-btn__content > div {
     padding: 0 14px !important;
     gap: 12px !important;
@@ -5886,10 +5924,7 @@ html body #addresses .kebab-btn {
     background: #f5f5f7 !important;
     color: #6b7280 !important;
 }
-html body #addresses .kebab-btn .v-btn__overlay,
-html body #addresses .kebab-btn .v-btn__underlay {
-    display: none !important;
-}
+/* 23.10 (ניקוי 2): הסתרת .v-btn__overlay/.v-btn__underlay כאן הוסרה — כפילות של "4. ניקוי לוגי" בראש הקובץ */
 html body #addresses .kebab-btn:active {
     background: #ececf0 !important;
 }
@@ -5957,10 +5992,7 @@ html body .v-bottom-sheet__content > .v-card.tw-rounded-t-xl:has(> .tw-px-4.tw-p
     inset: 0 !important;               /* 23.10: ה-img של Vuetify ממוקם absolute בפינה — ה-22px ישבו למעלה-שמאלה בעיגול, לא במרכז */
     margin: auto !important;
 }
-html body .v-bottom-sheet__content > .v-card.tw-rounded-t-xl:has(> .tw-px-4.tw-pb-8 > .tw-border.tw-rounded-xl > .tw-h-\[44px\].tw-cursor-pointer) > .v-card-title .v-btn__overlay,
-html body .v-bottom-sheet__content > .v-card.tw-rounded-t-xl:has(> .tw-px-4.tw-pb-8 > .tw-border.tw-rounded-xl > .tw-h-\[44px\].tw-cursor-pointer) > .v-card-title .v-btn__underlay {
-    display: none !important;
-}
+/* 23.10 (ניקוי 2): הסתרת .v-btn__overlay/.v-btn__underlay כאן הוסרה — כפילות של "4. ניקוי לוגי" בראש הקובץ */
 html body .v-bottom-sheet__content > .v-card.tw-rounded-t-xl > .tw-px-4.tw-pb-8 > .tw-border.tw-rounded-xl:has(> .tw-h-\[44px\].tw-cursor-pointer) {
     border: 0 !important;
     border-radius: 18px !important;
@@ -6450,8 +6482,8 @@ html body #FeaturedMerchants a.featured-merchant-card {
     border-radius: 0 !important;
     -webkit-tap-highlight-color: transparent !important;
 }
-html body #FeaturedMerchants a.featured-merchant-card .v-card__overlay,
-html body #FeaturedMerchants a.featured-merchant-card .v-card__underlay {
+/* 23.10 (ניקוי 2): .v-card__underlay הוסר מהרשימה — כפילות של "4. ניקוי לוגי" בראש הקובץ */
+html body #FeaturedMerchants a.featured-merchant-card .v-card__overlay {
     display: none !important;
 }
 html body #FeaturedMerchants a.featured-merchant-card .image {
@@ -6875,7 +6907,7 @@ html body #checkout #message .v-field {
     transform: none !important;
     transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease !important;
 }
-html body #checkout #message .v-field__overlay,
+/* 23.10 (ניקוי 2): .v-field__overlay הוסר מהרשימה — כפילות של "4. ניקוי לוגי" בראש הקובץ */
 html body #checkout #message .v-field__outline,
 html body #checkout #message .v-field__loader { display: none !important; }
 /* אייקון עיפרון בתחילת השדה (ימין) */
@@ -7056,8 +7088,7 @@ html body #MultiVendorBottomNav .v-btn.footer-btn {
     transition: none !important;
     -webkit-tap-highlight-color: transparent !important;
 }
-html body #MultiVendorBottomNav .v-btn.footer-btn .v-btn__overlay,
-html body #MultiVendorBottomNav .v-btn.footer-btn .v-btn__underlay { display: none !important; }
+/* 23.10 (ניקוי 2): הסתרת .v-btn__overlay/.v-btn__underlay כאן הוסרה — כפילות של "4. ניקוי לוגי" בראש הקובץ */
 html body #MultiVendorBottomNav .v-btn.footer-btn .v-btn__content {
     position: relative !important;
     z-index: 2 !important;
@@ -7172,21 +7203,12 @@ html body #mh-addrwarn .mh-aw-title {
     font-weight: 800 !important;
     line-height: 1.3 !important;
 }
-html body #mh-addrwarn .mh-aw-addr { color: #111 !important; font-weight: 900 !important; }
+/* .mh-aw-addr ו-.mh-aw-act (הכתובת המודגשת ו"החלפה ›") — הוסרו 23.10 (ניקוי 2): מאז v1.1.0 (1.10) ה-JS לא יוצר אותם; רק .mh-aw-ico/-body/-title/-text/-line */
 html body #mh-addrwarn .mh-aw-text {
     color: #4a1416 !important;
     font-size: 12.5px !important;
     font-weight: 600 !important;
     line-height: 1.4 !important;
-}
-html body #mh-addrwarn .mh-aw-act {
-    align-self: flex-start !important;
-    margin-top: 2px !important;
-    color: #c8151b !important;
-    font-size: 12.5px !important;
-    font-weight: 800 !important;
-    text-decoration: underline !important;
-    text-underline-offset: 3px !important;
 }
 /* ברירת המחדל: חמור — אדום מלא */
 html body #mh-addrwarn.mh-aw--default {
@@ -7195,9 +7217,7 @@ html body #mh-addrwarn.mh-aw--default {
     box-shadow: 0 10px 24px -10px rgba(200, 21, 27, 0.7) !important;
 }
 html body #mh-addrwarn.mh-aw--default .mh-aw-ico { background: #fff !important; color: #c8151b !important; }
-html body #mh-addrwarn.mh-aw--default .mh-aw-title,
-html body #mh-addrwarn.mh-aw--default .mh-aw-text,
-html body #mh-addrwarn.mh-aw--default .mh-aw-act { color: #fff !important; }
+/* ".mh-aw--default .mh-aw-title/-text/-act {color:#fff}" — הוסר 23.10 (ניקוי 2): מאז v1.1.0 מצב default מצייר רק .mh-aw-line (לבן ב-"ג" למטה) */
 /* במובייל, מעל כפתור "בחר כתובת" (שיש לו ריפוד 16px של Hyperzod) — מיושר לכפתור */
 html body .place-order #mh-addrwarn.mh-aw--none { margin: 4px 16px -6px !important; }
 @media (hover: hover) { html body #mh-addrwarn:hover { filter: brightness(0.98) !important; } }
@@ -7381,6 +7401,16 @@ html body .v-overlay__content:has(.date-btn) .v-card-title:not(.text-h6) .v-btn 
     border-radius: 999px !important;
     background: #f2f3f5 !important;
 }
+/* 23.10 (ניקוי 2, מגע): ה-X הוא 36px — ::before שקוף, 4px מכל צד (ה-v-btn כבר position:relative, בלי מסגרת). הכותרת (overflow:hidden
+   של Vuetify, ריפוד 4 למעלה ו-0 למטה) חותכת את מה שמתחת ל-X — בפועל 44 רוחב × 40 גובה */
+html body .v-overlay__content:has(.date-btn) .v-card-title:not(.text-h6) .v-btn::before {
+    content: "" !important;
+    position: absolute !important;
+    top: -4px !important;
+    right: -4px !important;
+    bottom: -4px !important;
+    left: -4px !important;
+}
 html body .v-overlay__content:has(.date-btn) .v-card-title:not(.text-h6) .v-btn .v-icon {
     width: 20px !important;
     height: 20px !important;
@@ -7388,10 +7418,7 @@ html body .v-overlay__content:has(.date-btn) .v-card-title:not(.text-h6) .v-btn 
     color: #374151 !important;
     caret-color: #374151 !important;
 }
-html body .v-overlay__content:has(.date-btn) .v-card-title .v-btn .v-btn__overlay,
-html body .v-overlay__content:has(.date-btn) .v-card-title .v-btn .v-btn__underlay {
-    display: none !important;
-}
+/* 23.10 (ניקוי 2): הסתרת .v-btn__overlay/.v-btn__underlay כאן הוסרה — כפילות של "4. ניקוי לוגי" בראש הקובץ */
 html body .v-overlay__content:has(.date-btn) .v-card-subtitle {
     padding: 2px 20px 0 !important;
     font-size: 13.5px !important;
@@ -7439,10 +7466,7 @@ html body .v-overlay__content:has(.date-btn) .date-btn {
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03) !important;
     transition: border-color 0.15s ease, background-color 0.15s ease, box-shadow 0.15s ease !important;
 }
-html body .v-overlay__content:has(.date-btn) .date-btn .v-btn__overlay,
-html body .v-overlay__content:has(.date-btn) .date-btn .v-btn__underlay {
-    display: none !important;
-}
+/* 23.10 (ניקוי 2): הסתרת .v-btn__overlay/.v-btn__underlay כאן הוסרה — כפילות של "4. ניקוי לוגי" בראש הקובץ */
 html body .v-overlay__content:has(.date-btn) .date-btn .tw-text-sm {
     font-size: 11px !important;
     font-weight: 700 !important;
@@ -7514,10 +7538,7 @@ html body .v-overlay__content:has(.date-btn) .time-btn {
     font-variant-numeric: tabular-nums !important;
     transition: border-color 0.15s ease, background-color 0.15s ease !important;
 }
-html body .v-overlay__content:has(.date-btn) .time-btn .v-btn__overlay,
-html body .v-overlay__content:has(.date-btn) .time-btn .v-btn__underlay {
-    display: none !important;
-}
+/* 23.10 (ניקוי 2): הסתרת .v-btn__overlay/.v-btn__underlay כאן הוסרה — כפילות של "4. ניקוי לוגי" בראש הקובץ */
 html body .v-overlay__content:has(.date-btn) .time-btn.v-btn-active {
     border-color: #e31e24 !important;
     background: #fff5f5 !important;
@@ -7551,10 +7572,7 @@ html body .v-overlay__content:has(.date-btn) .v-card-actions .v-btn {
     letter-spacing: 0 !important;
     transition: transform 0.12s ease !important;
 }
-html body .v-overlay__content:has(.date-btn) .v-card-actions .v-btn .v-btn__overlay,
-html body .v-overlay__content:has(.date-btn) .v-card-actions .v-btn .v-btn__underlay {
-    display: none !important;
-}
+/* 23.10 (ניקוי 2): הסתרת .v-btn__overlay/.v-btn__underlay כאן הוסרה — כפילות של "4. ניקוי לוגי" בראש הקובץ */
 html body .v-overlay__content:has(.date-btn) .v-card-actions .v-btn:active {
     transform: scale(0.985) !important;
 }
@@ -7926,7 +7944,7 @@ html body #MerchantSearchPage .scheme-merchant-search-control-bar > .native-top-
 html body #MerchantSearchPage .scheme-merchant-search-control-bar > .native-top-notch-margin.tw-flex-none > button .v-icon { color: #111 !important; font-size: 22px !important; }
 html body #MerchantSearchPage .scheme-merchant-search-control-bar .v-input,
 html body #MerchantSearchPage .scheme-merchant-search-control-bar .v-field { background: transparent !important; box-shadow: none !important; }
-html body #MerchantSearchPage .scheme-merchant-search-control-bar .v-field__overlay,
+/* 23.10 (ניקוי 2): .v-field__overlay הוסר מהרשימה — כפילות של "4. ניקוי לוגי" בראש הקובץ */
 html body #MerchantSearchPage .scheme-merchant-search-control-bar .v-field__outline,
 html body #MerchantSearchPage .scheme-merchant-search-control-bar .v-field__prepend-inner { display: none !important; }   /* prepend-inner: הזכוכית המגדלת של Hyperzod במחשב — שלנו (::before) אחת לכל המסכים */
 html body #MerchantSearchPage .scheme-merchant-search-control-bar .v-field__field::before { content: "" !important; flex: 0 0 18px !important; width: 18px !important; height: 18px !important; align-self: center !important; margin-inline: 6px 2px !important; background: #8a8580 !important;
@@ -8161,8 +8179,5 @@ html body .scheme-confirmation-popup .scheme-confirmation-secondary {
     color: #111 !important;
     font-weight: 700 !important;
 }
-html body .scheme-confirmation-popup .v-btn__overlay,
-html body .scheme-confirmation-popup .v-btn__underlay {
-    display: none !important;
-}
+/* 23.10 (ניקוי 2): הסתרת .v-btn__overlay/.v-btn__underlay כאן הוסרה — כפילות של "4. ניקוי לוגי" בראש הקובץ */
 /* mh-confirm-v1 */
