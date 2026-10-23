@@ -90,7 +90,10 @@ html body #AddressCard .v-select__selection {
     overflow: hidden !important;
 }
 
-/* --- 4. ניקוי לוגי (העלמת שכבות כפולות) - מוגן מודאל --- */
+/* --- 4. ניקוי לוגי (העלמת שכבות כפולות) - מוגן מודאל ---
+   בפועל חל על כל האתר (ה-:not(.product-popup) נבדק על כל אב, ו-#app עצמו אינו .product-popup).
+   23.10: זה הבעלים של "display:none" על השכבות האלה — 11 העתקים בחלקים הישנים (4, 5, 6, 7, 8א, 8ד, 8h, 8i, 12ג, 30×2)
+   הוסרו כמיותרים. אין בשום CSS (שלנו, Hyperzod, Vuetify) display אחר על השכבות האלה, כך שאין שינוי. */
 html body :not(.product-popup) .v-btn__overlay, 
 html body :not(.product-popup) .v-btn__underlay, 
 html body :not(.product-popup) .v-card__underlay,
@@ -152,10 +155,8 @@ html body button.add-btn {
     justify-content: center !important;
 }
 
-/* 2. ביטול שכבות הצבע האטומות של Tailwind/Hyperzod */
-html body .v-btn.add-btn.tw-border-grey-500 {
-    border-color: #e31e24 !important;
-}
+/* 2. ".v-btn.add-btn.tw-border-grey-500" — הוסר 23.10 (מת: בבילד כפתור ההוספה אף פעם לא מקבל tw-border-grey-500;
+   המחלקה קיימת רק על תמונת הכרטיס האופקי .pro-card-h-img). ההיסטוריה ב-git. */
 
 /* 3. אפקט ריחוף ולחיצה (Tactile Response) */
 html body .v-btn.add-btn:hover {
@@ -177,38 +178,28 @@ html body .v-btn.add-btn .tw-ms-1 {
     margin-bottom: 2px !important;
 }
 
-/* 5. ניקוי שכבות ה-Overlay של Vuetify שיוצרות "עננות" על הכפתור */
-html body .v-btn.add-btn .v-btn__overlay,
-html body .v-btn.add-btn .v-btn__underlay {
-    display: none !important;
-}
+/* 5. ניקוי שכבות ה-Overlay (.v-btn__overlay/__underlay) — הוסר 23.10: כפילות; הכלל הכללי בראש הקובץ ("4. ניקוי לוגי") מסתיר אותן בכל האתר. */
 
 /* =========================================================
    חלק 5: דף העגלה - CRYSTAL BASKET OVERHAUL
    מטרה: טיהור הרקע האפור, יצירת כרטיסי זכוכית וכפתורי QLED
    ========================================================= */
 
-/* 1. טיהור הרקע הכללי - מעבר מלבן/אפור משעמם ללבן קריסטל */
-html body #app-router-view .tw-bg-\[#f7f7f7\],
+/* 1. טיהור הרקע הכללי - מעבר מלבן/אפור משעמם ללבן קריסטל
+   23.10 (ניקוי): "#app-router-view .tw-bg-\[#f7f7f7\]" הוסר מהרשימה — מעולם לא חל: ה-# לא היה מוברח, ולכן הדפדפן
+   קרא אותו כמחלקה "tw-bg-[" + id "f7f7f7]" (אין כזה). ההיסטוריה ב-git. */
 html body #checkout.tw-relative {
     background-color: #ffffff !important;
     background: radial-gradient(circle at top, #ffffff 0%, #fcfcfc 100%) !important;
 }
 
-/* 2. הדר העגלה (Sticky Header) - Liquid Glass */
+/* 2. הדר העגלה (Sticky Header) - Liquid Glass.
+   23.10 (ניקוי): רקע, טשטוש וקו תחתון הוסרו מכאן — חלק 7 §2 (אותו סלקטור, !important, מאוחר יותר) תמיד גבר עליהם. נשאר הצל. */
 html body #checkout .position-fixed.tw-top-0 {
-    background: rgba(255, 255, 255, 0.5) !important;
-    backdrop-filter: blur(30px) saturate(200%) !important;
-    -webkit-backdrop-filter: blur(30px) saturate(200%) !important;
-    border-bottom: 1.5px solid rgba(227, 30, 36, 0.1) !important;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03) !important;
 }
 
-/* כפתור חזור (Back) - אדום QLED */
-html body #checkout .back-btn svg path {
-    fill: #e31e24 !important;
-    stroke: #e31e24 !important;
-}
+/* כפתור חזור (Back) — 23.10 (ניקוי): הכלל הוסר; כפילות מדויקת של חלק 8א §4 (אותו סלקטור ואותם ערכים, מאוחר יותר). */
 
 /* 3. כרטיס החנות (Merchant Card) - Floating Glass Tile */
 html body #checkout .tw-bg-white.tw-border {
@@ -267,20 +258,16 @@ html body #checkout .v-btn--icon i.v-icon svg {
     fill: #e31e24 !important;
 }
 
-/* 6. הסרת אלמנטים מיותרים */
-html body #checkout .v-card__underlay,
-html body #checkout .v-btn__overlay {
-    display: none !important;
-}
+/* 6. הסרת אלמנטים מיותרים (.v-card__underlay, .v-btn__overlay) — הוסר 23.10: כפילות של "4. ניקוי לוגי" בראש הקובץ. */
 
 /* =========================================================
    חלק 6: דף "החשבון שלי" - LIQUID GLASS EDITION
    מטרה: הפיכת הפרופיל לממשק זכוכית יוקרתי עם נגיעות QLED
    ========================================================= */
 
-/* 1. טיהור רקע הדף - לבן קריסטל רענן */
-html body #app-router-view .tw-min-h-svh,
-html body .v-container.tw--mt-3.tw-bg-\[#fff\] {
+/* 1. טיהור רקע הדף - לבן קריסטל רענן
+   23.10 (ניקוי): ".v-container.tw--mt-3.tw-bg-\[#fff\]" הוסר מהרשימה — מעולם לא חל (# לא מוברח = id "fff]"). */
+html body #app-router-view .tw-min-h-svh {
     background-color: #ffffff !important;
     background: radial-gradient(circle at 50% 0%, #ffffff 0%, #f9f9f9 100%) !important;
 }
@@ -306,10 +293,8 @@ html body .user-details p {
     opacity: 0.8 !important;
 }
 
-/* אייקון עריכה - אדום QLED */
-html body .user-details img[alt="edit"] {
-    filter: invert(18%) sepia(88%) saturate(6144%) hue-rotate(354deg) brightness(91%) contrast(100%) !important;
-}
+/* אייקון עריכה (.user-details img[alt="edit"]) — הוסר 23.10 (מת: כפתור העריכה הוא היום span עם SVG מוטמע (pencilIcon),
+   אין בבילד שום img עם alt="edit"). ההיסטוריה ב-git. */
 
 /* 3. שורות הניווט - קפסולות זכוכית (Navigation Items) */
 html body #ProfileSideBar .v-list-item.navigation-item {
@@ -358,21 +343,16 @@ html body #profile hr.v-divider {
     margin: 20px 0 !important;
 }
 
-/* 6. הסרת שכבות מערכת מיותרות */
-html body #ProfileSideBar .v-btn__overlay,
-html body #ProfileSideBar .v-list-item__overlay,
-html body #ProfileSideBar .v-list-item__underlay {
-    display: none !important;
-}
+/* 6. הסרת שכבות מערכת מיותרות — הוסר 23.10: כפילות ("4. ניקוי לוגי" בראש הקובץ + ".v-list-item__overlay" בחלק 8f). */
 
 /* =========================================================
    חלק 7: דף "ההזמנות שלי" - CRYSTAL ORDER HISTORY
    מטרה: הפיכת רשימת ההזמנות לממשק זכוכית נוזלית פרימיום
    ========================================================= */
 
-/* 1. טיהור הרקע הכללי - חיסול ה-f7f7f7 האפרורי */
+/* 1. טיהור הרקע הכללי - חיסול ה-f7f7f7 האפרורי
+   23.10 (ניקוי): "#orders .tw-bg-\[#f7f7f7\]" הוסר מהרשימה — מעולם לא חל (# לא מוברח = id "f7f7f7]"). */
 html body #custom-scroll-orders,
-html body #orders .tw-bg-\[#f7f7f7\],
 html body #profile.tw-relative {
     background-color: #ffffff !important;
     background: radial-gradient(circle at center, #ffffff 0%, #f8f8f8 100%) !important;
@@ -450,20 +430,10 @@ html body .c-table tbody td {
 
 /* כפתור "להזמין מחדש" (button.track-btn.tw-bg-black) — הוסר 22.10 (מת: בבילד הכפתור הוא bg-button_normal, אין tw-bg-black). ההיסטוריה ב-git. */
 
-/* כפתור "דרג" - CRYSTAL SECONDARY */
-html body button.track-btn.tw-bg-\[#F3F3F4\] {
-    background: rgba(255, 255, 255, 0.8) !important;
-    border: 1.2px solid rgba(227, 30, 36, 0.3) !important;
-    border-radius: 50px !important;
-    color: #e31e24 !important;
-    font-weight: 700 !important;
-}
+/* כפתור "דרג" (button.track-btn.tw-bg-\[#F3F3F4\]) — הוסר 23.10 (מת: ה-# לא היה מוברח, הדפדפן קרא id "F3F3F4]" — הכלל מעולם
+   לא חל; את "דרג" מעצב חלק 37). ההיסטוריה ב-git. */
 
-/* 7. ניקוי לוגי וסינכרון אייקונים */
-html body .v-card__underlay,
-html body .v-btn__overlay {
-    display: none !important;
-}
+/* 7. ניקוי לוגי (".v-card__underlay, .v-btn__overlay" גלובלי) — הוסר 23.10: כפילות מדויקת של "4. ניקוי לוגי" בראש הקובץ. */
 
 /* הפיכת חץ הניווט בכרטיס לאדום */
 html body div[id^="order-"] .order-price svg path {
@@ -514,10 +484,7 @@ html body #checkout .back-btn svg path {
     transition: transform 0.2s ease !important;
 }
 
-/* 5. ניקוי שכבות ה-Underlay של Vuetify שחוסמות את הבלור */
-html body #checkout .v-card__underlay {
-    display: none !important;
-}
+/* 5. ניקוי שכבות ה-Underlay — הוסר 23.10: כפילות של "4. ניקוי לוגי" בראש הקובץ. */
 
 /* 6. הסרת פס ההתקדמות הלבן/שחור שמעל הכותרת */
 html body #checkout .v-card__loader {
@@ -583,10 +550,7 @@ html body #sl-inner-instruction-slider p.tw-m-0 {
     text-align: center !important;
 }
 
-/* 6. הסרת אלמנטים חוסמים מהמערכת */
-html body #sl-inner-instruction-slider .v-card__underlay {
-    display: none !important;
-}
+/* 6. הסרת אלמנטים חוסמים (.v-card__underlay) — הוסר 23.10: כפילות של "4. ניקוי לוגי" בראש הקובץ. */
 
 
 
@@ -849,9 +813,7 @@ html body #sl-inner-instruction-slider .v-card__underlay {
     transition: transform 0.2s ease !important;
 }
 
-:where(html body .v-bottom-sheet:not(.merchant-bottom-sheet):not(.scheme-location-search-host)) > .v-bottom-sheet__content .v-btn--icon:active {
-    transform: scale(0.9) !important;
-}
+/* ".v-btn--icon:active { transform: scale(0.9) }" — הוסר 23.10 (כפילות מדויקת: אותו סלקטור ואותו ערך בחלק 12ג, "אפקט ריחוף ולחיצה", מאוחר יותר). */
 
 /* 3. טבלת הפירוט בתוך החלונית */
 html body .v-bottom-sheet__content table.summary-card {
@@ -957,8 +919,9 @@ html body #payment-card .payment-method[data-test-id$="-cod"]:is(.mh-pay-on, :ha
     html body #payment-card .payment-method[data-test-id$="-custompg"] label::after { height: 18px !important; background-size: auto 18px !important; }
 }
 
-/* ניקוי שכבות מיותרות של Hyperzod (נשאר כפי שהיה ב-Part 8h המקורי) */
-.v-card__overlay, .v-card__underlay, .v-btn__overlay {
+/* ניקוי שכבות מיותרות של Hyperzod (נשאר כפי שהיה ב-Part 8h המקורי). 23.10: ".v-card__underlay, .v-btn__overlay" הוסרו מהרשימה —
+   כפילות של "4. ניקוי לוגי" בראש הקובץ; נשאר .v-card__overlay (אין לו כלל אחר). */
+.v-card__overlay {
     display: none !important;
 }
 /* mh-pay-v1 */
@@ -1071,21 +1034,11 @@ html body #payment-card .payment-method[data-test-id$="-cod"]:is(.mh-pay-on, :ha
     letter-spacing: 0.5px !important;
 }
 
-/* עיצוב הטקסט בתוך הכפתור (סה"כ לתשלום) */
-.mobile-place-order-btn .tw-text-\[10px\] {
-    font-size: 11px !important;
-    opacity: 0.9 !important;
-}
+/* עיצוב הטקסט בתוך הכפתור (סה"כ לתשלום): ".tw-text-\[10px\]" ו-".tw-text-xs.tw-text-uppercase" — הוסרו 23.10 (מתים: בתבנית
+   הכפתור של היום אין tw-text-[10px], והמחיר הוא "tw-text-base tw-text-uppercase" — בלי tw-text-xs). ההיסטוריה ב-git. */
 
-.mobile-place-order-btn .tw-text-xs.tw-text-uppercase {
-    font-size: 16px !important; /* מחיר בולט */
-    font-weight: 900 !important;
-}
-
-/* ניקוי רעשים ויזואליים של Hyperzod */
-.place-order .tw-border-t, 
-.v-card__overlay, 
-.v-btn__overlay {
+/* ניקוי רעשים ויזואליים של Hyperzod. 23.10: ".v-card__overlay, .v-btn__overlay" הוסרו מהרשימה — כפילות מדויקת (חלק 8h, "4. ניקוי לוגי"). */
+.place-order .tw-border-t {
     display: none !important;
 }
 
@@ -1130,12 +1083,8 @@ html body #payment-card .payment-method[data-test-id$="-cod"]:is(.mh-pay-on, :ha
     padding: 20px !important;
 }
 
-/* תרגום כותרות הטבלה */
-.c-table thead th {
-    color: #e31e24 !important;
-    font-weight: 800 !important;
-    border-bottom: 1px solid rgba(227, 30, 36, 0.1) !important;
-}
+/* כותרות הטבלה (.c-table thead th: אדום 800) — הוסר 23.10: מעולם לא חל. חלק 7 §5 ("html body .c-table thead th") מכסה
+   בדיוק את אותם אלמנטים בספציפיות גבוהה יותר ומגדיר את אותם שלושה מאפיינים (שחור 700). ההיסטוריה ב-git. */
 
 /* תרגום Inclusive (.c-table span:contains(...)) — הוסר 22.10 (CSS לא תקין: :contains לא קיים בדפדפנים, שני הכללים מעולם לא חלו). ההיסטוריה ב-git. */
 
@@ -1206,14 +1155,8 @@ a[href^="tel:"] svg path {
    מטרה: תיקון RTL, שדרוג רמת הטשטוש ועברות מלא של הממשק
    ========================================================= */
 
-/* --- 12א: תיקון מבני ומרכוז (RTL Bug Fix) --- */
-#mobileLocationSearch .v-overlay__content {
-    left: 0 !important;
-    right: 0 !important;
-    margin-left: auto !important;
-    margin-right: auto !important;
-    max-width: 500px !important; /* הגבלה למראה מובייל מהודק */
-}
+/* --- 12א: "#mobileLocationSearch .v-overlay__content" (מרכוז) — הוסר 23.10 (מת: #mobileLocationSearch הוא div בתוך תוכן
+   החלונית — ה-.v-overlay__content הוא אב שלו, לא צאצא; אף overlay בבילד לא מוצמד (attach) בתוכו). ההיסטוריה ב-git. --- */
 
 /* --- 12ב: תרגומים והזרקת תוכן (Localization Injection) --- */
 
@@ -1310,11 +1253,7 @@ a[href^="tel:"] svg path {
     padding: 6px !important; /* ריווח פנימי ל-X בתוך העיגול */
 }
 
-/* --- 3. ניקוי שכבות המערכת שחוסמות את ה-X --- */
-:where(html body .v-bottom-sheet:not(.merchant-bottom-sheet):not(.scheme-location-search-host)) > .v-bottom-sheet__content .v-btn__overlay,
-:where(html body .v-bottom-sheet:not(.merchant-bottom-sheet):not(.scheme-location-search-host)) > .v-bottom-sheet__content .v-btn__underlay {
-    display: none !important; /* הסרת שכבות אפורות של Vuetify */
-}
+/* --- 3. ניקוי שכבות המערכת שחוסמות את ה-X (.v-btn__overlay/__underlay) — הוסר 23.10: כפילות של "4. ניקוי לוגי" בראש הקובץ --- */
 
 /* --- 3. ניקוי שכבות המערכת שחוסמות את ה-X בלבד --- */
 :where(html body .v-bottom-sheet:not(.merchant-bottom-sheet):not(.scheme-location-search-host)) > .v-bottom-sheet__content .v-btn--icon .v-responsive__sizer {
@@ -1370,16 +1309,8 @@ a[href^="tel:"] svg path {
 #MultiVendorSearch {
     background: radial-gradient(circle at 50% 0%, #ffffff 0%, #f9f9f9 100%) !important;
 }
-/* 2. הדר חיפוש Sticky - Liquid Glass */
-#MultiVendorSearch .tw-sticky.tw-top-0.tw-bg-white {
-    background: rgba(255, 255, 255, 0.45) !important;
-    backdrop-filter: blur(40px) saturate(210%) !important;
-    -webkit-backdrop-filter: blur(40px) saturate(210%) !important;
-    border-bottom: 1.5px solid rgba(227, 30, 36, 0.1) !important;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04) !important;
-    padding: 16px !important;
-    z-index: 100 !important;
-}
+/* 2. הדר חיפוש Sticky (.tw-sticky.tw-top-0.tw-bg-white) — הוסר 23.10 (מת: אין בבילד אלמנט עם tw-sticky + tw-top-0;
+   ההדר של היום הוא .scheme-global-search-mobile-header, בבעלות חלק 26ב §1). ההיסטוריה ב-git. */
 /* 3. שורת החיפוש - Crystal Capsule */
 #MultiVendorSearch .mobile-search-input .v-field {
     background: rgba(255, 255, 255, 0.7) !important;
@@ -1852,8 +1783,7 @@ html body .v-overlay__content.v-bottom-sheet__content:has(.v-card.tw-pt-0.tw-bor
     overflow: hidden !important;
 }
 
-/* 3. ניקוי שכבות underlay של ה-card */
-html body .v-overlay__content.v-bottom-sheet__content:has(.v-card.tw-pt-0.tw-border-none .tw-w-full.tw-p-4.tw-rounded-lg.tw-border) > .v-card > .v-card__underlay,
+/* 3. ניקוי שכבות underlay של ה-card (23.10: "> .v-card__underlay" הוסר מהרשימה — כפילות של "4. ניקוי לוגי" בראש הקובץ) */
 html body .v-overlay__content.v-bottom-sheet__content:has(.v-card.tw-pt-0.tw-border-none .tw-w-full.tw-p-4.tw-rounded-lg.tw-border) > .v-card > .v-card__loader {
     display: none !important;
 }
@@ -2007,11 +1937,7 @@ html body .v-overlay__content.v-bottom-sheet__content:has(.v-card.tw-pt-0.tw-bor
     box-shadow: 0 4px 12px rgba(227, 30, 36, 0.4) !important;
 }
 
-/* 15. ניקוי overlays של Vuetify בכפתורים */
-html body .v-overlay__content.v-bottom-sheet__content:has(.v-card.tw-pt-0.tw-border-none .tw-w-full.tw-p-4.tw-rounded-lg.tw-border) button.v-btn .v-btn__overlay,
-html body .v-overlay__content.v-bottom-sheet__content:has(.v-card.tw-pt-0.tw-border-none .tw-w-full.tw-p-4.tw-rounded-lg.tw-border) button.v-btn .v-btn__underlay {
-    display: none !important;
-}
+/* 15. ניקוי overlays של Vuetify בכפתורים — הוסר 23.10: כפילות של "4. ניקוי לוגי" בראש הקובץ. */
 
 /* =========================================================
    חלקים 29, 29.1, "Fix: Search Results Container Collapse", 26 (תוצאות חיפוש כתובת) ו-27 (עיצוב פרימיום לתוצאות) — הוסרו.
@@ -2082,11 +2008,8 @@ html body #MultiVendorHeader .text-nav_icon_color.tw-text-\[11px\] {
     margin-top: 1px !important;
 }
 
-/* === 6. אייקונים - גרדיאנט אדום->ורוד דרך SVG defs === */
-html body #CurrentLocationBtn svg:first-child path {
-    fill: url(#mh-grad-red-pink) !important;
-}
-
+/* === 6. אייקונים === "גרדיאנט אדום->ורוד" (fill: url(#mh-grad-red-pink) על svg:first-child path) — הוסר 23.10: מעולם לא נראה —
+   חלק 36 (אותו סלקטור, !important, מאוחר יותר) צובע את אותו path ב-#e31e24. יחד איתו הוסר ה-JS שהזריק את ה-<defs>. */
 html body #CurrentLocationBtn svg:last-child path {
     stroke: #e31e24 !important;
     stroke-width: 2 !important;
@@ -2117,15 +2040,11 @@ html body #MobileSearchFilterBtn:active .icon-stroke {
 /* === 7. שורת חיפוש - LIQUID GLASS PREMIUM === */
 /* 22.10: כלל על [data-v-aee55508] (hash מת) הוסר כאן. */
 
+/* 23.10 (ניקוי): border / border-radius / box-shadow הוסרו מכאן — חלק 36 "מסך 1" (אותו סלקטור, !important, מאוחר יותר) תמיד גבר עליהם. */
 html body .home-mobile-search-input .v-field {
     background: rgba(255, 255, 255, 0.85) !important;
     backdrop-filter: blur(20px) saturate(180%) !important;
     -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
-    border: 1.5px solid rgba(227, 30, 36, 0.15) !important;
-    border-radius: 18px !important;
-    box-shadow:
-        0 6px 20px rgba(227, 30, 36, 0.06),
-        inset 0 1px 2px rgba(255, 255, 255, 0.9) !important;
     height: 48px !important;
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
     overflow: hidden !important;
@@ -2614,9 +2533,8 @@ html body #merchants_by_category .back-btn svg { transform: scaleX(-1) !importan
 html body #merchants_by_category .hide-scrollbar .v-btn {
     border-radius: 12px !important;
 }
-html body #merchants_by_category .hide-scrollbar .tw-bg-\[#212121\] {
-    background: #e31e24 !important;
-}
+/* ".hide-scrollbar .tw-bg-\[#212121\]" (מונה אדום בגלולות הסינון) — הוסר 23.10 (מת: ה-# לא מוברח ו-"#212121]" מתחיל בספרה →
+   סלקטור לא חוקי, הדפדפן זורק את הכלל כולו; אומת ב-WebKit וב-Chrome). ההיסטוריה ב-git. */
 
 /* =========================================================
    חלק 37: דף "ההזמנות שלי" - כפתורי פעולה + כרטיס דירוג | 2026-07-01
@@ -6538,7 +6456,6 @@ html body #AddonsConfirmation .v-card-actions .repeat-ntn.v-btn--disabled {
     opacity: 1 !important;
     color: #9ca3af !important;
     box-shadow: none !important;
-    opacity: 1 !important;
 }
 html body #AddonsConfirmation .v-card-actions .chose-btn {
     background: #fff !important;
@@ -6874,7 +6791,7 @@ html body #MultiVendorBottomNav .floating-nav-pill > .mh-lens {
 }
 html body #MultiVendorBottomNav .floating-nav-pill > .mh-lens::after { content: none !important; }
 html body #MultiVendorBottomNav .floating-nav-pill > .mh-lens.mh-lens-off { opacity: 0 !important; }
-/* .mh-active-pill (האינדיקטור הישן של חלק 31) — הוסר 22.10 (מת: MH NavGlass ב-custom-footer.js מוחק את האלמנט אם הוא קיים). */
+/* .mh-active-pill (האינדיקטור הישן של חלק 31) — הוסר 22.10 (מת: שום קוד לא יוצר את האלמנט מאז 28.9; גם הניקוי שלו ב-MH NavGlass הוסר 23.10). */
 
 /* ---- הטאבים ---- */
 html body #MultiVendorBottomNav .floating-nav-pill > .v-badge { position: relative !important; z-index: 3 !important; }

@@ -210,68 +210,9 @@ if (!window.__MH_FOOTER__) { window.__MH_FOOTER__ = true;
     });
 })();
 
-/* =========================================================
-   SVG Gradient Defs Injector
-   תאריך: 2026-05-01
-   מטרה: מזריק SVG <defs> עם גרדיאנט "mh-grad-red-pink"
-          כדי שאייקוני ההדר (מיקום, פילטר) יקבלו fill בגרדיאנט אדום->ורוד
-   ========================================================= */
-(function() {
-    'use strict';
-
-    function injectSvgGradients() {
-        if (document.getElementById('mh-svg-grads')) return;
-
-        var svgNS = 'http://www.w3.org/2000/svg';
-        var svg = document.createElementNS(svgNS, 'svg');
-        svg.id = 'mh-svg-grads';
-        svg.setAttribute('width', '0');
-        svg.setAttribute('height', '0');
-        svg.setAttribute('aria-hidden', 'true');
-        svg.style.position = 'absolute';
-        svg.style.width = '0';
-        svg.style.height = '0';
-        svg.style.overflow = 'hidden';
-
-        var defs = document.createElementNS(svgNS, 'defs');
-
-        var gradient = document.createElementNS(svgNS, 'linearGradient');
-        gradient.setAttribute('id', 'mh-grad-red-pink');
-        gradient.setAttribute('x1', '0%');
-        gradient.setAttribute('y1', '0%');
-        gradient.setAttribute('x2', '100%');
-        gradient.setAttribute('y2', '100%');
-
-        var stop1 = document.createElementNS(svgNS, 'stop');
-        stop1.setAttribute('offset', '0%');
-        stop1.setAttribute('stop-color', '#e31e24');
-
-        var stop2 = document.createElementNS(svgNS, 'stop');
-        stop2.setAttribute('offset', '100%');
-        stop2.setAttribute('stop-color', '#e75480');
-
-        gradient.appendChild(stop1);
-        gradient.appendChild(stop2);
-        defs.appendChild(gradient);
-        svg.appendChild(defs);
-
-        if (document.body) {
-            document.body.appendChild(svg);
-        } else {
-            document.addEventListener('DOMContentLoaded', function() {
-                document.body.appendChild(svg);
-            });
-        }
-    }
-
-    // ניסיון מיידי
-    injectSvgGradients();
-
-    // נסיון נוסף אחרי load (במקרה שה-body לא היה מוכן)
-    if (document.readyState !== 'complete') {
-        window.addEventListener('load', injectSvgGradients);
-    }
-})();
+/* "SVG Gradient Defs Injector" (#mh-svg-grads / #mh-grad-red-pink, 1.5.2026) — הוסר 23.10: הצרכן היחיד שלו, הכלל
+   fill: url(#mh-grad-red-pink) בחלק 2+3 ב-global-cdn.css, מעולם לא חל (חלק 36 גובר עליו באותו סלקטור) — והוסר גם הוא.
+   ה-<svg> היה 0×0 ומוחלט — לא נראה. ההיסטוריה ב-git. */
 
 /* =========================================================
    Bottom Nav - Selective Anti-Vibrate
@@ -629,15 +570,14 @@ if (!window.__MH_FOOTER__) { window.__MH_FOOTER__ = true;
 
 /* =========================================================
    עברות ותיקוני טקסט לדף "ההזמנות שלי" | 2026-07-01
-   - החזרת טקסט מלא לכפתור "להזמין מחדש" (הפלטפורמה מקצרת ל"מחד...")
    - המרת שעה מפורמט 12ש עברי ל-24 שעות (order-status)
    - תרגום "Delivery" ל-"משלוח לבית" (order-type)
    - תרגום "Rating:" ל-"הדירוג שלי:" (span.review)
+   - "להזמין מחדש" מלא (button.track-btn.tw-bg-black) — הוסר 23.10: מת. בבילד הכפתור הוא "bg-button_normal track-btn"
+     (בלי tw-bg-black), ולכן הלולאה לא מצאה אף כפתור מאז שהבילד השתנה. ההיסטוריה ב-git.
    ========================================================= */
 (function () {
     'use strict';
-
-    var REORDER_FULL = 'להזמין מחדש';
 
     function to24(text) {
         return text.replace(
@@ -653,13 +593,6 @@ if (!window.__MH_FOOTER__) { window.__MH_FOOTER__ = true;
     }
 
     function applyFixes() {
-        document.querySelectorAll('button.track-btn.tw-bg-black').forEach(function (btn) {
-            var label = btn.querySelector('.tw-truncate') ||
-                        btn.querySelector('.v-btn__content > span:last-of-type');
-            if (label && label.textContent.trim() !== REORDER_FULL) {
-                label.textContent = REORDER_FULL;
-            }
-        });
         document.querySelectorAll('.order-status').forEach(function (el) {
             var t = el.textContent, n = to24(t);
             if (n !== t) { el.textContent = n; }
@@ -4258,9 +4191,9 @@ log('פעיל');
 
 /* ============================================================
    מחרוזות שאין להן תרגום בחבילת השפה — MH Lang  |  v1.5.0 | 2026-10-06 (v1.4.0: 29.9, v1.3.0: 23.9, v1.2.0: 22.9, v1.1.0: 10.9)
-   Hyperzod מציירת טקסטים עם ברירת מחדל באנגלית כשמפתח חסר בחבילה:
-   getLug().common.customizable || "Customizable". המפתח common.customizable לא קיים
-   בחבילה של האתר (88 מפתחות ב-common, נבדק 10.9), ולכן התג בכרטיס המוצר באנגלית.
+   Hyperzod מציירת טקסטים עם ברירת מחדל באנגלית כשמפתח חסר בחבילה (למשל getLug().common.X || "English").
+   (ב-10.9 גם התג בכרטיס המוצר: common.customizable || "Customizable". בבילד של 23.10 הוא common.customize || "Customize",
+   והערך הישן הוסר מ-MAP.)
    הבלוק מחליף טקסט בלבד, רק באלמנטים ברשימה, רק כשהטקסט שווה בדיוק למחרוזת האנגלית.
    v1.4.0: שדה "Save as" (סוג כתובת "אחרים") — label קשיח באנגלית ב-chunk confirm_location. ההחלפה נוגעת
      רק בצומת הטקסט: בתוך ה-label של Vuetify יש הערת-עוגן של Vue (<!---->), ו-textContent= היה מוחק אותה.
@@ -4273,7 +4206,8 @@ log('פעיל');
   var VERSION = '1.5.0';
   /* סלקטור → { אנגלית: עברית } */
   var MAP = [
-    { sel: '.product-customizable-tag', text: { 'Customizable': 'ניתן להתאמה' } },
+    /* '.product-customizable-tag' "Customizable" → "ניתן להתאמה" — הוסר 23.10 (מת: היום Hyperzod מציירת שם
+       common.customize || "Customize"; המחרוזת "Customizable" לא קיימת בבילד, כך שההחלפה לא תפסה כלום) */
     /* מסך הוספת כתובת (22.9): כותרת רשימת התוצאות ותווית סוג הכתובת */
     { sel: '.scheme-location-results-heading', text: { 'Search Results': 'תוצאות חיפוש' } },
     /* (6.10) מסך "אישור מקום" אחרי בחירת תוצאה במודאל המיקום: כפתור החזרה לחיפוש (מחרוזת קשיחה באנגלית) */
@@ -5339,8 +5273,7 @@ log('פעיל');
     lens = null;
     for (var i = 0; i < pill.children.length; i++) {
       var ch = pill.children[i];
-      if (ch.classList.contains('mh-lens')) { lens = ch; }
-      else if (ch.classList.contains('mh-active-pill')) { ch.remove(); i--; }
+      if (ch.classList.contains('mh-lens')) { lens = ch; }   /* ניקוי .mh-active-pill הישן (מטמון, 28.9) — הוסר 23.10: שום קוד לא יוצר אותו */
     }
     if (!lens) {
       lens = document.createElement('span'); lens.className = 'mh-lens mh-lens-off'; lens.setAttribute('aria-hidden', 'true');
