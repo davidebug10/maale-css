@@ -673,6 +673,14 @@ html body #checkout .v-card__loader {
     display: none !important;
 }
 
+/* 7. מחשב (23.10, ליטוש p2): ה-AppBar קבוע (71px) והתוכן התחיל ב-32 (md:tw-pt-8) — "כתובת למשלוח" וראש כרטיס העסק (הלוגו)
+   הסתתרו מתחתיו. כמו חלק 6 §8: רק ≥960 ורק כשה-AppBar באמת בדף. */
+@media (min-width: 960px) {
+    html body #MultiVendorHeaderRoot:has(#AppBar) ~ #app-router-view #checkout > .scheme-checkout-content {
+        padding-top: 103px !important;
+    }
+}
+
 /* חלק 8ג (שדה הערות למטבח, #message) — הוחלף ע"י "חלק 50: MH CheckoutCart" בסוף הקובץ (27.9.2026). ההיסטוריה ב-git. */
 
 
@@ -686,15 +694,18 @@ html body #slinstruction-slider,
 html body .slinstruction-slider,
 html body #sl-inner-instruction-slider {
     overflow: visible !important; /* קריטי: מאפשר לאלמנטים לצאת מהגבולות בלי להיחתך */
-    padding-top: 15px !important; /* מרחב לאפקט ה-Scale למעלה */
-    padding-bottom: 15px !important; /* מרחב לאפקט ה-Scale למטה */
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
     display: flex !important;
     align-items: center !important;
 }
 
-/* 2. וידוא גובה מינימלי למכולה הפנימית כדי שלא תקרוס */
+/* 2. המכולה הפנימית: 10px למעלה ולמטה = המרחב של אפקט הבחירה (קפיצה 5px + הגדלה 6%).
+   23.10 (ליטוש p2): היה ריפוד 15 בכל אחת משלוש השכבות + גובה מינימלי 140 — כ-95px ריקים סביב אריחים של 105. */
 html body #sl-inner-instruction-slider {
-    min-height: 140px !important; 
+    min-height: 0 !important;
+    padding-top: 10px !important;
+    padding-bottom: 10px !important;
     gap: 15px !important; /* ריווח יוקרתי בין הכפתורים */
 }
 
@@ -724,7 +735,7 @@ html body #sl-inner-instruction-slider .tw-relative[style*="border-color"] {
 
 /* 5. תיקון הטקסט - שלא ייחתך בתוך הקופסה */
 html body #sl-inner-instruction-slider p.tw-m-0 {
-    font-size: 11px !important;
+    font-size: 12.5px !important;   /* 23.10: היה 11px */
     line-height: 1.2 !important;
     font-weight: 800 !important;
     white-space: normal !important;
@@ -856,7 +867,19 @@ html body #sl-inner-instruction-slider p.tw-m-0 {
 
 /* 1. קונטיינר חיצוני ([data-v-77884587]) — הוסר 22.10 (מת: hash של Vue שכבר לא קיים בבילד). ההיסטוריה ב-git. */
 
-/* 2. כותרת הסקשן - יישור לימין ושיפור נוכחות */
+/* 2. כותרת הסקשן - יישור לימין ושיפור נוכחות.
+   23.10 (ליטוש p2): כל כותרות הכרטיסים בצ'ק-אאוט באותו סגנון — "הוראות לשליח", "טיפ לשליח", "סוג הזמנה" (אקספרס) היו 12px
+   דקות כמו כיתוב, ליד "סוג הזמנה" (משלוח) ו"מועד המשלוח" (חלק 56) המודגשות. רק הגופן — המרווחים של Hyperzod נשארים.
+   בלי "סוג הזמנה" של #mbOrderTypeSelect — הבעלים שלו הוא הכלל שמתחת (כבר 15 מודגש), כלל אחד לכל כותרת. */
+html body #checkout h2.tw-text-xs.tw-font-medium:not(#mbOrderTypeSelect h2) {
+    font-size: 15px !important;
+    font-weight: 800 !important;
+    line-height: 1.35 !important;
+    letter-spacing: 0 !important;
+    text-transform: none !important;
+    color: #111 !important;
+    text-wrap: balance !important;   /* "טיפ לשליח האלוף שלך? (בתשלום באשראי בלבד)" — בטלפון צר נשבר לשתי שורות מאוזנות, לא "(בלבד)" לבד */
+}
 #mbOrderTypeSelect h2 {
     color: #1a1a1a !important;
     font-size: 15px !important;
@@ -929,9 +952,9 @@ html body #sl-inner-instruction-slider p.tw-m-0 {
 
 /* כותרת קטנה מעל הטבלה */
 #summary span.tw-text-black.tw-uppercase {
-    font-size: 11px !important;
-    letter-spacing: 0.5px !important;
-    color: #888 !important; /* צבע ניטרלי לכותרת משנית */
+    font-size: 12.5px !important;   /* 23.10: היה 11px */
+    letter-spacing: 0 !important;
+    color: #6b7280 !important; /* צבע ניטרלי לכותרת משנית (23.10: #888 → קריא יותר) */
     font-weight: 700 !important;
     margin-bottom: 8px !important;
     display: block !important;
@@ -945,6 +968,12 @@ html body #sl-inner-instruction-slider p.tw-m-0 {
 
 #summary svg path {
     fill: #e31e24 !important; /* צבע מותג לאייקון הקבלה */
+}
+/* 23.10 (ליטוש p2): הסכום — אדום ומודגש, כמו בחלונית "פרטי חשבון" (§3) וכמו כל מחיר באתר (היה שחור 14). הסכום עצמו — בלי שינוי. */
+html body #summary table.summary-card td.text-end > span.tw-font-semibold {
+    font-size: 16px !important;
+    font-weight: 800 !important;
+    color: #c8151b !important;
 }
 
 /* 2. עיצוב ה-Bottom Sheet (החלונית שנפתחת) — הקליפה הכללית של כל חלונית תחתונה.
@@ -1145,7 +1174,7 @@ html body #payment-card .payment-method[data-test-id$="-cod"]:is(.mh-pay-on, :ha
 /* 2. סרגל ביצוע ההזמנה הצף (The Floating Island) */
 .place-order {
     position: fixed !important;
-    bottom: 30px !important; /* ציפה מעל התחתית */
+    bottom: 18px !important; /* ציפה מעל התחתית. 23.10 (ליטוש p2): היה 30 — סרגל הניווט (חלק 52, תחתית 18) הציץ מתחת לסרגל ההזמנה כ"כרטיס שני" */
     left: 0 !important;
     right: 0 !important;
     margin: auto !important;
@@ -1163,6 +1192,8 @@ html body #payment-card .payment-method[data-test-id$="-cod"]:is(.mh-pay-on, :ha
     flex-direction: column !important;
     gap: 8px !important;
 }
+
+html.mh-android-app body .place-order { bottom: 30px !important; }   /* אנדרואיד: הסרגל מורם (חלק 52) ומוסתר גם כך — בלי שינוי */
 
 /* 3. כרטיס הכתובת בתוך הסרגל הצף */
 #AddressCard {
@@ -1235,6 +1266,22 @@ html body .place-order .add-address-btn:active { transform: scale(0.98) !importa
     font-weight: 800 !important;
     letter-spacing: 0.5px !important;
 }
+/* 23.10 (ליטוש p2): (א) מחשב — "בצע הזמנה" (#OrderPlaceButton) היה מלבן אדום שטוח בפינות 4 וטקסט 14, כשבנייד אותו כפתור בגרדיאנט;
+   (ב) עגלה ריקה — "התחל קנייה" אדום שטוח בפינות 8. עכשיו כמו כל כפתורי הפעולה. כבוי — בלי גרדיאנט; האפור של קפית (חלק 42) גובר — אותה ספציפיות ומאוחר יותר בקובץ. */
+html body #CartCard #OrderPlaceButton,
+html body #checkout > .hpz-page-surface > .tw-max-w-\[320px\] > .v-btn.bg-button_normal {
+    height: 52px !important;
+    border-radius: 16px !important;
+    font-size: 16px !important;
+    font-weight: 800 !important;
+    letter-spacing: 0 !important;
+}
+html body #CartCard #OrderPlaceButton:not(.v-btn--disabled),
+html body #checkout > .hpz-page-surface > .tw-max-w-\[320px\] > .v-btn.bg-button_normal {
+    background: linear-gradient(135deg, #ff3b41 0%, #c8151b 100%) !important;
+    box-shadow: 0 10px 26px rgba(227, 30, 36, 0.28) !important;
+}
+html body #checkout > .hpz-page-surface > .tw-max-w-\[320px\] > .v-btn.bg-button_normal .v-btn__content { font-size: 16px !important; font-weight: 800 !important; }
 
 /* עיצוב הטקסט בתוך הכפתור (סה"כ לתשלום): ".tw-text-\[10px\]" ו-".tw-text-xs.tw-text-uppercase" — הוסרו 23.10 (מתים: בתבנית
    הכפתור של היום אין tw-text-[10px], והמחיר הוא "tw-text-base tw-text-uppercase" — בלי tw-text-xs). ההיסטוריה ב-git. */
@@ -1255,9 +1302,9 @@ html body .place-order .add-address-btn:active { transform: scale(0.98) !importa
 /* 2. הדר אישור הזמנה (Sticky Order Header).
    23.10 (ניקוי 2): היה ".native-top-notch-padding" גלובלי — Hyperzod שמה את המחלקה גם על #AppBar וגם על סקשן "Product Banners"
    (#HomePageBanners, שיש בו h1 כשמוגדרת כותרת) — הכותרת של באנר הייתה מתחלפת ב"פרטי הזמנה" ומקבלת זכוכית וקו אדום.
-   עכשיו רק ההדר של פרטי ההזמנה (.scheme-order-tracking-header, במובייל) ו-#AppBar (שם הכלל חל היום: ריפוד 15 מתחת ו-blur — נשמר
-   בדיוק כמו שהוא). :where() משאיר את הספציפיות (0,1,0)/(0,1,1) כמו קודם — אותו מנצח בכל מקום. */
-:where(.scheme-order-tracking-header, #AppBar).native-top-notch-padding {
+   עכשיו רק ההדר של פרטי ההזמנה (.scheme-order-tracking-header, במובייל). :where() משאיר את הספציפיות (0,1,0)/(0,1,1) כמו קודם.
+   מה שהכלל עשה ל-#AppBar (ריפוד 15 מתחת + blur; הרקע והקו תמיד נדרסו שם) עבר לבעלים של #AppBar — חלק 2+3 §2 (23.10, ליטוש p2). */
+:where(.scheme-order-tracking-header).native-top-notch-padding {
     background: rgba(255, 255, 255, 0.6) !important;
     backdrop-filter: blur(40px) saturate(200%) !important;
     -webkit-backdrop-filter: blur(40px) saturate(200%) !important;
@@ -2196,6 +2243,81 @@ html body .v-overlay__content.v-bottom-sheet__content:has(.v-card.tw-pt-0.tw-bor
 /* 15. ניקוי overlays של Vuetify בכפתורים — הוסר 23.10: כפילות של "4. ניקוי לוגי" בראש הקובץ. */
 
 /* =========================================================
+   חלק 30ב: העגלה של עסק אחד — MH Cart v1.0.0 | 2026-10-23 (ליטוש)
+   הבעלים של: (א) הכפתור הצף "המשך לתשלום • N" בדף העסק (.merchant-page > button.v-btn--fixed, נייד ואפליקציה);
+   (ב) העגלה עצמה — .scheme-cart-panel (חלונית באפליקציה/נייד, מגירה במחשב): שורות המוצרים, "המשך לתשלום", ה-X, עגלה ריקה.
+   עד היום בלי עיצוב שלנו: שם המוצר ומחירו 11.75px, כפתור אדום שטוח בפינות 8 (כל שאר כפתורי הפעולה בגרדיאנט),
+   ה-X 10px מתחת לכותרת, ו"NO ITEMS IN CART" באנגלית בתוך התמונה של עגלה ריקה. טקסטים, סכומים והתנהגות — של Hyperzod.
+   ========================================================= */
+/* (א) הכפתור הצף בדף העסק — הגרדיאנט והזוהר של "הוספה" במקום אדום שטוח עם צל אפור של Material. הגודל והמקום לא השתנו (חלק 45 מודד אותו) */
+html body .merchant-page > button.v-btn.v-btn--fixed.rounded-pill.bg-button_normal {
+    background: linear-gradient(135deg, #ff3b41 0%, #c8151b 100%) !important;
+    box-shadow: 0 10px 26px rgba(227, 30, 36, 0.32), 0 2px 6px rgba(0, 0, 0, 0.08) !important;
+    font-weight: 800 !important;
+}
+/* (ב1) שורת מוצר: שם ומחיר קריאים (היו 11.75px), תמונה בפינות 12 וכרטיס בפינות 16 עם קו דק — כמו שורות המוצרים בצ'ק-אאוט (חלק 50) */
+html body .v-bottom-sheet__content > .scheme-cart-panel #cartItems2 {   /* חלונית בלבד: במגירה של המחשב הרשימה לבנה על לבן מקצה לקצה — בלי מסגרת */
+    border-radius: 16px !important;
+    border: 1px solid #eef0f3 !important;
+    box-shadow: none !important;
+}
+html body .scheme-cart-panel .cart-item .product-name {
+    font-size: 14.5px !important;
+    font-weight: 700 !important;
+    line-height: 1.35 !important;
+    color: #111 !important;
+}
+html body .scheme-cart-panel .cart-item .product-price {
+    font-size: 14px !important;
+    font-weight: 800 !important;
+    color: #c8151b !important;   /* מחיר — אדום, כמו בכל האתר (תיקון השופטים: לא מבליטים מחיר שחור) */
+}
+/* "שינוי תוספות" — אדום המותג עם קו, כמו בצ'ק-אאוט (חלק 50), במקום הכחול של Hyperzod */
+html body .scheme-cart-panel .cart-item .product-price > span.tw-cursor-pointer {
+    color: #c8151b !important;
+    font-size: 12px !important;
+    font-weight: 700 !important;
+    text-decoration: underline !important;
+    text-decoration-color: rgba(200, 21, 27, 0.3) !important;
+    text-underline-offset: 3px !important;
+}
+html body .scheme-cart-panel .cart-item .product-image {
+    border-radius: 12px !important;
+    box-shadow: 0 0 0 1px rgba(17, 17, 17, 0.06) !important;
+}
+/* (ב2) "המשך לתשלום" — גרדיאנט QLED, פינות 16 וזוהר, כמו "הוספה" בחלון המוצר ו"המשך לתשלום" ב"ייתכן שתאהבו גם" (חלק 64); טקסט 14–15 (היה 12) */
+html body .scheme-cart-panel .scheme-cart-checkout-action {
+    background: linear-gradient(135deg, #ff3b41 0%, #c8151b 100%) !important;
+    border-radius: 16px !important;
+    box-shadow: 0 10px 26px rgba(227, 30, 36, 0.28) !important;
+}
+html body .scheme-cart-panel .scheme-cart-checkout-summary .tw-text-sm { font-size: 14px !important; font-weight: 700 !important; }
+html body .scheme-cart-panel .scheme-cart-checkout-label { font-size: 15px !important; font-weight: 800 !important; letter-spacing: 0 !important; }
+/* טלפון צר (375/360): "12 פריטים | ₪1,234.00" + "המשך לתשלום" ב-14/15 נגעו זה בזה (360: רווח 1px) או ירדו לשתי שורות — 13/14 נשאר בשורה אחת (נמדד: 360 → 6px, 375 → 21px) */
+@media (max-width: 389px) {
+    html body .scheme-cart-panel .scheme-cart-checkout-summary .tw-text-sm { font-size: 13px !important; }
+    html body .scheme-cart-panel .scheme-cart-checkout-label { font-size: 14px !important; }
+}
+/* (ב3) ה-X: בחלונית הקליפה הכללית (8z §2) נותנת לכותרת ריפוד תחתון 20 — ה-X (ממורכז לגובה הכותרת) ישב 10px מתחת ל"עגלה". ריפוד סימטרי + הבועה של שאר החלוניות (12ג) */
+html body .v-bottom-sheet__content > .scheme-cart-panel > .v-card-title { padding: 10px 0 !important; }
+html body .scheme-cart-panel .scheme-cart-close {
+    width: 36px !important;
+    height: 36px !important;
+    border-radius: 50% !important;
+    background: rgba(255, 255, 255, 0.9) !important;
+    border: 1px solid rgba(227, 30, 36, 0.1) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
+}
+/* שטח לחיצה 44 בלי שינוי נראה (כמו ה-X בשאר החלוניות, 12ג §1): 36 + 4 מכל צד (+ המסגרת 1px). ה-::after תפוס (טבעת הפוקוס של Vuetify) */
+html body .scheme-cart-panel .scheme-cart-close::before { content: "" !important; position: absolute !important; inset: -5px !important; background: transparent !important; }
+/* (ב4) עגלה ריקה: התמונה של Hyperzod (pan-Up2JpR_g.png, 800×600) כוללת "NO ITEMS IN CART" באנגלית מתחת לעגלה — מציגים רק את העגלה
+   (שורות 100–392 מתוך 600; 36.6% = 292/800), והכותרת העברית שמתחתיה בולטת. תמונה אחרת — בלי חיתוך: הסלקטור כולל את ה-hash של הקובץ (Vite — תוכן אחר = שם אחר), אז ציור חדש לא ייחתך בקווים של הישן. */
+html body .scheme-cart-panel .v-img:has(> img[src*="/assets/pan-Up2JpR_g."]) > .v-responsive__sizer { padding-bottom: 36.6% !important; }
+html body .scheme-cart-panel .v-img:has(> img[src*="/assets/pan-Up2JpR_g."]) > img { object-fit: cover !important; object-position: 50% 32.5% !important; }
+html body .scheme-cart-panel .v-img:has(> img[src*="/assets/pan-Up2JpR_g."]) + .text-center { font-size: 18px !important; font-weight: 800 !important; color: #111 !important; }
+/* mh-cart-v1 */
+
+/* =========================================================
    חלקים 29, 29.1, "Fix: Search Results Container Collapse", 26 (תוצאות חיפוש כתובת) ו-27 (עיצוב פרימיום לתוצאות) — הוסרו.
    הוחלף במלואו ע"י "חלק 44: MH AddrEditor" בסוף הקובץ (22.9.2026). ההיסטוריה ב-git.
    ========================================================= */
@@ -2237,6 +2359,25 @@ html body #AppBar.bg-header_bg {
     background: transparent !important;
     box-shadow: none !important;
     border: none !important;
+}
+/* #AppBar עם .native-top-notch-padding (Hyperzod שמה אותה כשאין פס הודעה — אפליקציה, נייד, מחשב): ריפוד 15 מתחת + blur.
+   עבר לכאן מחלק 11 (23.10, ליטוש p2) — בעלים אחד ל-#AppBar. :where() = אותה ספציפיות (0,1,0) כמו שם, ולכן body.mh-scrolled
+   ו-@media שמתחת גוברים בדיוק כמו קודם (נבדק: אין כלל אחר באמצע שנוגע בזה) */
+:where(#AppBar).native-top-notch-padding {
+    backdrop-filter: blur(40px) saturate(200%) !important;
+    -webkit-backdrop-filter: blur(40px) saturate(200%) !important;
+    padding-bottom: 15px !important;
+}
+/* מחשב: הסרגל הקבוע (#AppBar) צף מעל התוכן — זכוכית לבנה. עד p2 (23.10) הוא היה שקוף לגמרי, וה-blur 40 + saturate 200%
+   (הכלל שלמעלה; עד 23.10 בדליפה מחלק 11, ראש פרטי ההזמנה) — מתחת לסרגל נמרחו צבעי האוכל
+   (כתום/אדום/חום) והטקסט "סינון · התחברות · העגלה שלי" ישב עליהם. כאן: לבן 80% + blur — נשאר זכוכית, נקרא על כל רקע */
+@media (min-width: 900px) {
+    html body #AppBar,
+    html body #AppBar.bg-header_bg {
+        background: rgba(255, 255, 255, 0.8) !important;
+        -webkit-backdrop-filter: blur(24px) saturate(160%) !important;
+        backdrop-filter: blur(24px) saturate(160%) !important;
+    }
 }
 
 html body #MultiVendorHeader .v-toolbar__content {
@@ -2737,6 +2878,23 @@ html body .v-bottom-sheet__content:has(#Phone) #Phone #mh-terms-row{
 html body .v-bottom-sheet__content:has(#Phone) #Phone #mh-terms-link{
   color:#e31e24 !important;font-weight:800 !important;text-decoration:underline !important;
   cursor:pointer !important;white-space:nowrap !important;}
+/* 23.10 (ליטוש p2): (1) משטח אחד — הכרטיס הפנימי קיבל מהקליפה הכללית (8z) פינות 32 וצל משלו בתוך החלונית (פינות 28):
+   "כרטיס בתוך כרטיס" עם הילה אפורה בפינות. (2) שורת ה-X: 8z ריפדה אותה (20 + קו + 20) ודרסה את ה-tw--mb-5 של Hyperzod —
+   פס ריק של ~120px עם קו מתחת ל-X, וה-overflow:hidden של השורה חתך את צד הבועה. עכשיו ה-X למעלה, בלי קו, והבועה שלמה. */
+html body .v-bottom-sheet__content:has(#Phone) > .v-card{
+  border-radius:inherit !important;box-shadow:none !important;padding-top:8px !important;
+  -webkit-backdrop-filter:none !important;backdrop-filter:none !important;}   /* החלונית אטומה — הטשטוש רק צייר הילה בפינות */
+html body .v-bottom-sheet__content:has(#Phone) > .v-card > .v-card-text > .v-card-title{
+  padding:0 !important;margin:8px 0 -20px !important;border-bottom:0 !important;overflow:visible !important;}
+/* שלב קוד האימות (גם בדף הפתיחה #WelcomePage): (3) המספר הוצג הפוך — "500000000 972+" (מספר בתוך משפט RTL) — עכשיו "+972 500000000".
+   (4) "שינוי" ו"כניסה עם סיסמה"/"שכחת סיסמה" היו בכחול של Hyperzod — עכשיו באדום הכהה של הקישורים באתר. טקסטים והתנהגות — בלי שינוי. */
+:is(html body #WelcomePage, html body .v-bottom-sheet__content:has(#Phone)) #Phone #loginEmail{
+  direction:ltr !important;text-align:right !important;
+  padding-right:16px !important;padding-left:6px !important;}   /* הריפוד של ה-RTL (16 מימין, 6 ליד "שינוי") — ltr הפך אותו, והמספר נצמד לקו הימני. עכשיו על קו אחד עם "הזן את הקוד שקיבלת" */
+:is(html body #WelcomePage, html body .v-bottom-sheet__content:has(#Phone)) #Phone span.tw-text-black.tw-font-semibold{
+  direction:ltr !important;unicode-bidi:isolate !important;}
+:is(html body #WelcomePage, html body .v-bottom-sheet__content:has(#Phone)) #Phone :is(.tw-text-\[\#0671E3\], .v-field__append-inner .v-btn){
+  color:#c8151b !important;caret-color:#c8151b !important;}
 
 /* === חלק 35 | אנימציית פעימה בכפתור התחברות אוטומטית | 2026-06-27 ===
    מופעלת ע"י class "mh-auto-press" שמוזרק ב-custom-footer.js ברגע הלחיצה
@@ -2771,26 +2929,35 @@ html body #CurrentLocationBtn svg:first-child path {
     fill: #e31e24 !important;
 }
 
-/* --- מסך 3: חלונית "מיון ומסננים" (scoped ל-.filter-sheet בלבד) --- */
-html body .filter-sheet .filter-sheet__title {
+/* --- מסך 3: חלונית "מיון ומסננים" — בנייד גיליון (.filter-sheet), במחשב מגירה; לשניהם .scheme-filter-panel (p2 23.10:
+   עד אז רק .filter-sheet, ובמחשב הכול נשאר של Hyperzod — רדיו שחור, X שחור, "סנן" אדום שטוח).
+   הנבחר באדום ולא בשחור (כמו "נבחר" בשאר האתר): פס הלשונית, שמה, הנקודה של לשונית עם בחירה, ריבוע הסימון.
+   הכפתורים כמו שאר כפתורי הפעולה (p1): 50 גובה, פינות 14, מודגש, הגרדיאנט של האתר --- */
+html body .scheme-filter-panel .filter-sheet__title {
     color: #1a1a1a !important;
     font-weight: 800 !important;
 }
-html body .filter-sheet #closeFilter .v-icon {
+html body .scheme-filter-panel #closeFilter .v-icon {
     color: #e31e24 !important;
 }
-html body .filter-sheet .v-selection-control--dirty,
-html body .filter-sheet .v-selection-control--dirty .v-icon {
+html body .scheme-filter-panel .v-selection-control--dirty,
+html body .scheme-filter-panel .v-selection-control--dirty .v-icon {
     color: #e31e24 !important;
 }
-html body .filter-sheet .v-btn--variant-flat {
-    background: linear-gradient(135deg, #e31e24 0%, #b3161b 100%) !important;
+html body .scheme-filter-panel .scheme-filter-active-indicator { background: #e31e24 linear-gradient(180deg, #ff3b41 0%, #c8151b 100%) !important; border-radius: 999px !important; }
+html body .scheme-filter-panel .scheme-filter-tab--active span:last-child { color: #c8151b !important; }
+html body .scheme-filter-panel .scheme-filter-tab span.tw-rounded-full[class*="tw-bg-[#1a1a1a]"] { background-color: #e31e24 !important; }
+html body .scheme-filter-panel .scheme-filter-checkbox[class*="tw-bg-[#1a1a1a]"] { background-color: #e31e24 !important; border-color: #e31e24 !important; }
+html body .scheme-filter-panel .scheme-filter-footer .v-btn { height: 50px !important; border-radius: 14px !important; font-size: 15px !important; font-weight: 700 !important; letter-spacing: 0 !important; }
+html body .scheme-filter-panel .scheme-filter-footer .v-btn--variant-flat {
+    background: linear-gradient(135deg, #ff3b41 0%, #c8151b 100%) !important;
     color: #ffffff !important;
-    box-shadow: 0 6px 16px rgba(227, 30, 36, 0.28) !important;
+    box-shadow: 0 8px 20px rgba(227, 30, 36, 0.28) !important;
 }
-html body .filter-sheet .v-btn--variant-outlined {
+html body .scheme-filter-panel .scheme-filter-footer .v-btn--variant-outlined {
     border: 1.5px solid rgba(227, 30, 36, 0.5) !important;
-    color: #e31e24 !important;
+    background: #ffffff !important;
+    color: #c8151b !important;
 }
 
 /* --- מסך 4: דף תוצאות הסינון (תחום ל-#merchants_by_category) --- */
@@ -2798,8 +2965,27 @@ html body #merchants_by_category .back-btn svg path {
     fill: #e31e24 !important;
 }
 html body #merchants_by_category .back-btn svg { transform: scaleX(-1) !important; }   /* 9.10: ב-RTL "חזרה" מצביע ימינה (Apple HIG); גם הדף שנפתח מ"הכול" באוספי הבית */
+/* גלולות הסינון מעל התוצאות — אותה גלולה כמו בשני החיפושים (p1 §7): עגולה, קו חם; מה שנבחר (Hyperzod צובעת את הקו
+   inline ב-!important = rgb(33,33,33)) — קו אדום, רקע ורוד, טקסט אדום, והמונה אדום ולא שחור (p2 23.10; היו מלבנים
+   עם פינות 12, נבחר בשחור). הקו והצבע של Hyperzod inline+!important — לכן הקו מצויר ב-box-shadow והצבע על הילדים */
 html body #merchants_by_category .hide-scrollbar .v-btn {
-    border-radius: 12px !important;
+    border-radius: 999px !important;
+    border-width: 0 !important;
+    background: #ffffff !important;
+    box-shadow: inset 0 0 0 1px #e6e2dd !important;
+    font-weight: 600 !important;
+    letter-spacing: 0 !important;
+}
+html body #merchants_by_category .hide-scrollbar .v-btn[style*="border-color: rgb(33, 33, 33)"] { background: #fff5f5 !important; box-shadow: inset 0 0 0 1px #e31e24 !important; }
+html body #merchants_by_category .hide-scrollbar .v-btn[style*="border-color: rgb(33, 33, 33)"] .v-btn__content > :is(span.tw-truncate, i.v-icon) { color: #c8151b !important; }
+html body #merchants_by_category .hide-scrollbar .v-btn[style*="border-color: rgb(33, 33, 33)"] .v-btn__content > svg .icon-stroke { stroke: #c8151b !important; }   /* אייקון הסינון: stroke קשיח של Hyperzod */
+html body #merchants_by_category .hide-scrollbar .v-btn span[class*="tw-bg-[#212121]"] { background: #e31e24 !important; color: #ffffff !important; margin-inline: 0 6px !important; }   /* tw-mr-1.5 של Hyperzod = בצד הלא נכון ב-RTL — המונה נגע במילה */
+/* "ניקוי": קישור אדום כמו שאר הקישורים, ומטרת לחיצה של 44 (היה 23×20) בלי להזיז את השורה */
+html body #merchants_by_category .hide-scrollbar + div > button.tw-underline { position: relative !important; color: #c8151b !important; font-weight: 700 !important; text-underline-offset: 3px !important; }
+html body #merchants_by_category .hide-scrollbar + div > button.tw-underline::before { content: "" !important; position: absolute !important; inset: -12px -12px !important; }
+/* מחשב: כותרת הדף (שם האוסף / "תוצאות מסוננות") בקול של כותרות דף הבית, ולא צמודה לסרגל העליון (היה 20px רגיל, 9px מתחתיו) */
+@media (min-width: 900px) {
+    html body #merchants_by_category h1.text-h6 { padding-top: 22px !important; font-family: "Noto Sans Hebrew", -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif !important; font-stretch: 75% !important; font-size: 30px !important; font-weight: 800 !important; line-height: 1.15 !important; color: #111 !important; letter-spacing: 0 !important; }
 }
 /* ".hide-scrollbar .tw-bg-\[#212121\]" (מונה אדום בגלולות הסינון) — הוסר 23.10 (מת: ה-# לא מוברח ו-"#212121]" מתחיל בספרה →
    סלקטור לא חוקי, הדפדפן זורק את הכלל כולו; אומת ב-WebKit וב-Chrome). ההיסטוריה ב-git. */
@@ -3737,7 +3923,7 @@ html body .product-popup .scheme-product-options-card .v-list-item {
     background: #ffffff !important;
     border: 1.5px solid #e6e8ec !important;
     border-radius: 14px !important;
-    margin: 0 14px 10px !important;
+    margin: 0 4px 10px !important;   /* 23.10 (ליטוש): 4 + tw-mx-3 (12) = 16 — באותו קו עם התמונה וכותרת הקבוצה (היה 26) */
     padding: 12px 14px !important;
     min-height: 56px !important;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03) !important;
@@ -3817,6 +4003,7 @@ html body .product-popup .scheme-product-options-card .v-selection-control__inpu
     width: 24px !important;
     height: 24px !important;
     min-width: 0 !important;
+    min-height: 0 !important;   /* 23.10 (ליטוש): Vuetify נותנת לצ'קבוקס min-height 40 (לרדיו לא) — שורת צ'קבוקס יצאה 66 ושורת רדיו 56 */
     flex: 0 0 24px !important;
 }
 html body .product-popup .scheme-product-options-card .v-selection-control__input {
@@ -4122,7 +4309,7 @@ html body .product-popup .v-carousel__controls .v-btn--active { color: #e31e24 !
 /* 5. זהות המוצר — קטגוריה כתג, שם גדול, מחיר אדום QLED, תיאור */
 html body .product-popup #productInfo {
     text-align: right !important;
-    padding: 18px 18px 6px !important;
+    padding: 18px 0 6px !important;   /* 23.10 (ליטוש): ההורה (tw-px-4) כבר נותן 16 — עם 18 נוספים השם והמחיר ישבו 34 מהקצה, והתמונה וכותרות הקבוצות ב-16 */
 }
 html body .product-popup .product-category-name {
     display: inline-block !important;
@@ -4169,6 +4356,8 @@ html body .product-popup .product-price small.tw-line-through {
 html body .product-popup #ProductDescription .tw-text-primary {
     color: #c8151b !important;
     font-weight: 700 !important;
+    white-space: nowrap !important;          /* 23.10: "ראה" בסוף שורה ו"עוד" לבד בשורה הבאה (ספארי) — עוברים יחד */
+    margin-inline-start: 3px !important;     /* "...ראה עוד" היה צמוד לשלוש הנקודות */
 }
 html body .product-popup .product-description {
     color: #555555 !important;
@@ -4178,7 +4367,7 @@ html body .product-popup .product-description {
     margin: 6px 0 0 !important;
 }
 html body .product-popup hr.v-divider {
-    margin: 12px 18px 0 !important;
+    margin: 12px 16px 0 !important;
     border-color: rgba(227, 30, 36, 0.10) !important;
     opacity: 1 !important;
 }
@@ -6803,7 +6992,7 @@ html body #checkout #cartItems .cart-item .product-price {
     gap: 2px 10px !important;
     font-size: 13.5px !important;
     font-weight: 800 !important;
-    color: #111 !important;
+    color: #c8151b !important;   /* 23.10 (ליטוש p2): היה #111 — מחיר אדום כמו בכל האתר ובעגלה (חלק 30ב) */
 }
 /* "שינוי תוספות" — אדום המותג במקום הכחול של Hyperzod */
 html body #checkout #cartItems .cart-item .product-price > span.tw-cursor-pointer {
@@ -7819,6 +8008,8 @@ html body [id="MerchantCollection"] { margin: 30px 0 !important; }
 html body [id="MerchantCollection"] > div:first-child { margin: 0 16px 12px !important; }
 /* כותרות הסקשנים באותה משפחה של ההירו (Noto Sans Hebrew צר) — דף אחד, קול אחד. הפונט נטען ב-JS (MH Collections) רק בדף הבית */
 html body [id="MerchantCollection"] h1 { font-family: "Noto Sans Hebrew", -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif !important; font-stretch: 75% !important; font-size: 24px !important; font-weight: 800 !important; line-height: 1.1 !important; color: #111 !important; letter-spacing: 0 !important; }
+/* כותרת ארוכה נשברת לשתי שורות מאוזנות — בלי אימוג'י (או מילה) לבד בשורה השנייה (p2 23.10: "פלאפל בורקס ושאר תענוגות" / "✨") */
+html body [id="MerchantCollection"] h1 { text-wrap: balance !important; }
 html body [id="MerchantCollection"][data-mh-emoji-desc] h1::after { content: attr(data-mh-emoji) !important; display: inline-block !important; white-space: nowrap !important; margin-inline-start: 6px !important; font-size: 17px !important; font-weight: 400 !important; letter-spacing: 1px !important; }
 html body [id="MerchantCollection"][data-mh-emoji-desc] > div:first-child > p { display: none !important; }
 html body [id="MerchantCollection"] > div:first-child > p { margin-top: 2px !important; font-size: 13.5px !important; color: #6b7280 !important; }
@@ -7898,6 +8089,9 @@ html body #merchants_by_category .merchant-card .cover-img { aspect-ratio: 16 / 
    ========================================================= */
 html body [id="ProductHighlights"] { margin-top: 26px !important; margin-bottom: 18px !important; min-height: 0 !important; }
 html body [id="ProductHighlights"] > div:first-child { margin-bottom: 6px !important; }
+/* גובה התא = הכרטיס. Hyperzod קובעת תא קבוע (טלפון 140×232, מחשב 192×326) לכרטיס נמוך ממנו → חור לבן מתחת לכל שורה
+   (p2 23.10: בטלפון ~100px מתחת למחיר, ~150px עד הכותרת הבאה — פי 4 מהרווח בין אוספי העסקים). התמונה בגובה קבוע, אז אין קפיצה בטעינה */
+html body [id="ProductHighlights"] .slider-inner-container > div > div[class*="tw-h-"] { height: auto !important; }
 html body [id="ProductHighlights"] > div:first-child h1 { margin-inline-start: 16px !important; padding-top: 0 !important; font-family: "Noto Sans Hebrew", -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif !important; font-stretch: 75% !important; font-size: 24px !important; font-weight: 800 !important; line-height: 1.1 !important; color: #111 !important; text-transform: none !important; letter-spacing: 0 !important; }
 html body [id="ProductHighlights"] > div:first-child > span { display: inline-flex !important; align-items: center !important; gap: 2px !important; margin-inline-start: 16px !important; font-size: 13.5px !important; font-weight: 600 !important; color: #6b7280 !important; }
 html body [id="ProductHighlights"] > div:first-child > span::after { content: "" !important; width: 14px !important; height: 14px !important; background: currentColor !important;
@@ -7906,7 +8100,6 @@ html body [id="ProductHighlights"] > div:first-child > span::after { content: ""
 @media (min-width: 900px) {
     html body [id="ProductHighlights"] > div:first-child h1, html body [id="ProductHighlights"] > div:first-child > span { margin-inline-start: 28px !important; }
     html body [id="ProductHighlights"] > div:first-child h1 { font-size: 30px !important; }
-    html body [id="ProductHighlights"] .slider-inner-container > div > div[class*="tw-h-"] { height: auto !important; }   /* תא 326px לכרטיס של ~220 */
     /* סקשני הקידום: אותו יחס, רוחב של "באנר" ולא של מסך */
     html body :is(#mh-home-dalia, #mh-home-katsefet, #mh-soon-goa) { max-width: 920px !important; margin: 30px auto !important; }
 }
