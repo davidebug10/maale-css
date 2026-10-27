@@ -745,6 +745,43 @@ html body #sl-inner-instruction-slider p.tw-m-0 {
 
 /* 6. הסרת אלמנטים חוסמים (.v-card__underlay) — הוסר 23.10: כפילות של "4. ניקוי לוגי" בראש הקובץ. */
 
+/* 7. MH AgeDoor v1.0.0 (27.10, דוד: "לחסום את 'תשאיר על יד הדלת' כשמזמינים אלכוהול או סיגריות" — הזמנה 2833 מגואה).
+   ה-JS (MH AgeDoor ב-custom-footer.js) שם data-mh-agedoor על כפתור "ליד הדלת" רק בצ'ק-אאוט של עגלת 18+
+   (חנויות/קטגוריות של MH AgeGate), ו-data-mh-agedoor-hint על שורש האזור. בלי ה-JS — אין מאפיינים ואין שינוי.
+   הכפתור: אפור כמו כפתור "בצע הזמנה" החסום של קפית (חלק 42), בלי קפיצה/מסגרת אדומה גם אם הספיק להיבחר לרגע.
+   ספציפיות (1,3,2) — גוברת על פריטים 3–4 בלי תלות בסדר. */
+html body #sl-inner-instruction-slider .scheme-checkout-instruction.tw-relative[data-mh-agedoor] {
+    background: #e8e5e1 !important;
+    border: 1px solid rgba(0, 0, 0, 0.06) !important;
+    transform: none !important;
+    box-shadow: none !important;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+    cursor: not-allowed !important;
+}
+html body #sl-inner-instruction-slider .scheme-checkout-instruction.tw-relative[data-mh-agedoor] p.tw-m-0 { color: #8a8580 !important; }
+html body #sl-inner-instruction-slider .scheme-checkout-instruction.tw-relative[data-mh-agedoor] .v-img { opacity: 0.45 !important; filter: grayscale(1) !important; }
+html body #checkout [data-mh-agedoor-hint]::after {
+    content: "בהזמנה עם מוצרי 18+ השליח חייב לראות תעודה מזהה — אי אפשר להשאיר ליד הדלת" !important;
+    display: block !important;
+    margin: 2px 12px 0 !important;
+    font-size: 13px !important;
+    font-weight: 700 !important;
+    line-height: 1.4 !important;
+    letter-spacing: 0 !important;
+    text-transform: none !important;
+    text-wrap: balance !important;
+    color: #c8151b !important;
+}
+/* לחיצה על הכפתור החסום — השורה "מהבהבת" פעם אחת (ה-JS שם data-mh-agedoor-nudge ל-0.9 שניות) */
+html body #checkout [data-mh-agedoor-hint][data-mh-agedoor-nudge]::after { animation: mhAgeDoorNudge 0.85s ease 1 !important; }
+@keyframes mhAgeDoorNudge {
+    0%, 100% { opacity: 1; transform: none; }
+    30% { opacity: 0.35; transform: translateX(-3px); }
+    60% { opacity: 1; transform: translateX(3px); }
+}
+/* mh-agedoor-v1 */
+
 
 
 /* --- חלק 8ה׳: אזור הטיפ - גרסת ה-Liquid Glass המזוקקת (ללא שכפולים) --- */

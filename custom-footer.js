@@ -7260,4 +7260,186 @@ log('פעיל');
   /* mh-storesearch-v1 */
 })();
 
+/* ============================================================
+   "תשאיר על יד הדלת" חסום בהזמנה עם מוצרי 18+ — MH AgeDoor  |  v1.0.0 | 2026-10-27
+   הבעיה (דוד 27.10, הזמנה 2833 מגואה — סיגריות עם "תשאיר על יד הדלת"): השליח חייב לראות תעודה מזהה,
+   אבל הכפתור של Hyperzod ב"הוראות לשליח" זמין בכל הזמנה. הרשימה כללית לכל האתר (getBootSettings.delivery_instructions),
+   אין לה הגדרה לפי חנות, והבחירה נשמרת ב-localStorage (vuex → Cart.orderInstructions) גם להזמנה הבאה.
+   מה הבלוק עושה — רק בצ'ק-אאוט (#checkout) ורק כשהעגלה שבתשלום היא 18+:
+     - 18+ = עסק העגלה ברשימת החנויות של MH AgeGate (ageMerchants — גואה), או מוצר בעגלה ששם הקטגוריה שלו
+       ברשימת הקטגוריות של MH AgeGate (restricted). אותה רשימה כמו שער ה-18+, נקראת מחדש בכל בדיקה.
+     - "ליד הדלת" מזוהה מהנתונים (טקסט הפריסט בכל השפות: "תשאיר על יד הדלת" / "Leave at door" / contactless) — לא לפי מיקום.
+     - הכפתור מקבל data-mh-agedoor (אפור, CSS חלק 8ד פריט 7) + aria-disabled; לחיצה עליו לא בוחרת; שורת הסבר מתחת לכפתורים.
+     - כבר נבחר (נשמר מהזמנה קודמת) → לחיצה של הבלוק על הכפתור = הביטול של Hyperzod עצמה (מסך, מאגר ושמירה מסונכרנים).
+       בלי כפתורים על המסך (סוג הזמנה שבו האזור מוסתר) → מסירים מהמאגר (בטוח כשהרכיב לא טעון).
+     - שכבת ביטחון: POST /store/v1/order של עגלת 18+ שעדיין נושא "ליד הדלת" — מוסר רק הפריט הזה מ-delivery_instructions,
+       וההזמנה ממשיכה (לא חוסמים: זו בדיוק הבקשה של לקוח שביטל את הבחירה, ואין מצב "תקוע" כשהאזור מוסתר).
+       כל שאר הבקשות — עוברות כמו שהן, בלי לפתוח את הגוף מחדש.
+   נכשל-פתוח: אין MH_AGEGATE / אין מאגר / שגיאה → לא נוגעים בכלום.
+   בדיקה: window.MH_AGEDOOR.stats()
+   ============================================================ */
+(function () {
+  'use strict';
+  if (window.__MH_AGEDOOR__) { return; }
+  window.__MH_AGEDOOR__ = true;
+
+  var VERSION = '1.0.0';
+  var ATTR = 'data-mh-agedoor';            /* על הכפתור החסום (לא class: Vue מחליף className כשהבחירה משתנה) */
+  var HINT = 'data-mh-agedoor-hint';       /* על שורש האזור "הוראות לשליח" — הטקסט ב-CSS (::after) */
+  var SEL = 'scheme-checkout-instruction--selected';
+  var CHIPS = '#sl-inner-instruction-slider .scheme-checkout-instruction';
+  var IS_ORDER = /\/store\/v1\/order(\?|$)/;
+  /* "ליד הדלת" ושקולים — בכל שפה שיש לפריסט. לא "דפוק בדלת" (זה דווקא מסירה ביד). */
+  var DOOR = /(תשאיר|השאר|להשאיר|השאירו|תניח|להניח|הניחו)[^]{0,20}דלת|leave[^]{0,20}door|contactless|no[\s-]?contact|ללא מגע|בלי מגע/i;
+  var stats = { version: VERSION, scans: 0, on: false, reason: null, disabled: 0, deselected: 0, storeCleaned: 0, tapsBlocked: 0, stripped: 0, errors: 0 };
+
+  function store() { try { return document.getElementById('app').__vue_app__.config.globalProperties.$store; } catch (e) { return null; } }
+
+  function isDoor(x) {
+    if (!x) { return false; }
+    if (typeof x === 'string') { return DOOR.test(x); }
+    var t = [x.instruction, x.name];
+    (x.language_translation || []).forEach(function (l) { t.push(l && l.value); });
+    return t.some(function (s) { return typeof s === 'string' && DOOR.test(s); });
+  }
+
+  /* העגלה 18+? — לפי MH AgeGate (נקרא כל פעם; אין → false = לא נוגעים) */
+  function ageReason(cart) {
+    var A = window.MH_AGEGATE;
+    if (!A || !cart) { return null; }
+    var items = cart.cart_items || [], why = [];
+    var mid = cart.merchant_id || (items[0] && items[0].merchant_id);
+    if ((A.ageMerchants || []).indexOf(mid) !== -1) { why.push('merchant'); }
+    var R = A.restricted || [];
+    var hit = items.some(function (it) {
+      return (it && it.product_categories || []).some(function (c) {
+        var n = [c && c.name];
+        (c && c.language_translation || []).forEach(function (l) { if (l && l.key === 'name') { n.push(l.value); } });
+        return n.some(function (s) { return typeof s === 'string' && R.indexOf(s.trim()) !== -1; });
+      });
+    });
+    if (hit) { why.push('category'); }
+    return why.length ? why.join('+') : null;
+  }
+  function checkoutCart() {
+    if (!document.getElementById('checkout')) { return null; }
+    var st = store();
+    return st && st.getters.getCart;
+  }
+
+  function hintRoot() {
+    var sec = document.getElementById('slinstruction-slider');
+    var wrap = sec && sec.parentElement;              /* div.simple-slider */
+    return wrap && wrap.parentElement;                 /* שורש הרכיב order-instruction (h2 + הסליידר) */
+  }
+  function setAttr(el, name, on) {
+    if (!el || el.hasAttribute(name) === on) { return; }
+    if (on) { el.setAttribute(name, ''); } else { el.removeAttribute(name); }
+  }
+
+  function sync() {
+    stats.scans++;
+    var reason = ageReason(checkoutCart());
+    stats.on = !!reason; stats.reason = reason;
+    var st = store();
+    var boot = (st && st.getters.getBootSettings && st.getters.getBootSettings.delivery_instructions) || [];
+    var chips = document.querySelectorAll(CHIPS), any = false;
+    for (var i = 0; i < chips.length; i++) {
+      var chip = chips[i], p = chip.querySelector('p'), txt = p ? p.textContent.trim() : '';
+      /* הכפתורים מצוירים לפי סדר הרשימה; הנתונים (כל התרגומים) קובעים — ואם לא תואם, הטקסט שעל המסך */
+      var door = !!reason && (boot[i] && boot[i].instruction === txt ? isDoor(boot[i]) : isDoor(txt));
+      if (door && !chip.hasAttribute(ATTR)) { stats.disabled++; }
+      setAttr(chip, ATTR, door);
+      if (door) { chip.setAttribute('aria-disabled', 'true'); } else if (chip.getAttribute('aria-disabled') === 'true') { chip.removeAttribute('aria-disabled'); }
+      if (door) { any = true; }
+      if (door && chip.classList.contains(SEL)) {
+        var now = Date.now();
+        if (!chip.__mhAgeDoorT || now - chip.__mhAgeDoorT > 1500) { chip.__mhAgeDoorT = now; stats.deselected++; chip.click(); }   /* הביטול של Hyperzod */
+      }
+    }
+    setAttr(hintRoot(), HINT, any);
+    /* אין כפתורים על המסך (האזור מוסתר בסוג ההזמנה הזה) אבל במאגר נשמר "ליד הדלת" → מסירים מהמאגר */
+    if (reason && !chips.length && st) {
+      var cur = st.getters.getOrderInstructions;
+      if (Array.isArray(cur) && cur.some(isDoor)) { stats.storeCleaned++; st.commit('setOrderInstructions', cur.filter(function (x) { return !isDoor(x); })); }
+    }
+  }
+
+  /* לחיצה על הכפתור החסום: לא בוחרת. ביטול בחירה (כפתור שכבר נבחר) — תמיד עובר */
+  document.addEventListener('click', function (e) {
+    try {
+      var t = e.target, chip = t && t.closest && t.closest(CHIPS);
+      if (!chip || !chip.hasAttribute(ATTR) || chip.classList.contains(SEL)) { return; }
+      if (!ageReason(checkoutCart())) { sync(); return; }          /* כבר לא 18+ → כרגיל */
+      e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation();
+      stats.tapsBlocked++;
+      var r = hintRoot();
+      if (r) { r.removeAttribute('data-mh-agedoor-nudge'); void r.offsetWidth; r.setAttribute('data-mh-agedoor-nudge', ''); setTimeout(function () { r.removeAttribute('data-mh-agedoor-nudge'); }, 900); }
+    } catch (er) { stats.errors++; }
+  }, true);
+
+  /* שכבת ביטחון: מחזיר גוף חדש בלי "ליד הדלת", או null = לשלוח כמו שהוא */
+  function cleanBody(body) {
+    if (typeof body !== 'string' || body.indexOf('delivery_instructions') === -1) { return null; }
+    var o = JSON.parse(body), list = o && o.delivery_instructions;
+    if (!Array.isArray(list) || !list.some(isDoor)) { return null; }
+    var A = window.MH_AGEGATE, st = store(), cart = null;
+    if (st) {
+      var all = [st.getters.getCart, st.state.Cart && st.state.Cart.selectedCart].concat((st.state.Cart && st.state.Cart.cart) || []);
+      for (var i = 0; i < all.length && !cart; i++) { if (all[i] && all[i].cart_id === o.cart_id) { cart = all[i]; } }
+    }
+    var age = !!(A && (A.ageMerchants || []).indexOf(o.merchant_id) !== -1) || !!ageReason(cart);
+    if (!age) { return null; }
+    o.delivery_instructions = list.filter(function (x) { return !isDoor(x); });
+    stats.stripped++;
+    console.warn('[MH AgeDoor] "ליד הדלת" הוסר מהזמנת 18+');
+    setTimeout(function () { try { sync(); } catch (e) {} }, 0);
+    return JSON.stringify(o);
+  }
+  try {
+    var XP = XMLHttpRequest.prototype, _o = XP.open, _s = XP.send;
+    XP.open = function (m, url) {
+      try { this.__mhAgeDoorOrder = String(m).toUpperCase() === 'POST' && IS_ORDER.test(String(url || '')); } catch (e) {}
+      return _o.apply(this, arguments);
+    };
+    XP.send = function (b) {
+      if (this.__mhAgeDoorOrder) {
+        var nb = null;
+        try { nb = cleanBody(b); } catch (e) { stats.errors++; nb = null; }
+        if (nb !== null) { return _s.call(this, nb); }
+      }
+      return _s.apply(this, arguments);
+    };
+  } catch (e) { stats.errors++; }
+  try {
+    var _f = window.fetch;
+    if (typeof _f === 'function') {
+      window.fetch = function (input, init) {
+        try {
+          var u = typeof input === 'string' ? input : ((input && input.url) || '');
+          var M = String((init && init.method) || (input && input.method) || 'GET').toUpperCase();
+          if (M === 'POST' && IS_ORDER.test(u) && init && typeof init.body === 'string') {
+            var nb = cleanBody(init.body);
+            if (nb !== null) { return _f.call(this, input, Object.assign({}, init, { body: nb })); }
+          }
+        } catch (e) { stats.errors++; }
+        return _f.apply(this, arguments);
+      };
+    }
+  } catch (e) { stats.errors++; }
+
+  var pending = false;
+  function schedule() { if (pending) { return; } pending = true; setTimeout(function () { pending = false; try { sync(); } catch (e) { stats.errors++; } }, 180); }
+  try {
+    new MutationObserver(function (muts) {
+      for (var i = 0; i < muts.length; i++) { if (muts[i].addedNodes && muts[i].addedNodes.length) { schedule(); return; } }
+    }).observe(document.documentElement, { subtree: true, childList: true });
+    window.addEventListener('load', schedule); schedule();
+  } catch (e) { console.warn('[MH AgeDoor] disabled:', e); }
+
+  window.MH_AGEDOOR = { version: VERSION, sync: sync, isDoor: isDoor, ageReason: ageReason, stats: function () { return JSON.parse(JSON.stringify(stats)); } };
+  /* mh-agedoor-v1 */
+})();
+
+
 }   /* סוף השומר מטעינה כפולה (window.__MH_FOOTER__) — בראש הקובץ */
