@@ -7443,7 +7443,7 @@ log('פעיל');
 })();
 
 /* ============================================================
-   מסך "ההזמנה שלי" + הכפתור "ההזמנה שלי" בדף הבית — MH OrderTrack  |  v1.0.0 | 2026-10-28
+   מסך "ההזמנה שלי" + הכפתור "ההזמנה שלי" בדף הבית — MH OrderTrack  |  v1.1.0 | 2026-10-29 (v1.0.0: 28.10, שעון כבוי)
    העיצוב שאושר (דוד 28.10, "מאשר הכל"): capture/order-screen-27.10/design/r2/final (markup.html = ה-DOM המדויק
    שהבלוק כותב, DECISIONS §7/§11). ה-CSS: חלק 66 ב-global-cdn.css.
    מה הבלוק עושה (tick אחד כל 400ms, רק כשיש .scheme-order-details או #ongoingOrders בדף; אחרת אין טיימר):
@@ -7473,8 +7473,8 @@ log('פעיל');
   if (window.__MH_OT__) { return; }
   window.__MH_OT__ = true;
 
-  var VERSION = '1.0.0';
-  var CLOCK_ON = false;            /* דחיפה 1: שעון כבוי. דחיפה 2 (אחרי הזמנת הבדיקה של דוד): true */
+  var VERSION = '1.1.0';
+  var CLOCK_ON = true;             /* דחיפה 2 (29.10, דוד: "להדליק עכשיו" אחרי הזמנה חיה באייפון): שעון דלוק. false = מצב שלבים בלבד */
   var TICK = 400, LIVE_GRACE = 60000, BEAT_FRESH = 120000, TILES_WAIT = 4000;
   var AZ_ORIGIN = 'https://www.autozod.app', WA_NUMBER = '972555190064';   /* גיבוי בלבד; אותו מספר כמו NUMBER של MH WhatsApp — לשנות בשניהם */
   var MIN = 60000;
