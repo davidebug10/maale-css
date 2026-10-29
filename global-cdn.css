@@ -1379,56 +1379,12 @@ html body #checkout > .hpz-page-surface > .tw-max-w-\[320px\] > .v-btn.bg-button
 
 /* תרגום Inclusive (.c-table span:contains(...)) — הוסר 22.10 (CSS לא תקין: :contains לא קיים בדפדפנים, שני הכללים מעולם לא חלו). ההיסטוריה ב-git. */
 
-/* 5. ציר הזמן למעקב (Timeline Tracking) */
-.track-delivery {
-    background: rgba(255, 255, 255, 0.5) !important;
-    backdrop-filter: blur(50px) saturate(220%) !important;
-    border-radius: 32px !important;
-    border: 1px solid rgba(255, 255, 255, 0.6) !important;
-    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.03) !important;
-    margin-top: 20px !important;
-}
+/* 5. ציר הזמן (.track-delivery + v-timeline: הקווים, הנקודות והאייקונים) ו"כתובת למשלוח" במקום "home" על .tw-capitalize — הוסרו 28.10.
+   הבעלים של מסך "ההזמנה שלי": "חלק 66: MH OrderTrack" בסוף הקובץ. ציר הזמן של Hyperzod מוסתר שם (data-mh-ot-hide),
+   והכתובת מוצגת בשורה שלנו (.mh-ot-drop, "כתובת למשלוח"). בלי ה-JS — המסך של Hyperzod כמו שהוא. ההיסטוריה ב-git. */
 
-/* עיצוב הקווים המחברים ב-Timeline.
-   23.10 (ניקוי 2): כללי ה-v-timeline היו גלובליים — בבילד יש VTimeline אחד בלבד, בתוך רכיב track-delivery, ולכן הסקופ
-   :where(.track-delivery) תופס בדיוק את אותם אלמנטים באותה ספציפיות. מונע דליפה (למשל "כתובת למשלוח" על כל tw-capitalize
-   בציר זמן עתידי של Hyperzod). */
-:where(.track-delivery) .v-timeline-divider__before, :where(.track-delivery) .v-timeline-divider__after {
-    background-color: rgba(227, 30, 36, 0.2) !important; /* קו אדום עדין */
-}
-
-/* עיצוב האייקונים בתוך ה-Timeline */
-:where(.track-delivery) .v-timeline-divider__inner-dot {
-    background-color: white !important;
-    border: 2px solid #e31e24 !important;
-    box-shadow: 0 0 15px rgba(227, 30, 36, 0.2) !important;
-}
-
-:where(.track-delivery) .v-timeline-divider__inner-dot svg path {
-    fill: #e31e24 !important;
-}
-
-/* תרגום כותרת הכתובת "home" */
-:where(.track-delivery) .v-timeline-item__body .tw-capitalize {
-    font-size: 0 !important;
-}
-
-:where(.track-delivery) .v-timeline-item__body .tw-capitalize::before {
-    content: "כתובת למשלוח" !important;
-    font-size: 14px !important;
-    font-weight: 900 !important;
-    color: #000 !important;
-    visibility: visible !important;
-}
-
-/* 6. כפתור התקשרות (Call Merchant) */
-a[href^="tel:"] svg rect {
-    fill: #01C267 !important; /* ירוק הצלחה לשיחות */
-}
-
-a[href^="tel:"] svg path {
-    fill: white !important;
-}
+/* 6. כפתור התקשרות — הכלל הגלובלי a[href^="tel:"] svg (rect ירוק #01C267 + path לבן) הוסר 28.10. טלפון העסק בכרטיס ההזמנה:
+   אדום רך — "חלק 66" §B9 ([data-mh-ot-bill] a[href^="tel:"]); כרטיס השליח של Hyperzod (עם הטלפון) מוסתר שם. ההיסטוריה ב-git. */
 
 /* 7. הדגשת המחיר הסופי. 23.10: היה ".grand-total td" — הפסיד בספציפיות ל-"html body .c-table tbody td" של חלק 7 (אפור 444, משקל 500),
    ולכן "סה"כ לתשלום" יצא אפור וחלש כמו שאר השורות. עכשיו: הכותרת כהה ומודגשת, הסכום באדום כמו המחיר בכרטיס ההזמנה ברשימה */
@@ -2682,91 +2638,8 @@ html body.mh-scrolled .home-mobile-search-input .v-field:active img.home-mobile-
 
 /* חלק 31 (סרגל ניווט תחתון, 1.5.2026) — הוחלף ע"י "חלק 52: MH NavGlass" בסוף הקובץ (28.9.2026). ההיסטוריה ב-git. */
 
-/* =========================================================
-   חלק 32: טאב סטטוס הזמנה פעילה - LIVE ORDER STRIP
-   תאריך: 2026-05-04
-   מטרה: עיצוב הטאב הצף שמופיע כשיש הזמנה פעילה (#ongoingOrders)
-   - רקע קריסטלי אדום עדין (לרמוז על מצב "חי")
-   - תמונה עם הילה אדומה מתפעמת (live pulse)
-   - נקודת LIVE אדומה מהבהבת בפינה
-   - כותרת מודגשת באדום
-   הערה: הטאב יושב מעל הסרגל התחתון בתוך .floating-nav-wrapper
-   ========================================================= */
-
-/* 1. הקפסולה הראשית - אדום קריסטלי עדין */
-html body #MultiVendorBottomNav #ongoingOrders .ongoing-orders-strip {
-  background: rgba(255, 245, 245, 0.75) !important;
-  backdrop-filter: blur(30px) saturate(180%) !important;
-  -webkit-backdrop-filter: blur(30px) saturate(180%) !important;
-  border: 1px solid rgba(227, 30, 36, 0.15) !important;
-  border-radius: 999px !important;
-  box-shadow:
-    0 8px 24px rgba(227, 30, 36, 0.08),
-    0 2px 6px rgba(0, 0, 0, 0.04),
-    inset 0 1px 1px rgba(255, 255, 255, 0.7) !important;
-  padding: 10px 14px !important;
-  overflow: hidden !important;
-}
-
-/* 2. הכרטיס הפנימי - שקוף, יורש מההורה */
-html body #MultiVendorBottomNav #ongoingOrders .ongoing-order {
-  background: transparent !important;
-  border: none !important;
-  box-shadow: none !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  position: relative !important;
-}
-
-/* 3. "הילה מתפעמת" על התמונה + @keyframes mh-live-pulse — הוסרו 22.10 (מת: הסלקטור הושחת בהדבקה
-   ".[v-img.tw](http://v-img.tw)-rounded-full" — CSS לא תקין, הכלל מעולם לא חל, והאנימציה לא שימשה בשום מקום). ההיסטוריה ב-git. */
-
-/* 4. נקודת LIVE אדומה מהבהבת בפינת התמונה */
-html body #MultiVendorBottomNav #ongoingOrders .ongoing-order > div:first-child::after {
-  content: '' !important;
-  position: absolute !important;
-  top: -2px !important;
-  right: -2px !important;
-  width: 10px !important;
-  height: 10px !important;
-  border-radius: 50% !important;
-  background: #e31e24 !important;
-  border: 2px solid white !important;
-  box-shadow: 0 0 8px rgba(227, 30, 36, 0.6) !important;
-  animation: mh-live-blink 1.2s ease-in-out infinite !important;
-  z-index: 5 !important;
-}
-
-@keyframes mh-live-blink {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.4; transform: scale(0.85); }
-}
-
-/* 5. כותרת "ההזמנה שלך ממתינה" - מודגש ואדום */
-html body #MultiVendorBottomNav #ongoingOrders .ongoing-order h3 {
-  color: #b3161b !important;
-  font-weight: 800 !important;
-  font-size: 13px !important;
-  line-height: 1.3 !important;
-}
-
-/* 6. טקסט זמן ("5m ago") - אפור עדין */
-html body #MultiVendorBottomNav #ongoingOrders .ongoing-order span {
-  color: rgba(0, 0, 0, 0.5) !important;
-  font-weight: 600 !important;
-  font-size: 10px !important;
-}
-
-/* 7. חץ ניווט - אדום מותג */
-html body #MultiVendorBottomNav #ongoingOrders .ongoing-order img[alt="chevron"] {
-  filter: brightness(0) saturate(100%) invert(18%) sepia(88%) saturate(5427%) hue-rotate(352deg) brightness(91%) contrast(92%) !important;
-}
-
-/* 8. אפקט לחיצה פיזי */
-html body #MultiVendorBottomNav #ongoingOrders .ongoing-order:active {
-  transform: scale(0.97) !important;
-  transition: transform 0.1s ease !important;
-}
+/* חלק 32 (הכפתור "ההזמנה שלי" מעל הסרגל התחתון, #ongoingOrders, 4.5.2026: קפסולה ורודה, נקודת LIVE מהבהבת, כותרת אדומה) — הוסר 28.10.
+   הוחלף במלואו ע"י "חלק 66: MH OrderTrack" בסוף הקובץ (כרטיס זכוכית + טבעת קטנה, לא זז בגלילה). ההיסטוריה ב-git. */
 
 /* Android Bottom Nav - Safe Gap Fix (27.6.2026) — עבר ל"חלק 52: MH NavGlass" בסוף הקובץ. */
 
@@ -7201,7 +7074,7 @@ html body #checkout #message .v-field.v-field--focused::before { background: #e3
 /* =========================================================
    חלק 52: סרגל הניווט התחתון — MH NavGlass v1.2.1 | 2026-09-29 (v1.2.0, v1.1.0: 29.9, v1.0.0: 28.9) — Liquid Glass "מים"
    הבעלים היחיד של #MultiVendorBottomNav .floating-nav-pill והטאבים בו (החליף את חלק 31 ואת
-   "Android Bottom Nav - Safe Gap Fix"; רצועת ההזמנה הפעילה מעל הסרגל = חלק 32, לא כאן).
+   "Android Bottom Nav - Safe Gap Fix"; רצועת ההזמנה הפעילה מעל הסרגל = חלק 66 (MH OrderTrack; עד 28.10 חלק 32), לא כאן).
    v1.2.0 אחרי צילום מהאייפון של דוד + רינדור ב-WebKit אמיתי (tools/wk-snap):
    - "הטבעת": ב-v1.1.0 השפה הייתה שכבת backdrop נפרדת (טבעת 9px, brightness 1.28) מעל גוף אפרפר —
      באייפון נראתה כמסגרת לבנה סביב מלבן אפור. עכשיו שכבת זכוכית אחת (::before) בלי שום אור פנימי
@@ -8411,3 +8284,491 @@ html body .scheme-confirmation-popup .scheme-confirmation-secondary {
 }
 /* 23.10 (ניקוי 2): הסתרת .v-btn__overlay/.v-btn__underlay כאן הוסרה — כפילות של "4. ניקוי לוגי" בראש הקובץ */
 /* mh-confirm-v1 */
+
+/* =========================================================
+   חלק 66: MH OrderTrack — מסך "ההזמנה שלי" + הכפתור "ההזמנה שלי" מעל הסרגל התחתון | v1.0.0 | 2026-10-28
+   (דוד 28.10: "מאשר הכל" — סבב 2: שעון עגול על מפת Google של Hyperzod, סמל השלב רוכב על ראש הטבעת.
+   העיצוב: capture/order-screen-27.10/design/r2/final — ot.css, markup.html (33 מצבי מסך + 8 של הכפתור), DECISIONS.md.)
+   מחליף: חלק 32 כולו (הכפתור), ומחלק 11: ציר הזמן, "כתובת למשלוח" על tw-capitalize והכלל הגלובלי a[href^="tel:"] svg.
+   הבעלים של: #ongoingOrders (הכפתור), .mh-ot-* (הצמתים של ה-JS "MH OrderTrack"), וכל מה שמוסתר במסך ההזמנה כשהצומת שלנו בפנים.
+   חוזה ה-JS: capture/order-screen-27.10/cand/CSS-NOTES.md.
+   כללים: הכול תחת עוגן ייחודי + !important (חריג מכוון אחד: אנימציית ההמתנה של המפה, B3); בלי data-v-*; בלי :has(input:checked).
+   נכשל-פתוח: כל הסתרה / שינוי בצומת של Hyperzod מותנה בצומת שלנו באותו מופע (:has(.mh-ot-hero) / :has(.mh-ot-line)),
+     וכל מה שתלוי ב-:has() בתוך @supports selector(:has(*)) — דפדפן בלי :has() רואה את Hyperzod כמו שהיא (וה-JS לא מצייר).
+   hover רק ב-(hover:hover); תנועה רק ב-prefers-reduced-motion:no-preference.
+   אדום: הטבעת (גרדיאנט) + המספר (אדום כהה) — מקום אחד. ב-L3/L4: הטבעת אדום רך, כפתור הוואטסאפ בגרדיאנט. בלי ירוק.
+   ========================================================= */
+/* בדיקת טעינה ל-JS (שיעור WebKit 17.10: הקוד רץ לפעמים לפני שהעיצוב ירד) — ה-JS קורא את --mh-ot מצומת עם המחלקה הזו, בכל פעם שצריך */
+html body .mh-ot-css-probe { --mh-ot: on !important; }
+
+/* A1. הכפתור לא זז בגלילה (לא מותנה — תיקון באג, גם בלי ה-JS). Hyperzod כותבת inline "transform: translateY(71px)" כשהסרגל "מוסתר",
+   וחלק 52 משאיר את הגלולה במקומה — הכפתור נדחף אל מתחתיה. כלל !important בגיליון גובר על inline בלי !important. */
+html body #MultiVendorBottomNav .floating-nav-wrapper #ongoingOrders.ongoing-orders--floating-host { transform: none !important; }
+/* A1a (QA r3). אנדרואיד: חלק 52 מרים את הגלולה ב-28px (position:relative; bottom:28 — ויזואלי בלבד), והכפתור נשאר 8px (tw-mb-2) מעל המקום
+   הישן שלה — הגלולה כיסתה 20px ממנו. מרימים גם אותו: 8 + 28. הסרגל גדל, ובועת הוואטסאפ (שמודדת את ראש הסרגל) עולה איתו לבד. לא מותנה (כמו A1) */
+html.mh-android-app body #MultiVendorBottomNav .floating-nav-wrapper #ongoingOrders.ongoing-orders--floating-host { margin-bottom: 36px !important; }
+
+@supports selector(:has(*)) {
+
+  /* הדהייה הלבנה מתחת לסרגל לא מהבהבת כשהמחלקה "מוסתר" מתחלפת (רק כשיש כפתור) */
+  html body #MultiVendorBottomNav .floating-nav-wrapper.floating-nav-wrapper--nav-hidden:has(> #ongoingOrders)::before { opacity: 1 !important; }
+
+  /* A2. המעטפת של Hyperzod (גלולה 240px, overflow:hidden) → שקופה ברוחב הסרגל; כל הזמנה = כרטיס זכוכית משלה.
+     overflow גלוי: הצל של הכרטיס לא נחתך, והכרטיס הבא (כמה הזמנות) מציץ בשוליים של 20px מחוץ לסרגל. */
+  html body #MultiVendorBottomNav #ongoingOrders.ongoing-orders--floating-host:has(.mh-ot-line) { overflow: visible !important; border-radius: 0 !important; }
+  html body #MultiVendorBottomNav #ongoingOrders .ongoing-orders-strip:has(.mh-ot-line) {
+    width: 100% !important; margin: 0 !important; padding: 0 !important; overflow: visible !important;
+    background: transparent !important; border: 0 !important; border-radius: 0 !important; box-shadow: none !important;
+    -webkit-backdrop-filter: none !important; backdrop-filter: none !important;
+  }
+  html body #MultiVendorBottomNav #ongoingOrders .ongoing-orders-strip:has(.mh-ot-line) .ongoing-swiper { overflow: visible !important; padding: 0 !important; }
+  /* כמה הזמנות: השקופית רחבה ב-8px מהסרגל והכרטיס בתוכה ברוחב הסרגל בדיוק; הכרטיס הבא מציץ ~12px בשוליים.
+     Swiper (slidesPerView:auto) מודד את רוחב השקופית. */
+  html body #MultiVendorBottomNav #ongoingOrders .ongoing-swiper .swiper-slide:has(> .ongoing-order > .mh-ot-line) {
+    width: calc(100% + 8px) !important; padding-left: 8px !important; box-sizing: border-box !important;
+  }
+  html body #MultiVendorBottomNav #ongoingOrders .ongoing-swiper .swiper-slide:only-child:has(> .ongoing-order > .mh-ot-line) { width: 100% !important; padding-left: 0 !important; }
+
+  /* A3. הכרטיס: זכוכית לבנה כמעט אטומה (.98, בלי saturate — מעל הכרטיס הירוק של בנס .94 קיבל גוון מנטה), רדיוס 18, צל רך.
+     הטבעת המיני בתחילת השורה (ימין, 12px = 11 ריפוד + מסגרת 1) במקום הלוגו */
+  html body #MultiVendorBottomNav #ongoingOrders .ongoing-order.ongoing-order--card:has(> .mh-ot-line) {
+    width: 100% !important; height: auto !important; min-height: 60px !important; margin: 0 !important; box-sizing: border-box !important;
+    display: flex !important; align-items: center !important; gap: 12px !important;
+    padding: 10px 11px 10px 10px !important; position: relative !important; cursor: pointer !important; transform: none !important;
+    background: rgba(255, 255, 255, 0.98) !important;
+    -webkit-backdrop-filter: none !important; backdrop-filter: none !important;   /* QA r0: blur מאחורי 98% לבן לא נראה, ונחשב מחדש בכל פריים של גלילה */
+    border: 1px solid rgba(17, 17, 17, 0.07) !important; border-radius: 18px !important;
+    box-shadow: 0 6px 18px rgba(17, 17, 17, 0.10), 0 1px 2px rgba(17, 17, 17, 0.05) !important;
+  }
+  /* הלוגו, הטקסט של Hyperzod ("ההזמנה שלך נאספה" + "6m ago") והחץ שלה — רק בכרטיס שיש בו את השורה שלנו */
+  html body #MultiVendorBottomNav #ongoingOrders .ongoing-order:has(> .mh-ot-line) > div:not(.mh-ot-line) { display: none !important; }
+
+  /* A4. השורה שלנו: (טבעת) [שלב · עד 19:43] / [עסק]  ‹ — טבעת מיני Ø32, עובי 4, אדום מלא על מסלול חיוור, בלי גרדיאנט / LIVE / ניצוץ.
+     בפנים המספר של המסך (12/800 אדום כהה) או סמל השלב. אותו שלב ואותו מספר כמו במסך, באותה דקה. */
+  html body #MultiVendorBottomNav #ongoingOrders .mh-ot-line {
+    flex: 1 1 auto !important; min-width: 0 !important; display: flex !important; align-items: center !important; gap: 10px !important;
+    direction: rtl !important; text-align: start !important; font-family: inherit !important; letter-spacing: 0 !important;
+  }
+  html body #MultiVendorBottomNav #ongoingOrders .mh-ot-mini { position: relative !important; flex: 0 0 32px !important; width: 32px !important; height: 32px !important; display: grid !important; place-items: center !important; }
+  html body #MultiVendorBottomNav #ongoingOrders .mh-ot-mini > svg:first-child { position: absolute !important; inset: 0 !important; width: 32px !important; height: 32px !important; }
+  html body #MultiVendorBottomNav #ongoingOrders .mh-ot-mini circle { fill: none !important; stroke-width: 4 !important; }
+  html body #MultiVendorBottomNav #ongoingOrders .mh-ot-mini circle.t { stroke: rgba(227, 30, 36, 0.13) !important; }
+  html body #MultiVendorBottomNav #ongoingOrders .mh-ot-mini circle.f { stroke: #e31e24 !important; stroke-linecap: round !important; }
+  html body #MultiVendorBottomNav #ongoingOrders .mh-ot-mini > b { position: relative !important; font-size: 12px !important; line-height: 1 !important; font-weight: 800 !important; color: #c8151b !important; font-variant-numeric: tabular-nums !important; }
+  html body #MultiVendorBottomNav #ongoingOrders .mh-ot-mini > .mh-ot-g { position: relative !important; width: 15px !important; height: 15px !important; color: #c8151b !important; }
+  html body #MultiVendorBottomNav #ongoingOrders .mh-ot-lx { flex: 1 1 auto !important; min-width: 0 !important; display: flex !important; flex-direction: column !important; gap: 2px !important; }
+  html body #MultiVendorBottomNav #ongoingOrders .mh-ot-l1 {
+    display: flex !important; align-items: baseline !important; gap: 6px !important; min-width: 0 !important;
+    font-size: 15px !important; line-height: 20px !important; font-weight: 800 !important; color: #111 !important; white-space: nowrap !important; overflow: hidden !important;
+  }
+  html body #MultiVendorBottomNav #ongoingOrders .mh-ot-l1 .mh-ot-ls { flex: 0 1 auto !important; min-width: 0 !important; overflow: hidden !important; text-overflow: ellipsis !important; }
+  html body #MultiVendorBottomNav #ongoingOrders .mh-ot-l1 .mh-ot-sep { flex: none !important; color: #9ca3af !important; font-weight: 600 !important; }
+  html body #MultiVendorBottomNav #ongoingOrders .mh-ot-l1 .mh-ot-lt { flex: 0 1 auto !important; min-width: 0 !important; overflow: hidden !important; text-overflow: ellipsis !important; color: #c8151b !important; font-variant-numeric: tabular-nums !important; }
+  html body #MultiVendorBottomNav #ongoingOrders .mh-ot-line bdi { unicode-bidi: isolate !important; }
+  html body #MultiVendorBottomNav #ongoingOrders .mh-ot-l2 { display: block !important; min-width: 0 !important; font-size: 12px !important; line-height: 16px !important; font-weight: 600 !important; color: #555 !important; }
+  /* שורה 2: עטיפה RTL שמיושרת לימין, ה-bdi בתוכה — שם לטיני ("Bens pizza shop") עומד מתחת לשורה 1, לא בקצה השמאלי */
+  html body #MultiVendorBottomNav #ongoingOrders .mh-ot-l2 > .mh-ot-lm { display: block !important; direction: rtl !important; text-align: right !important; overflow: hidden !important; text-overflow: ellipsis !important; white-space: nowrap !important; }
+  html body #MultiVendorBottomNav #ongoingOrders .mh-ot-l2 > .mh-ot-lm > bdi { unicode-bidi: isolate !important; }
+  /* עיכוב (L2) — הטבעת המיני רכה, כמו במסך */
+  html body #MultiVendorBottomNav #ongoingOrders .mh-ot-line[data-soft] .mh-ot-mini circle.f { stroke: rgba(227, 30, 36, 0.35) !important; }
+  html body #MultiVendorBottomNav #ongoingOrders .mh-ot-line > .mh-ot-chev { flex: 0 0 16px !important; width: 16px !important; height: 16px !important; color: #9ca3af !important; }
+
+  /* A5. נקודות (כמה הזמנות; Hyperzod מציגה אותן רק מ-2): גלולת זכוכית קטנה, הפעילה אפורה ומוארכת — בדף הבית האדום הוא רק הזמן והטבעת */
+  html body #MultiVendorBottomNav #ongoingOrders .ongoing-orders-strip:has(.mh-ot-line) .ongoing-dots {
+    width: max-content !important; margin: 6px auto 0 !important; padding: 5px 8px !important; gap: 5px !important; align-items: center !important;
+    background: rgba(255, 255, 255, 0.92) !important; -webkit-backdrop-filter: blur(20px) !important; backdrop-filter: blur(20px) !important;
+    border-radius: 999px !important; box-shadow: 0 1px 4px rgba(17, 17, 17, 0.10) !important;
+  }
+  /* הזמנה אחת: Hyperzod משאירה את המעטפת (נקודה אחת מוסתרת, 7px ריפוד) — בלי גלולה ריקה */
+  html body #MultiVendorBottomNav #ongoingOrders .ongoing-orders-strip:has(.mh-ot-line) .ongoing-dots:not(:has(.ongoing-dot + .ongoing-dot)) { display: none !important; }
+  html body #MultiVendorBottomNav #ongoingOrders .ongoing-orders-strip:has(.mh-ot-line) .ongoing-dot { width: 5px !important; height: 5px !important; border-radius: 999px !important; background: rgba(17, 17, 17, 0.20) !important; box-shadow: none !important; }
+  html body #MultiVendorBottomNav #ongoingOrders .ongoing-orders-strip:has(.mh-ot-line) .ongoing-dot.ongoing-dot--active { width: 14px !important; background: #6b7280 !important; }
+
+  /* A6 (כפתור העגלה הצף מעל הכפתור שלנו) — הוסר ב-QA r0: כפתור העגלה מצויר רק בחנות (במסלול חנות אין #MultiVendorBottomNav,
+     ובחלון החנות הכפתור שלנו מכוסה), והכלל רק הזיז את "המשך לתשלום" לאמצע התפריט בחלון החנות. העגלה של Hyperzod כמו שהיא. */
+
+  /* A7. מגע */
+  @media (prefers-reduced-motion: no-preference) {
+    html body #MultiVendorBottomNav #ongoingOrders .ongoing-order.ongoing-order--card:has(> .mh-ot-line) { transition: transform 0.12s ease !important; }
+    html body #MultiVendorBottomNav #ongoingOrders .ongoing-order.ongoing-order--card:has(> .mh-ot-line):active { transform: scale(0.98) !important; }
+  }
+  @media (hover: hover) {
+    html body #MultiVendorBottomNav #ongoingOrders .ongoing-order.ongoing-order--card:has(> .mh-ot-line):hover { background: #fff !important; }
+  }
+  /* תנועה מופחתת (QA r3): ההחלקה בין הזמנות קופצת בלי מעבר — Swiper כותב transition-duration inline (בלי !important),
+     והנקודות של Hyperzod (.ongoing-dot{transition:width .28s}) לא מתארכות בהנפשה.
+     ponytail: 1ms ולא 0 — ב-0 הדפדפן לא שולח transitionend, ו-Swiper נשאר "animating" אחרי כל החלקה (נמדד); 1ms לא נראה לעין */
+  @media (prefers-reduced-motion: reduce) {
+    html body #MultiVendorBottomNav #ongoingOrders .ongoing-orders-strip:has(.mh-ot-line) .swiper-wrapper { transition-duration: 1ms !important; }
+    html body #MultiVendorBottomNav #ongoingOrders .ongoing-orders-strip:has(.mh-ot-line) .ongoing-dot { transition: none !important; }
+  }
+
+  /* A8 (QA r3). בועת הצ'אט של Hyperzod (.chat-float-button: fixed, right 24, bottom inline 96 / 24 כשהסרגל "מוסתר") וחלון השיחות שלה
+     (.chat-panel: bottom inline +68) — מעל הכפתור שלנו, שרחב מהגלולה הישנה ולא יורד בגלילה (הבועה כיסתה את הטבעת).
+     ה-JS כותב על <html> את --mh-ot-above = מתחתית המסך עד ראש הכפתור, בכל tick. מיקום בלבד; הבועה עצמה של Hyperzod */
+  html body:has(#MultiVendorBottomNav #ongoingOrders .mh-ot-line) .chat-float-button { bottom: calc(var(--mh-ot-above, 160px) + 12px) !important; }
+  html body:has(#MultiVendorBottomNav #ongoingOrders .mh-ot-line) .chat-panel {
+    bottom: calc(var(--mh-ot-above, 160px) + 80px) !important; max-height: min(400px, calc(100vh - var(--mh-ot-above, 160px) - 96px)) !important;
+  }
+
+  /* A9 (QA r3). סוף דף הבית: הכפתור לא יורד בגלילה, אז התוכן נגמר מעליו — ריווח בגובה מה שהכפתור תופס מעל הגלולה
+     (--mh-ot-over מה-JS: מראש הכפתור עד ראש הגלולה) + 12. הריווח של Hyperzod עצמה (מעל הגלולה) נשאר כמו שהוא */
+  html body:has(#MultiVendorBottomNav #ongoingOrders .mh-ot-line) #MultiVendorHome .home-page-content { padding-bottom: calc(var(--mh-ot-over, 68px) + 12px) !important; }
+
+  /* ---------- B. המסך ---------- */
+
+  /* B1. מה מסתירים — רק במופע שהצומת שלנו בתוכו (ולא במופע חיצוני שמופע פנימי שלו מחזיק אותו — ביקורת 11):
+     בהדר — הכול חוץ משורת החץ והכותרת (שורת הסטטוס / התאריך / "זמן הגעה משוער" באנגלית, הפס הירוק והרווח; מבני, בלי Tailwind);
+     ומה שה-JS מסמן ב-data-mh-ot-hide בכל tick: מפה (רק כשאין לה מקום), כרטיס השליח של Hyperzod (עם הטלפון והצ'אט),
+     ציר הזמן עם השעות, "הושלם ב-", "זמן איסוף", כרטיס "בוטלה", שורת העסק המעורבת, וחץ הניווט לעסק (קפית). */
+  html body .scheme-order-details:has(.mh-ot-hero):not(:has(.scheme-order-details .mh-ot-hero)) .scheme-order-tracking-header > :not(:first-child),
+  html body .scheme-order-details:has(.mh-ot-hero):not(:has(.scheme-order-details .mh-ot-hero)) .scheme-order-tracking-header > :first-child > :not(:first-child),
+  html body .scheme-order-details:has(.mh-ot-hero):not(:has(.scheme-order-details .mh-ot-hero)) [data-mh-ot-hide] { display: none !important; }
+  /* בועת הצ'אט הצפה של Hyperzod (.chat-float-button, fixed) — במסך ההזמנה עזרה רק בוואטסאפ (דוד 28.10, שאלה 11).
+     חלון צ'אט שהלקוח פתח בעצמו (.order-chat-panel) לא מוסתר. */
+  html body:has(.scheme-order-details .mh-ot-hero) .chat-float-button { display: none !important; }
+
+  /* B2. ההדר בטלפון קבוע (fixed) והתקצר — התוכן מתחיל מתחתיו. ה-JS מודד אחרי ההסתרה (על .scheme-order-details):
+     --mh-ot-lead = כמה הכרטיס כבר מתחת לראש הדף (באפליקציה #app-router-view מרופד בפס הסטטוס, 59) ו---mh-ot-top = תחתית ההדר − lead.
+     בלעדיהם: lead = פס הסטטוס (0 בדפדפן), top = שורת החץ (נמדד 63; 64 = עוד 1px ביטחון). במחשב ההדר לא קבוע — לא נוגעים. */
+  html body .scheme-order-details:has(.mh-ot-hero):not(:has(.scheme-order-details .mh-ot-hero)) > .v-card-text:has(> .scheme-order-tracking-header.native-top-notch-padding) {
+    padding-top: var(--mh-ot-top, 64px) !important;
+  }
+
+  /* B3. המפה + השעון העגול. מבנה (ה-JS):
+       [קופסת המפה של Hyperzod, data-mh-mapbox] → section.mh-ot-hero (אח מיד אחריה; בלי מפה — אחרי ההדר)
+         > .mh-ot-sheet > .mh-ot-clock ([כתף — רק על התפר] + הדיסק + כפתורי הצד) → .mh-ot-under → (.mh-ot-cta) → .mh-ot-steps
+         > שורות (שליח / כתובת / עזרה) → .mh-ot-sr
+     טלפון 390×844 (אפליקציה): הקופסה 0–537, נמשכת מתחת להדר הזכוכית 0–122. דיסק Ø200 (טבעת Ø184, עובי 13), מורם: התחתית 28px מעל
+       תחתית המפה — הלוגו של Google (511–537) ושורת "נתוני מפה / תנאים" (523–537) גלויים, גם בלי צל עליהם (ביקורת 1).
+       ה-fit של ה-JS (בכל fit): top = הדר + 12 + 43, bottom = הקופסה − (ראש הדיסק − 12), צדדים 40 → אזור נקודות 120px.
+     על התפר (data-seam — ה-JS מחשב בכל fit: boxW/2 + d + 8 ≤ attr.left ו- boxW/2 − d − 8 ≥ logo.right, d = √((R+rf)² − rf²),
+       מ-.gm-style-cc והלוגו של Google): מרכז הדיסק על תחתית המפה + כתף לבנה r14. בטלפון אף פעם; במחשב 782 עם Ø184 — כן.
+     מסך נמוך (<700): קופסה 457, Ø176. iframe (AutoZod): רצועה 298 מתחת להדר, הדיסק כולו מתחתיה (IFRAME_OVERLAP = 0).
+     בלי מפה (נמסרה / בוטלה / קפית) ומפה שקרסה (data-mh-cover): בלי רצועה — הדיסק בראש הגיליון על גוון אדום רך. */
+
+  /* הקופסה של Hyperzod (ה-JS מסמן data-mh-mapbox; Vue לא מנהל את התכונה, אז רינדור מחדש משאיר אותה; בלי ה-JS — 350/400 שלה) */
+  html body .scheme-order-details:has(.mh-ot-hero) [data-mh-mapbox] {
+    height: 537px !important; margin: 0 -12px !important; border-radius: 0 !important; background: #f2f2f0 !important; position: relative !important; overflow: hidden !important;
+  }
+  /* טלפון: נמשכת מתחת להדר הקבוע (חוץ מ-iframe — את המצלמה של AutoZod אי אפשר לרפד — ומקופסה שקרסה) */
+  html body .scheme-order-details:has(.mh-ot-hero):has(.scheme-order-tracking-header.native-top-notch-padding) [data-mh-mapbox]:not([data-mh-mapmode="iframe"]):not([data-mh-cover]) {
+    margin-top: calc(-1 * (var(--mh-ot-top, 64px) + var(--mh-ot-lead, var(--native-status-bar-height, 0px)))) !important;   /* עד 0 של המסך, מתחת להדר */
+  }
+  html body .scheme-order-details:has(.mh-ot-hero) [data-mh-mapbox][data-mh-mapmode="iframe"] { height: 298px !important; pointer-events: none !important; }
+  @media (max-height: 699px) { html body .scheme-order-details:has(.mh-ot-hero) [data-mh-mapbox]:not([data-mh-mapmode="iframe"]) { height: 457px !important; } }
+  /* מחשב: 360 בתוך הכרטיס, פינות עליונות 16 (ההדר לא קבוע — לא נמשכת לשום מקום) */
+  html body .scheme-order-details:has(.mh-ot-hero):has(.scheme-order-tracking-header:not(.native-top-notch-padding)) [data-mh-mapbox] { height: 360px !important; border-radius: 16px 16px 0 0 !important; }
+  /* מחשב, דיסק מורם (בלי data-seam — באתר החי שורת הייחוס של Google ארוכה, והתפר כמעט תמיד נכשל): 440, כדי שלסיכות יישארו ~160px
+     (זום של רחוב כמו בטלפון) ולא 82 (QA r0). data-seam תלוי רק ברוחב ובשורת Google, לא בגובה — אין קפיצה הלוך-חזור */
+  html body .scheme-order-details:has(.mh-ot-hero[data-mode="google"]:not([data-seam])):has(.scheme-order-tracking-header:not(.native-top-notch-padding)) [data-mh-mapbox] { height: 440px !important; }
+  /* קריסה: המפה לא מוצגת בכלל (visibility, לא display — ה-iframe ממשיך לרוץ, וההודעה הבאה של AutoZod מחזירה אותו) */
+  /* :not(#mh-ot-x) = ספציפיות של id: גובר על 360 של המחשב (:has כפול) ועל 457/537 — בלי זה במחשב נשאר חור ריק של 360 (QA r0) */
+  html body .scheme-order-details:has(.mh-ot-hero) [data-mh-mapbox][data-mh-cover]:not(#mh-ot-x) { height: 0 !important; min-height: 0 !important; visibility: hidden !important; border: 0 !important; }
+  /* בלי הבזק של המפה הצבעונית: עד שה-JS מסמן data-mh-map="on" (אחרי setOptions) — שקופה; נחשפת לבד אחרי 6 שנ'.
+     ביקורת 8: אנימציה, לא opacity קבוע — ובלי !important ובלי fill-mode (both/forwards היה משאיר opacity 0 לתמיד אחרי הסוף).
+     החריג היחיד ל-!important בחלק הזה: מה שגובר עליה רק מבטל את ההמתנה (= המפה נראית), לעולם לא מסתיר. ספציפיות #id — מספיקה. */
+  html body .scheme-order-details [data-mh-mapbox]:not([data-mh-map]):not([data-mh-mapmode]) #order-track-map { animation: mh-ot-hold 6s step-end 1; }
+  @keyframes mh-ot-hold { from, to { opacity: 0; } }
+
+  /* הסיכות שלנו (OverlayView בשכבת overlayLayer — לא לחיצות): עומדות על הנקודה. זכוכית לבנה, סמל אדום כהה. בית 36 + הילה אדומה רכה, עסק 32 */
+  html body .scheme-order-details [data-mh-mapbox] .mh-ot-pin {
+    position: absolute !important; width: var(--p) !important; height: calc(var(--p) + 7px) !important; transform: translate(-50%, -100%) !important; pointer-events: none !important;
+  }
+  html body .scheme-order-details [data-mh-mapbox] .mh-ot-pin.is-shop { --p: 32px !important; }
+  html body .scheme-order-details [data-mh-mapbox] .mh-ot-pin.is-home { --p: 36px !important; }
+  html body .scheme-order-details [data-mh-mapbox] .mh-ot-pin > span {
+    position: relative !important; z-index: 1 !important; display: grid !important; place-items: center !important; width: var(--p) !important; height: var(--p) !important; border-radius: 50% !important;
+    background: rgba(255, 255, 255, 0.96) !important; color: #c8151b !important; border: 1px solid rgba(17, 17, 17, 0.08) !important;
+    box-shadow: 0 3px 10px rgba(17, 17, 17, 0.16) !important;
+  }
+  html body .scheme-order-details [data-mh-mapbox] .mh-ot-pin.is-home > span { box-shadow: 0 0 0 6px rgba(227, 30, 36, 0.14), 0 3px 10px rgba(17, 17, 17, 0.16) !important; }
+  html body .scheme-order-details [data-mh-mapbox] .mh-ot-pin svg { width: 56% !important; height: 56% !important; }
+  html body .scheme-order-details [data-mh-mapbox] .mh-ot-pin::after {
+    content: "" !important; position: absolute !important; left: 50% !important; bottom: 2.5px !important; width: 9px !important; height: 9px !important;
+    transform: translateX(-50%) rotate(45deg) !important; background: #fff !important; border-radius: 1px !important; box-shadow: 2px 2px 3px rgba(17, 17, 17, 0.12) !important;
+  }
+
+  /* ההדר הזכוכית מעל המפה (משטח קטן — blur מותר) + הכותרת "ההזמנה שלי" (טלפון ומחשב, אושר 28.10; בלי הצומת שלנו — "פרטי הזמנה" של חלק 11).
+     ה-JS שם aria-label="ההזמנה שלי" על ה-h1 (קורא מסך קרא "Order #…") */
+  html body .scheme-order-details:has(.mh-ot-hero[data-mode="google"]):not(:has(.scheme-order-details .mh-ot-hero)) .scheme-order-tracking-header.native-top-notch-padding {
+    background: rgba(255, 255, 255, 0.8) !important; -webkit-backdrop-filter: blur(20px) saturate(140%) !important; backdrop-filter: blur(20px) saturate(140%) !important;
+    border-bottom: 1px solid rgba(227, 30, 36, 0.12) !important; box-shadow: none !important;
+  }
+  html body .scheme-order-details:has(.mh-ot-hero):not(:has(.scheme-order-details .mh-ot-hero)) .scheme-order-tracking-header h1 { font-size: 0 !important; line-height: 0 !important; }
+  html body .scheme-order-details:has(.mh-ot-hero):not(:has(.scheme-order-details .mh-ot-hero)) .scheme-order-tracking-header h1::before {
+    content: "ההזמנה שלי" !important; font-size: 17px !important; line-height: 24px !important; font-weight: 800 !important; color: #111 !important; visibility: visible !important;
+  }
+
+  /* הצומת שלנו. --disc קוטר הדיסק, --pull כמה הוא עולה מעל תחילת הגיליון, --after הרווח אחריו, --num גודל המספר */
+  html body .scheme-order-details .mh-ot-hero {
+    --disc: 200px !important; --pull: 228px !important; --after: 28px !important; --num: 58px !important;
+    position: relative !important; display: flex !important; flex-direction: column !important; gap: 10px !important;
+    margin: 0 -12px 12px !important; direction: rtl !important; font-family: inherit !important; color: #111 !important; letter-spacing: 0 !important;
+  }
+  html body .scheme-order-details .mh-ot-hero * { box-sizing: border-box !important; }
+  html body .scheme-order-details .mh-ot-hero[data-mode="none"] { --pull: -20px !important; --after: 0px !important; margin: 0 0 12px !important; }
+  html body .scheme-order-details .mh-ot-hero[data-mode="iframe"] { --pull: -12px !important; --after: 0px !important; }   /* IFRAME_OVERLAP = 0 */
+  html body .scheme-order-details .mh-ot-hero[data-small] { --disc: 176px !important; --pull: 204px !important; --num: 48px !important; }
+  html body .scheme-order-details .mh-ot-hero[data-small]:is([data-mode="none"], [data-mode="iframe"]) { --pull: -16px !important; }
+  /* מחשב (ההדר לא קבוע): Ø184; מורם כברירת מחדל, ועל התפר רק כשה-JS הוכיח שהכתף לא נוגעת בשורת Google */
+  html body .scheme-order-details:has(.scheme-order-tracking-header:not(.native-top-notch-padding)) .mh-ot-hero { --disc: 184px !important; --num: 52px !important; }
+  html body .scheme-order-details:has(.scheme-order-tracking-header:not(.native-top-notch-padding)) .mh-ot-hero[data-mode="google"] { --pull: 212px !important; --after: 28px !important; }
+  html body .scheme-order-details:has(.scheme-order-tracking-header:not(.native-top-notch-padding)) .mh-ot-hero[data-mode="google"][data-seam] { --pull: 92px !important; --after: 0px !important; }
+
+  html body .scheme-order-details .mh-ot-hero .mh-ot-sheet {
+    display: flex !important; flex-direction: column !important; margin: 0 !important; padding: 0 0 18px !important;
+    background: #fff !important; border-bottom: 1px solid #eceef1 !important;
+  }
+  /* טלפון, מעל מפה: פינות 24 לגיליון, ומאחוריהן צבע היבשה של המפה — מתחת לתחתית הקופסה, לא על שורת Google */
+  html body .scheme-order-details:has(.scheme-order-tracking-header.native-top-notch-padding) .mh-ot-hero[data-mode="google"] { background: linear-gradient(#f2f2f0 0 24px, transparent 24px) !important; }
+  html body .scheme-order-details:has(.scheme-order-tracking-header.native-top-notch-padding) .mh-ot-hero[data-mode="google"] .mh-ot-sheet { border-radius: 24px 24px 0 0 !important; }
+  /* בלי מפה: אין רחוב מזויף — רק גוון אדום רך מאחורי הדיסק */
+  html body .scheme-order-details .mh-ot-hero[data-mode="none"] .mh-ot-sheet { background: linear-gradient(180deg, #fbeeee 0px, #fff 240px) !important; }
+
+  /* השעון: הדיסק לבן אטום (לא blur של המפה — זיכרון ה-WebView), קו שיער + צל קצר מאוד (נגמר לפני שורת Google).
+     pointer-events רק לדיסק ולכפתורים */
+  html body .scheme-order-details .mh-ot-hero .mh-ot-clock {
+    position: relative !important; flex: none !important; height: var(--disc) !important; margin: calc(-1 * var(--pull)) 0 var(--after) !important; pointer-events: none !important;
+  }
+  html body .scheme-order-details .mh-ot-hero .mh-ot-disc {
+    position: absolute !important; top: 0 !important; left: 50% !important; width: var(--disc) !important; height: var(--disc) !important; margin-left: calc(var(--disc) / -2) !important;
+    border-radius: 50% !important; background: #fff !important; pointer-events: auto !important;
+    box-shadow: 0 0 0 1px rgba(17, 17, 17, 0.07), 0 1px 2px rgba(17, 17, 17, 0.16) !important;
+  }
+  html body .scheme-order-details .mh-ot-hero[data-mode="none"] .mh-ot-disc { box-shadow: 0 0 0 1px rgba(17, 17, 17, 0.05), 0 6px 18px rgba(17, 17, 17, 0.08) !important; }
+  /* על התפר (מחשב): הכתף הלבנה נושאת את הצורה, בלי צל מעל המפה */
+  html body .scheme-order-details .mh-ot-hero .mh-ot-shoulder { display: none !important; }
+  html body .scheme-order-details .mh-ot-hero[data-seam] .mh-ot-shoulder { display: block !important; position: absolute !important; top: 0 !important; left: 50% !important; transform: translateX(-50%) !important; fill: #fff !important; overflow: visible !important; }
+  html body .scheme-order-details .mh-ot-hero[data-seam] .mh-ot-disc { box-shadow: none !important; }
+  /* קו שיער פנימי, כמו בוולט */
+  html body .scheme-order-details .mh-ot-hero .mh-ot-disc::after {
+    content: "" !important; position: absolute !important; inset: calc(var(--disc) * 0.135) !important; border-radius: 50% !important; border: 1px solid #f1f1f3 !important; pointer-events: none !important;
+  }
+  /* pointer-events: none — ה-svg מרובע: בלי זה פינות התיבה השקופות "תופסות" נגיעה ליד הלוגו של Google (320, QA r0); הדיסק העגול נשאר לחיץ */
+  html body .scheme-order-details .mh-ot-hero .mh-ot-ring { position: absolute !important; inset: 0 !important; width: 100% !important; height: 100% !important; overflow: visible !important; pointer-events: none !important; }
+  html body .scheme-order-details .mh-ot-hero .mh-ot-ring circle { fill: none !important; stroke-linecap: round !important; }
+  html body .scheme-order-details .mh-ot-hero .mh-ot-ring .mh-ot-trk { stroke: rgba(227, 30, 36, 0.10) !important; }
+  html body .scheme-order-details .mh-ot-hero .mh-ot-ring .mh-ot-trk.is-grey { stroke: #eceef1 !important; }
+  html body .scheme-order-details .mh-ot-hero .mh-ot-ring .mh-ot-fil { stroke: url(#mhOtGrad) !important; }
+  /* קווקוו רדיאלי (וולט, אושר 28.10): עיגול מקווקו 1/2.6 בלבן 13%, רק בתוך קשת המילוי (mask) — הפסים ניצבים לקו בכל מקום */
+  html body .scheme-order-details .mh-ot-hero .mh-ot-ring .mh-ot-hatch { stroke: rgba(255, 255, 255, 0.13) !important; stroke-linecap: butt !important; }
+  html body .scheme-order-details .mh-ot-hero .mh-ot-ring .mh-ot-mask { stroke: #fff !important; }
+  /* L2 / L3 / L4: הטבעת אדום רך שטוח וקפואה — לא "כמעט נגמר" ליד שעה מעודכנת; בעיכוב גדול האדום החזק עובר לכפתור הוואטסאפ */
+  html body .scheme-order-details .mh-ot-hero .mh-ot-ring .mh-ot-fil.is-soft { stroke: rgba(227, 30, 36, 0.35) !important; }
+  html body .scheme-order-details .mh-ot-hero .mh-ot-spin { transform-origin: 50% 50% !important; transform-box: view-box !important; }
+  html body .scheme-order-details .mh-ot-hero .mh-ot-ring .mh-ot-shine { stroke: rgba(255, 255, 255, 0.24) !important; stroke-linecap: butt !important; opacity: 0 !important; }
+
+  /* סמל השלב רוכב על ראש המילוי (--bx/--by/--bs מה-JS): זכוכית לבנה (32 בטלפון, 30 במחשב, 28 במסך נמוך), סמל אדום כהה ~20px.
+     מייצג את השלב, לעולם לא מיקום. כשבמרכז סמל — לא מצויר (לא פעמיים). iframe עם שליח אמיתי של AutoZod (סטטוס 4 + הודעת
+     hyperzod_agent_tracking ב-120 השנ' האחרונות): לא מצויר (שליח אחד במסך) */
+  html body .scheme-order-details .mh-ot-hero .mh-ot-badge {
+    position: absolute !important; left: var(--bx) !important; top: var(--by) !important; width: var(--bs) !important; height: var(--bs) !important;
+    transform: translate(-50%, -50%) !important; display: grid !important; place-items: center !important; border-radius: 50% !important;
+    background: rgba(255, 255, 255, 0.97) !important; color: #c8151b !important; border: 1px solid rgba(200, 21, 27, 0.18) !important;
+    box-shadow: 0 1px 4px rgba(17, 17, 17, 0.18) !important;
+  }
+  html body .scheme-order-details .mh-ot-hero .mh-ot-badge svg { width: 62% !important; height: 62% !important; stroke-width: 2.1 !important; }
+
+  /* מרכז הדיסק: "עד" / מספר / "דק׳" — המספר אדום כהה, ספרות ברוחב קבוע, בלי שניות */
+  html body .scheme-order-details .mh-ot-hero .mh-ot-face {
+    position: absolute !important; inset: 0 !important; display: flex !important; flex-direction: column !important; align-items: center !important; justify-content: center !important;
+    text-align: center !important; pointer-events: none !important;
+  }
+  html body .scheme-order-details .mh-ot-hero .mh-ot-pre { font-size: 14px !important; line-height: 18px !important; font-weight: 700 !important; color: #6b7280 !important; }
+  html body .scheme-order-details .mh-ot-hero .mh-ot-num {
+    font-size: var(--num) !important; line-height: 1 !important; font-weight: 800 !important; color: #c8151b !important;
+    font-variant-numeric: tabular-nums !important; letter-spacing: -0.01em !important; margin: 0 0 2px !important;
+  }
+  html body .scheme-order-details .mh-ot-hero .mh-ot-num.is-time { font-size: calc(var(--num) * 0.72) !important; margin: 2px 0 6px !important; }
+  html body .scheme-order-details .mh-ot-hero .mh-ot-face.is-small .mh-ot-num.is-time { font-size: calc(var(--num) * 0.55) !important; }
+  html body .scheme-order-details .mh-ot-hero .mh-ot-num bdi, html body .scheme-order-details .mh-ot-hero .mh-ot-ftime bdi { unicode-bidi: isolate !important; }
+  html body .scheme-order-details .mh-ot-hero .mh-ot-unit { font-size: 15px !important; line-height: 18px !important; font-weight: 700 !important; color: #6b7280 !important; }
+  html body .scheme-order-details .mh-ot-hero .mh-ot-face.is-sched .mh-ot-pre { font-size: 15px !important; font-weight: 600 !important; }
+  html body .scheme-order-details .mh-ot-hero .mh-ot-ftext {
+    max-width: 64% !important; font-size: calc(var(--num) * 0.4) !important; line-height: 1.18 !important; font-weight: 800 !important; color: #c8151b !important; text-wrap: balance !important;
+  }
+  html body .scheme-order-details .mh-ot-hero .mh-ot-fglyph { display: grid !important; place-items: center !important; width: calc(var(--disc) * 0.22) !important; height: calc(var(--disc) * 0.22) !important; color: #c8151b !important; }
+  html body .scheme-order-details .mh-ot-hero .mh-ot-fglyph svg { width: 100% !important; height: 100% !important; stroke-width: 1.7 !important; }
+  html body .scheme-order-details .mh-ot-hero .mh-ot-fglyph.is-grey { color: #9ca3af !important; }
+  /* נמסרה: ✓ + השעה באדום כהה; "ההזמנה נמסרה" נאמר פעם אחת, מתחת */
+  html body .scheme-order-details .mh-ot-hero .mh-ot-ftime { margin-top: 4px !important; font-size: 22px !important; line-height: 26px !important; font-weight: 800 !important; color: #c8151b !important; font-variant-numeric: tabular-nums !important; }
+
+  /* כפתורי הצד (±150px מהמרכז, כמו בוולט): ימין = עזרה בוואטסאפ, שמאל = החשבון. מעל המפה: זכוכית קטנה (blur מותר), צל קצר —
+     התחתית 23px מעל הלוגו של Google (טלפון). סמל אדום כהה, בלי ירוק */
+  html body .scheme-order-details .mh-ot-hero .mh-ot-flank {
+    position: absolute !important; top: calc(var(--disc) - 64px) !important; width: 44px !important; height: 44px !important; border-radius: 50% !important;
+    display: grid !important; place-items: center !important; pointer-events: auto !important; color: #c8151b !important; text-decoration: none !important;
+    background: rgba(255, 255, 255, 0.92) !important; -webkit-backdrop-filter: blur(12px) saturate(140%) !important; backdrop-filter: blur(12px) saturate(140%) !important;
+    border: 1px solid rgba(17, 17, 17, 0.08) !important; box-shadow: 0 1px 3px rgba(17, 17, 17, 0.14) !important;
+  }
+  html body .scheme-order-details .mh-ot-hero .mh-ot-flank.is-help { right: max(8px, calc(50% - 172px)) !important; }   /* 320: לא יוצא מהמסך */
+  html body .scheme-order-details .mh-ot-hero .mh-ot-flank.is-bill { left: max(8px, calc(50% - 172px)) !important; }
+  html body .scheme-order-details .mh-ot-hero .mh-ot-flank svg { width: 22px !important; height: 22px !important; }
+  /* על הגיליון (iframe / בלי מפה / מחשב על התפר) — אותו כפתור, לבן אטום, בלי blur ובלי צל */
+  html body .scheme-order-details .mh-ot-hero:is([data-mode="none"], [data-mode="iframe"], [data-seam]) .mh-ot-flank {
+    top: calc(var(--disc) - 50px) !important; background: #fff !important; -webkit-backdrop-filter: none !important; backdrop-filter: none !important; box-shadow: none !important; border-color: #e6e8ec !important;
+  }
+
+  /* מתחת לדיסק: עסק (שם בלבד — הלוגו נשאר בכרטיס החשבון) · משפט · שורת הזמן. ממורכז (כמו בוולט); במחשב טור של 480 */
+  html body .scheme-order-details .mh-ot-hero .mh-ot-under { display: flex !important; flex-direction: column !important; align-items: center !important; text-align: center !important; padding: 14px 20px 0 !important; }
+  html body .scheme-order-details .mh-ot-hero .mh-ot-merch { max-width: 100% !important; font-size: 13px !important; line-height: 18px !important; font-weight: 600 !important; color: #6b7280 !important; overflow: hidden !important; text-overflow: ellipsis !important; white-space: nowrap !important; }
+  html body .scheme-order-details .mh-ot-hero .mh-ot-title { margin: 2px 0 0 !important; padding: 0 !important; font-size: 20px !important; line-height: 26px !important; font-weight: 800 !important; color: #111 !important; letter-spacing: 0 !important; text-wrap: balance !important; }
+  html body .scheme-order-details .mh-ot-hero .mh-ot-line { margin: 4px 0 0 !important; font-size: 15px !important; line-height: 20px !important; font-weight: 700 !important; color: #c8151b !important; font-variant-numeric: tabular-nums !important; }
+  html body .scheme-order-details .mh-ot-hero .mh-ot-line bdi { unicode-bidi: isolate !important; white-space: nowrap !important; }
+  html body .scheme-order-details .mh-ot-hero .mh-ot-sub { margin: 4px 0 0 !important; font-size: 14px !important; line-height: 20px !important; font-weight: 500 !important; color: #555 !important; }
+  html body .scheme-order-details .mh-ot-hero .mh-ot-sheet > .mh-ot-steps { margin: 18px 16px 0 !important; }
+  html body .scheme-order-details .mh-ot-hero .mh-ot-sheet > .mh-ot-cta { margin: 16px 16px 0 !important; }
+  html body .scheme-order-details .mh-ot-hero .mh-ot-sheet + .mh-ot-row { margin-top: 2px !important; }
+  html body .scheme-order-details:has(.scheme-order-tracking-header:not(.native-top-notch-padding)) .mh-ot-hero .mh-ot-sheet > :not(.mh-ot-clock) { width: 100% !important; max-width: 480px !important; margin-left: auto !important; margin-right: auto !important; }
+
+  /* תנועה — רק ב-no-preference: ניצוץ איטי לאורך המילוי (6 שנ', --to מה-JS), הקשת הלא-מוגדרת מסתובבת לאט (3 שנ', L4/תקוע: 6 שנ'),
+     המספר מתגלגל פעם בדקה (ה-JS מוסיף mh-ot-roll). בלי תקתוק, בלי הבהוב. */
+  @media (prefers-reduced-motion: no-preference) {
+    html body .scheme-order-details .mh-ot-hero .mh-ot-clock[data-ring="pending"] .mh-ot-spin { animation: mh-ot-spin 3s linear infinite !important; }
+    html body .scheme-order-details .mh-ot-hero .mh-ot-clock[data-ring="softpending"] .mh-ot-spin { animation: mh-ot-spin 6s linear infinite !important; }
+    html body .scheme-order-details .mh-ot-hero .mh-ot-ring .mh-ot-shine { opacity: 1 !important; animation: mh-ot-shine 6s linear infinite !important; }
+    html body .scheme-order-details .mh-ot-hero .mh-ot-num.mh-ot-roll { animation: mh-ot-roll 0.32s cubic-bezier(0.16, 1, 0.3, 1) 1 both !important; }
+  }
+  @keyframes mh-ot-spin { to { transform: rotate(360deg); } }
+  @keyframes mh-ot-shine { from { stroke-dashoffset: 7; } to { stroke-dashoffset: var(--to); } }
+  @keyframes mh-ot-roll { from { transform: translateY(-0.35em); opacity: 0; } to { transform: none; opacity: 1; } }
+
+  /* B4. השלבים: מקטע + שם, מתמלא מימין. שעבר = אדום רך + שם כהה עם ✓ (לא תלוי בצבע), נוכחי = אדום מלא + שם אדום כהה, עתידי = אפור */
+  html body .scheme-order-details .mh-ot-hero .mh-ot-steps {
+    list-style: none !important; margin: 16px 0 0 !important; padding: 0 !important; direction: rtl !important;
+    display: grid !important; grid-template-columns: repeat(5, minmax(0, 1fr)) !important; gap: 4px !important;
+  }
+  html body .scheme-order-details .mh-ot-hero .mh-ot-steps > li { display: flex !important; flex-direction: column !important; gap: 7px !important; min-width: 0 !important; margin: 0 !important; padding: 0 !important; }
+  html body .scheme-order-details .mh-ot-hero .mh-ot-steps > li > i { display: block !important; height: 6px !important; border-radius: 999px !important; background: #e9ebef !important; transform-origin: right center !important; }
+  html body .scheme-order-details .mh-ot-hero .mh-ot-steps > li.is-done > i { background: rgba(227, 30, 36, 0.28) !important; }
+  html body .scheme-order-details .mh-ot-hero .mh-ot-steps > li.is-now > i { background: #e31e24 !important; }
+  html body .scheme-order-details .mh-ot-hero .mh-ot-steps > li > span {
+    display: flex !important; align-items: center !important; gap: 3px !important; min-width: 0 !important; overflow: hidden !important; white-space: nowrap !important;
+    font-size: 12px !important; line-height: 16px !important; font-weight: 500 !important; color: #6b7280 !important;
+  }
+  html body .scheme-order-details .mh-ot-hero .mh-ot-steps > li.is-done > span { color: #374151 !important; font-weight: 600 !important; }
+  html body .scheme-order-details .mh-ot-hero .mh-ot-steps > li.is-done > span::before {
+    content: "" !important; flex: none !important; width: 10px !important; height: 10px !important;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10'%3E%3Cpath d='M1.5 5.2 4 7.6 8.5 2.6' fill='none' stroke='%23374151' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat !important;
+  }
+  html body .scheme-order-details .mh-ot-hero .mh-ot-steps > li.is-now > span { color: #c8151b !important; font-weight: 800 !important; }
+  @media (max-width: 359px) { html body .scheme-order-details .mh-ot-hero .mh-ot-steps > li.is-done > span::before { display: none !important; } }
+  /* זום 200% / טקסט ענק (רוחב קטן מ-300): רק השם של השלב הנוכחי (הרשימה מוקראת מ-aria-label) */
+  @media (max-width: 299px) {
+    html body .scheme-order-details .mh-ot-hero .mh-ot-steps > li:not(.is-now) > span { visibility: hidden !important; }
+    html body .scheme-order-details .mh-ot-hero .mh-ot-steps > li.is-now > span { overflow: visible !important; }
+  }
+
+  /* B5. עיכוב גדול (L3/L4) ותשלום/אישור תקועים (data-stuck): הטבעת אדום רך, המקטע הנוכחי רך, והאדום החזק היחיד = כפתור הוואטסאפ בגרדיאנט.
+     הקישור = window.MH_WA.href(text), ואם חסר — wa.me המילולי (ביקורת 18: תמיד קישור). באפליקציה המאזין של MH WhatsApp פותח אותו. */
+  html body .scheme-order-details .mh-ot-hero:is([data-level="3"], [data-level="4"], [data-stuck]) .mh-ot-steps > li.is-now > i { background: #f08a8d !important; }
+  html body .scheme-order-details .mh-ot-hero:is([data-level="3"], [data-level="4"], [data-stuck]) .mh-ot-steps > li.is-now > span { color: #c8151b !important; font-weight: 700 !important; }   /* רך, אבל לא שחור (דוד 23.10) */
+  html body .scheme-order-details .mh-ot-hero .mh-ot-cta {
+    display: flex !important; align-items: center !important; justify-content: center !important; gap: 8px !important;
+    min-height: 52px !important; border-radius: 999px !important; text-decoration: none !important;
+    background: linear-gradient(135deg, #ff3b41 0%, #c8151b 100%) !important; box-shadow: none !important;
+    color: #fff !important; font-size: 19px !important; line-height: 1 !important; font-weight: 800 !important;   /* לבן על הקצה הבהיר: רק מ-18.66px מודגש */
+  }
+  html body .scheme-order-details .mh-ot-hero .mh-ot-cta svg { width: 22px !important; height: 22px !important; flex: none !important; }
+
+  /* B6. שורות: שליח ("בדרך"; לפני האיסוף רק כשיש צ'אט עם השליח — QA r1; שם פרטי, סמל אדם ניטרלי, בלי טלפון), כתובת (הוראות בשורה נפרדת), עזרה (וואטסאפ).
+     אריחי האייקון באדום רך כמו כפתור החזרה בהדר */
+  html body .scheme-order-details .mh-ot-hero .mh-ot-row {
+    display: flex !important; align-items: center !important; gap: 12px !important; min-height: 60px !important; margin: 0 12px !important; padding: 12px 14px !important;
+    background: #fff !important; border: 1px solid #e6e8ec !important; border-radius: 16px !important; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03) !important;
+    color: #111 !important; text-decoration: none !important;
+  }
+  html body .scheme-order-details .mh-ot-hero .mh-ot-row.mh-ot-drop { align-items: flex-start !important; }
+  html body .scheme-order-details .mh-ot-hero .mh-ot-ico {
+    flex: 0 0 40px !important; width: 40px !important; height: 40px !important; border-radius: 50% !important; display: grid !important; place-items: center !important;
+    background: rgba(227, 30, 36, 0.08) !important; color: #c8151b !important; font-size: 17px !important; line-height: 1 !important; font-weight: 800 !important;
+  }
+  html body .scheme-order-details .mh-ot-hero .mh-ot-ico svg { width: 20px !important; height: 20px !important; }
+  html body .scheme-order-details .mh-ot-hero .mh-ot-rt { flex: 1 1 auto !important; min-width: 0 !important; display: flex !important; flex-direction: column !important; }
+  html body .scheme-order-details .mh-ot-hero .mh-ot-rt > b { font-size: 15px !important; line-height: 21px !important; font-weight: 800 !important; color: #111 !important; overflow-wrap: anywhere !important; }
+  html body .scheme-order-details .mh-ot-hero .mh-ot-rt > span { font-size: 13px !important; line-height: 18px !important; font-weight: 600 !important; color: #6b7280 !important; }
+  html body .scheme-order-details .mh-ot-hero .mh-ot-rt > .mh-ot-cap { font-size: 12px !important; line-height: 16px !important; font-weight: 700 !important; color: #6b7280 !important; }
+  html body .scheme-order-details .mh-ot-hero .mh-ot-rt > .mh-ot-note { margin-top: 3px !important; font-size: 13px !important; line-height: 18px !important; font-weight: 500 !important; color: #555 !important; overflow-wrap: anywhere !important; }
+  /* צ'אט עם השליח (דוד 27.10: "צ'אט אם יש"; QA r1) — בקצה שורת השליח, רק כש-Hyperzod מציעה צ'אט. אותו אריח אדום רך כמו הצ'אט עם העסק
+     בכרטיס החשבון (B9), 44 מלא. המונה = מספר ההודעות שלא נקראו של Hyperzod, מעוגל לבן מסביב. בלי כפתור התקשרות */
+  html body .scheme-order-details .mh-ot-hero .mh-ot-courier .mh-ot-chat {
+    position: relative !important; flex: 0 0 44px !important; width: 44px !important; height: 44px !important; margin: 0 !important; padding: 0 !important;
+    display: grid !important; place-items: center !important; border: 0 !important; border-radius: 50% !important;
+    background: #fdecec !important; color: #c8151b !important; box-shadow: none !important; cursor: pointer !important; -webkit-tap-highlight-color: transparent !important;
+  }
+  html body .scheme-order-details .mh-ot-hero .mh-ot-courier .mh-ot-chat svg { width: 22px !important; height: 22px !important; }
+  html body .scheme-order-details .mh-ot-hero .mh-ot-courier .mh-ot-unread {
+    position: absolute !important; top: -3px !important; right: -3px !important; min-width: 18px !important; height: 18px !important; padding: 0 5px !important;
+    border-radius: 999px !important; background: #e31e24 !important; color: #fff !important; box-shadow: 0 0 0 2px #fff !important;
+    font-size: 11px !important; line-height: 18px !important; font-weight: 800 !important; text-align: center !important; font-variant-numeric: tabular-nums !important;
+  }
+  html body .scheme-order-details .mh-ot-hero .mh-ot-help { min-height: 56px !important; }
+  html body .scheme-order-details .mh-ot-hero .mh-ot-help .mh-ot-rt > b { font-size: 14px !important; font-weight: 600 !important; color: #111 !important; }
+  html body .scheme-order-details .mh-ot-hero .mh-ot-help .mh-ot-rt > b u { text-decoration: none !important; color: #c8151b !important; font-weight: 800 !important; }
+  html body .scheme-order-details .mh-ot-hero .mh-ot-chev { flex: 0 0 16px !important; width: 16px !important; height: 16px !important; color: #9ca3af !important; }
+  @media (hover: hover) {
+    html body .scheme-order-details .mh-ot-hero a.mh-ot-row:hover { border-color: rgba(227, 30, 36, 0.25) !important; }
+    html body .scheme-order-details .mh-ot-hero a.mh-ot-cta:hover { filter: brightness(1.05) !important; }
+  }
+
+  /* B7. קורא מסך: אזור הודעה אחד (role=status), והכותרת הנגישה שלנו בהדר (ה-JS מוציא את ה-h1 של Hyperzod מעץ הנגישות) — מוסתרים חזותית */
+  html body .scheme-order-details .mh-ot-hero .mh-ot-sr,
+  html body .scheme-order-details .scheme-order-tracking-header .mh-ot-h1 {
+    position: absolute !important; width: 1px !important; height: 1px !important; margin: -1px !important; padding: 0 !important; border: 0 !important;
+    overflow: hidden !important; clip: rect(0 0 0 0) !important; white-space: nowrap !important;
+  }
+
+  /* B8. תנועה: המקטע הנוכחי מתמלא פעם אחת בכניסה לשלב (ה-JS מוסיף mh-ot-pulse רק במעבר שלב; לא במתוזמנת) */
+  @media (prefers-reduced-motion: no-preference) {
+    html body .scheme-order-details .mh-ot-hero .mh-ot-steps > li.is-now.mh-ot-pulse > i { animation: mh-ot-fill 0.7s cubic-bezier(0.16, 1, 0.3, 1) 1 both !important; }
+  }
+  @keyframes mh-ot-fill { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+
+  /* B9. כרטיס העסק והחשבון של Hyperzod — עיצוב בלבד, אף מספר לא משתנה: אותו טור (12px), רדיוס ומסגרת כמו שלנו.
+     ה-JS מסמן: הכרטיס (data-mh-ot-bill + id="mh-ot-bill" — היעד של כפתור החשבון), העוטף עם הריפוד (data-mh-ot-wrap)
+     והעוטפים בדרך (data-mh-ot-chain — מבטל space-y ואת הפס האפור והשוליים השליליים של "נמסרה"). */
+  html body .scheme-order-details:has(.mh-ot-hero):not(:has(.scheme-order-details .mh-ot-hero)) [data-mh-ot-chain] { margin-top: 0 !important; padding-top: 0 !important; background: transparent !important; }
+  html body .scheme-order-details:has(.mh-ot-hero):not(:has(.scheme-order-details .mh-ot-hero)) [data-mh-ot-wrap] { padding: 0 12px !important; margin: 0 !important; background: transparent !important; }
+  html body .scheme-order-details:has(.mh-ot-hero):not(:has(.scheme-order-details .mh-ot-hero)) [data-mh-ot-bill] {
+    margin: 0 0 12px !important; padding: 0 !important; background: #fff !important; overflow: hidden !important;   /* padding: חלק 11 §4 נתן 20px ל"בוטלה" */
+    -webkit-backdrop-filter: none !important; backdrop-filter: none !important;   /* חלק 11 §4 נתן blur(45px) ל"בוטלה" — מתחת ללבן אטום לא נראה */
+    border: 1px solid #e6e8ec !important; border-radius: 18px !important; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03) !important;
+  }
+  /* שורה שלנו במקום "הזמנה #… | ערב 7:42, 27 באוקטובר 2026 | …": כל חלק לא נשבר בתוכו */
+  html body .scheme-order-details .mh-ot-mline { margin-top: 2px !important; font-size: 12px !important; line-height: 17px !important; font-weight: 600 !important; color: #6b7280 !important; }
+  html body .scheme-order-details .mh-ot-mline > span { white-space: nowrap !important; }
+  html body .scheme-order-details .mh-ot-mline bdi { unicode-bidi: isolate !important; }
+  /* לוגו העסק: עיגול נקי (היה ריבוע עם פינות שחורות) */
+  html body .scheme-order-details:has(.mh-ot-hero):not(:has(.scheme-order-details .mh-ot-hero)) [data-mh-ot-bill] img { border-radius: 50% !important; object-fit: cover !important; }
+  /* טלפון העסק: אריח אדום רך + אייקון אדום כהה (אושר 28.10; היה ירוק #01C267 מהכלל הגלובלי של חלק 11, שהוסר) */
+  html body .scheme-order-details:has(.mh-ot-hero):not(:has(.scheme-order-details .mh-ot-hero)) [data-mh-ot-bill] a[href^="tel:"] svg rect { fill: #fdecec !important; }
+  html body .scheme-order-details:has(.mh-ot-hero):not(:has(.scheme-order-details .mh-ot-hero)) [data-mh-ot-bill] a[href^="tel:"] svg path { fill: #c8151b !important; }
+  /* הצ'אט עם העסק (כשיש): אותו אריח אדום רך כמו הטלפון לידו (היה אפור). ה-JS נותן aria בעברית לשניהם */
+  html body .scheme-order-details:has(.mh-ot-hero):not(:has(.scheme-order-details .mh-ot-hero)) [data-mh-ot-bill] button.scheme-order-action { background: #fdecec !important; }
+  html body .scheme-order-details:has(.mh-ot-hero):not(:has(.scheme-order-details .mh-ot-hero)) [data-mh-ot-bill] button.scheme-order-action .v-icon { color: #c8151b !important; }
+  /* שטח לחיצה 44 בלי שינוי נראה (הדפוס של 23.10): העיגולים 34 + ::before שקוף, 5px מכל צד */
+  html body .scheme-order-details:has(.mh-ot-hero):not(:has(.scheme-order-details .mh-ot-hero)) [data-mh-ot-bill] :is(a[href^="tel:"], button.scheme-order-action) { position: relative !important; }
+  html body .scheme-order-details:has(.mh-ot-hero):not(:has(.scheme-order-details .mh-ot-hero)) [data-mh-ot-bill] :is(a[href^="tel:"], button.scheme-order-action)::before {
+    content: "" !important; position: absolute !important; inset: -5px !important; background: transparent !important;
+  }
+
+  /* B10. "מעקב הזמנה" של Hyperzod (AutoZod בלי iframe, data-mh-ot-ext מה-JS): נשאר — הקישור היחיד לשליח — אבל כשורה שקטה
+     כמו שורת העזרה (כרטיס לבן, טקסט אדום כהה), לא כפתור אדום מלא שני מתחת לשעון (QA r0) */
+  html body .scheme-order-details:has(.mh-ot-hero):not(:has(.scheme-order-details .mh-ot-hero)) [data-mh-ot-ext] { padding: 0 12px !important; margin: 0 0 12px !important; }
+  html body .scheme-order-details:has(.mh-ot-hero):not(:has(.scheme-order-details .mh-ot-hero)) [data-mh-ot-ext] > div { height: auto !important; margin: 0 !important; }
+  html body .scheme-order-details:has(.mh-ot-hero):not(:has(.scheme-order-details .mh-ot-hero)) [data-mh-ot-ext] .v-btn {
+    height: 56px !important; margin: 0 !important; background: #fff !important; color: #c8151b !important;
+    border: 1px solid #e6e8ec !important; border-radius: 16px !important; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03) !important;
+    font-size: 15px !important; font-weight: 800 !important; letter-spacing: 0 !important; text-transform: none !important;
+  }
+
+  /* B11. מחשב, הדף אחרי התשלום (/order/success/:id — שם הכרטיס ילד ישיר של #app-router-view עם tw-pt-6, ולא בתוך דף הפרופיל):
+     ה-AppBar הקבוע (71) כיסה את ההדר של המסך (24–77, QA r1). 64 → הכרטיס מתחיל ב-88, כמו בדף ההזמנה הרגיל.
+     תיקון פריסה בלבד ולא מותנה בצומת שלנו (כמו A1) — גם ההדר של Hyperzod היה מוסתר שם. רק ≥960 ורק כשה-AppBar בדף (כמו חלק 6 §8) */
+  @media (min-width: 960px) {
+    html body #MultiVendorHeaderRoot:has(#AppBar) ~ #app-router-view > .scheme-order-details { margin-top: 64px !important; }
+  }
+
+}
+/* mh-ordertrack-v1 */

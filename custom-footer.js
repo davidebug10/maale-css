@@ -4866,7 +4866,7 @@ log('פעיל');
 })();
 
 /* ============================================================
-   בועת וואטסאפ צפה — MH WhatsApp  |  v1.0.2 | 2026-09-28
+   בועת וואטסאפ צפה — MH WhatsApp  |  v1.0.3 | 2026-10-28 (v1.0.2: 28.9)
    בקשת דוד: בועה קטנה עם סמל וואטסאפ בדף הבית ובדפי העסקים, שלא מתנגשת בכלום.
    מה הבלוק עושה: יוצר <a id="mh-wa"> אחד (העיצוב בחלק 45), ומדליק/מכבה .mh-wa-on לפי:
      - מסלול: דף הבית (/, /he, /he/home) — אחרי 1.2 שניות; דף עסק (/he/m/<slug>/<id>) —
@@ -4880,13 +4880,14 @@ log('פעיל');
    המספר: קבוע בקוד (NUMBER) — לא נקרא מה-boot של Hyperzod (v1.0.1, ראו הערה ליד phone()).
    באפליקציה (v1.0.2): כל קישור וואטסאפ (הבועה, "דברו איתנו") נפתח דרך openNativeExternalWebview
    של Hyperzod — ראו הערה ליד המאזין בסוף הבלוק.
+   v1.0.3 (28.10): MH_WA.href(text) — אותו קישור (אותו מספר) עם טקסט אחר, למסך "ההזמנה שלי" (MH OrderTrack). שום התנהגות לא השתנתה.
    נכשל-פתוח: כל שגיאה = אין בועה. בדיקה: window.MH_WA.stats()
    ============================================================ */
 (function () {
   'use strict';
   if (window.__MH_WA__) { return; }
   window.__MH_WA__ = true;
-  var VERSION = '1.0.2', NUMBER = '972555190064';
+  var VERSION = '1.0.3', NUMBER = '972555190064';   /* אותו מספר גם ב-WA_NUMBER של MH OrderTrack (גיבוי) — לשנות בשניהם */
   var TEXT = 'שלום, אשמח לעזרה עם הזמנה במעלה המשלוחים';
   var HOME = /^\/(he\/?(home\/?)?)?$/, MERCHANT = /^\/he\/m\/[^\/]+\/[0-9a-f]{20,}\/?$/;
   var SCROLL_MIN = 160, NAV_GAP = 12, BASE_BOTTOM = 20;
@@ -5007,7 +5008,7 @@ log('פעיל');
       stats.nativeOpens++;
     } catch (err) { /* נכשל-פתוח: הדפדפן ימשיך כרגיל */ }
   }, true);
-  window.MH_WA = { version: VERSION, apply: apply, stats: function () { return JSON.parse(JSON.stringify(stats)); } };
+  window.MH_WA = { version: VERSION, apply: apply, href: function (text) { return 'https://wa.me/' + phone() + '?text=' + encodeURIComponent(text || TEXT); }, stats: function () { return JSON.parse(JSON.stringify(stats)); } };
   /* mh-whatsapp-v1 */
 })();
 
@@ -7439,6 +7440,868 @@ log('פעיל');
 
   window.MH_AGEDOOR = { version: VERSION, sync: sync, isDoor: isDoor, ageReason: ageReason, stats: function () { return JSON.parse(JSON.stringify(stats)); } };
   /* mh-agedoor-v1 */
+})();
+
+/* ============================================================
+   מסך "ההזמנה שלי" + הכפתור "ההזמנה שלי" בדף הבית — MH OrderTrack  |  v1.0.0 | 2026-10-28
+   העיצוב שאושר (דוד 28.10, "מאשר הכל"): capture/order-screen-27.10/design/r2/final (markup.html = ה-DOM המדויק
+   שהבלוק כותב, DECISIONS §7/§11). ה-CSS: חלק 66 ב-global-cdn.css.
+   מה הבלוק עושה (tick אחד כל 400ms, רק כשיש .scheme-order-details או #ongoingOrders בדף; אחרת אין טיימר):
+     - מסך ההזמנה: section.mh-ot-hero (מפה + שעון עגול + שלבים + שליח/כתובת/עזרה) מיד אחרי קופסת המפה של Hyperzod,
+       ובלי מפה — מיד אחרי ההדר. הנתונים: getViewOrder של ה-store (אותו אובייקט שהמסך של Hyperzod מצייר, כולל Echo).
+       שורת השליח: שם פרטי, בלי טלפון; צ'אט עם השליח רק כש-Hyperzod מציעה אותו (הלחיצה = הכפתור שלה, QA r1).
+       מסמן ב-data-mh-ot-hide את מה שמוחלף (כרטיס השליח עם הטלפון, ההיסטוריה עם השעות, "הושלם ב-", "בוטלה", שורת
+       העסק המעורבת) — ה-CSS מסתיר רק כשהצומת שלנו נמצא באותו מופע. שגיאה בציור = הצמתים שלנו יוצאים, Hyperzod שלם.
+     - מפת Google של Hyperzod (אותו מופע — הליכה על #app._vnode כמו MH MenuLoad): סגנון עמום, בלי מחוות ובלי כפתורים,
+       הסיכות והקווים שלהם מוסתרים, שתי סיכות שלנו (OverlayView), fitBounds עטוף במופע בלבד = ה-hook לציור מחדש.
+       אריחים לא נטענו 4 שנ' → data-mh-cover="tiles" (הקופסה מתקפלת). iframe של AutoZod (#orderTracking) — לא נוגעים
+       בו; הודעות hyperzod_agent_tracking רק מ-https://www.autozod.app: שליח חי (120 שנ') → סמל השלב יורד מהטבעת;
+       היו הודעות ונעצרו 120 שנ' בסטטוס 4 → data-mh-cover="az-stale". AutoZod שלא שולח בכלל — אף פעם לא מכסים.
+     - הכפתור בדף הבית: .mh-ot-line בכל כרטיס של Swiper (getOnGoingOrders בלי 5/6, אותו סדר), אותו שלב ואותו מספר כמו המסך.
+   השעון: clockView() — מודל research2/eta-model.mjs + תיקוני הביקורת (28.10): חסד 2 דק' לאיחור Realtime, prev אחד לכל
+     הזמנה (מסך+כפתור), תקרת טבעת 0.94 ו"ממש עוד רגע" ב-≤2 דק' בתוך המודל, היסט שעון שרת (HEAD, פעם אחת לטעינה, רק מעל 60 שנ'; עד התשובה — שלבים בלבד).
+     ייצוב (QA r2): ההבטחה בדקות שלמות, זזה רק מעל 3′ ולכל היותר פעם ב-2′, תזוזה מאוחרת = "זמן הגעה מעודכן", הטבעת לא חוזרת אחורה.
+     CLOCK_ON=false (דחיפה 1): מצב שלבים בלבד — סמל + חלק טבעת לפי שלב, בלי שום מספר/שעת הגעה/עיכוב, גם לא בכפתור וב-aria.
+     נשאר: חלון משלוח מתוזמן שהלקוח בחר (עובדה, לא הערכה — QA r0). שעת המסירה — רק כשהשעון דלוק.
+   חיבור לא חי (60 שנ' בלי Echo מחובר) → בלי מספר ובלי זמנים. נפתח מהתראה וההזמנה בלי ערוץ → watchOrders של Hyperzod פעם אחת.
+   פרטיות: לא קוראים order_status_history[].user; ב-stats אין uuid, טלפון, מייל או כתובת.
+   בדיקה: MH_ORDERTRACK.stats(). מתגים לבדיקות: window.__MH_OT_CLOCK__=true (שעון דלוק), window.__MH_NOW__=<ms>,
+     window.__MH_OT_LIVE__=true|false. הבדיקה של המודל: capture/order-screen-27.10/cand/clock-check.mjs
+   ============================================================ */
+(function () {
+  'use strict';
+  if (window.__MH_OT__) { return; }
+  window.__MH_OT__ = true;
+
+  var VERSION = '1.0.0';
+  var CLOCK_ON = false;            /* דחיפה 1: שעון כבוי. דחיפה 2 (אחרי הזמנת הבדיקה של דוד): true */
+  var TICK = 400, LIVE_GRACE = 60000, BEAT_FRESH = 120000, TILES_WAIT = 4000;
+  var AZ_ORIGIN = 'https://www.autozod.app', WA_NUMBER = '972555190064';   /* גיבוי בלבד; אותו מספר כמו NUMBER של MH WhatsApp — לשנות בשניהם */
+  var MIN = 60000;
+  /* המודל (calibration.md §4). grace = ביקורת 12; cap/soon = ביקורת 16 */
+  var P = { courier: 10, wait: 5, tA: 7.5, tB: 1.4, maxKm: 8, preLo: 6, preHi: 12, postLo: 6, postHi: 8, adoptLater: 5, adoptEarlier: 3,
+    L1: 5, L2: 15, L3: 30, maxPrep: 120, grace: 2, cap: 0.94, soon: 2 };
+  var stats = { version: VERSION, clock: false, css: false, has: false, ticks: 0, renders: 0, discs: 0, stripRenders: 0, mode: null, stage: null, level: 0,
+    mapMode: null, map: null, cover: null, seam: false, chat: false, fits: 0, redraws: 0, beats: 0, live: null, offsetS: 0, watched: 0, announces: 0, errors: 0, lastError: null };
+
+  function ext(a, b) { var o = {}, k; for (k in a) { o[k] = a[k]; } for (k in b) { o[k] = b[k]; } return o; }
+  function err(e) { stats.errors++; stats.lastError = String((e && e.message) || e).slice(0, 140); }
+  function clockOn() { return CLOCK_ON || window.__MH_OT_CLOCK__ === true; }
+
+  /* ---------- זמן ---------- */
+  var offset = 0, offAsk = 0, offDone = false;
+  function tnow() { return typeof window.__MH_NOW__ === 'number' ? window.__MH_NOW__ : Date.now(); }
+  function now() { return typeof window.__MH_NOW__ === 'number' ? window.__MH_NOW__ : Date.now() + offset; }
+  /* ביקורת 15: מכשיר שהשעון שלו זז מקצר/מאריך את המספר. Date של HEAD לאותו מקור (+Age אם הגיע מ-cache).
+     פעם אחת לטעינת דף, מהמסך או מהכפתור — אותו היסט בשניהם (QA r0) */
+  function askOffset() {
+    if (offAsk) { return; }
+    offAsk = Date.now();
+    if (typeof fetch !== 'function') { offDone = true; return; }
+    var t0 = Date.now();
+    fetch(location.origin + '/', { method: 'HEAD', cache: 'no-store', credentials: 'same-origin' }).then(function (r) {
+      var t1 = Date.now(), d = Date.parse(r.headers.get('date') || ''), age = Number(r.headers.get('age') || 0);
+      if (!isFinite(d)) { return; }
+      var off = d + 500 + (age > 0 && age < 86400 ? age * 1000 : 0) - (t0 + t1) / 2;
+      offset = Math.abs(off) > 60000 ? Math.round(off) : 0;
+      stats.offsetS = Math.round(offset / 1000);
+    }).catch(function () {}).then(function () { offDone = true; });
+  }
+  /* עד שההיסט ידוע (לכל היותר 2 שנ') — בלי מספרים, ובלי לזכור תצוגה שחושבה משעון המכשיר (המספר לא קופץ למעלה בפתיחה) */
+  function offPending() { return offAsk > 0 && !offDone && Date.now() - offAsk < 2000 && typeof window.__MH_NOW__ !== 'number'; }
+  var fmtHM = null, fmtD = null;
+  function hm(t) {
+    fmtHM = fmtHM || new Intl.DateTimeFormat('he-IL', { timeZone: 'Asia/Jerusalem', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' });
+    return fmtHM.format(t).replace(/[^\d:]/g, '');
+  }
+  function ilDay(t) {
+    fmtD = fmtD || new Intl.DateTimeFormat('en-US', { timeZone: 'Asia/Jerusalem', year: 'numeric', month: 'numeric', day: 'numeric' });
+    var y = 0, mo = 1, d = 1;
+    fmtD.formatToParts(t).forEach(function (p) { if (p.type === 'year') { y = +p.value; } else if (p.type === 'month') { mo = +p.value; } else if (p.type === 'day') { d = +p.value; } });
+    var u = Date.UTC(y, mo - 1, d);
+    return { n: u / 864e5, wd: new Date(u).getUTCDay(), dm: d + '.' + mo };
+  }
+  var WD = ['ראשון', 'שני', 'שלישי', 'רביעי', 'חמישי', 'שישי', 'שבת'];
+  function dayWord(t, nw) {   /* היום / מחר / מוצ״ש (שבת מ-17:00) / "יום שני 2.11" */
+    var a = ilDay(t), diff = a.n - ilDay(nw).n;
+    if (a.wd === 6 && diff >= 0 && diff <= 6 && +hm(t).slice(0, 2) >= 17) { return 'מוצ״ש'; }
+    return diff === 0 ? 'היום' : diff === 1 ? 'מחר' : 'יום ' + WD[a.wd] + ' ' + a.dm;
+  }
+
+  /* "משלוח מתוזמן · מחר 12:00-12:30"; עם תאריך — פסיק, שהתאריך לא ייצמד לשעה ("יום שני 2.11, 12:00-12:30", QA r1).
+     פסיק ולא "·": ב-320 השורה נשברת אחריו, ופסיק בסוף שורה נקרא טבעי */
+  function schedLine(w, r) { return 'משלוח מתוזמן · ' + w + (/\d/.test(w) ? ', ' : ' ') + r; }
+
+  /* ---------- המודל (פורט של research2/eta-model.mjs + תיקוני הביקורת) ---------- */
+  function parseUTC(ts) {   /* "YYYY-MM-DD HH:MM:SS" ב-UTC בלי Z — אף פעם לא new Date(naive) */
+    var t = String(ts == null ? '' : ts).trim();
+    var m = /^(\d{4})-(\d\d)-(\d\d)[ T](\d\d):(\d\d)(?::(\d\d))?$/.exec(t);
+    if (m) { return Date.UTC(+m[1], m[2] - 1, +m[3], +m[4], +m[5], +(m[6] || 0)); }
+    var d = Date.parse(t);
+    return isFinite(d) ? d : null;
+  }
+  function prepEntered(o) {
+    var x = o && o.preparation_time;
+    if (!x || x.enabled === false || x.value == null || x.value === '') { return null; }
+    var v = Number(x.value);
+    if (!isFinite(v) || v < 0) { return null; }
+    var u = String(x.unit || 'minutes').toLowerCase(), m = u.indexOf('hour') === 0 ? v * 60 : u.indexOf('sec') === 0 ? v / 60 : v;
+    return m > P.maxPrep ? null : m;
+  }
+  function km(a, b) {
+    if (!a || !b) { return null; }
+    var la1 = Number(a[0]), lo1 = Number(a[1]), la2 = Number(b[0]), lo2 = Number(b[1]);
+    if (!(isFinite(la1) && isFinite(lo1) && isFinite(la2) && isFinite(lo2))) { return null; }
+    var r = Math.PI / 180, x = Math.pow(Math.sin((la2 - la1) * r / 2), 2) + Math.cos(la1 * r) * Math.cos(la2 * r) * Math.pow(Math.sin((lo2 - lo1) * r / 2), 2);
+    return 12742 * Math.asin(Math.sqrt(x));
+  }
+  function slotOf(o) {   /* רק מתוזמנת. בהזמנה מיידית delivery_timestamp_human הוא חלון של שעה מזמן ההזמנה — לא ETA */
+    if (!o || !o.is_scheduled || !Number(o.delivery_timestamp_unix)) { return null; }
+    var start = Number(o.delivery_timestamp_unix) * 1000, h = o.delivery_timestamp_human && o.delivery_timestamp_human.local_time;
+    var m = /(\d\d?):(\d\d)\s*-\s*(\d\d?):(\d\d)/.exec(String(h || ''));
+    var len = m ? (((+m[3] * 60 + +m[4]) - (+m[1] * 60 + +m[2])) % 1440 + 1440) % 1440 : 0;
+    return { start: start, end: start + (len || 30) * MIN };
+  }
+  var STAGE = ['payment', 'received', 'preparing', 'ready', 'on_the_way', 'delivered', 'cancelled'];
+  /* עוגנים: A = האישור הראשון אחרי הביטול האחרון, K = האיסוף הראשון אחריו. שלב = מקסימום אחרי האישור (סבב 0: 1,2,4,3 לא חוזר אחורה).
+     קורא רק order_status ו-timestamp מההיסטוריה (לא user). prev = התצוגה הקודמת של אותה הזמנה (לייצוב, QA r2) */
+  function up(t) { return t == null ? t : Math.ceil(t / MIN) * MIN; }   /* QA r2: דקה שלמה — "עד 20 דק׳" ו"עד 20:02" מסכימים גם כשבחותמות יש שניות */
+  function promise(o, nw, prev) {
+    var st = Number(o && o.order_status), src = (o && o.order_status_history) || [], h = [], i, e, s, t;
+    for (i = 0; i < src.length; i++) {
+      e = src[i]; s = Number(e && e.order_status); t = parseUTC(e && e.timestamp);
+      if (t != null && s >= 0 && s <= 6) { h.push({ s: s, t: t }); }
+    }
+    h.sort(function (a, b) { return a.t - b.t; });
+    var from = 0;
+    for (i = 0; i < h.length; i++) { if (h[i].s === 6) { from = i + 1; } }
+    var ep = h.slice(from), A = null, K = null, t5 = null, top = isFinite(st) ? st : 0, since = null;
+    for (i = 0; i < ep.length; i++) { if (ep[i].s === 2) { A = ep[i].t; break; } }
+    for (i = 0; i < ep.length; i++) { if (ep[i].s === 4 && (A == null || ep[i].t >= A)) { K = ep[i].t; break; } }
+    for (i = 0; i < ep.length; i++) { if (ep[i].s === 5) { t5 = ep[i].t; } }
+    if (st === 6) { top = 6; } else { for (i = 0; i < ep.length; i++) { if (ep[i].s <= 5 && ep[i].s > top) { top = ep[i].s; } } }
+    for (i = ep.length - 1; i >= 0; i--) { if (ep[i].s === top) { since = ep[i].t; break; } }
+    if (since == null && ep.length) { since = ep[0].t; }
+    var slot = slotOf(o), base = { stage: STAGE[top] || 'payment', st: top, A: A, K: K, slot: slot, since: since, t5: t5 };
+    if (top <= 1 || top >= 5) { return base; }
+    var d = km(o.merchant && o.merchant.merchant_address_location, o.delivery_address && o.delivery_address.location_lat_lon);
+    if (String(o.order_type) !== 'delivery' || d == null || d > P.maxKm) { return ext(base, { kind: 'stage' }); }   /* קפית ("pickup"), custom_*, רחוק, בלי מיקום */
+    var T = P.tA + P.tB * d, Tlo = Math.max(3, T - P.postLo), Pe = prepEntered(o), lo = null, hi = null;
+    if (slot) { lo = slot.start; hi = slot.end; }
+    else if (A != null && Pe != null) { var c = A + Math.round(Math.max(Pe, P.courier) + P.wait + T) * MIN; lo = c - P.preLo * MIN; hi = c + P.preHi * MIN; }
+    /* QA r2 ייצוב (תוכנית §5.4): באותו שלב (לפני האיסוף / אחריו) ההבטחה שהוצגה נשארת אם השינוי עד 3′, ובכל מקרה לכל היותר
+       שינוי אחד ב-2′ (זמן הכנה 35→37→35 או רעש לא מזיזים את השעה). בלי יו-יו: חזרה לכיוון ההפוך בתוך 5′ מהתזוזה הקודמת
+       צריכה יותר מ-6′ (כל רוחב רעש של ±3′). באיסוף — כללי ה-adopt מול ההבטחה שהוצגה.
+       ponytail: חדשות של עד 6′ בכיוון ההפוך בתוך 5′ מתזוזה מחכות לסוף ה-5′ (בינתיים סולם העיכוב מול מה שהוצג) */
+    var q = prev && prev.ph != null ? prev : null;
+    function hold(h, l, same) {
+      h = up(h); l = up(l);
+      if (!q || !same || h == null) { return [h, l]; }
+      var d = h - q.ph, rev = q.md && d * q.md < 0 && nw - q.chAt < 5 * MIN;
+      return Math.abs(d) <= (rev ? 6 : 3) * MIN || (q.chAt != null && nw - q.chAt < 2 * MIN) ? [q.ph, q.pl] : [h, l];
+    }
+    var hl = hold(hi, lo, q && q.K == null); hi = hl[0]; lo = hl[1];
+    var hi0 = hi, H = hi, adopted = 0, preLate = false;
+    if (K != null) {
+      var cK = K + Math.round(T) * MIN, loK = cK - P.postLo * MIN, hiK = cK + P.postHi * MIN;
+      preLate = hi != null && K + (Tlo + P.grace) * MIN > hi;   /* ביקורת 12: איסוף שמגיע באיחור Realtime לא מחזיר דקות אחרי טקסט עיכוב */
+      if (!preLate) {
+        /* QA r2: מי שעבר להבטחה של האיסוף נשאר איתה (בלי לקפוץ הלוך-חזור על הסף של adopt) */
+        if (hi == null || (q && q.K != null && q.ad) || hiK > hi + P.adoptLater * MIN || hiK < hi - P.adoptEarlier * MIN) { adopted = hi == null ? 0 : hiK > hi ? 1 : -1; H = hiK; lo = loK; }
+        else { lo = Math.max(lo, loK); }
+        if (slot) { lo = Math.max(lo, slot.start); H = Math.max(H, lo + 4 * MIN); }
+      }
+      hl = hold(H, lo, q && q.K != null); H = hl[0]; lo = hl[1];
+    }
+    if (H == null) { return ext(base, { kind: 'stage', soon: true }); }   /* בלי זמן הכנה: הזמן מופיע באיסוף */
+    var chAt = q && H === q.ph ? q.chAt : q ? nw : null, md = !q ? 0 : H === q.ph ? q.md : H > q.ph ? 1 : -1;   /* מתי ולאן ההבטחה המוצגת זזה בפעם האחרונה */
+    var lam, level;
+    if (K == null) { lam = (nw + Tlo * MIN - H) / MIN; level = lam <= P.grace ? 0 : lam <= P.L2 ? 2 : lam <= P.L3 ? 3 : 4; }   /* לפני איסוף: L2 רק כש-now+Tlo > hi+2′ */
+    else {
+      lam = (preLate ? Math.max(K + Tlo * MIN, nw) - H : nw - H) / MIN;
+      level = lam < 0 ? 0 : (!preLate && lam <= P.L1) ? 1 : lam <= P.L2 ? 2 : lam <= P.L3 ? 3 : 4;
+    }
+    return ext(base, { kind: slot && K == null ? 'slot' : 'clock', lo: lo, hi: H, hi0: hi0, adopted: adopted, preLate: preLate, level: level, ring0: hi0 != null && !slot ? A : K, chAt: chAt, md: md });
+  }
+  var LABEL = { payment: 'מאשרים את התשלום', received: 'ההזמנה התקבלה', preparing: 'מכינים את ההזמנה', ready: 'ההזמנה מוכנה ויוצאת אליך בקרוב', on_the_way: 'ההזמנה בדרך אליך', delivered: 'ההזמנה נמסרה', cancelled: 'ההזמנה בוטלה' };
+  var STEP = { preparing: 0.25, ready: 0.5, on_the_way: 0.75 };
+  function clamp01(x) { return isFinite(x) ? Math.min(1, Math.max(0, x)) : 0; }
+  /* mode: pending | scheduled | countdown | late | stage | stale | delivered | cancelled. opts: { live: false → stale, prev: התצוגה הקודמת של אותה הזמנה } */
+  function clockView(o, nw, opts) {
+    if (nw == null) { nw = now(); }
+    opts = opts || {};
+    var prev = opts.prev, pr = promise(o, nw, prev);
+    var v = { mode: '', stage: pr.stage, st: pr.st, level: 0, label: LABEL[pr.stage], centerBig: null, centerSmall: null, centerText: null, ring: null, tone: 'neutral',
+      line: null, help: false, slow: false, lo: null, hi: null, K: pr.K, slot: pr.slot, t5: pr.t5, today: false,
+      ph: pr.hi, pl: pr.lo, chAt: pr.chAt, md: pr.md, ad: pr.adopted };   /* ההבטחה שהוצגה (לפני סולם העיכוב) — הזיכרון של הייצוב ב-promise() */
+    if (pr.stage === 'cancelled') { return ext(v, { mode: 'cancelled', tone: 'muted' }); }
+    if (pr.stage === 'delivered') {
+      var t = pr.t5, today = t != null && ilDay(t).n === ilDay(nw).n;
+      return ext(v, { mode: 'delivered', ring: 1, tone: 'done', today: today, centerBig: t != null ? hm(t) : null, centerSmall: t != null ? 'נמסרה' : null,
+        line: t == null ? 'ההזמנה נמסרה' : today ? 'ההזמנה נמסרה ב-' + hm(t) : 'ההזמנה נמסרה ביום ' + WD[ilDay(t).wd] + ' ' + ilDay(t).dm + ' · ' + hm(t) });
+    }
+    /* חיבור לא חי: השלב נשאר, כל זמן מוסתר, הטבעת קפואה במקום האחרון. החלון המתוזמן עצמו (לפני איסוף, בלי עיכוב) = עובדה, נשאר;
+       מתוזמנת שכבר "איחרה" — כמו כל השאר (QA r2) */
+    if (opts.live === false && pr.st >= 2 && !(pr.kind === 'slot' && !pr.level && !(prev && prev.level))) {
+      return ext(v, { mode: 'stale', ring: prev && prev.ring != null ? prev.ring : (STEP[pr.stage] == null ? null : STEP[pr.stage]) });
+    }
+    var slotV = pr.slot && { mode: 'scheduled', label: 'ההזמנה מתוזמנת', ring: 0, centerBig: hm(pr.slot.start), centerSmall: dayWord(pr.slot.start, nw),
+      line: schedLine(dayWord(pr.slot.start, nw), hm(pr.slot.start) + '-' + hm(pr.slot.end)), lo: pr.slot.start, hi: pr.slot.end };
+    if (pr.st <= 1) {   /* ממתינה לתשלום / לאישור: בלי מספר; מתוזמנת — הספים מ-slot.start − 45′ (ביקורת 9) */
+      var w = pr.since == null ? 0 : (nw - Math.max(pr.since, pr.slot ? pr.slot.start - 45 * MIN : -Infinity)) / MIN, pay = pr.st === 0;
+      /* מתוזמנת שהחלון שלה נגמר ועדיין לא אושרה — לא שעה שעברה: ההמתנה הרגילה (חנות/קבלה + "האישור לוקח…" + CTA), QA r2 */
+      var slow = pay ? w >= 15 : w >= 10, b0 = slotV && nw < pr.slot.end ? slotV : { mode: 'pending', tone: 'wait' };
+      return ext(ext(v, b0), { slow: slow, line: slow ? (pay ? 'התשלום עוד לא אושר' : 'האישור לוקח קצת יותר מהרגיל — נעדכן כאן') : b0.line || null, help: pay ? w >= 15 : w >= 20 });
+    }
+    if (pr.kind === 'stage') { return ext(v, { mode: 'stage', ring: STEP[pr.stage], line: pr.soon ? 'זמן ההגעה יופיע כאן בהמשך' : null }); }
+    var level = Math.max(pr.level, (prev && prev.level) || 0), H = pr.hi;   /* רמה לא יורדת (prev אחד לכל הזמנה) */
+    if (level === 0 && pr.kind === 'slot') { return ext(v, slotV); }
+    if (level === 0) {
+      var m = Math.ceil((H - nw) / MIN), s = pr.ring0;
+      /* QA r2: תזוזה מאוחרת = תמיד "זמן הגעה מעודכן", ונשאר עד תזוזה מוקדמת. הטבעת לא חוזרת אחורה (DECISIONS §0) */
+      var upd = prev && prev.hi != null ? H > prev.hi || (H === prev.hi && prev.tone === 'updated') : pr.adopted === 1;   /* מול מה שהוצג; פתיחה ראשונה — adopt */
+      var rK = pr.K != null && s !== pr.K && pr.hi0 != null ? clamp01((pr.K - s) / (pr.hi0 - s)) : null;
+      var ring = rK == null ? clamp01((nw - s) / (H - s)) : clamp01(rK + (1 - rK) * (nw - pr.K) / (H - pr.K));
+      if (prev && prev.mode === 'countdown' && prev.ring > ring) { ring = prev.ring; }
+      var soon = pr.K != null && m <= P.soon;   /* ביקורת 16: "ממש עוד רגע" רק בדרך, ≤2′ */
+      return ext(v, { mode: 'countdown', ring: Math.min(P.cap, ring), tone: upd ? 'updated' : 'live', lo: pr.lo, hi: H, m: m,
+        centerBig: soon ? null : m <= 60 ? String(m) : hm(H), centerSmall: soon ? null : m <= 60 ? 'דק׳' : 'עד', centerText: soon ? 'ממש עוד רגע' : null,
+        line: upd ? 'זמן הגעה מעודכן · עד ' + hm(H) : nw < pr.lo ? 'הגעה משוערת ' + hm(pr.lo) + '-' + hm(H) : 'הגעה עד ' + hm(H) });
+    }
+    var late = ext(v, { mode: 'late', level: level, ring: P.cap });   /* הטבעת בתקרה עד המסירה */
+    if (level === 1) { return ext(late, { tone: 'soft', centerText: 'מגיעה בדקות הקרובות', line: 'מגיעה בדקות הקרובות', hi: H }); }
+    if (level === 4) { return ext(late, { label: 'אנחנו בודקים מה קורה עם ההזמנה', tone: 'check', help: true }); }
+    var R = H + (level === 2 ? P.L2 : P.L3) * MIN;   /* כל הבטחה חדשה = הרגע שבו הרמה הבאה מתחילה */
+    if (level === 2) { return ext(late, { tone: 'updated', centerBig: hm(R), centerSmall: 'עד', line: 'זמן הגעה מעודכן · עד ' + hm(R), hi: R }); }
+    return ext(late, { label: 'סליחה על העיכוב', tone: 'sorry', centerBig: hm(R), centerSmall: 'עד', line: pr.stage === 'on_the_way' ? 'ההזמנה בדרך אליך' : 'אנחנו על זה ומעדכנים כאן', help: true, hi: R });
+  }
+  /* תצוגה אחת לכל הזמנה בכל tick — המסך והכפתור קוראים ממנה (prev משותף, ביקורת 12) */
+  var PREV = {};
+  function viewFor(o, nw, isLive) {
+    var id = String(o.order_id), on = clockOn(), ok = !on || !offPending(), v = clockView(o, nw, { prev: PREV[id], live: isLive });
+    if (v.mode !== 'stale' && ok) { PREV[id] = v; }   /* QA r0: תצוגה "לא חי" (רמה 0) לא מוחקת את הרמה/השעה שהוחזקו */
+    if ((!on || !ok) && (v.mode === 'countdown' || v.mode === 'late' || v.mode === 'stale' || v.mode === 'stage')) {
+      /* שעון כבוי (דחיפה 1) / ההיסט עוד לא ידוע: מצב שלבים בלבד */
+      v = ext(v, { mode: 'stage', level: 0, label: LABEL[v.stage], ring: STEP[v.stage] || 0, centerBig: null, centerSmall: null, centerText: null, line: null, help: false, tone: 'neutral' });
+    } else if (!on && v.mode === 'delivered') {
+      v = ext(v, { noTime: true });   /* דחיפה 1: בלי שעת מסירה (פענוח שעות ההיסטוריה נבדק בהזמנת הבדיקה). החלון המתוזמן נשאר — הלקוח בחר אותו (QA r0) */
+    }
+    return v;
+  }
+
+  /* ---------- חיבור (Echo) ---------- */
+  var lastLive = 0, openedAt = 0;
+  function echoUp() { try { return window.Echo.connector.pusher.connection.state === 'connected'; } catch (e) { return false; } }
+  function isLive() {
+    if (window.__MH_OT_LIVE__ === true) { return true; }
+    if (window.__MH_OT_LIVE__ === false) { return false; }
+    var t = tnow();
+    if (echoUp()) { lastLive = t; }
+    return t - Math.max(lastLive, openedAt) < LIVE_GRACE;
+  }
+  /* ביקורת 17: נפתח מהתראה → ייתכן שאין ערוץ להזמנה. הפעולה של Hyperzod עצמה, פעם אחת להזמנה, רק כשהערוץ חסר */
+  var watched = {};
+  function ensureWatched(st, o) {
+    try {
+      var ch = window.Echo && window.Echo.connector && window.Echo.connector.channels;
+      if (!ch || !o.order_uuid || watched[o.order_id] || Number(o.order_status) >= 5) { return; }
+      if (ch['order-' + o.order_uuid] || !st._actions || !st._actions.watchOrders) { return; }
+      watched[o.order_id] = true;
+      var r = st.dispatch('watchOrders', [o]);
+      if (r && typeof r.catch === 'function') { r.catch(function () {}); }
+      stats.watched++;
+    } catch (e) {}
+  }
+
+  /* ---------- AutoZod (רק קריאה; est_arrival_time לא נקרא ולא מוצג) ---------- */
+  var beat = { win: null, last: 0 };   /* החלון ששלח (= ה-contentWindow של #orderTracking שעל המסך) — iframe אחר / ישן לא נחשב */
+  window.addEventListener('message', function (e) {
+    try {
+      if (e.origin !== AZ_ORIGIN) { return; }
+      var d = e.data;
+      if (typeof d === 'string') { if (d.indexOf('hyperzod_agent_tracking') < 0) { return; } d = JSON.parse(d); }
+      if (d && d.type === 'hyperzod_agent_tracking') { beat.win = e.source; beat.last = tnow(); stats.beats++; }
+    } catch (err2) {}
+  });
+  /* חזרה לאפליקציה (QA r0): ברקע ה-tick וה-iframe מושהים — שני חלונות החסד מתחילים מחדש. אחרת המפה של AutoZod מתקפלת
+     בכל חזרה ונפתחת בהודעה הבאה (שתי קפיצות), והשעון "לא חי" לרגע. "אף פעם לא שלח" נשאר בלי כיסוי (beat.win) */
+  document.addEventListener('visibilitychange', function () { if (!document.hidden) { var t = tnow(); openedAt = t; if (beat.last) { beat.last = Math.max(beat.last, t); } } });
+
+  /* ---------- HTML (בדיוק markup.html) ---------- */
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  function one(a) { return '<bdi dir="ltr">' + a + '</bdi>'; }
+  function range(a, b) { return '<bdi dir="ltr">' + a + '-' + b + '</bdi>'; }
+  function plain(h) { return String(h).replace(/<[^>]+>/g, ''); }
+  var G = {
+    receipt: '<path d="M6 3h12v18l-2-1.4-2 1.4-2-1.4-2 1.4-2-1.4L6 21z"/><path d="M9 8h6M9 12h6M9 16h3"/>',
+    pot: '<path d="M4 11h16v5.5a3.5 3.5 0 0 1-3.5 3.5h-9A3.5 3.5 0 0 1 4 16.5z"/><path d="M2.5 11H4M20 11h1.5"/><path d="M6.5 11a5.5 3.2 0 0 1 11 0"/><path d="M12 6.3v1.5"/>',
+    bag: '<path d="M5 8.5h14l-1.2 11.5H6.2z"/><path d="M9 8.5V7a3 3 0 0 1 6 0v1.5"/>',
+    scooter: '<circle cx="5.5" cy="17.5" r="2.5"/><circle cx="18.5" cy="17.5" r="2.5"/><path d="M8 17.5h5.5a3 3 0 0 0 3-3V13h-5"/><path d="M5.5 17.5 7.6 9H5.5M7.6 9h2"/><rect x="14" y="5.5" width="7" height="5" rx="1"/>',
+    search: '<circle cx="11" cy="11" r="6"/><path d="m20 20-4.6-4.6"/>',
+    check: '<path d="M5 12.5 9.5 17 19 7.5"/>',
+    x: '<path d="M7 7l10 10M17 7 7 17"/>',
+    calendar: '<rect x="4" y="5.5" width="16" height="14.5" rx="2.5"/><path d="M4 10h16M8.5 3.5v4M15.5 3.5v4"/>',
+    home: '<path d="M4 10.5 12 4l8 6.5V19a1 1 0 0 1-1 1h-4.5v-5.5h-5V20H5a1 1 0 0 1-1-1z"/>',
+    store: '<path d="M4 9.5 5.5 4h13L20 9.5"/><path d="M4 9.5a2.7 2.7 0 0 0 5.3 0 2.7 2.7 0 0 0 5.4 0 2.7 2.7 0 0 0 5.3 0"/><path d="M5.5 12.5V20h13v-7.5"/><path d="M10 20v-4.5h4V20"/>',
+    person: '<circle cx="12" cy="8.5" r="3.6"/><path d="M5 20c.8-3.6 3.6-5.6 7-5.6s6.2 2 7 5.6"/>',
+    wa: '<path d="M20 12a8 8 0 0 1-11.7 7.1L4 20.2l1.1-4.1A8 8 0 1 1 20 12z"/><path d="M9.2 8.6c.3 2.9 2.5 5.4 5.9 6l1-1.3-1.8-1.1-1 .8a5 5 0 0 1-2.4-2.4l.8-1-1.1-1.8z"/>',
+    chat: '<path d="M5 4.5h14a2 2 0 0 1 2 2V15a2 2 0 0 1-2 2h-8.5L6 20.5V17H5a2 2 0 0 1-2-2V6.5a2 2 0 0 1 2-2z"/><path d="M7.5 9h9M7.5 12.5h6"/>',
+    chev: '<path d="M14.5 5.5 8 12l6.5 6.5"/>'
+  };
+  function ico(n, cls) { return '<svg class="' + (cls || 'mh-ot-g') + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + G[n] + '</svg>'; }
+  function r1(x) { return Math.round(x * 10) / 10; }
+  function waHref(id) {   /* נוסח הבועה + מספר ההזמנה (דוד 28.10). ביקורת 18: תמיד קישור */
+    var text = 'שלום, אשמח לעזרה עם הזמנה #' + id + ' במעלה המשלוחים';
+    try { if (window.MH_WA && typeof window.MH_WA.href === 'function') { return window.MH_WA.href(text); } } catch (e) {}
+    return 'https://wa.me/' + WA_NUMBER + '?text=' + encodeURIComponent(text);
+  }
+  function geo(desk, small) {
+    if (desk) { return { disc: 184, ring: 168, sw: 12, badge: 30, desk: true, rf: 14 }; }
+    if (small) { return { disc: 176, ring: 160, sw: 12, badge: 28, small: true, rf: 24 }; }
+    return { disc: 200, ring: 184, sw: 13, badge: 32, rf: 24 };
+  }
+  function ringSVG(d, g) {
+    var c = g.disc / 2, r = (g.ring - g.sw) / 2, k = d.ring.k, f = d.ring.f || 0;
+    var circ = function (cls, extra, noPL) { return '<circle' + (cls ? ' class="' + cls + '"' : '') + ' cx="' + c + '" cy="' + c + '" r="' + r + '"' + (noPL ? '' : ' pathLength="100"') + ' stroke-width="' + g.sw + '"' + (extra || '') + '/>'; };
+    var rot = ' transform="rotate(-90 ' + c + ' ' + c + ')"';
+    var dash = function (len, off) { return ' stroke-dasharray="' + len + ' ' + r1(100 - len) + '" stroke-dashoffset="' + (off || 0) + '"'; };
+    var lead = 0.6, len = k === 'done' ? 100 : r1(Math.max(0.5, f * 100 - lead)), da = k === 'done' ? '' : dash(len, -lead);
+    var s = '<svg class="mh-ot-ring" viewBox="0 0 ' + g.disc + ' ' + g.disc + '" width="' + g.disc + '" height="' + g.disc + '" aria-hidden="true" focusable="false">' +
+      '<defs><linearGradient id="mhOtGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ff3b41"/><stop offset="1" stop-color="#c8151b"/></linearGradient>' +
+      '<mask id="mhOtArc" maskUnits="userSpaceOnUse" x="0" y="0" width="' + g.disc + '" height="' + g.disc + '">' + circ('mh-ot-mask', da + rot + ' stroke="#fff" fill="none"') + '</mask></defs>' +
+      circ('mh-ot-trk' + (k === 'grey' ? ' is-grey' : ''));
+    if (k === 'fill' || k === 'soft' || k === 'done') {
+      s += circ('mh-ot-fil' + (k === 'soft' ? ' is-soft' : ''), da + rot);
+      if (k !== 'soft') { s += '<g mask="url(#mhOtArc)">' + circ('mh-ot-hatch', ' stroke-dasharray="1 2.6"' + rot, 1) + '</g>'; }
+      if (k === 'fill' && !d.ring.still) { s += circ('mh-ot-shine', ' stroke-dasharray="7 200" stroke-dashoffset="7" style="--to:' + (-(len - 7 + lead)).toFixed(1) + '"' + rot); }
+    } else if (k === 'pending' || k === 'softpending') {
+      s += '<g class="mh-ot-spin">' + circ('mh-ot-fil' + (k === 'softpending' ? ' is-soft' : ''), dash(20, -4) + rot) + '</g>';
+    }
+    return s + '</svg>';
+  }
+  function shoulderSVG(g) {   /* כתף וולט — רק "על התפר" במחשב (data-seam) */
+    var R = g.disc / 2, rf = g.rf, dd = Math.sqrt((R + rf) * (R + rf) - rf * rf), W = 2 * dd, k = R / (R + rf);
+    var tlx = dd - dd * k, tly = R - rf * k, trx = dd + dd * k;
+    return '<svg class="mh-ot-shoulder" viewBox="0 0 ' + W.toFixed(2) + ' ' + R + '" width="' + W.toFixed(2) + '" height="' + R + '" aria-hidden="true" focusable="false">' +
+      '<path d="M0 ' + R + 'A' + rf + ' ' + rf + ' 0 0 0 ' + tlx.toFixed(2) + ' ' + tly.toFixed(2) + 'A' + R + ' ' + R + ' 0 0 1 ' + trx.toFixed(2) + ' ' + tly.toFixed(2) +
+      'A' + rf + ' ' + rf + ' 0 0 0 ' + W.toFixed(2) + ' ' + R + 'Z"/></svg>';
+  }
+  function badgeHTML(d, g) {   /* סמל השלב על ראש המילוי — שלב, לעולם לא מיקום. כשבמרכז סמל — בלי תג */
+    if (!d.badge || !(d.ring.k === 'fill' || d.ring.k === 'soft') || d.face.glyph) { return ''; }
+    var c = g.disc / 2, r = (g.ring - g.sw) / 2, a = 2 * Math.PI * d.ring.f;
+    return '<span class="mh-ot-badge" style="--bx:' + (c + r * Math.sin(a)).toFixed(1) + 'px;--by:' + (c - r * Math.cos(a)).toFixed(1) + 'px;--bs:' + g.badge + 'px">' + ico(d.badge) + '</span>';
+  }
+  function faceHTML(d) {
+    var f = d.face, h = '<div class="mh-ot-face' + (f.small ? ' is-small' : '') + (f.sched ? ' is-sched' : '') + '">';
+    if (f.num) { h += '<span class="mh-ot-pre">' + f.pre + '</span><b class="mh-ot-num">' + f.num + '</b><span class="mh-ot-unit">' + f.unit + '</span>'; }
+    else if (f.time && !f.glyph) { h += '<span class="mh-ot-pre">' + f.pre + '</span><b class="mh-ot-num is-time">' + one(f.time) + '</b>'; }
+    else if (f.text) { h += '<b class="mh-ot-ftext">' + f.text + '</b>'; }
+    else if (f.glyph) { h += '<span class="mh-ot-fglyph' + (f.grey ? ' is-grey' : '') + '">' + ico(f.glyph) + '</span>' + (f.time ? '<b class="mh-ot-ftime">' + one(f.time) + '</b>' : ''); }
+    return h + '</div>';
+  }
+  var STEPS5 = ['התקבלה', 'בהכנה', 'מוכנה', 'בדרך', 'נמסרה'];
+  function stepsHTML(st) {
+    return '<ol class="mh-ot-steps" aria-label="' + (st >= 5 ? 'כל השלבים הושלמו' : st === 0 ? 'ההזמנה עוד לא התקבלה' : 'שלב ' + st + ' מתוך 5: ' + STEPS5[st - 1]) + '">' + STEPS5.map(function (n, i) {
+      var k = i + 1, c = (st >= 5 || k < st) ? 'is-done' : k === st ? 'is-now' : '';
+      return '<li class="' + c + '"' + (c === 'is-now' ? ' aria-current="step"' : '') + '><i></i><span>' + n + '</span></li>';
+    }).join('') + '</ol>';
+  }
+  /* הדיסק לבד: הטבעת/המספר משתנים כל ~24 שנ' — מחליפים רק אותו, לא את הכפתורים והשורות (פוקוס ונגיעה נשמרים, QA r0) */
+  function discHTML(d, g) { return '<div class="mh-ot-disc" role="timer" aria-label="' + esc(plain(d.aria || d.status)) + '">' + ringSVG(d, g) + badgeHTML(d, g) + faceHTML(d) + '</div>'; }
+  function heroInner(d, g, disc) {   /* התוכן של section.mh-ot-hero, בלי .mh-ot-sr (הוא נשאר במקומו כדי שההכרזה תעבוד) */
+    var wa = esc(d.wa);
+    var h = '<div class="mh-ot-sheet"><div class="mh-ot-clock" data-ring="' + d.ring.k + '"' + (d.ring.still ? ' data-still=""' : '') + '>' +
+      (g.desk ? shoulderSVG(g) : '') + (disc == null ? discHTML(d, g) : disc) +
+      '<a class="mh-ot-flank is-help" href="' + wa + '" target="_blank" rel="noopener" aria-label="צריכים עזרה? דברו איתנו בוואטסאפ">' + ico('wa') + '</a>' +
+      '<a class="mh-ot-flank is-bill" href="#mh-ot-bill" aria-label="פרטי ההזמנה והחשבון">' + ico('receipt') + '</a></div>' +
+      '<div class="mh-ot-under"><div class="mh-ot-merch"><bdi>' + esc(d.merchant) + '</bdi></div><h2 class="mh-ot-title">' + d.status + '</h2>' +
+      (d.line ? '<p class="mh-ot-line">' + d.line + '</p>' : '') + (d.sub ? '<p class="mh-ot-sub">' + d.sub + '</p>' : '') + '</div>' +
+      (d.cta ? '<a class="mh-ot-cta" href="' + wa + '" target="_blank" rel="noopener">' + ico('wa') + '<span>דברו איתנו בוואטסאפ</span></a>' : '') +
+      (d.stage != null ? stepsHTML(d.stage) : '') + '</div>';
+    if (d.courier) {
+      /* צ'אט עם השליח (דוד 27.10: "צ'אט אם יש", QA r1): רק כש-Hyperzod מציירת את כפתור הצ'אט שלה; הלחיצה = הכפתור שלה (מאזין הלחיצה למטה) */
+      var cn = d.chat && d.chat.n, chat = !d.chat ? '' : '<button type="button" class="mh-ot-chat" aria-label="צ׳אט עם השליח' + (!cn ? '' : cn === '1' ? ', הודעה חדשה אחת' : ', ' + esc(cn) + ' הודעות חדשות') + '">' +
+        ico('chat') + (cn ? '<span class="mh-ot-unread" aria-hidden="true">' + esc(cn) + '</span>' : '') + '</button>';
+      h += '<div class="mh-ot-row mh-ot-courier"><span class="mh-ot-ico" aria-hidden="true">' + ico('person') + '</span><span class="mh-ot-rt"><b>' + esc(d.courier) + '</b><span>' +
+        (d.stage === 4 ? 'בדרך אליך עם ההזמנה' : 'השליח שלך') + '</span></span>' + chat + '</div>';
+    }
+    if (d.drop) {
+      h += '<div class="mh-ot-row mh-ot-drop"><span class="mh-ot-ico" aria-hidden="true">' + ico('home') + '</span><span class="mh-ot-rt"><span class="mh-ot-cap">כתובת למשלוח</span><b>' + esc(d.drop.addr) + '</b>' +
+        (d.drop.note ? '<span class="mh-ot-note">הוראות לשליח: ' + esc(d.drop.note) + '</span>' : '') + '</span></div>';
+    }
+    if (!d.cta) { h += '<a class="mh-ot-row mh-ot-help" href="' + wa + '" target="_blank" rel="noopener"><span class="mh-ot-ico" aria-hidden="true">' + ico('wa') + '</span><span class="mh-ot-rt"><b>' + (d.help || 'צריכים עזרה?') + ' <u>דברו איתנו</u></b></span>' + ico('chev', 'mh-ot-chev') + '</a>'; }
+    return h;
+  }
+
+  /* ---------- מה הלקוח רואה (DECISIONS §7) ---------- */
+  var GLYPH = { payment: 'receipt', received: 'store', preparing: 'pot', ready: 'bag', on_the_way: 'scooter' };
+  var STAGE_NO = { payment: 0, received: 1, preparing: 2, ready: 3, on_the_way: 4, delivered: 5 };
+  var WORD = { payment: 'מאשרים תשלום', received: 'התקבלה', preparing: 'בהכנה', ready: 'יוצאת בקרוב', on_the_way: 'בדרך' };
+  function model(o, v, nw, liveCourier, chat) {
+    var st = v.stage, d = { stage: STAGE_NO[st] == null ? null : STAGE_NO[st], level: 0, status: v.label, line: null, sub: null, aria: null, badge: null,
+      face: {}, ring: { k: 'fill', f: 0 }, cta: false, stuck: false, help: null, sched: false, courier: null, drop: null };
+    var H = v.hi;
+    if (v.mode === 'cancelled') { d.ring = { k: 'grey' }; d.face = { glyph: 'x', grey: 1 }; d.help = 'יש שאלה?'; }
+    else if (v.mode === 'delivered') {
+      d.ring = { k: 'done' }; d.face = { glyph: 'check' }; d.help = 'יש בעיה בהזמנה?';
+      if (v.noTime) { d.aria = 'ההזמנה נמסרה'; }
+      else if (v.t5 != null && v.today) { d.face.time = hm(v.t5); d.aria = 'נמסרה ב-' + hm(v.t5); }
+      else if (v.t5 != null) { var dd = ilDay(v.t5), dw = 'ביום ' + WD[dd.wd] + ' ' + dd.dm; d.line = dw + ' · ' + one(hm(v.t5)); d.aria = 'ההזמנה נמסרה ' + dw + ' ב-' + hm(v.t5); }
+    } else if (v.mode === 'pending') {
+      var pay = v.st === 0;
+      d.face = { glyph: pay ? 'receipt' : 'store' }; d.ring = { k: v.help ? 'softpending' : 'pending' }; d.cta = d.stuck = !!v.help;
+      if (pay) { d.status = v.slow ? 'התשלום עוד לא אושר' : 'מאשרים את התשלום'; }
+      else { d.sub = v.slow ? 'האישור לוקח קצת יותר מהרגיל — נעדכן כאן' : 'שלחנו אותה לעסק'; }
+    } else if (v.mode === 'scheduled') {
+      var w = dayWord(v.slot.start, nw), end = hm(v.slot.end);
+      d.sched = true; d.stage = v.st <= 2 ? 1 : d.stage; d.ring = { k: 'track' }; d.status = 'ההזמנה מתוזמנת';
+      d.face = { pre: w + ' עד', time: end, sched: 1 };
+      d.line = schedLine(w, range(hm(v.slot.start), end));
+      d.sub = v.slow ? (v.st === 0 ? 'התשלום עוד לא אושר' : 'האישור לוקח קצת יותר מהרגיל — נעדכן כאן') : 'נעדכן כאן כשההזמנה תצא לדרך';
+      d.aria = 'משלוח מתוזמן ' + w + ', עד ' + end; d.cta = d.stuck = !!v.help;
+    } else if (v.mode === 'countdown') {
+      var lineH = v.tone === 'updated' ? 'זמן הגעה מעודכן · עד ' + one(hm(H)) : nw < v.lo ? 'הגעה משוערת ' + range(hm(v.lo), hm(H)) : 'הגעה עד ' + one(hm(H));
+      d.ring = { k: 'fill', f: v.ring }; d.badge = GLYPH[st]; d.line = lineH;
+      if (v.centerText) { d.face = { text: v.centerText }; d.line = 'הגעה עד ' + one(hm(H)); d.aria = v.centerText + '. הגעה עד ' + hm(H); }
+      else if (v.centerSmall === 'דק׳') {
+        d.face = { pre: 'עד', num: v.centerBig, unit: 'דק׳' };
+        var mins = v.centerBig === '1' ? 'דקה אחת' : v.centerBig + ' דקות';
+        d.aria = v.tone === 'updated' ? 'זמן הגעה מעודכן: עד ' + mins + ', עד ' + hm(H) : 'עד ' + mins + '. ' + plain(lineH).replace(/(\d\d:\d\d)-(\d\d:\d\d)/, '$1 עד $2');
+      } else {
+        d.face = { pre: 'עד', time: v.centerBig };
+        d.aria = v.tone === 'updated' ? 'זמן הגעה מעודכן: עד ' + hm(H) : plain(lineH).replace(/(\d\d:\d\d)-(\d\d:\d\d)/, '$1 עד $2');
+      }
+    } else if (v.mode === 'late') {
+      d.level = v.level;
+      if (v.level === 1) { d.ring = { k: 'fill', f: P.cap, still: 1 }; d.badge = GLYPH[st]; d.face = { text: 'מגיעה בדקות הקרובות' }; d.aria = 'מגיעה בדקות הקרובות'; }
+      else if (v.level === 2) { d.ring = { k: 'soft', f: P.cap }; d.badge = GLYPH[st]; d.face = { pre: 'עד', time: v.centerBig }; d.line = 'זמן הגעה מעודכן'; d.aria = 'זמן הגעה מעודכן: עד ' + v.centerBig; }
+      else if (v.level === 3) { d.ring = { k: 'soft', f: P.cap }; d.badge = GLYPH[st]; d.face = { pre: 'עד', time: v.centerBig, small: 1 }; d.status = v.label; d.sub = v.line; d.cta = true; d.aria = 'עד ' + v.centerBig; }
+      else { d.ring = { k: 'softpending' }; d.face = { glyph: 'search' }; d.status = v.label; d.cta = true; }
+    } else {   /* stage / stale: סמל השלב במרכז, טבעת קפואה, בלי זמן */
+      d.ring = { k: 'fill', f: v.ring == null ? (STEP[st] || 0) : v.ring, still: 1 }; d.face = { glyph: GLYPH[st] || 'pot' };
+    }
+    if (d.ring.f != null) { d.ring.f = Math.round(d.ring.f * 100) / 100; }   /* ציור מחדש בערך פעם ב-24 שנ', לא בכל tick */
+    if (liveCourier && st === 'on_the_way') { d.badge = null; }   /* מפת AutoZod מראה שליח אמיתי — שליח אחד במסך */
+    var ag = o.delivery_provider && o.delivery_provider.agent;
+    /* שם פרטי בלבד, בלי טלפון. בדרך — תמיד; לפני האיסוף — רק כשיש צ'אט עם השליח (Hyperzod מציעה אותו מרגע ששובץ, QA r1) */
+    if (ag && ag.name && (st === 'on_the_way' || (chat && d.stage >= 1 && d.stage <= 3))) { d.courier = String(ag.name).trim().split(/\s+/)[0]; d.chat = chat || null; }
+    var da = o.delivery_address;
+    if (d.stage != null && d.stage < 5 && da && da.address) { d.drop = { addr: da.address, note: da.landmark || '' }; }
+    d.merchant = (o.merchant && o.merchant.name) || '';
+    d.wa = waHref(o.order_id);
+    return d;
+  }
+
+  /* ---------- מפת Google של Hyperzod ---------- */
+  var STYLES = [
+    { elementType: 'geometry', stylers: [{ color: '#f2f2f0' }] },
+    { elementType: 'labels.icon', stylers: [{ visibility: 'off' }] },
+    { elementType: 'labels.text.fill', stylers: [{ color: '#8d8d8d' }] },
+    { elementType: 'labels.text.stroke', stylers: [{ color: '#f7f7f5' }] },
+    { featureType: 'poi', stylers: [{ visibility: 'off' }] },
+    { featureType: 'transit', stylers: [{ visibility: 'off' }] },
+    { featureType: 'administrative', elementType: 'geometry', stylers: [{ visibility: 'off' }] },
+    { featureType: 'road', elementType: 'geometry', stylers: [{ color: '#ffffff' }] },
+    { featureType: 'road.highway', elementType: 'geometry', stylers: [{ color: '#ececea' }] },
+    { featureType: 'road.local', elementType: 'labels', stylers: [{ visibility: 'off' }] },
+    { featureType: 'landscape.natural', elementType: 'geometry', stylers: [{ color: '#ecede7' }] },
+    { featureType: 'water', elementType: 'geometry', stylers: [{ color: '#dde6eb' }] }
+  ];
+  function raw(x) { return (x && x.__v_raw) || x; }
+  /* כל הרכיבים בשם הזה — אותה הליכה כמו MH MenuLoad (ב-production אין __vueParentComponent). כולם, לא הראשון:
+     הפאנל הצדדי של Hyperzod מעל מסך ההזמנה = שתי מפות (QA r1) */
+  function findComps(name) {
+    var el = document.getElementById('app'), found = [];
+    if (!el || !el._vnode) { return found; }
+    function walkInst(inst, d) { if (!inst || d > 80) { return; } if (inst.type && inst.type.name === name) { found.push(inst); return; } walkV(inst.subTree, d + 1); }
+    function walkV(v, d) {
+      if (!v || d > 400) { return; }
+      if (v.component) { walkInst(v.component, d + 1); }
+      if (v.suspense && v.suspense.activeBranch) { walkV(v.suspense.activeBranch, d + 1); }
+      if (Array.isArray(v.children)) { for (var i = 0; i < v.children.length; i++) { walkV(v.children[i], d + 1); } }
+    }
+    walkV(el._vnode, 0);
+    return found;
+  }
+  var PinC = null;
+  function pinClass() {
+    if (PinC) { return PinC; }
+    var O = window.google.maps.OverlayView;
+    function Pin(cls, glyph) {
+      try { O.call(this); } catch (e) {}
+      this.pos = null; this.div = document.createElement('div'); this.div.className = 'mh-ot-pin ' + cls; this.div.innerHTML = '<span>' + ico(glyph) + '</span>';
+    }
+    Pin.prototype = Object.create(O.prototype);
+    Pin.prototype.constructor = Pin;
+    Pin.prototype.onAdd = function () { var p = this.getPanes(); if (p && p.overlayLayer) { p.overlayLayer.appendChild(this.div); } };   /* שכבה לא לחיצה */
+    Pin.prototype.draw = function () {
+      var pr = this.getProjection && this.getProjection(); if (!pr || !this.pos) { return; }
+      var x = pr.fromLatLngToDivPixel(this.pos); if (x) { this.div.style.left = r1(x.x) + 'px'; this.div.style.top = r1(x.y) + 'px'; }
+    };
+    Pin.prototype.onRemove = function () { if (this.div.parentNode) { this.div.parentNode.removeChild(this.div); } };
+    PinC = Pin;
+    return Pin;
+  }
+  function ll(a) { return a && isFinite(Number(a[0])) && isFinite(Number(a[1])) ? [Number(a[0]), Number(a[1])] : null; }
+  /* המצב של כל מפה יושב על האלמנט שלה (#order-track-map): __mhOtS = המפה המחוברת, __mhOtOff = "לא שלנו" (נשאר),
+     __mhOtWalk = ההליכה האחרונה על העץ, __mhOtSeen = מתי נראתה (אריחים). אלמנט שיצא מה-DOM לוקח את המצב איתו */
+  function hideTheirs(S) {
+    var p = S.c.proxy, a = raw(p.gPolylines) || [], k = raw(p.gMarkers) || [], i, x;
+    for (i = 0; i < a.length; i++) { x = raw(a[i]); if (x && typeof x.setMap === 'function') { x.setMap(null); } }
+    for (i = 0; i < k.length; i++) { x = raw(k[i]); if (x && typeof x.setVisible === 'function') { x.setVisible(false); } else if (x && typeof x.setMap === 'function') { x.setMap(null); } }
+    if ((S.m.get('styles') || []).length !== STYLES.length) { S.m.setOptions({ styles: STYLES }); }
+  }
+  /* אזור הנקודות: top = ההדר (שמעל הקופסה) + 12 + 43, bottom = הקופסה − (ראש הדיסק − 12), צדדים 40 (DECISIONS §6/§11) */
+  function pad(S) {
+    var box = S.box, b = box.getBoundingClientRect(), card = box.closest('.scheme-order-details'), head = card && card.querySelector('.scheme-order-tracking-header');
+    var sc = document.getElementById('order'), sy = (window.scrollY || 0) + ((sc && sc.scrollTop) || 0);
+    var over = head && getComputedStyle(head).position === 'fixed' ? Math.max(0, head.getBoundingClientRect().bottom - (b.top + sy)) : 0;   /* ההדר הקבוע כולל את פס הסטטוס */
+    var top = over + 55, bottom = 40, hero = box.nextElementSibling, disc = hero && hero.classList.contains('mh-ot-hero') && hero.querySelector('.mh-ot-disc');
+    if (disc) { var dt = disc.getBoundingClientRect().top - b.top; if (dt < b.height) { bottom = Math.max(40, b.height - (dt - 12)); } }
+    var room = b.height - top - bottom;
+    if (room < 60) { var cut = (60 - room) / 2; top = Math.max(16, top - cut); bottom = Math.max(16, bottom - cut); }
+    return { top: Math.round(top), bottom: Math.round(bottom), left: 40, right: 40 };
+  }
+  function attach(m, c, mapEl, box) {
+    var gm = window.google.maps, S = m.__mhOtS;
+    if (!S) {
+      S = { m: m, c: c, el: mapEl, box: box, pins: null, posKey: '', padKey: '', refitAt: 0, bounds: null };
+      m.setOptions({ styles: STYLES, disableDefaultUI: true, clickableIcons: false, keyboardShortcuts: false, gestureHandling: 'none' });
+      var FIT = gm.Map.prototype.fitBounds;
+      /* הציור של Hyperzod נגמר ב-map.fitBounds(bounds) → עטיפה על המופע הזה בלבד (לא על ה-prototype) = "Hyperzod ציירה עכשיו" */
+      m.fitBounds = function (bb, p) {
+        try { hideTheirs(S); stats.redraws++; } catch (e) {}
+        var pd = null; try { pd = pad(S); } catch (e) {}
+        return FIT.call(this, bb, pd || p);
+      };
+      gm.event.addListener(m, 'idle', function () { try { hideTheirs(S); } catch (e) {} });   /* רשת ביטחון אם בילד עתידי לא יסיים ב-fitBounds */
+      m.__mhOtS = S;
+    }
+    S.c = c; S.el = mapEl; S.box = box;
+    hideTheirs(S);
+    return S;
+  }
+  function mapTick(box, mapEl, o) {   /* מחזיר 'on' | 'off' | 'nopts' (מחוברת, אין שתי נקודות) | null (עוד לא) */
+    var S = mapEl.__mhOtS, gm = window.google && window.google.maps;
+    if (!S) {
+      /* ההליכה על העץ לא חינם: לכל היותר פעם בשנייה לכל מפה, ו"off" נשאר לאותה מפה */
+      if (mapEl.__mhOtOff) { return 'off'; }
+      if (Date.now() - (mapEl.__mhOtWalk || 0) < 1000) { return null; }
+      mapEl.__mhOtWalk = Date.now();
+      /* המופע שהמפה שלו בתוך האלמנט הזה (getDiv של Google / getContainer של Mapbox) */
+      var cs = findComps('order-tracker-map'), c = null, m = null, i, x, dv;
+      for (i = 0; i < cs.length && !m; i++) {
+        x = cs[i].proxy && raw(cs[i].proxy.mapInstance);
+        dv = x && (typeof x.getDiv === 'function' ? x.getDiv() : typeof x.getContainer === 'function' ? x.getContainer() : null);
+        if (dv && mapEl.contains(dv)) { c = cs[i]; m = x; }
+      }
+      if (!m) { return null; }
+      var ok = gm && gm.OverlayView && gm.Map && m instanceof gm.Map && typeof m.getDiv === 'function' &&
+        Array.isArray(raw(c.proxy.gPolylines)) && Array.isArray(raw(c.proxy.gMarkers)) && !m.get('mapId');
+      if (!ok) { mapEl.__mhOtOff = true; return 'off'; }   /* Mapbox / בילד אחר — המפה שלהם נשארת כמו שהיא */
+      S = mapEl.__mhOtS = attach(m, c, mapEl, box);
+    }
+    var a = ll((o.merchant && o.merchant.merchant_address_location) || (o.pickup_address && o.pickup_address.location_lat_lon)), b = ll(o.delivery_address && o.delivery_address.location_lat_lon);
+    if (!a || !b) { return 'nopts'; }   /* בלי מיקום לעסק או לבית — מפה בלי נקודות לא אומרת כלום: מקפלים (QA r0, nocoords) */
+    if (!S.pins) { var Pin = pinClass(); S.pins = [new Pin('is-shop', 'store'), new Pin('is-home', 'home')]; S.pins[0].setMap(S.m); S.pins[1].setMap(S.m); }
+    var key = a.join(',') + '|' + b.join(',');
+    if (key !== S.posKey) {
+      S.posKey = key; S.padKey = '';
+      S.pins[0].pos = new gm.LatLng(a[0], a[1]); S.pins[1].pos = new gm.LatLng(b[0], b[1]);
+      S.pins[0].draw(); S.pins[1].draw();
+      S.bounds = new gm.LatLngBounds(); S.bounds.extend(S.pins[0].pos); S.bounds.extend(S.pins[1].pos);
+    }
+    var pd = pad(S), pk = box.clientWidth + 'x' + box.clientHeight + ':' + pd.top + ',' + pd.bottom;
+    /* הקופסה גדלה ב-CSS (350 → 537) וגוגל מגלה את זה באיחור — fit שני אחרי 800ms */
+    if (pk !== S.padKey) { S.padKey = pk; S.refitAt = Date.now() + 800; S.m.fitBounds(S.bounds); stats.fits++; }
+    else if (S.refitAt && Date.now() >= S.refitAt) { S.refitAt = 0; S.m.fitBounds(S.bounds); stats.fits++; }
+    return 'on';
+  }
+  function tilesOk(mapEl) {
+    var imgs = mapEl.getElementsByTagName('img'), i;
+    for (i = 0; i < imgs.length; i++) { if (/maps\/vt/.test(imgs[i].src) && imgs[i].complete && imgs[i].naturalWidth > 0) { return true; } }
+    return !!mapEl.querySelector('canvas.mapboxgl-canvas');
+  }
+  /* אריחים לא נטענו: 4 שנ' מאז ש-Google יצרה את המפה (.gm-style — טעינה קרה של ה-API לא נספרת) בלי אף אריח raster;
+     בלי .gm-style בכלל — 12 שנ'. מפה וקטורית (WebGL, בלי <img>) — אף פעם לא */
+  function tilesFailed(mapEl) {
+    var t = Date.now(), f = mapEl.__mhOtSeen || (mapEl.__mhOtSeen = { t: t, g: 0 }), S = mapEl.__mhOtS;
+    if (tilesOk(mapEl)) { return false; }
+    if (mapEl.querySelector('.gm-style')) {
+      if (!f.g) { f.g = t; }
+      try { if (S && String(S.m.getRenderingType()).toUpperCase() === 'VECTOR') { return false; } } catch (e) {}
+      return t - f.g > TILES_WAIT;
+    }
+    return t - f.t > 12000;
+  }
+  /* "על התפר" (מחשב, כמו וולט) רק כשהכתף לא נוגעת בלוגו ובשורת הייחוס של Google: boxW/2 ± (d + 8), d = √((R+rf)² − rf²) */
+  function seamOk(hero, box, g) {
+    var b = box.getBoundingClientRect(), disc = hero.querySelector('.mh-ot-disc');
+    if (!disc || !b.width) { return false; }
+    var R = disc.offsetWidth / 2, dd = Math.sqrt((R + g.rf) * (R + g.rf) - g.rf * g.rf), mid = b.width / 2, attrL = Infinity, logoR = -Infinity, i, r;
+    var cc = box.querySelectorAll('.gm-style-cc');
+    for (i = 0; i < cc.length; i++) { r = cc[i].getBoundingClientRect(); if (r.width > 0 && r.height > 0) { attrL = Math.min(attrL, r.left - b.left); } }
+    var logo = box.querySelector('a[href*="maps.google.com/maps"]');
+    if (logo) { r = logo.getBoundingClientRect(); if (r.width > 0) { logoR = r.right - b.left; } }
+    return isFinite(attrL) && isFinite(logoR) && mid + dd + 8 <= attrL && mid - dd - 8 >= logoR;
+  }
+
+  /* ---------- המסך ---------- */
+  function setAttr(el, k, v) { if (v == null || v === false) { if (el.hasAttribute(k)) { el.removeAttribute(k); } } else if (el.getAttribute(k) !== String(v)) { el.setAttribute(k, v); } }
+  function mark(el, why) { if (el && el.getAttribute('data-mh-ot-hide') !== why) { el.setAttribute('data-mh-ot-hide', why); } }
+  function removeOurs(scope) {
+    [].forEach.call(scope.querySelectorAll('.mh-ot-hero, .mh-ot-mline, .mh-ot-h1'), function (e) { if (e.parentNode) { e.parentNode.removeChild(e); } });
+    [].forEach.call(scope.querySelectorAll('[data-mh-ot-hide]'), function (e) { e.removeAttribute('data-mh-ot-hide'); });
+    var h1 = scope.querySelector('.scheme-order-tracking-header h1');
+    if (h1 && h1.getAttribute('aria-hidden') === 'true') { h1.removeAttribute('aria-hidden'); }
+  }
+  /* כפתור הצ'אט של Hyperzod עם השליח (בכרטיס השליח שלה, שמוסתר): button.scheme-order-action שלא בכרטיס החשבון (שם — הצ'אט עם העסק).
+     Hyperzod מציירת אותו רק כשהצ'אט פתוח לזוג לקוח-שליח (chat_urls + chat-visibility) */
+  function courierChat(text, bill) {
+    return [].filter.call(text.querySelectorAll('button.scheme-order-action'), function (b) { return !bill.contains(b) && !b.closest('.mh-ot-hero'); })[0] || null;
+  }
+  function screenCards() {   /* המופע הפנימי בלבד (ביקורת 11: שני מופעים זה בתוך זה) */
+    return [].filter.call(document.querySelectorAll('.scheme-order-details:not(.scheme-order-details-loader)'), function (c) { return !c.querySelector('.scheme-order-details'); });
+  }
+  var annKey = {};
+  function renderScreen(card, st) {
+    var o = st.getters.getViewOrder, text = card.querySelector(':scope > .v-card-text');
+    var table = text && text.querySelector('.c-table'), bill = table && table.closest('.tw-rounded-\\[14px\\], .tw-rounded-\\[16px\\]');
+    /* הכרטיס של Hyperzod חייב להראות את אותה הזמנה (#id בשורת העסק) — אחרת לא מציירים */
+    if (!o || o.order_status == null || !o.order_id || !bill || !text.contains(bill) || !new RegExp('#\\s*' + o.order_id + '(?!\\d)').test(bill.textContent)) { removeOurs(card); return; }
+    ensureWatched(st, o);
+    var nw = now(), lv = isLive(), v = viewFor(o, nw, lv);
+    var head = text.querySelector('.scheme-order-tracking-header');
+    var mapEl = text.querySelector('#order-track-map, #orderTracking'), box = v.mode !== 'cancelled' && v.mode !== 'delivered' && mapEl ? mapEl.parentElement : null;
+    var mapMode = !box ? 'none' : mapEl.id === 'orderTracking' ? 'iframe' : 'google', cover = null, mapState = null, t = tnow();
+    var azSeen = mapMode === 'iframe' && v.st === 4 && beat.win != null && beat.win === mapEl.contentWindow;
+    var liveCourier = azSeen && t - beat.last < BEAT_FRESH;
+    if (azSeen && t - beat.last >= BEAT_FRESH) { cover = 'az-stale'; }   /* רק אם היו הודעות ונעצרו */
+    if (mapMode === 'google') {
+      try { mapState = mapTick(box, mapEl, o); } catch (e) { err(e); mapState = 'off'; }
+      if (mapState === 'nopts') { mapState = 'on'; cover = 'nopts'; }
+      else if (tilesFailed(mapEl)) { cover = 'tiles'; }
+    }
+    var desk = head ? !head.classList.contains('native-top-notch-padding') : (window.innerWidth >= 960 && !window.ReactNativeWebView);
+    var cb = courierChat(text, bill), badge = cb && cb.querySelector(':scope > span'), chat = cb ? { n: badge ? badge.textContent.replace(/\s+/g, '') : '' } : null;
+    var g = geo(desk, !desk && window.innerHeight < 700), d = model(o, v, nw, liveCourier, chat);
+    var hero = card.querySelector('.mh-ot-hero'), disc = discHTML(d, g), rest = heroInner(d, g, '\u0001'), fresh = !hero;
+    if (!hero) {
+      var tmp = document.createElement('div');
+      tmp.innerHTML = '<section class="mh-ot-hero" data-mode="" data-stage="" data-level="" style="--bs:' + g.badge + 'px" aria-label="מצב ההזמנה"><div class="mh-ot-sr" role="status" aria-live="polite"></div></section>';
+      hero = tmp.firstChild;
+    }
+    /* מקום: מיד אחרי קופסת המפה (אותו הורה); בלי מפה — מיד אחרי ההדר */
+    var after = box || head;
+    if (after ? after.nextElementSibling !== hero : hero.parentNode !== text) {
+      if (after) { after.parentNode.insertBefore(hero, after.nextSibling); } else { text.insertBefore(hero, text.firstChild); }
+    }
+    var layout = cover ? 'none' : mapMode;
+    setAttr(hero, 'data-mode', layout); setAttr(hero, 'data-stage', d.stage == null ? 'x' : d.stage); setAttr(hero, 'data-level', d.level);
+    setAttr(hero, 'data-stuck', d.stuck ? '' : null); setAttr(hero, 'data-sched', d.sched ? '' : null); setAttr(hero, 'data-small', g.small ? '' : null);
+    if (hero.style.getPropertyValue('--bs') !== g.badge + 'px') { hero.style.setProperty('--bs', g.badge + 'px'); }
+    var od = hero.__mhOt === rest ? hero.querySelector(':scope > .mh-ot-sheet > .mh-ot-clock > .mh-ot-disc') : null;
+    if (hero.__mhOt !== rest || hero.__mhDisc !== disc) {
+      var prevNum = hero.__mhNum, prevStage = hero.__mhStage;
+      if (od) { od.insertAdjacentHTML('afterend', disc); od.parentNode.removeChild(od); stats.discs++; }   /* רק הדיסק */
+      else {
+        var sr = hero.querySelector(':scope > .mh-ot-sr');
+        while (hero.firstChild && hero.firstChild !== sr) { hero.removeChild(hero.firstChild); }
+        hero.insertAdjacentHTML('afterbegin', rest.replace('\u0001', function () { return disc; }));
+      }
+      hero.__mhOt = rest; hero.__mhDisc = disc; stats.renders++;
+      var num = hero.querySelector('.mh-ot-num'), nowLi = hero.querySelector('.mh-ot-steps > li.is-now');
+      if (!fresh && num && prevNum != null && prevNum !== num.textContent) { num.classList.add('mh-ot-roll'); }      /* גלגול פעם בדקה */
+      if (!fresh && nowLi && !d.sched && prevStage != null && prevStage !== d.stage) { nowLi.classList.add('mh-ot-pulse'); }   /* רק במעבר שלב */
+      hero.__mhNum = num ? num.textContent : null; hero.__mhStage = d.stage;
+    }
+    /* קורא מסך: הכרזה אחת לכל שינוי שלב/משפט, לא כל דקה */
+    var key = d.stage + '|' + plain(d.status), ok = String(o.order_id);
+    if (annKey[ok] !== key) {
+      var srEl = hero.querySelector(':scope > .mh-ot-sr');
+      if (annKey[ok] != null && srEl) { srEl.textContent = plain(d.status); stats.announces++; }
+      annKey[ok] = key;
+    }
+    /* קופסת המפה */
+    if (box) {
+      setAttr(box, 'data-mh-mapbox', '');
+      setAttr(box, 'data-mh-mapmode', mapMode === 'iframe' ? 'iframe' : null);
+      setAttr(box, 'data-mh-map', mapMode === 'google' ? mapState : null);
+      setAttr(box, 'data-mh-cover', cover);
+    }
+    setAttr(hero, 'data-seam', g.desk && layout === 'google' && seamOk(hero, box, g) ? '' : null);
+    /* מה מוחלף אצל Hyperzod (כמו המוק): כל מה שלפני כרטיס החשבון, חוץ מההדר ומהעוטף שמחזיק את המפה ואותנו */
+    var kind = function (e) {
+      return e.querySelector('#order-track-map, #orderTracking') ? 'map' : e.querySelector('.track-delivery') ? 'history' : e.querySelector('.pickup-icon') ? 'pickup-time'
+        : e.querySelector('a[href^="tel:"]') ? 'courier' : d.stage === 5 ? 'completed-in' : d.stage == null ? 'cancelled-card' : (e.textContent.trim() ? 'other' : 'empty');
+    };
+    for (var up = bill; up && up !== text; up = up.parentElement) {
+      for (var sib = up.previousElementSibling; sib; sib = sib.previousElementSibling) {
+        if (sib === head || sib === hero || sib.contains(hero) || sib.contains(head) || (box && sib.contains(box)) || sib.contains(bill)) { continue; }   /* QA r0: לעולם לא קופסת המפה או החשבון */
+        var k = kind(sib);
+        /* "מעקב הזמנה" של Hyperzod (AutoZod בלי iframe) נשאר — הקישור היחיד לשליח — אבל כשורה שקטה, לא אדום מלא שני (QA r0) */
+        if (k === 'other' && d.stage != null && d.stage < 5 && (sib.matches('.v-btn') || sib.querySelector('.v-btn'))) { setAttr(sib, 'data-mh-ot-ext', ''); continue; }
+        mark(sib, k);
+      }
+    }
+    [].forEach.call(text.querySelectorAll('.track-delivery'), function (x) { var p = x.parentElement; if (!x.closest('[data-mh-ot-hide]') && !p.contains(bill) && !p.contains(hero)) { mark(p, 'history'); } });
+    setAttr(bill, 'data-mh-ot-bill', '');
+    if (!bill.id) { bill.id = 'mh-ot-bill'; }
+    var wrap = bill.closest('.tw-px-2'); if (wrap) { setAttr(wrap, 'data-mh-ot-wrap', ''); }
+    for (var e2 = bill.parentElement; e2 && e2 !== text; e2 = e2.parentElement) { setAttr(e2, 'data-mh-ot-chain', ''); }
+    var mline = [].filter.call(bill.querySelectorAll('.tw-text-gray-500'), function (x) { return /#\d+/.test(x.textContent) && !x.classList.contains('mh-ot-mline'); })[0];
+    if (mline) {
+      mark(mline, 'merchant-line');
+      var type = mline.textContent.split('|').pop().trim();
+      if (/[A-Za-z]/.test(type) || /#\d/.test(type)) { type = ''; }   /* עברית בלבד */
+      var mh = '<span>הזמנה <bdi dir="ltr">#' + esc(o.order_id) + '</bdi>' + (type ? ' ·' : '') + '</span>' + (type ? ' <span>' + esc(type) + '</span>' : '');
+      var ours = mline.nextElementSibling;
+      if (!ours || !ours.classList.contains('mh-ot-mline')) { ours = document.createElement('div'); ours.className = 'mh-ot-mline'; mline.parentNode.insertBefore(ours, mline.nextSibling); }
+      if (ours.__mhOt !== mh) { ours.innerHTML = mh; ours.__mhOt = mh; }   /* המקור, לא innerHTML (" ו-nbsp מתסדרים אחרת) */
+    }
+    [].forEach.call(bill.querySelectorAll('a[href^="tel:"]'), function (a) { setAttr(a, 'aria-label', 'חיוג לעסק'); [].forEach.call(a.parentElement.children, function (c) { if (c.tagName.toLowerCase() === 'svg') { mark(c, 'nav-arrow'); } }); });
+    [].forEach.call(bill.querySelectorAll('button.scheme-order-action'), function (b2) { setAttr(b2, 'aria-label', 'צ׳אט עם העסק'); });   /* היה "Open chat with merchant" */
+    [].forEach.call(bill.querySelectorAll('img'), function (im) { setAttr(im, 'alt', ''); });   /* לוגו העסק ליד השם — קישוט; היה "Merchant Logo" (QA r1) */
+    /* הדר קבוע (טלפון) → --mh-ot-top אחרי ההסתרה; ה-h1 בגודל 0 והכותרת ב-::before — השם הנגיש */
+    if (head && getComputedStyle(head).position === 'fixed') {
+      /* lead = ראש הכרטיס בדף לא גלול (באפליקציה #app-router-view מרופד בפס הסטטוס) — offsetTop לא תלוי בגלילה */
+      var lead = 0, oe = card; while (oe) { lead += oe.offsetTop || 0; oe = oe.offsetParent; }
+      var hh = Math.max(0, Math.round(head.getBoundingClientRect().bottom - lead)) + 'px'; lead = Math.round(lead) + 'px';
+      if (card.style.getPropertyValue('--mh-ot-top') !== hh) { card.style.setProperty('--mh-ot-top', hh); }
+      if (card.style.getPropertyValue('--mh-ot-lead') !== lead) { card.style.setProperty('--mh-ot-lead', lead); }
+    }
+    /* הכותרת הנגישה (QA r1): ה-h1 של Hyperzod ("Order #…" / שם העסק, בגודל 0 — רואים את ::before) יוצא מעץ הנגישות,
+       ובמקומו כותרת שלנו מוסתרת חזותית מיד אחריו. div ולא h1 — כללי ה-h1 של ההדר (חלק 11, חלק 66) לא חלים עליה */
+    var h1 = head && head.querySelector('h1');
+    if (h1) {
+      setAttr(h1, 'aria-hidden', 'true');
+      var hd = head.querySelector('.mh-ot-h1');
+      if (!hd) { hd = document.createElement('div'); hd.className = 'mh-ot-h1'; hd.setAttribute('role', 'heading'); hd.setAttribute('aria-level', '1'); hd.textContent = 'ההזמנה שלי'; }
+      if (h1.nextElementSibling !== hd) { h1.parentNode.insertBefore(hd, h1.nextSibling); }
+    }
+    /* כותרת הלשונית (Hyperzod: "Order - #id", פעם אחת בכניסה; בפאנל צדדי היא לא נוגעת) — רק במסך עצמו */
+    if (!card.closest('.v-navigation-drawer, .v-overlay') && document.title !== 'ההזמנה שלי') { document.title = 'ההזמנה שלי'; }
+    stats.mode = v.mode; stats.stage = v.stage; stats.level = d.level; stats.mapMode = mapMode; stats.map = mapState; stats.cover = cover; stats.seam = hero.hasAttribute('data-seam'); stats.chat = !!d.chat; stats.live = lv;
+  }
+
+  /* ---------- הכפתור בדף הבית ---------- */
+  function stripModel(o, v, nw) {
+    var st = v.stage, m = { word: WORD[st] || '', time: null, num: null, glyph: GLYPH[st] || 'pot', f: 0, soft: false, name: (o.merchant && o.merchant.name) || '' };
+    if (v.mode === 'pending') { m.glyph = v.st === 0 ? 'receipt' : 'store'; if (v.st === 0 && v.slow) { m.word = 'התשלום עוד לא אושר'; } }
+    else if (v.mode === 'scheduled') { m.word = 'מתוזמנת'; m.glyph = 'calendar'; m.time = dayWord(v.slot.start, nw) + ' עד ' + one(hm(v.slot.end)); }
+    else if (v.mode === 'countdown') { m.f = v.ring; if (v.centerText) { m.time = v.centerText; } else { m.time = 'עד ' + one(hm(v.hi)); if (v.centerSmall === 'דק׳') { m.num = v.centerBig; } } }
+    else if (v.mode === 'late') { m.f = P.cap; m.soft = v.level >= 2; if (v.level === 1) { m.time = 'מגיעה בדקות הקרובות'; } else if (v.level <= 3) { m.time = 'עד ' + one(v.centerBig); } }
+    else { m.f = v.ring == null ? (STEP[st] || 0) : v.ring; }
+    m.f = Math.round(m.f * 100) / 100;
+    return m;
+  }
+  function stripLine(x) {
+    var r = 14, C = 2 * Math.PI * r, len = C * x.f;
+    var mini = '<span class="mh-ot-mini" aria-hidden="true"><svg viewBox="0 0 32 32" width="32" height="32"><circle cx="16" cy="16" r="' + r + '" class="t"/>' +
+      (x.f ? '<circle cx="16" cy="16" r="' + r + '" class="f" stroke-dasharray="' + len.toFixed(2) + ' ' + C.toFixed(2) + '" transform="rotate(-90 16 16)"/>' : '') + '</svg>' +
+      (x.num ? '<b>' + x.num + '</b>' : ico(x.glyph)) + '</span>';
+    return '<div class="mh-ot-line" data-ring="' + (x.num ? 'num' : 'glyph') + '"' + (x.soft ? ' data-soft=""' : '') + '>' + mini + '<div class="mh-ot-lx">' +
+      '<div class="mh-ot-l1"><span class="mh-ot-ls">' + x.word + '</span>' + (x.time ? '<span class="mh-ot-sep" aria-hidden="true">·</span><span class="mh-ot-lt">' + x.time + '</span>' : '') + '</div>' +
+      '<div class="mh-ot-l2"><span class="mh-ot-lm"><bdi>' + esc(x.name) + '</bdi></span></div></div>' + ico('chev', 'mh-ot-chev') + '</div>';
+  }
+  function removeStrip() {
+    [].forEach.call(document.querySelectorAll('#ongoingOrders .mh-ot-line'), function (e) { var c = e.parentNode; c.removeChild(e); if ((c.getAttribute('aria-label') || '').indexOf('ההזמנה שלי:') === 0) { c.removeAttribute('aria-label'); c.removeAttribute('role'); c.removeAttribute('tabindex'); } });
+    var hs = document.documentElement.style; hs.removeProperty('--mh-ot-above'); hs.removeProperty('--mh-ot-over');
+  }
+  function cssVar(k, px) { var hs = document.documentElement.style, v = Math.round(px) + 'px'; if (hs.getPropertyValue(k) !== v) { hs.setProperty(k, v); } }
+  function renderStrip(st) {
+    var host = document.getElementById('ongoingOrders');
+    if (!host) { return; }
+    var cardsEl = host.querySelectorAll('.ongoing-order'), list = [].filter.call(st.getters.getOnGoingOrders || [], function (o) { return o && [5, 6].indexOf(Number(o.order_status)) < 0; });
+    if (!cardsEl.length || cardsEl.length !== list.length) { removeStrip(); return; }   /* לא בטוחים איזה כרטיס של איזו הזמנה — Hyperzod כמו שהיא */
+    var nw = now(), lv = isLive(), added = false;
+    for (var i = 0; i < cardsEl.length; i++) {
+      var o = list[i], x = stripModel(o, viewFor(o, nw, lv), nw), html = stripLine(x), card = cardsEl[i], line = card.querySelector(':scope > .mh-ot-line');
+      if (!line || line.__mhOt !== html) {
+        if (line) { card.removeChild(line); } else { added = true; }
+        card.insertAdjacentHTML('beforeend', html); card.lastElementChild.__mhOt = html; stats.stripRenders++;
+      }
+      setAttr(card, 'aria-label', 'ההזמנה שלי: ' + x.word + (x.time ? ', ' + plain(x.time) : '') + ', ' + x.name);
+      setAttr(card, 'role', 'button'); setAttr(card, 'tabindex', '0');   /* QA r3: כפתור לקורא מסך ולמקלדת (Enter / רווח — המאזין למטה) */
+    }
+    if (added && cardsEl.length > 1) { var sw = host.querySelector('.swiper'); try { if (sw && sw.swiper && typeof sw.swiper.update === 'function') { sw.swiper.update(); } } catch (e) {} }   /* רוחב השקופיות השתנה */
+    /* QA r3: לבועת הצ'אט של Hyperzod (A8) ולסוף דף הבית (A9) — מתחתית המסך עד ראש הכפתור, ומראש הכפתור עד ראש הגלולה */
+    var hr = host.getBoundingClientRect(), pill = document.querySelector('#MultiVendorBottomNav .floating-nav-pill'), pt = pill ? pill.getBoundingClientRect().top : hr.bottom;
+    cssVar('--mh-ot-above', window.innerHeight - hr.top); cssVar('--mh-ot-over', Math.max(hr.bottom, pt) - hr.top);
+  }   /* --mh-ot-nav-h (לכפתור העגלה, A6) הוסר ב-QA r0 — הכלל הזיז את "המשך לתשלום" בחלון החנות */
+
+  /* ---------- הלולאה ---------- */
+  var HAS = false, probe = null;
+  try { HAS = !!(window.CSS && CSS.supports && CSS.supports('selector(:has(*))')); } catch (e) { HAS = false; }
+  stats.has = HAS;
+  function cssOn() {   /* העיצוב (חלק 66) נטען? נבדק בכל tick עד שכן (WebKit: הקוד רץ לפעמים לפני העיצוב, 17.10) */
+    if (stats.css) { return true; }
+    if (!probe || !probe.isConnected) { probe = document.createElement('i'); probe.className = 'mh-ot-css-probe'; probe.hidden = true; (document.body || document.documentElement).appendChild(probe); }
+    stats.css = getComputedStyle(probe).getPropertyValue('--mh-ot').trim() === 'on';
+    return stats.css;
+  }
+  function store() { try { return document.getElementById('app').__vue_app__.config.globalProperties.$store; } catch (e) { return null; } }
+  function relevant() { return !!document.querySelector('.scheme-order-details, #ongoingOrders'); }
+  var timer = null, scrId = null;
+  function stop() {
+    if (timer) { clearInterval(timer); timer = null; }
+    scrId = null;
+  }
+  function tick() {
+    if (!relevant()) { stop(); return; }
+    if (document.hidden) { return; }
+    stats.ticks++; stats.clock = clockOn();
+    try {
+      if (!HAS || !cssOn()) { return; }
+      var st = store();
+      if (!st || !st.getters) { return; }
+      if (clockOn()) { askOffset(); }   /* פעם אחת לטעינה — המסך והכפתור */
+      var cards = screenCards(), vo = st.getters.getViewOrder, id = cards.length && vo && vo.order_id ? String(vo.order_id) : null;
+      if (id !== scrId) { scrId = id; openedAt = tnow(); }   /* מסך חדש */
+      cards.forEach(function (c) { try { renderScreen(c, st); } catch (e) { err(e); try { removeOurs(c); } catch (e3) {} } });
+      try { renderStrip(st); } catch (e) { err(e); try { removeStrip(); } catch (e4) {} }
+    } catch (e) { err(e); }
+  }
+  function wake() { if (timer || !relevant()) { return; } openedAt = tnow(); timer = setInterval(tick, TICK); tick(); }
+  var pend = false;
+  function schedule() { if (timer || pend) { return; } pend = true; setTimeout(function () { pend = false; try { wake(); } catch (e) { err(e); } }, 150); }
+  /* "פרטי ההזמנה והחשבון" — גלילה לכרטיס החשבון מתחת להדר הקבוע (בלי לשנות את ה-hash של הנתב).
+     "צ׳אט עם השליח" — לחיצה על הכפתור של Hyperzod עצמה (openChat('driver') שלה, אותו חלון צ'אט; אין מנגנון שני) */
+  document.addEventListener('click', function (e) {
+    try {
+      var ch = e.target && e.target.closest && e.target.closest('.mh-ot-hero .mh-ot-chat'), cc = ch && ch.closest('.scheme-order-details');
+      if (cc) {
+        var ct = cc.querySelector(':scope > .v-card-text'), cbill = cc.querySelector('[data-mh-ot-bill]'), hz = ct && cbill && courierChat(ct, cbill);
+        if (hz) { e.preventDefault(); hz.click(); }
+        return;
+      }
+      var a = e.target && e.target.closest && e.target.closest('.mh-ot-flank.is-bill'), card = a && a.closest('.scheme-order-details'), bill = card && card.querySelector('[data-mh-ot-bill]');
+      if (!bill) { return; }
+      e.preventDefault();
+      var head = card.querySelector('.scheme-order-tracking-header');
+      bill.style.scrollMarginTop = ((head && getComputedStyle(head).position === 'fixed' ? Math.round(head.getBoundingClientRect().bottom) : 0) + 12) + 'px';
+      var rm = false; try { rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e2) {}
+      bill.scrollIntoView({ behavior: rm ? 'auto' : 'smooth', block: 'start' });
+    } catch (err3) {}
+  });
+  /* QA r3: הכפתור בדף הבית במקלדת — Enter / רווח = הלחיצה של Hyperzod עצמה (trackOrder שלה) */
+  document.addEventListener('keydown', function (e) {
+    try {
+      var c = e.target;
+      if ((e.key !== 'Enter' && e.key !== ' ') || !c || !c.matches || !c.matches('#ongoingOrders .ongoing-order[role="button"]')) { return; }
+      e.preventDefault(); c.click();
+    } catch (err5) {}
+  });
+  try {
+    new MutationObserver(function (muts) {
+      if (timer) { return; }
+      for (var i = 0; i < muts.length; i++) { if (muts[i].addedNodes && muts[i].addedNodes.length) { schedule(); return; } }
+    }).observe(document.documentElement, { subtree: true, childList: true });
+    window.addEventListener('load', schedule); schedule();
+  } catch (e) { console.warn('[MH OrderTrack] disabled:', e); }
+
+  window.MH_ORDERTRACK = { version: VERSION, tick: tick, _clockView: clockView, stats: function () { stats.clock = clockOn(); return JSON.parse(JSON.stringify(stats)); } };
+  /* mh-ordertrack-v1 */
 })();
 
 
