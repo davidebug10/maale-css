@@ -8488,6 +8488,8 @@ html.mh-android-app body #MultiVendorBottomNav .floating-nav-wrapper #ongoingOrd
     content: "" !important; position: absolute !important; left: 50% !important; bottom: 2.5px !important; width: 9px !important; height: 9px !important;
     transform: translateX(-50%) rotate(45deg) !important; background: #fff !important; border-radius: 1px !important; box-shadow: 2px 2px 3px rgba(17, 17, 17, 0.12) !important;
   }
+  /* QA r4: רשת ביטחון — בלי השעון שלנו בכרטיס (כשל בציור, ניתוק) הסיכות שלנו לא נראות על המפה של Hyperzod. ה-JS גם מוציא אותן (detach) */
+  html body .scheme-order-details:not(:has(.mh-ot-hero)) .mh-ot-pin { display: none !important; }
 
   /* ההדר הזכוכית מעל המפה (משטח קטן — blur מותר) + הכותרת "ההזמנה שלי" (טלפון ומחשב, אושר 28.10; בלי הצומת שלנו — "פרטי הזמנה" של חלק 11).
      ה-JS שם aria-label="ההזמנה שלי" על ה-h1 (קורא מסך קרא "Order #…") */
