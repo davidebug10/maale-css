@@ -319,6 +319,7 @@ if (!window.__MH_FOOTER__) { window.__MH_FOOTER__ = true;
    מטרה: מוסיף class לתגית <html> לפי סביבת ההרצה:
          mh-android-app  = אפליקציית אנדרואיד (WebView)
          mh-ios-app      = אפליקציית אייפון (WKWebView)
+         mh-android      = כל אנדרואיד — אפליקציה, כרום, סמסונג (1.11: חלק 67 בעיצוב)
          כך ניתן לכוון CSS לפלטפורמה אחת בלבד.
    הערה: nativeVibrateShort אינו אמין לזיהוי (מוזרק גם בדפדפן iOS).
    ========================================================= */
@@ -335,6 +336,7 @@ if (!window.__MH_FOOTER__) { window.__MH_FOOTER__ = true;
 
   if (isAndroidApp) { html.classList.add('mh-android-app'); }
   if (isIOSApp) { html.classList.add('mh-ios-app'); }
+  if (/Android/i.test(ua)) { html.classList.add('mh-android'); }
 })();
 
 /* =========================================================

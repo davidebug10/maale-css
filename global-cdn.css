@@ -8774,3 +8774,34 @@ html.mh-android-app body #MultiVendorBottomNav .floating-nav-wrapper #ongoingOrd
 
 }
 /* mh-ordertrack-v1 */
+
+/* =========================================================
+   חלק 67: אנדרואיד — חלון המוצר בלי זכוכית מטושטשת | MH AndroidPopup v1.0.0 | 2026-11-01
+   (דוד 1.11: סרטון של לקוחה באפליקציית אנדרואיד — ב"מגש תוספות" של בנ'ס אריחים ריקים, מלבנים לבנים, הכותרת חתוכה,
+   חץ החזרה וכפתור "הוספה" נעלמים, הגלגל נחתך בקו ישר; "באייפון עובד — לא לשנות שם")
+   הסיבה (שוחזרה בכרום עם תקציב זיכרון גרפי של טלפון, --force-gpu-mem-available-mb): כל אלמנט עם backdrop-filter
+   בתוך החלון המעוגל (overflow:hidden + פינות 30) מוסיף בכרום שכבת מסכה בגודל כל החלון + מעבר ציור בגודל אזור הגלילה —
+   15 אריחי הגלגל + 7 חלקי החלון = 22 שכבות כאלה (~130M פיקסלים ב-dpr 3) → התקציב נגמר ואריחים שלמים לא מצוירים.
+   WebKit (אייפון) לא בונה שכבות כך — שם הכול נשאר כמו שהוא.
+   כאן: באנדרואיד בלבד (html.mh-android — custom-footer.js "Platform Detection", כל אנדרואיד: אפליקציה, כרום, סמסונג)
+   אפס backdrop-filter בחלון ובכל מה שבתוכו, ורקע אטום בגוון שהטשטוש נתן (נמדד מול החי). הצורה, הגלגל והכפתורים —
+   בבעלים שלהם (חלק 8z "חלון המוצר", Pizza Quarters); כאן רק ביטול הטשטוש. :not(#mh-a):not(#mh-b) = גובר על הכללים
+   הקיימים (חלקם עם #id) בלי לגעת בהם.
+   ========================================================= */
+html.mh-android body .product-popup:not(#mh-a):not(#mh-b),
+html.mh-android body .product-popup *:not(#mh-a):not(#mh-b),
+html.mh-android body .product-popup *:not(#mh-a):not(#mh-b)::before,
+html.mh-android body .product-popup *:not(#mh-a):not(#mh-b)::after {
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+/* הגוונים נמדדו מול החי באנדרואיד (אפליקציה, בנ'ס "מגש תוספות", 4 מצבים): החלון = הממוצע שהזכוכית נתנה (86% לבן מעל החנות
+   המוחשכת, ±5 בגוון לפי מה שמאחור); ההדר, הפוטר, אריחי הגלגל והפאנל הפתוח יצאו בחי לבן מלא (זכוכית בתוך זכוכית בכרום);
+   הכרטיס שסביב התמונה — 86% לבן, אחרת מאחורי הפינות התחתונות של התמונה נראה ריבוע הצל האפור */
+html.mh-android body .product-popup:not(#mh-a):not(#mh-b) { background: #f1eeec !important; }
+html.mh-android body .product-popup .v-card-title:not(#mh-a):not(#mh-b),
+html.mh-android body .product-popup .v-card-actions:not(#mh-a):not(#mh-b),
+html.mh-android body .product-popup #add_to_cart_hide_from_mobile_app:not(#mh-a):not(#mh-b),
+html.mh-android body .product-popup .mhq-card:not(#mh-a):not(#mh-b) { background: #ffffff !important; }
+html.mh-android body .v-bottom-sheet__content .product-popup .v-carousel-item .v-card:not(#mh-a):not(#mh-b) { background: rgba(255, 255, 255, 0.86) !important; }
+/* mh-androidpopup-v1 */
