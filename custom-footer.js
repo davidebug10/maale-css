@@ -2358,7 +2358,7 @@ log('פעיל | גרסה', CFG.VERSION);
 })();
 
 /* =========================================================================
-   SEO לדפי האתר — MH SEO  |  v1.0.1 | 2026-09-06
+   SEO לדפי האתר — MH SEO  |  v1.0.2 | 2026-11-04
    -------------------------------------------------------------------------
    מה זה עושה (רק head/meta, לא נוגע בעגלה, בתשלום או בהזמנה):
      1. כותרת (<title>) ותיאור (meta description) לכל דף לפי הנתיב:
@@ -2371,6 +2371,11 @@ log('פעיל | גרסה', CFG.VERSION);
    טבלת SEO (SEO_MERCHANTS): מפתח = slug של העסק. שדות: he (שם בעברית לכותרת),
    d (meta description), c (servesCuisine). עסק שלא בטבלה מקבל ברירת מחדל
    מהשם והקטגוריות שלו. עדכון הטבלה = חלק מרוטינת "הוספת עסק חדש".
+
+   v1.0.2 (B-17, מהסשן של maale-seo): בעמודי תוכן הכותרת גדלה בלי סוף (30 שנ' — ~1,800 תווים, ~110 פעמים
+   "| מעלה המשלוחים"). ה-H1 הראשון בדף הוא הכותרת הריקה של Hyperzod (.scheme-mobile-page-header) → נפלנו ל-document.title,
+   שכבר כלל את הסיומת, ומשקיף ה-head הריץ שוב. עכשיו: SEO_PAGE_TITLES[slug] → H1 הראשון שאינו ריק בתוך התוכן
+   (#html-content, ואם אין — בכל הדף) → אין: null (ניסיון חוזר). לעולם לא מ-document.title; סיומת מותג בסוף הבסיס מוסרת.
 
    אבחון: localStorage.setItem('mh_seo_debug','1') → רענן. MH_SEO.apply(), MH_SEO.last()
    ========================================================================= */
@@ -2427,6 +2432,11 @@ var SEO_PAGES = {
   'kosher-restaurants-maale-adumim': 'מסעדות כשרות במעלה אדומים עם משלוחים: פלאפל וסביח, מעורב ירושלמי, פסטה, סלטים, פיצה ומאפים, עם סוג הכשרות של כל עסק. מזמינים בקליק ושליח מקומי מביא.',
   'join-business': 'בעלי עסקים במעלה אדומים: הצטרפו למעלה המשלוחים, אפליקציית המשלוחים המקומית. שליחים מהעיר, תפריט דיגיטלי, תשלום באתר או במזומן, מודל עמלה על הזמנות. דברו איתנו.',
   'contact-us': 'דברו איתנו: שירות הלקוחות של מעלה המשלוחים, אפליקציית המשלוחים של מעלה אדומים. שאלות על הזמנה, בעלי עסקים שרוצים להצטרף, הערות ומחמאות.'
+};
+/* כותרת לעמוד תוכן כשה-H1 לא מתאים (אימוג'י) או חסר; השאר — מה-H1. בלי הסיומת: היא מתווספת ב-compute */
+var SEO_PAGE_TITLES = {
+  'contact-us': 'דברו איתנו',                 /* H1: "אנחנו כאן בשבילכם 👋"; זו גם הכותרת של Hyperzod */
+  'privacy-policy': 'מדיניות פרטיות'          /* אין H1; הכותרת של Hyperzod היא ה-slug באנגלית */
 };
 var DEBUG = (function(){ try { return localStorage.getItem('mh_seo_debug') === '1'; } catch(e){ return false; } })();
 var LAST = null, timer = null, lastKey = null, PN = {};
@@ -2509,6 +2519,13 @@ function homeJsonLd(){
           { '@context': 'https://schema.org', '@type': 'WebSite', name: SITE, url: ORIGIN + '/he', inLanguage: 'he' }];
 }
 
+var BRAND_TAIL = new RegExp('(\\s*[|\u2013\u2014-]\\s*' + SITE + ')+\\s*$');
+function firstH1(root){
+  var hs = root ? root.querySelectorAll('h1') : [];
+  for (var i = 0; i < hs.length; i++) { if (hs[i].textContent.trim()) return hs[i]; }
+  return null;
+}
+
 function compute(){
   var st = store();
   var p = location.pathname.replace(/\/+$/, '') || '/';
@@ -2537,11 +2554,15 @@ function compute(){
   }
   if (p === '/' || p === '/he' || p === '/he/home') return { key: 'home', title: HOME.title, desc: HOME.desc, canon: ORIGIN + '/he', ld: homeJsonLd(), ldId: 'mh-ld-home' };
   if (/\/page\//.test(p)) {
-    var h = document.querySelector('h1'); var pt = (h && h.textContent.trim()) || document.title;
     var slug = (p.match(/\/page\/([^\/]+)/) || [])[1] || '';
-    /* תיאור: מהטבלה, ואם אין — הפסקה הראשונה אחרי ה-H1 (לא כל טקסט הדף עם התפריט) */
-    var firstP = h && h.parentElement && h.parentElement.querySelector('p');
-    var pd = SEO_PAGES[slug] || (firstP ? firstP.textContent : '') || pt;
+    var box = document.getElementById('html-content'), h = firstH1(box) || firstH1(document);
+    /* לעולם לא מ-document.title: הוא כבר כולל את הסיומת שלנו, והכותרת הייתה גדלה בכל ריצה */
+    var pt = (SEO_PAGE_TITLES[slug] || (h ? h.textContent : '')).replace(/\s+/g, ' ').trim().replace(BRAND_TAIL, '');
+    if (!pt) return null;                                      /* התוכן עוד לא נטען — ננסה שוב */
+    /* תיאור: מהטבלה, ואם אין — הפסקה הראשונה עם תוכן (40+ תווים, לא "עודכן לאחרונה: …") אחרי ה-H1, לא כל טקסט הדף עם התפריט */
+    var ps = ((h && h.parentElement) || box || document.body).querySelectorAll('p'), firstP = '';
+    for (var i = 0; i < ps.length && !firstP; i++) { if (ps[i].textContent.trim().length >= 40) firstP = ps[i].textContent; }
+    var pd = SEO_PAGES[slug] || firstP || pt;
     return { key: 'p:' + p, title: pt + ' | ' + SITE, desc: cut(pd, 155), canon: canon, ld: null, ldId: 'mh-ld-page' };
   }
   return { key: 'x:' + p, title: null, desc: null, canon: canon, ld: null, ldId: null };
@@ -2566,7 +2587,7 @@ new MutationObserver(function(){ clearTimeout(timer); timer = setTimeout(apply, 
 new MutationObserver(function(){ clearTimeout(timer); timer = setTimeout(apply, 400); }).observe(document.body || document.documentElement, { childList: true, subtree: true });
 window.addEventListener('popstate', function(){ setTimeout(apply, 300); });
 setTimeout(apply, 800); setTimeout(apply, 2500);
-window.MH_SEO = { version: '1.0.1', apply: apply, last: function(){ return LAST; }, table: SEO_MERCHANTS };
+window.MH_SEO = { version: '1.0.2', apply: apply, last: function(){ return LAST; }, table: SEO_MERCHANTS };
 log('פעיל');
 })();
 
