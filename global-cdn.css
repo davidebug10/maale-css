@@ -1487,7 +1487,7 @@ html body #mobileLocationSearch .locate-me span.tw-font-medium {   /* הגודל
 /* --- 12ה: שורת החיפוש — הוסר 6.10.2026; השדה ורשימת התוצאות במודאל בבעלות "חלק 44: MH AddrEditor" --- */
 
 /* --- 12ו: ".merchant-card" גלובלי (זכוכית, רדיוס 32) — הוסר 22.10. נגע בכל כרטיס עסק באתר; באוספי דף הבית ובדף "הכול"
-   חלק 59 ביטל אותו. המראה עבר כמו שהוא ל"חלק 26ב" (סעיף 15): דף החיפוש, עוזר הקניות וסקשני Page Builder של עסקים. ההיסטוריה ב-git. --- */
+   חלק 59 ביטל אותו. המראה עבר כמו שהוא ל"חלק 26ב" §13: עוזר הקניות וסקשני Page Builder של עסקים (בדף החיפוש מ-4.11 כרטיס לבן). ההיסטוריה ב-git. --- */
 
 /* כותרת "קולקציות נבחרות" ל-CollectionGrid--172265 — הוסרה 9.10.2026: הסקשן כבר לא קיים בדף הבית (QA). */
 
@@ -1597,140 +1597,8 @@ html body #mobileLocationSearch .locate-me span.tw-font-medium {   /* הגודל
    הוחלף במלואו ע"י "חלק 44: MH AddrEditor" בסוף הקובץ (22.9.2026). ההיסטוריה ב-git.
    ========================================================= */
 
-/* =========================================================
-   חלק 26: דף חיפוש - LIQUID GLASS SEARCH PAGE
-   Scope: #MultiVendorSearch
-   Date: 2026-03-14
-   ========================================================= */
-/* 1. רקע הדף - לבן קריסטל נקי */
-#MultiVendorSearch {
-    background: radial-gradient(circle at 50% 0%, #ffffff 0%, #f9f9f9 100%) !important;
-}
-/* 2. הדר חיפוש Sticky (.tw-sticky.tw-top-0.tw-bg-white) — הוסר 23.10 (מת: אין בבילד אלמנט עם tw-sticky + tw-top-0;
-   ההדר של היום הוא .scheme-global-search-mobile-header, בבעלות חלק 26ב §1). ההיסטוריה ב-git. */
-/* 3. שורת החיפוש - Crystal Capsule */
-#MultiVendorSearch .mobile-search-input .v-field {
-    background: rgba(255, 255, 255, 0.7) !important;
-    backdrop-filter: blur(20px) saturate(180%) !important;
-    -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
-    border: 1.5px solid rgba(227, 30, 36, 0.12) !important;
-    border-radius: 20px !important;
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.04) !important;
-    height: 54px !important;
-    transition: all 0.3s ease !important;
-}
-/* פוקוס על שדה החיפוש */
-#MultiVendorSearch .mobile-search-input .v-field--focused {
-    background: #ffffff !important;
-    border-color: #e31e24 !important;
-    box-shadow: 0 10px 30px rgba(227, 30, 36, 0.1) !important;
-}
-/* ניקוי שכבות Vuetify */
-/* 23.10 (ניקוי 2): .v-field__overlay הוסר מהרשימה — כפילות של "4. ניקוי לוגי" בראש הקובץ */
-#MultiVendorSearch .mobile-search-input .v-field__outline {
-    display: none !important;
-}
-/* Placeholder וטקסט */
-#MultiVendorSearch .mobile-search-input input::placeholder {
-    color: rgba(0, 0, 0, 0.35) !important;
-    font-weight: 500 !important;
-}
-#MultiVendorSearch .mobile-search-input input {
-    font-weight: 700 !important;
-    color: #1a1a1a !important;
-}
-/* אייקון חיפוש - אדום QLED */
-#MultiVendorSearch .mobile-search-input svg path {
-    fill: #e31e24 !important;
-}
-/* כפתור חזור - אדום QLED */
-#MultiVendorSearch .mobile-search-input .v-icon {
-    color: #e31e24 !important;
-}
-#MultiVendorSearch .mobile-search-input .v-icon svg path {
-    fill: #e31e24 !important;
-}
-/* 4. כותרות סקציות (חיפוש אחרון / קניות לפי קטגוריות) */
-#MultiVendorSearch .recent-search-heading .tw-font-medium,
-#MultiVendorSearch .tw-uppercase {
-    color: #e31e24 !important;
-    font-weight: 800 !important;
-    font-size: 13px !important;
-    letter-spacing: 0.5px !important;
-}
-/* 5. כרטיס חיפוש אחרון - Floating Glass Tile */
-#MultiVendorSearch .recent-searches .tw-flex.tw-justify-between.tw-items-center.tw-mb-4 {
-    background: rgba(255, 255, 255, 0.6) !important;
-    backdrop-filter: blur(15px) !important;
-    -webkit-backdrop-filter: blur(15px) !important;
-    border: 1px solid rgba(255, 255, 255, 0.5) !important;
-    border-radius: 18px !important;
-    padding: 12px 14px !important;
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.03) !important;
-    transition: all 0.3s ease !important;
-}
-#MultiVendorSearch .recent-searches .tw-flex.tw-justify-between.tw-items-center.tw-mb-4:active {
-    transform: scale(0.98) !important;
-    background: rgba(255, 255, 255, 0.9) !important;
-}
-/* שם החנות בחיפוש אחרון */
-#MultiVendorSearch .recent-searches h4 {
-    color: #1a1a1a !important;
-    font-weight: 800 !important;
-    font-size: 14px !important;
-}
-/* כתובת בחיפוש אחרון */
-#MultiVendorSearch .recent-searches p {
-    color: #888 !important;
-    font-weight: 500 !important;
-}
-/* כפתור X (מחיקה) - אדום */
-#MultiVendorSearch .recent-searches .v-icon {
-    color: #e31e24 !important;
-    opacity: 0.5 !important;
-    transition: opacity 0.2s ease !important;
-}
-#MultiVendorSearch .recent-searches .v-icon:hover {
-    opacity: 1 !important;
-}
-/* תמונת החנות - עיגול פינות */
-#MultiVendorSearch .recent-searches .tw-rounded-\[10px\] {
-    border-radius: 14px !important;
-    overflow: hidden !important;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06) !important;
-}
-/* 6. קטגוריות - Crystal Grid Cards */
-#MultiVendorSearch .category-img {
-    background: rgba(255, 255, 255, 0.6) !important;
-    backdrop-filter: blur(15px) !important;
-    -webkit-backdrop-filter: blur(15px) !important;
-    border: 1px solid rgba(255, 255, 255, 0.5) !important;
-    border-radius: 20px !important;
-    padding: 12px !important;
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.04) !important;
-    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
-    aspect-ratio: 1 !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-}
-#MultiVendorSearch .category-img:active {
-    transform: scale(0.92) !important;
-    border-color: rgba(227, 30, 36, 0.3) !important;
-    box-shadow: 0 8px 25px rgba(227, 30, 36, 0.1) !important;
-}
-/* שם הקטגוריה */
-#MultiVendorSearch .tw-grid .tw-text-xs.tw-text-center {
-    color: #1a1a1a !important;
-    font-weight: 700 !important;
-    font-size: 12px !important;
-    margin-top: 8px !important;
-}
-/* 7. ניקוי שכבות מערכת */
-/* 23.10 (ניקוי 2): .v-btn__overlay/.v-btn__underlay הוסר מהרשימה — כפילות של "4. ניקוי לוגי" בראש הקובץ */
-#MultiVendorSearch .v-field__loader {
-    display: none !important;
-}
+/* חלק 26 (דף החיפוש — LIQUID GLASS SEARCH PAGE, 14.3): הוסר 4.11 — Hyperzod החליפה את הדף (3.11). מה שעוד חי (רקע, השדה, הסתרת
+   פס הטעינה) עבר ל"חלק 26ב: דף החיפוש הכללי — MH Search v3" בסוף הקובץ; השאר (חיפוש אחרון / קטגוריות במבנה הישן) היה מת. ההיסטוריה ב-git. */
 
 /* חלק 27 (חלונית "בחירת כתובת למשלוח", עוגן .v-bottom-sheet__content:has(.location-search-custom-height.dashed-border):not(:has(.scheme-location-search))) —
    הוסר 22.10 (מת: בבילד dashed-border קיים רק בתוך .scheme-location-search, שהעוגן עצמו מוציא — הכלל לא יכול לחול). ההיסטוריה ב-git. */
@@ -2407,8 +2275,8 @@ html body #CurrentLocationBtn svg:last-child path {
 }
 
 html body #MobileSearchFilterBtn {
-    border: 1.5px solid rgba(227, 30, 36, 0.25) !important;
-    border-radius: 12px !important;
+    border: 1.5px solid rgba(227, 30, 36, 0.22) !important;
+    border-radius: 16px !important;   /* 4.11: כמו השדה שלידו (§7) */
     background: rgba(255, 255, 255, 0.7) !important;
     box-shadow: 0 4px 14px rgba(227, 30, 36, 0.06) !important;
     transition: all 0.25s ease !important;
@@ -2427,32 +2295,24 @@ html body #MobileSearchFilterBtn:active .icon-stroke {
     stroke: #ffffff !important;
 }
 
-/* === 7. שורת חיפוש - LIQUID GLASS PREMIUM === */
-/* 22.10: כלל על [data-v-aee55508] (hash מת) הוסר כאן. */
-
-/* 23.10 (ניקוי): border / border-radius / box-shadow הוסרו מכאן — חלק 36 "מסך 1" (אותו סלקטור, !important, מאוחר יותר) תמיד גבר עליהם. */
+/* === 7. שורת החיפוש — LIQUID GLASS (4.11: Hyperzod עטפה את השדה. .home-mobile-search-input = העוטף, השדה = .home-mobile-search-field,
+   והטקסט שרואים הוא placeholder מונפש: "Search" + שם קטגוריה שמתחלף כל 3 שניות — span מעל input readonly, לא ה-placeholder שלו) === */
 html body .home-mobile-search-input .v-field {
     background: rgba(255, 255, 255, 0.85) !important;
     backdrop-filter: blur(20px) saturate(180%) !important;
     -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
-    height: 48px !important;
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
     overflow: hidden !important;
 }
-
+/* קו אדום עדין ופינות 16, כמו כפתור הסינון (§6) ושדה דף החיפוש (26ב §3). Hyperzod: 1px אפור, פינות 10, !important על
+   [data-v] .home-mobile-search-field .v-field — לכן 4 מחלקות. רק לפני הגלילה: בגלילה (§8) השדה הופך לעיגול */
+html body:not(.mh-scrolled) .home-mobile-search-row .home-mobile-search-field .v-field {
+    border: 1.5px solid rgba(227, 30, 36, 0.22) !important;
+    border-radius: 16px !important;
+    box-shadow: 0 4px 14px rgba(227, 30, 36, 0.06) !important;
+}
 html body .home-mobile-search-input .v-field__field {
     align-items: center !important;
-}
-
-html body .home-mobile-search-input input.v-field__input {
-    color: #4a5568 !important;
-    font-weight: 500 !important;
-    font-size: 14px !important;
-    transition: opacity 0.3s ease !important;
-}
-
-html body .home-mobile-search-input input.v-field__input::placeholder {
-    color: rgba(74, 85, 104, 0.6) !important;
 }
 
 html body img.home-mobile-search-icon {
@@ -2466,6 +2326,22 @@ html body img.home-mobile-search-icon {
 html body .home-mobile-search-input .v-field__outline {
     display: none !important;
 }
+
+/* ה-placeholder המונפש (דף הבית, דף החיפוש, המחשב): "Search" באנגלית קשיח בקוד של Hyperzod → "חיפוש" (דוד 3.11, הצעה A).
+   המילה המתחלפת — כהה ומודגשת מעט; בגלילה (עיגול) מוסתר במפורש (עד היום נעלם רק כי רוחב השדה נהיה 0) */
+html body .animated-search-placeholder__prefix { font-size: 0 !important; margin-inline-end: 0 !important; }
+html body .animated-search-placeholder__prefix::before { content: "חיפוש"; font-size: 15px; margin-inline-end: 0.3em; }
+html body .animated-search-placeholder--desktop .animated-search-placeholder__prefix::before { font-size: 14px; }
+html body .home-mobile-search-row .animated-search-placeholder,
+html body main#MultiVendorSearch .animated-search-placeholder { color: #6b7280 !important; font-size: 15px !important; font-weight: 500 !important; }
+html body .home-mobile-search-row .animated-search-placeholder__text,
+html body .animated-search-placeholder--desktop .animated-search-placeholder__text,
+html body main#MultiVendorSearch .animated-search-placeholder__text { color: #374151 !important; font-weight: 600 !important; }
+html body.mh-scrolled .home-mobile-search-row .animated-search-placeholder { display: none !important; }
+/* חזרה מהעיגול (§8): הכיתוב מופיע רק אחרי שהשדה התרחב — אחרת לרגע מצויר מחוץ לשדה ועל הזכוכית. האנימציה מתחילה מחדש בכל פעם
+   שה-display חוזר מ-none (וגם בטעינה: 0.4 שנ') */
+@keyframes mh-ph-in { from { opacity: 0; } to { opacity: 1; } }
+html body:not(.mh-scrolled) .home-mobile-search-row .animated-search-placeholder { animation: mh-ph-in 0.18s ease 0.22s both !important; }
 
 /* === 8. SCROLLED STATE - הכל שקוף + עיגול קריסטלי === */
 
@@ -2826,15 +2702,7 @@ html body .v-bottom-sheet__content:has(#Phone) #Phone button.login-btn.mh-auto-p
    תיקוני מצב-הגלילה (שקיפות + blur) בוצעו במקום בחלק 2+3 שלמעלה. */
 
 /* --- מסך 1: ליטוש שדה החיפוש + מיקום (לפני גלילה) --- */
-html body .home-mobile-search-input .v-field {
-    border-radius: 16px !important;
-    border: 1.5px solid rgba(227, 30, 36, 0.25) !important;
-    box-shadow: 0 4px 14px rgba(227, 30, 36, 0.06) !important;
-}
-html body .home-mobile-search-input .v-field--focused {
-    border-color: rgba(227, 30, 36, 0.6) !important;
-    box-shadow: 0 6px 18px rgba(227, 30, 36, 0.12) !important;
-}
+/* קו / פינות / צל של שדה החיפוש: עברו 4.11 ל-2+3 §7 (כאן הפסידו לכלל !important של Hyperzod על .home-mobile-search-field — מתים). */
 html body #CurrentLocationBtn svg:first-child path {
     fill: #e31e24 !important;
 }
@@ -3491,199 +3359,148 @@ html body nav.scheme-coupon-panel .scheme-coupon-content p.tw-text-\[12px\] {
 /* mh-coupon-v2 */
 
 /* =========================================================
-   חלק 26ב: דף תוצאות חיפוש — MH Search v2.0.0 | 2026-09-06, עדכון 2026-10-09 (9–10: חנויות קודם, מונים, "למה")
-   סקופ קשיח: כל כלל כאן מתחיל ב-html body main#MultiVendorSearch (דף החיפוש הגלובלי בלבד).
-   לא נוגע בדף המרצ'נט, בדף הבית, בפופאפ מוצר או בצ'ק-אאוט — גם אם שם יש אותם קלאסים.
-   מה זה עושה: טאבים "מוצרים/חנויות" (תיקון "מוצרs"), קבוצת מרצ'נט ככרטיס לבן, רשימת מוצרים
-   אנכית במובייל (במקום קרוסלה חתוכה) וגריד בדסקטופ. כרטיס המוצר עצמו — חלק 62 (23.10).
-   טקסטים ("mins" → דק׳, "קילומטר" → ק״מ, "לא מדורג" מוסתר, "No merchants found") — בבלוק MH Search ב-custom-footer.js.
+   חלק 26ב: דף החיפוש הכללי — MH Search v3.0.0 | 2026-11-04 (v2: 9.10; v3 = רטרופיט לדף החדש של Hyperzod מ-3.11)
+   הבעלים של main#MultiVendorSearch: הראש הדביק ושדה החיפוש, "חיפוש אחרון", הגלולות, כותרות הסקשנים, קבוצות המנות
+   ואריחי המנות, הצ'יפים, "אין תוצאות". סקופ קשיח: כל כלל מתחיל ב-html body main#MultiVendorSearch (או עוטף שלו).
+   דוד 4.11 (צילומים מהאפליקציה): "השתנה... שורת חיפוש בדף הבית ודף החיפוש, ודף תוצאות החיפוש — נדרש retrofit עיצובי".
+   המבנה של Hyperzod (בילד Czrk2BV3, capture/search-4.11/hz/HZ-ATLAS.md): גלולות #search-{all|products|merchants}-tab
+   (resultView), סקשן .tab-item-product (קבוצות .search-group עם מסילת אריחים .search-dish) ואחריו .tab-item-merchant
+   (צ'יפים + כרטיסי עסק). במובייל (אתר ואפליקציה) הדף נפתח כגיליון .home-route-overlay--sheet מעל דף הבית, שנשאר בעץ.
+   החלטות (דוד 9.10, 22.10): חנויות קודם, מונים בגלולות, שורת "למה" בכרטיס חנות, בלי זמני משלוח, בלי "קניות לפי קטגוריות".
+   טקסטים (ק"מ, "No results found.", "1 תוצאות"), מונים, "למה", "לא מדורג" — JS "MH Search" (custom-footer.js).
+   ה-placeholder המונפש ("חיפוש" + קטגוריה) — משותף לדף הבית ולכאן: חלק 2+3 §7.
+   QA 4.11 סבב 1: "+" עגול באמת, "למה" עם שלוש נקודות, אריח טקסט 2+2 שורות, כרטיס חנות לבן 18, שטחי מגע, גלילה.
+   סבב 2: כרטיסי החנויות באותו רוחב וטיפוגרפיה כמו קבוצות המנות, שלדי טעינה, מונה מוצר 34, "ועוד N" שלא נחתך.
    ========================================================= */
 
-/* 1. הדר החיפוש הדביק — זכוכית עדינה */
+/* 1. רקע אחיד לדף ולגיליון (הרדיאלי הישן נגמר באמצע המסך בדף קצר — קו חיתוך) */
+html body main#MultiVendorSearch { background: #f7f7f8 !important; }
+html body .home-route-overlay:has(> main#MultiVendorSearch) { background: #f7f7f8 !important; }   /* לבד: :has ברשימה מפיל את כולה בדפדפן ישן */
+@media (min-width: 960px) { html body main#MultiVendorSearch:not(.home-route-overlay *) { min-height: 100vh !important; } }
+
+/* 2. הראש הדביק: זכוכית מקצה לקצה (Hyperzod: בתוך ה-container, הצדדים נשארו פתוחים), כולל פס השעון באפליקציה */
 html body main#MultiVendorSearch .scheme-global-search-mobile-header {
-    background: rgba(255, 255, 255, 0.88) !important;
+    margin-inline: -16px !important;
+    padding: 8px 16px 10px !important;
+    background: rgba(255, 255, 255, 0.92) !important;
     backdrop-filter: blur(18px) saturate(160%) !important;
     -webkit-backdrop-filter: blur(18px) saturate(160%) !important;
     border-bottom: 1px solid rgba(0, 0, 0, 0.06) !important;
-    padding: 10px 0 !important;
 }
+/* הרווח של פס השעון (native-safe-margin-top) — באותו צבע, כדי שהתוכן לא ייראה זז מאחורי השעה */
+html body main#MultiVendorSearch .scheme-global-search-mobile-header::before {
+    content: "";
+    position: absolute;
+    inset-inline: 0;
+    bottom: 100%;
+    height: var(--native-status-bar-height, 0px);
+    background: rgba(255, 255, 255, 0.92);
+}
+/* בגיליון: ה-margin-top של הראש (פס השעון) "ברח" מ-main ויצר 59px גלילה מדומה בדף קצר ("אין תוצאות") — גם בלי הקוד שלנו */
+html body .home-route-overlay > main#MultiVendorSearch { display: flow-root !important; }
+html body main#MultiVendorSearch .scheme-global-search-header-row { gap: 6px !important; }
+/* חזרה: ב-RTL מצביע ימינה (Hyperzod: mdi-chevron-left), אדום, שטח מגע 40 */
+html body main#MultiVendorSearch .scheme-global-search-back-btn { width: 40px !important; height: 40px !important; margin-inline-start: -8px !important; color: #e31e24 !important; justify-content: center !important; }
+html body main#MultiVendorSearch .scheme-global-search-back-btn .v-icon { transform: scaleX(-1) !important; color: inherit !important; }
+html body main#MultiVendorSearch .scheme-global-search-back-btn:active { opacity: 0.55 !important; }
 
-/* 1ב. חזרה (החץ בתוך השדה, מימין): ב-RTL מצביע ימינה — Hyperzod מציירת mdi-chevron-left (23.10, כמו בחלק 47 ובדף "הכול") */
-html body main#MultiVendorSearch .v-field__prepend-inner > .v-icon--clickable > svg { transform: scaleX(-1) !important; }
-
-/* 2. טאבים — בורר מקטע (מוצרים | חנויות) */
-html body main#MultiVendorSearch .scheme-global-search-tabs {
-    margin: 10px 0 14px !important;
-    border-bottom: 0 !important;
-    height: auto !important;
-}
-html body main#MultiVendorSearch .scheme-global-search-tabs .v-slide-group__container,
-html body main#MultiVendorSearch .scheme-global-search-tabs .v-slide-group__content {
-    display: flex !important;
-    width: 100% !important;
-}
-html body main#MultiVendorSearch .scheme-global-search-tabs .v-slide-group__content {
-    gap: 6px !important;
-    padding: 4px !important;
-    background: #f1f2f4 !important;
+/* 3. שדה החיפוש — אותו שדה כמו בדף הבית (2+3 §7): לבן, קו אדום עדין, פינות 16 */
+html body main#MultiVendorSearch .mobile-search-input.v-input { --v-input-control-height: 48px !important; }
+html body main#MultiVendorSearch .mobile-search-input .v-field {
+    height: 48px !important;
+    min-height: 48px !important;
+    padding-inline: 14px 10px !important;
+    background: rgba(255, 255, 255, 0.95) !important;
+    border: 1.5px solid rgba(227, 30, 36, 0.22) !important;
     border-radius: 16px !important;
-    box-sizing: border-box !important;
+    box-shadow: 0 4px 14px rgba(227, 30, 36, 0.06) !important;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease !important;
 }
-html body main#MultiVendorSearch .scheme-global-search-tabs .v-btn.v-tab {
+html body main#MultiVendorSearch .mobile-search-input .v-field--focused {
+    background: #ffffff !important;
+    border-color: rgba(227, 30, 36, 0.6) !important;
+    box-shadow: 0 6px 18px rgba(227, 30, 36, 0.12) !important;
+}
+html body main#MultiVendorSearch .mobile-search-input :is(.v-field__outline, .v-field__overlay, .v-field__loader) { display: none !important; }
+html body main#MultiVendorSearch .mobile-search-input .v-field__input { min-height: 45px !important; height: 45px !important; padding-block: 0 !important; padding-inline: 8px 4px !important; }
+html body main#MultiVendorSearch .mobile-search-input input { color: #111111 !important; font-weight: 600 !important; }
+html body main#MultiVendorSearch .mobile-search-input input::placeholder { color: #6b7280 !important; font-weight: 500 !important; opacity: 1 !important; }
+html body main#MultiVendorSearch .mobile-search-input .scheme-global-search-magnify { color: #e31e24 !important; opacity: 1 !important; }
+html body main#MultiVendorSearch .mobile-search-input .search-input-icon { opacity: 0.55 !important; }
+html body main#MultiVendorSearch .mobile-search-input .v-field__append-inner img.search-input-icon:not(.spinning) { box-sizing: content-box !important; padding-block: 12px !important; padding-inline: 4px 12px !important; margin-block: -12px !important; margin-inline: -4px -12px !important; }   /* שטח מגע 35×43 (היה 19) — לכיוון קצה השדה, לא לתוך הטקסט */
+
+/* 4. "חיפוש אחרון" (בלי מילה): כותרת, "ניקוי", שורות עם קו ביניהן. "קניות לפי קטגוריות" מוסתר (דוד 22.10: "לא בשימוש כרגע") */
+html body main#MultiVendorSearch .scheme-global-search-recent > .scheme-global-search-section-header:first-child { margin-top: 16px !important; }
+html body main#MultiVendorSearch .scheme-global-search-section-title { color: #111111 !important; font-size: 16px !important; font-weight: 800 !important; }
+html body main#MultiVendorSearch .scheme-global-search-section-icon { color: #9ca3af !important; opacity: 1 !important; }
+html body main#MultiVendorSearch .scheme-global-search-clear-all { color: #e31e24 !important; font-size: 14px !important; font-weight: 700 !important; padding: 12px 8px !important; margin: -6px !important; }   /* מגע 41, אותו מקום */
+html body main#MultiVendorSearch .scheme-global-search-recent-row { margin: 0 !important; padding: 10px 0 !important; border-bottom: 1px solid rgba(0, 0, 0, 0.06) !important; }
+html body main#MultiVendorSearch .scheme-global-search-recent-row:last-child { border-bottom: 0 !important; }
+html body main#MultiVendorSearch .scheme-global-search-recent-thumb { border-radius: 12px !important; border: 1px solid rgba(0, 0, 0, 0.06) !important; background: #ffffff !important; }
+html body main#MultiVendorSearch .scheme-global-search-recent-thumb .v-img { border-radius: 11px !important; }
+html body main#MultiVendorSearch .scheme-global-search-recent-name { color: #111111 !important; font-size: 15px !important; font-weight: 700 !important; }
+html body main#MultiVendorSearch .scheme-global-search-recent-sub { color: #6b7280 !important; font-size: 13px !important; font-weight: 500 !important; }
+html body main#MultiVendorSearch .scheme-global-search-recent-remove { width: 36px !important; height: 36px !important; padding: 0 !important; border-radius: 999px !important; color: #9ca3af !important; display: inline-flex !important; align-items: center !important; justify-content: center !important; }
+html body main#MultiVendorSearch .scheme-global-search-recent-remove:active { background: rgba(0, 0, 0, 0.06) !important; }
+html body main#MultiVendorSearch .scheme-global-search-category-grid { display: none !important; }
+html body main#MultiVendorSearch .scheme-global-search-recent > .scheme-global-search-section-header:has(+ .scheme-global-search-category-grid) { display: none !important; }
+
+/* 5. התוצאות: חנויות קודם (דוד 9.10). ב-DOM של Hyperzod המוצרים לפני החנויות — מסדרים ב-order */
+html body main#MultiVendorSearch .scheme-global-search-results { display: flex !important; flex-direction: column !important; margin-top: 14px !important; scroll-margin-top: calc(var(--native-status-bar-height, 0px) + 81px) !important; }
+/* בזמן הטעינה אין גלולות — כשהתוצאות מגיעות הכל קפץ 66px למטה. שומרים את המקום שלהן */
+html body main#MultiVendorSearch .scheme-global-search-results:not(:has(.search-result-pills)):has(.v-skeleton-loader) { padding-top: 66px !important; }
+html body main#MultiVendorSearch .scheme-global-search-results > .search-result-pills { order: -2 !important; }
+html body main#MultiVendorSearch .scheme-global-search-results > #mh-search-note { order: -1 !important; }
+html body main#MultiVendorSearch .scheme-global-search-results > .tab-item-merchant { order: 1 !important; margin-top: 0 !important; }
+html body main#MultiVendorSearch .scheme-global-search-results > .tab-item-product { order: 2 !important; margin-top: 0 !important; }
+html body main#MultiVendorSearch .scheme-global-search-results > .tab-item-product:has(~ .tab-item-merchant) { margin-top: 26px !important; }
+html body main#MultiVendorSearch .scheme-global-search-results > h6 { order: 3 !important; }
+@media (min-width: 960px) { html body main#MultiVendorSearch:not(.home-route-overlay *) .scheme-global-search-results { scroll-margin-top: 88px !important; } }
+
+/* 6. הגלולות = בורר מקטע (הכול | חנויות | מוצרים), כמו הטאבים של v2. התוויות מצוירות מחדש: אצל Hyperzod "כֹּל" בניקוד
+   ו"מוצר"/"חנות" ביחיד, והגלולה הפעילה לבן על לבן. מונה: data-mh-n מה-JS (בלי מונה ב"הכול" — דוד 15.10) */
+html body main#MultiVendorSearch .search-result-pills {
+    display: flex !important;
+    gap: 4px !important;
+    margin: 0 0 18px !important;
+    padding: 4px !important;
+    background: #eceef1 !important;
+    border-radius: 999px !important;
+    overflow: visible !important;
+}
+html body main#MultiVendorSearch .search-result-pill {
     flex: 1 1 0 !important;
     min-width: 0 !important;
-    height: 44px !important;
-    margin: 0 !important;
-    border-radius: 12px !important;
-    background: transparent !important;
-    box-shadow: none !important;
+    height: 40px !important;
+    padding: 0 6px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
     border: 0 !important;
+    border-radius: 999px !important;
+    background: transparent !important;
     color: #374151 !important;
-    text-transform: none !important;
-    letter-spacing: 0 !important;
-    transition: background-color 0.2s ease, color 0.2s ease !important;
+    font-size: 0 !important;
+    box-shadow: none !important;
+    transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease !important;
 }
-html body main#MultiVendorSearch .scheme-global-search-tabs .v-btn.v-tab.v-tab--selected {
-    background: #e31e24 !important;
-    color: #ffffff !important;
-    box-shadow: 0 6px 16px rgba(227, 30, 36, 0.25) !important;
-}
-/* 23.10 (ניקוי 2): .v-btn__overlay/.v-btn__underlay הוסר מהרשימה — כפילות של "4. ניקוי לוגי" בראש הקובץ */
-html body main#MultiVendorSearch .scheme-global-search-tabs .v-tab__slider { display: none !important; }
-/* Hyperzod מדביקה "s" לתרגום ("מוצרs", "חנותs") — מציירים את התווית מחדש */
-html body main#MultiVendorSearch .scheme-global-search-tabs .v-btn.v-tab .v-btn__content { font-size: 0 !important; color: inherit !important; }
-html body main#MultiVendorSearch #search-product-tab .v-btn__content::before { content: "מוצרים"; font-size: 15px; font-weight: 800; }
-html body main#MultiVendorSearch #search-merchant-tab .v-btn__content::before { content: "חנויות"; font-size: 15px; font-weight: 800; }
-
-/* 3. מונה תוצאות */
-html body main#MultiVendorSearch .tab-item-product > .tw-flex.tw-justify-between.tw-items-center.tw-mb-3 { margin: 0 4px 10px !important; }
-html body main#MultiVendorSearch .tab-item-product > .tw-flex.tw-justify-between.tw-items-center.tw-mb-3 > span {
-    font-size: 15px !important;
-    font-weight: 800 !important;
-    color: #111111 !important;
-}
-html body main#MultiVendorSearch #mh-search-empty {
-    margin: 18px 4px 0;
-    padding: 18px 16px;
-    border: 1px dashed #d1d5db;
-    border-radius: 16px;
-    color: #6b7280;
-    font-size: 14px;
-    font-weight: 600;
-    text-align: center;
-}
-
-/* 4. קבוצת מרצ'נט — כרטיס לבן */
-html body main#MultiVendorSearch .scheme-global-search-product-group {
-    background: #ffffff !important;
-    border: 1px solid #e5e7eb !important;
-    border-radius: 18px !important;
-    padding: 14px 12px 12px !important;
-    margin: 0 0 12px !important;
-    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.04) !important;
-}
-html body main#MultiVendorSearch .scheme-global-search-product-group > .tw-ms-3 { margin: 0 !important; }
-html body main#MultiVendorSearch .scheme-global-search-product-group > .tw-ms-3 > a { text-decoration: none !important; display: block !important; }
-html body main#MultiVendorSearch .scheme-global-search-product-group > .tw-ms-3 > a > div {
-    display: flex !important;
-    justify-content: space-between !important;
-    align-items: baseline !important;
-    gap: 10px !important;
-    font-size: 17px !important;
-    font-weight: 800 !important;
-    color: #111111 !important;
-    line-height: 1.3 !important;
-}
-html body main#MultiVendorSearch .scheme-global-search-product-group > .tw-ms-3 > a > div::after {
-    content: "לכל התפריט ‹";
-    flex: 0 0 auto;
-    font-size: 12.5px;
-    font-weight: 700;
-    color: #e31e24;
-    white-space: nowrap;
-}
-/* שורת המידע: זמן • מרחק (הדירוג "לא מדורג" מוסתר ע"י ה-JS דרך mh-unrated) */
-html body main#MultiVendorSearch .scheme-global-search-product-group > .tw-ms-3 > .tw-flex.tw-mt-1 {
-    margin-top: 4px !important;
-    font-size: 13px !important;
-    color: #6b7280 !important;
-}
-html body main#MultiVendorSearch #SearchedMerchantRating.mh-unrated { display: none !important; }
-html body main#MultiVendorSearch #SearchedMerchantAverageTimeAndDistance img { width: 14px !important; max-width: 14px !important; opacity: 0.7 !important; }
-html body main#MultiVendorSearch #SearchedMerchantAverageTimeAndDistance span {
-    font-size: 13px !important;
-    font-weight: 600 !important;
-    color: #6b7280 !important;
-}
-
-/* 5. רשימת המוצרים — אנכית במובייל (במקום קרוסלה שנחתכת), גריד בדסקטופ */
-html body main#MultiVendorSearch .scheme-global-search-product-group .simple-slider { margin-top: 12px !important; }
-html body main#MultiVendorSearch .scheme-global-search-product-group .simple-slider-container { overflow: visible !important; }
-html body main#MultiVendorSearch .scheme-global-search-product-group .slider-inner-container {
-    display: flex !important;
-    flex-direction: column !important;
-    gap: 0 !important;   /* 23.10: שורות עם קו ביניהן (חלק 62), לא כרטיסים נפרדים */
-    padding: 0 !important;
-    margin: 0 !important;
-    overflow: visible !important;
-    width: 100% !important;
-    scroll-snap-type: none !important;
-}
-html body main#MultiVendorSearch .scheme-global-search-product-group .slider-inner-container > .tw-py-2 {
-    padding: 0 !important;
-    width: 100% !important;
-    flex: 0 0 auto !important;
-}
-html body main#MultiVendorSearch .scheme-global-search-product-group .slider-inner-container > .tw-py-2 > div {
-    width: 100% !important;
-    max-width: none !important;
-    min-width: 0 !important;
-}
-/* חצי הקרוסלה / הבלוק הריק אחריה — לא רלוונטיים ברשימה אנכית */
-html body main#MultiVendorSearch .scheme-global-search-product-group > .tw-flex[class*="tw-col-span-4"] { display: none !important; }
-
-/* 6. כרטיס מוצר — עבר 23.10 ל"חלק 62: MH StoreSearch" (אותו רכיב .product-card-horizontal כמו בחיפוש בתוך חנות: שורה, אריח 88, מחיר אדום).
-   כאן נשארו רק הקבוצה (4), הרשימה (5) והרשת במחשב (7). ההיסטוריה ב-git. */
-
-/* 7. דסקטופ — שני טורים (ומעל 1280px שלושה) */
-@media (min-width: 768px) {
-    html body main#MultiVendorSearch .scheme-global-search-product-group .slider-inner-container {
-        display: grid !important;
-        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-        gap: 12px !important;
-    }
-    html body main#MultiVendorSearch .scheme-global-search-product-group { padding: 16px 16px 14px !important; }
-    html body main#MultiVendorSearch .scheme-global-search-tabs .v-slide-group__content { max-width: 420px !important; }
-}
-@media (min-width: 1280px) {
-    html body main#MultiVendorSearch .scheme-global-search-product-group .slider-inner-container {
-        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
-    }
-}
-
-/* 8. טאב חנויות — ריווח ומצב ריק */
-html body main#MultiVendorSearch .tab-item-merchant .v-row { margin: 0 -6px !important; }
-html body main#MultiVendorSearch .tab-item-merchant h6.text-h6,
-html body main#MultiVendorSearch .tab-item-product h6.text-h6 {
-    margin-top: 36px !important;
-    font-size: 16px !important;
-    font-weight: 700 !important;
-    color: #6b7280 !important;
-}
-
-/* 9. חנויות קודם (דוד 9.10): הטאב "חנויות" ראשון (מימין). ה-JS גם פותח אותו קודם (MH Search v2) */
-html body main#MultiVendorSearch .scheme-global-search-tabs #search-merchant-tab { order: -1 !important; }
-
-/* 10. מונה בטאב — data-mh-n מה-JS על ה-span הפנימי ("חנויות 4" / "מוצרים 12"); 0 → בלי מונה.
-   לא על הכפתור: ה-::after שלו תפוס (absolute, שכבת זכוכית) */
-html body main#MultiVendorSearch .scheme-global-search-tabs .v-btn.v-tab .v-btn__content[data-mh-n]::after {
+html body main#MultiVendorSearch .search-result-pill--active { background: #e31e24 !important; color: #ffffff !important; box-shadow: 0 2px 8px rgba(227, 30, 36, 0.22) !important; }
+html body main#MultiVendorSearch #search-all-tab { order: 0 !important; }
+html body main#MultiVendorSearch #search-merchants-tab { order: 1 !important; }
+html body main#MultiVendorSearch #search-products-tab { order: 2 !important; }
+html body main#MultiVendorSearch .search-result-pill::before { flex-shrink: 0; font-size: 15px; font-weight: 800; line-height: 1; white-space: nowrap; }
+html body main#MultiVendorSearch #search-all-tab::before { content: "הכול"; }
+html body main#MultiVendorSearch #search-merchants-tab::before { content: "חנויות"; }
+html body main#MultiVendorSearch #search-products-tab::before { content: "מוצרים"; }
+html body main#MultiVendorSearch .search-result-pill[data-mh-n]:not([data-mh-n="0"])::after {
     content: attr(data-mh-n);
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    flex-shrink: 0;
     min-width: 22px;
     height: 20px;
-    margin-inline-start: 7px;
+    margin-inline-start: 6px;
     padding: 0 6px;
     box-sizing: border-box;
     border-radius: 999px;
@@ -3694,79 +3511,179 @@ html body main#MultiVendorSearch .scheme-global-search-tabs .v-btn.v-tab .v-btn_
     font-variant-numeric: tabular-nums;
     line-height: 1;
 }
-html body main#MultiVendorSearch .scheme-global-search-tabs .v-btn.v-tab.v-tab--selected .v-btn__content[data-mh-n]::after {
-    background: rgba(255, 255, 255, 0.24);
-    color: #ffffff;
-}
-html body main#MultiVendorSearch .scheme-global-search-tabs .v-btn.v-tab .v-btn__content[data-mh-n="0"]::after { display: none; }
+html body main#MultiVendorSearch .search-result-pill--active[data-mh-n]:not([data-mh-n="0"])::after { background: rgba(255, 255, 255, 0.24); color: #ffffff; }
+@media (min-width: 960px) { html body main#MultiVendorSearch .search-result-pills { max-width: 480px !important; } }
+@media (max-width: 340px) { html body main#MultiVendorSearch .search-result-pill { padding: 0 4px !important; } }
+html body main#MultiVendorSearch #mh-search-note { margin: -6px 0 14px; padding: 9px 14px; border-radius: 12px; background: #fff5f5; color: #b91c1c; font-size: 13.5px; font-weight: 700; }
 
-/* 11. כרטיס חנות — שורת "למה" (המנות שהתאימו לחיפוש; Baymard: 57% מהמשתמשים לא הבינו למה תוצאה הופיעה) */
+/* 7. כותרת סקשן ("חנויות" / "מוצרים" — אצל Hyperzod ביחיד), מונה "N תוצאות", "צפה בהכל" ו"ניקוי" באדום */
+html body main#MultiVendorSearch .search-result-section__header { align-items: center !important; margin-bottom: 4px !important; }
+html body main#MultiVendorSearch .search-result-section h2.scheme-global-search-section-title { font-size: 0 !important; line-height: 1.2 !important; }
+html body main#MultiVendorSearch .search-result-section h2.scheme-global-search-section-title::before { font-size: 19px; font-weight: 800; color: #111111; }
+html body main#MultiVendorSearch .tab-item-merchant h2.scheme-global-search-section-title::before { content: "חנויות"; }
+html body main#MultiVendorSearch .tab-item-product h2.scheme-global-search-section-title::before { content: "מוצרים"; }
+html body main#MultiVendorSearch .search-result-count { color: #6b7280 !important; font-size: 13px !important; font-weight: 600 !important; }
+html body main#MultiVendorSearch .tab-item-product > .tw-flex.tw-mb-1 { margin-bottom: 10px !important; }
+html body main#MultiVendorSearch .scheme-global-search-see-all { color: #e31e24 !important; font-size: 14px !important; font-weight: 700 !important; text-decoration: none !important; display: inline-flex !important; align-items: center !important; gap: 2px !important; padding: 12px 8px !important; margin: -12px -8px !important; }
+html body main#MultiVendorSearch .scheme-global-search-see-all .v-icon { transform: scaleX(-1) !important; color: inherit !important; }
+
+/* 8. קבוצת מנות של עסק — כרטיס לבן (כמו v2), שם העסק + "לכל התפריט ‹", שורת דירוג · מרחק, מסילת אריחים */
+html body main#MultiVendorSearch .search-group {
+    position: relative !important;
+    margin: 0 0 12px !important;
+    padding: 14px 14px 14px !important;
+    background: #ffffff !important;
+    border: 1px solid #ececef !important;
+    border-radius: 18px !important;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.04) !important;
+}
+html body main#MultiVendorSearch .search-group__header { position: relative !important; align-items: baseline !important; gap: 10px !important; padding-inline-end: 96px !important; }
+html body main#MultiVendorSearch .search-group__title { min-width: 0 !important; color: #111111 !important; font-size: 16.5px !important; font-weight: 800 !important; line-height: 1.3 !important; text-decoration: none !important; }
+/* שייך לקישור של שם העסק — לחיצה עליו פותחת את העסק כמו השם */
+html body main#MultiVendorSearch .search-group__title::after {
+    content: "לכל התפריט ‹";
+    position: absolute;
+    inset-inline-end: 0;
+    top: -10px;
+    padding-block: 12px;
+    padding-inline-start: 8px;
+    color: #e31e24;
+    font-size: 12.5px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+/* כשיש ל-Hyperzod "צפה בהכל" משלה (תוצאה לא שלנו, is_paginated) — רק הוא, באותו מקום ובאותו סגנון */
+html body main#MultiVendorSearch .search-group__header:has(.search-group__more) { padding-inline-end: 0 !important; }
+html body main#MultiVendorSearch .search-group__header:has(.search-group__more) .search-group__title::after { display: none; }
+html body main#MultiVendorSearch .search-group__more { margin-inline-start: auto !important; color: #e31e24 !important; font-size: 12.5px !important; font-weight: 700 !important; text-decoration: none !important; white-space: nowrap !important; }
+html body main#MultiVendorSearch .search-group__more .v-icon { transform: scaleX(-1) !important; color: inherit !important; }
+/* שורת המידע: ★ דירוג · מרחק. זמן המשלוח (הילד ה-3, בלי class) והנקודה שלפניו מוסתרים (דוד 9.10: "אמורים להיות מוסתרים!!") */
+html body main#MultiVendorSearch .search-group__meta { margin-top: 3px !important; gap: 6px !important; color: #6b7280 !important; font-size: 13px !important; font-weight: 600 !important; }
+html body main#MultiVendorSearch .search-group__meta > span:nth-child(2),
+html body main#MultiVendorSearch .search-group__meta > span:nth-child(3) { display: none !important; }
+html body main#MultiVendorSearch .search-group__rating.mh-unrated,
+html body main#MultiVendorSearch .search-group__rating.mh-unrated ~ .search-group__dot { display: none !important; }
+html body main#MultiVendorSearch .search-group__rating { color: #374151 !important; font-weight: 700 !important; }
+html body main#MultiVendorSearch .search-group__dot { background: #c4c7cc !important; }
+/* המסילה עד שולי הכרטיס (Hyperzod: עד שולי המסך) */
+html body main#MultiVendorSearch .search-group__rail { margin: 12px -14px 0 !important; padding: 0 14px 2px !important; scroll-padding-inline: 14px !important; gap: 10px !important; }
+
+/* 9. אריח מנה: תמונה בפינות 14, שם מודגש, מחיר אדום (כמו בכל האתר), "+" לבן בעיגול. בלי תמונה — אריח טקסט */
+html body main#MultiVendorSearch .search-dish__tap { background: #f3f4f6 !important; border: 1px solid rgba(0, 0, 0, 0.05) !important; }
+html body main#MultiVendorSearch .search-dish__body { padding-top: 7px !important; }
+html body main#MultiVendorSearch .search-dish__name { color: #111111 !important; font-size: 13.5px !important; font-weight: 700 !important; line-height: 1.3 !important; }
+html body main#MultiVendorSearch .search-dish__price { margin-top: 3px !important; color: #c8151b !important; font-size: 14px !important; font-weight: 800 !important; }
+html body main#MultiVendorSearch .search-dish__compare { color: #9ca3af !important; font-size: 11.5px !important; font-weight: 500 !important; }
+html body main#MultiVendorSearch .search-dish__note { color: #6b7280 !important; font-size: 11.5px !important; font-weight: 600 !important; }
+html body main#MultiVendorSearch .search-dish--text .search-dish__media { background: linear-gradient(160deg, #fff5f5 0%, #ffffff 70%) !important; border: 1px solid #f1e4e4 !important; overflow: hidden !important; }
+html body main#MultiVendorSearch .search-dish__copy { padding: 12px 12px 44px !important; gap: 5px !important; }
+/* שם עד 2 שורות + תיאור עד 2 = 76px, בדיוק מה שיש בריבוע (3 שורות תיאור נחתכו באמצע האותיות כשהשם ירד לשורה שנייה) */
+html body main#MultiVendorSearch .search-dish--text .search-dish__name { font-size: 14px !important; font-weight: 800 !important; -webkit-line-clamp: 2 !important; line-clamp: 2 !important; flex-shrink: 0 !important; }
+html body main#MultiVendorSearch .search-dish__desc { color: #6b7280 !important; font-size: 11.5px !important; line-height: 1.35 !important; -webkit-line-clamp: 2 !important; line-clamp: 2 !important; flex-shrink: 0 !important; }
+/* אזל מהמלאי: המחיר אפור (אצל Hyperzod רק התמונה מוחשכת — מחיר אדום נראה כמו מנה שאפשר להזמין) */
+html body main#MultiVendorSearch .search-dish:has(.search-dish__veil) .search-dish__price { color: #9ca3af !important; }
+/* ה-"+" — הכלל הגלובלי של חלק 4 (.v-btn.add-btn: ריבוע זכוכית עם "הוספה") הפך אותו כאן ל"+הוספה" חתוך */
+html body main#MultiVendorSearch .search-dish__add { bottom: 7px !important; inset-inline-end: 7px !important; }
+html body main#MultiVendorSearch .search-dish__add button.v-btn.add-btn {
+    width: 34px !important;
+    min-width: 34px !important;
+    max-width: 34px !important;
+    height: 34px !important;
+    min-height: 34px !important;   /* Vuetify: min-height 40 — בלי זה אליפסה 34×40 (אותה מלכודת כמו בחלק 62) */
+    max-height: 34px !important;
+    padding: 0 !important;
+    border: 0 !important;
+    border-radius: 999px !important;
+    background: #ffffff !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    color: #e31e24 !important;
+    font-size: 0 !important;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.16) !important;
+    transform: none !important;   /* חלק 4: hover בלי @media — באייפון נשאר מוזז פיקסל אחרי נגיעה */
+}
+html body main#MultiVendorSearch .search-dish__add button.v-btn.add-btn .add-btn__icon { width: 14px !important; height: 14px !important; margin: 0 !important; }
+html body main#MultiVendorSearch .search-dish__add button.v-btn.add-btn:active { background: #e31e24 !important; color: #ffffff !important; transform: scale(0.92) !important; }
+html body main#MultiVendorSearch .search-dish__add .counter-btn { height: 34px !important; min-height: 34px !important; border-radius: 999px !important; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.16) !important; }
+html body main#MultiVendorSearch .search-dish__add .counter-btn :is(.decrement-btn, .increment-btn) { width: 34px !important; height: 34px !important; min-height: 34px !important; }
+@media (hover: hover) { html body main#MultiVendorSearch .search-dish__add button.v-btn.add-btn:hover { transform: none !important; box-shadow: 0 3px 12px rgba(227, 30, 36, 0.28) !important; } }
+
+/* 10. חנויות: צ'יפים (מיון/סינון) — אותה גלולה כמו בחיפוש בתוך חנות (חלק 62); פעיל = קו אדום, רקע ורוד; המונה של Hyperzod (שחור) באדום */
+html body main#MultiVendorSearch .search-merchant-filters { margin-top: 6px !important; }
+html body main#MultiVendorSearch .v-btn.scheme-global-search-filter { height: 40px !important; min-width: 40px !important; padding: 0 14px !important; border: 1px solid #e6e2dd !important; border-radius: 999px !important; background: #fff !important; color: #111 !important; box-shadow: none !important; font-size: 14px !important; font-weight: 600 !important; letter-spacing: 0 !important; text-transform: none !important; }
+html body main#MultiVendorSearch .v-btn.scheme-global-search-filter[style*="order: -2"] { width: 40px !important; padding: 0 !important; }   /* כפתור הסינון (אייקון בלבד) */
+html body main#MultiVendorSearch .v-btn.scheme-global-search-filter.scheme-global-search-filter--active { border-color: #e31e24 !important; background: #fff5f5 !important; color: #c8151b !important; }
+html body main#MultiVendorSearch .v-btn.scheme-global-search-filter.scheme-global-search-filter--active .v-icon { color: #c8151b !important; }
+html body main#MultiVendorSearch .v-btn.scheme-global-search-filter .tw-rounded-full { background: #e31e24 !important; color: #ffffff !important; margin: 0 !important; margin-inline-end: 6px !important; }
+html body main#MultiVendorSearch .v-btn.scheme-global-search-filter[style*="order: -2"]:has(.tw-rounded-full) { width: auto !important; padding: 0 10px !important; }
+html body main#MultiVendorSearch .tab-item-merchant .v-row { margin: 0 -12px !important; }   /* מבטל את ה-12 של v-col: 16..374 כמו הגלולות וקבוצות המנות */
+/* שורת "למה" בכרטיס חנות (המנות שהתאימו לחיפוש; Baymard: 57% לא הבינו למה תוצאה הופיעה) — JS לפי data-merchant-id */
+/* שמות המנות ב-span (מתכווץ עם "…"), "ועוד N" ב-::after מ-data-more — לא נחתך (בספארי הגופן רחב יותר: "ועו…") */
 html body main#MultiVendorSearch .tab-item-merchant .mh-why {
     display: flex !important;
     align-items: center !important;
-    gap: 6px !important;
     margin: 3px 0 0 !important;
     min-width: 0 !important;
     color: #374151 !important;
     font-size: 13px !important;
     font-weight: 600 !important;
     line-height: 1.35 !important;
-    white-space: nowrap !important;
     overflow: hidden !important;
-    text-overflow: ellipsis !important;
-    direction: rtl !important;
-    text-align: right !important;
 }
 html body main#MultiVendorSearch .tab-item-merchant .mh-why::before {
     content: "";
     flex: none;
+    margin-inline-end: 6px;
     width: 14px;
     height: 14px;
     background: #e31e24;
     -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M15.5 14h-.79l-.28-.27A6.47 6.47 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z'/%3E%3C/svg%3E") center / contain no-repeat;
     mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M15.5 14h-.79l-.28-.27A6.47 6.47 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z'/%3E%3C/svg%3E") center / contain no-repeat;
 }
-/* 12. דסקטופ: ה-AppBar קבוע (71px) ודף החיפוש מתחיל מתחתיו — הטאבים היו מוסתרים מאחורי ההדר ואי אפשר היה לעבור
-   ל"חנויות"/"מוצרים" (נמדד 9.10: ב-1024 וב-1280 tabs top 10 < header bottom 71; במובייל אין AppBar) */
-html body:has(#AppBar) main#MultiVendorSearch { padding-top: 72px !important; }
-
-/* 14. "קניות לפי קטגוריות" מוסתר (דוד 22.10: "לא בשימוש כרגע"). בדף החיפוש בלי מילה, בתוך .scheme-global-search-recent
-   (אותו בלוק של "חיפוש אחרון" — הוא נשאר): כותרת (.tw-pt-3.tw-mb-5, shopByCategories) + רשת של .category-img.
-   להחזרה: למחוק את שני הכללים. העיצוב הישן של .category-img (חלק 26 הישן) נשאר עד ניקוי הקוד הישן */
-html body main#MultiVendorSearch .scheme-global-search-recent > .tw-pt-3.tw-mb-5,
-html body main#MultiVendorSearch .scheme-global-search-recent > div:has(> .tw-cursor-pointer > .category-img) { display: none !important; }
-
-/* 13. זמני משלוח מוסתרים בדף החיפוש (דוד 9.10: "הזמנים האלה אמורים להיות מוסתרים!!"). Hyperzod מציגה בכותרת קבוצת
-   המוצרים delivery_data.time בלי לבדוק show_delivery_time (בכל מקום אחר היא בודקת), ובכרטיס החנות — כשהדגל דלוק
-   (כפר אדומים "עד שעה", חומוס אדומים "בערך חצי שעה"). נשאר רק המרחק. הטקסט בכותרת הוא צומת טקסט — מתרוקן ב-MH Search */
+html body main#MultiVendorSearch .tab-item-merchant .mh-why > span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+html body main#MultiVendorSearch .tab-item-merchant .mh-why[data-more]::after { content: attr(data-more); flex: none; white-space: pre; }
+/* זמני משלוח מוסתרים גם בכרטיס החנות (#AverageTime מוצג כשהדגל של העסק דלוק) — וגם הנקודה שאחריו (בתוך המרחק או דמי
+   המשלוח). נקודה בין מרחק לדמי משלוח נשארת */
 html body main#MultiVendorSearch #AverageTime,
-html body main#MultiVendorSearch .merchant-card-info__dot,
-html body main#MultiVendorSearch #SearchedMerchantAverageTimeAndDistance img,
-html body main#MultiVendorSearch #SearchedMerchantAverageTimeAndDistance span > div { display: none !important; }
+html body main#MultiVendorSearch #AverageTime + span > .merchant-card-info__dot { display: none !important; }
 
-html body main#MultiVendorSearch #mh-search-note {
-    margin: -4px 4px 12px;
-    padding: 9px 14px;
-    border-radius: 12px;
-    background: #fff5f5;
-    color: #b91c1c;
-    font-size: 13.5px;
-    font-weight: 700;
+/* 11. "אין תוצאות" (הטקסט מתורגם ב-JS) */
+html body main#MultiVendorSearch .scheme-global-search-results h6.text-h6 { margin-top: 36px !important; color: #6b7280 !important; font-size: 16px !important; font-weight: 700 !important; }
+html body main#MultiVendorSearch .scheme-global-search-results h6.text-h6 .v-icon { color: #e5e7eb !important; }
+
+/* 12. מחשב: ה-AppBar קבוע (71px) — הדף מתחיל מתחתיו (9.10: הטאבים היו מאחוריו). לא בגיליון של המובייל: שם ה-AppBar של דף
+   הבית נשאר בעץ מתחת, והכלל יצר פס לבן של 72px מעל שורת החיפוש (30.10 באפליקציה; מ-3.11 גם בספארי) */
+html body:has(#AppBar) main#MultiVendorSearch:not(.home-route-overlay *) { padding-top: 72px !important; }
+
+/* 13. כרטיס עסק בדף החיפוש: לבן ברדיוס 18 כמו קבוצות המנות (§8). עד 4.11 זכוכית ברדיוס 32 — blur(45px) על כל כרטיס
+   מעל רקע אחיד לא נראה, רק עלה בזיכרון גרפי. ריפוד 6 = התמונה (פינות 12) קונצנטרית לכרטיס */
+html body main#MultiVendorSearch .merchant-card {
+    padding: 6px !important;
+    background: #ffffff !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    border: 1px solid #ececef !important;
+    border-radius: 18px !important;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.04) !important;
 }
-
-/* 16. גלולות המיון/הסינון (כפתור הסינון, רלוונטיות, דירוג, סוג הזמנה, קטגוריות) — אותה גלולה כמו בחיפוש בתוך חנות
-   (חלק 62): 40px, פינות 999, קו חם, 14/600 (23.10; היו מלבנים 36 עם פינות 8 של Hyperzod — לבד בכל האתר).
-   פעיל (.scheme-global-search-filter--active, Hyperzod גם צובעת את הקו inline) = "נבחר" של שפת העיצוב: קו אדום, רקע ורוד, טקסט אדום */
-html body main#MultiVendorSearch .v-btn.scheme-global-search-filter { height: 40px !important; min-width: 40px !important; padding: 0 14px !important; border: 1px solid #e6e2dd !important; border-radius: 999px !important; background: #fff !important; color: #111 !important; box-shadow: none !important; font-size: 14px !important; font-weight: 600 !important; letter-spacing: 0 !important; text-transform: none !important; }
-html body main#MultiVendorSearch .v-btn.scheme-global-search-filter[style*="order: -2"] { width: 40px !important; padding: 0 !important; }   /* כפתור הסינון (אייקון בלבד) */
-html body main#MultiVendorSearch .v-btn.scheme-global-search-filter.scheme-global-search-filter--active { border-color: #e31e24 !important; background: #fff5f5 !important; color: #c8151b !important; }
-html body main#MultiVendorSearch .v-btn.scheme-global-search-filter.scheme-global-search-filter--active .v-icon { color: #c8151b !important; }
-
-/* 15. כרטיס עסק בטאב "חנויות" (.merchant-card): זכוכית לבנה, פינות 32. עבר לכאן 22.10 כמו שהוא מ"חלק 12ו" —
-   הכלל הגלובלי שם נגע בכל כרטיס עסק באתר; כאן נשאר רק במקומות שבהם הוא נראה עד היום, בלי שינוי במראה: דף החיפוש,
-   כרטיס עסק בעוזר הקניות של Hyperzod (.shopping-assistant-merchant-card), וסקשני Page Builder "Nearby Merchants" /
-   "Merchant Recommendation" (לא פעילים היום — אם יופעלו, ייראו כמו עד היום). באוספי דף הבית ובדף "הכול" חלק 59 הוא הבעלים. */
-html body main#MultiVendorSearch .merchant-card,
+/* הטקסט באותו טור ובאותו סולם כמו שם העסק ושורת המידע של קבוצת מנות (§8) */
+html body main#MultiVendorSearch .merchant-card .merchant-card-body { padding-inline: 8px !important; }
+html body main#MultiVendorSearch .merchant-card .merchant-card-title { color: #111111 !important; font-size: 16.5px !important; font-weight: 800 !important; }
+html body main#MultiVendorSearch .merchant-card .merchant-card-info { color: #6b7280 !important; font-size: 13px !important; font-weight: 600 !important; }
+/* שלדי הטעינה (Hyperzod: כרטיס Material בפינות 4; קבוצת מנות שטוחה) — כמו הכרטיסים שיגיעו, בלי קפיצה */
+html body main#MultiVendorSearch .tab-item-merchant .v-skeleton-loader.elevation-1 { padding: 6px !important; border: 1px solid #ececef !important; border-radius: 18px !important; box-shadow: 0 6px 18px rgba(0, 0, 0, 0.04) !important; overflow: hidden !important; }
+html body main#MultiVendorSearch .tab-item-merchant .v-skeleton-loader.elevation-1 .v-skeleton-loader__image { border-radius: 12px !important; }
+html body main#MultiVendorSearch .search-group-loader { margin: 0 0 12px !important; padding: 14px !important; background: #ffffff !important; border: 1px solid #ececef !important; border-radius: 18px !important; box-shadow: 0 6px 18px rgba(0, 0, 0, 0.04) !important; overflow: hidden !important; }
+html body main#MultiVendorSearch .search-group-loader__rail { margin: 12px -14px 0 !important; padding: 0 14px 2px !important; gap: 10px !important; }
+/* בגובה של מה שיגיע (כרטיס 274 עם תמונה 184 — קבועים אצל Hyperzod; קבוצה 259), ושורת "N תוצאות" (ריקה בזמן הטעינה) — 20 */
+html body main#MultiVendorSearch .tab-item-merchant .v-skeleton-loader.elevation-1 { min-height: 274px !important; }
+html body main#MultiVendorSearch .tab-item-merchant .v-skeleton-loader.elevation-1 .v-skeleton-loader__image { height: 184px !important; }
+html body main#MultiVendorSearch .search-group-loader { min-height: 259px !important; }
+html body main#MultiVendorSearch .tab-item-merchant:has(.v-skeleton-loader.elevation-1) .search-merchant-filters > :has(> .search-result-count) { min-height: 20px !important; }
+html body main#MultiVendorSearch .tab-item-product:has(.search-group-loader) > :has(> .search-result-count) { min-height: 20px !important; }
+/* כרטיס עסק — זכוכית לבנה, פינות 32. עבר 22.10 כמו שהוא מ"חלק 12ו" (הכלל הגלובלי שם נגע בכל כרטיס עסק באתר); נשאר רק
+   במקומות שבהם הוא נראה עד היום: כרטיס עסק בעוזר הקניות של Hyperzod (.shopping-assistant-merchant-card), וסקשני Page
+   Builder "Nearby Merchants" / "Merchant Recommendation" (לא פעילים היום). באוספי דף הבית ובדף "הכול" חלק 59 הוא הבעלים. */
 html body .shopping-assistant-merchant-card .merchant-card,
 html body #NearbyMerchants .merchant-card,
 html body #MerchantRecommendations .merchant-card {
@@ -3776,7 +3693,7 @@ html body #MerchantRecommendations .merchant-card {
     border: 1px solid rgba(255, 255, 255, 0.4) !important;
     box-shadow: 0 15px 40px rgba(0, 0, 0, 0.06) !important;
 }
-/* mh-search-v2 */
+/* mh-search-v3 */
 
 /* =========================================================
    חלק 22ט: רשימת האופציות בפופאפ המוצר — MH Options v1.1.0 | 2026-09-23 (§8 מגבלת בחירה)
@@ -8027,9 +7944,8 @@ html body #payment-card[data-mh-nocash] .payment-method[data-test-id$="-cod"] { 
    חלק 62: החיפוש בתוך חנות — MH StoreSearch v1.0.1 | 2026-10-20 (דוד: "שיהיה נוח לחוויית משתמש"; v1.0.1 21.10: באפליקציה שורת החיפוש נשארת מתחת לפס השעון בגלילה)
    הבעלים של #MerchantSearchPage (נתיב merchant-search, הזכוכית בראש דף העסק): שורת החיפוש, גלולות המיון והסינון,
    שורות התוצאות, המצב הריק ו"אין תוצאות". התנהגות (×, חיפושים אחרונים, טקסטים): JS "MH StoreSearch".
-   23.10: גם הבעלים של שורת המוצר בטאב "מוצרים" של החיפוש הכללי (main#MultiVendorSearch) — אותו רכיב, אותה שורה (26ב.6 הוסר).
-   בסלקטור: :is(#MerchantSearchPage, #MultiVendorSearch) — בלי "main": :is() לוקח את הספציפיות של הארגומנט החזק, ו-main העלה
-   את כל הכללים מעל כללי המחשב (112px מ-900) שלמטה.
+   23.10–3.11 היה גם הבעלים של שורת המוצר בחיפוש הכללי (:is(#MerchantSearchPage, #MultiVendorSearch)); מ-4.11 שם יש אריחים (חלק 26ב),
+   והסלקטור חזר ל-#MerchantSearchPage בלבד — אותה ספציפיות (:is() לקח את ה-id), אותו מראה כאן.
    עקרונות: שורה צפופה (6–7 תוצאות במסך במקום 4–5), תמונה 88px (DriveImg מוריד אותה בגודל הזה — זיכרון),
    מחיר באדום כמו בכרטיסי החנות, בלי זכוכית/טשטוש בראש הנדבק (זיכרון באייפון), שדה 17px (בלי זום של iOS).
    ========================================================= */
@@ -8065,7 +7981,7 @@ html body #MerchantSearchPage .scheme-merchant-search-header .full-bleed-scroll 
 html body #MerchantSearchPage .scheme-merchant-search-header .full-bleed-scroll > .v-btn { width: auto !important; flex: 0 0 auto !important; }
 html body #MerchantSearchPage .scheme-merchant-search-header .full-bleed-scroll > .v-btn[style*="order: -2"] { width: 40px !important; padding: 0 !important; }   /* כפתור הסינון (אייקון בלבד) — לשלושתם אותה מחלקה */
 /* פעיל: Hyperzod מסמנת במחלקה (סינון) או במסגרת שחורה inline (מיון/קטגוריות). 23.10: "נבחר" של שפת העיצוב — קו אדום, רקע ורוד,
-   טקסט אדום — כמו בחיפוש הכללי (26ב.16; היה מילוי שחור ואייקון מהופך ללבן). האייקונים נשארים כהים על הרקע הבהיר */
+   טקסט אדום — כמו בחיפוש הכללי (26ב §10; היה מילוי שחור ואייקון מהופך ללבן). האייקונים נשארים כהים על הרקע הבהיר */
 html body #MerchantSearchPage .scheme-merchant-search-header .full-bleed-scroll > .v-btn:is(.scheme-merchant-search-filter--active, [style*="border-color: rgb(0, 0, 0)"]) { background: #fff5f5 !important; border-color: #e31e24 !important; color: #c8151b !important; }
 /* מצב ריק: מה מחפשים + חיפושים אחרונים (JS: #mh-ss-empty[data-on]) */
 html body #MerchantSearchPage #mh-ss-empty { display: none !important; padding: 36px 20px 8px !important; text-align: center !important; }
@@ -8089,50 +8005,38 @@ html body #MerchantSearchPage .recent-searches .label-chip { height: 40px !impor
 html body #MerchantSearchPage .scheme-merchant-search-content { padding-top: 2px !important; }
 html body #MerchantSearchPage .product-horizontal-cards { display: block !important; }
 /* Hyperzod ב-.merchant-list-view: לכרטיס height+min-height 155.8px (200 במחשב), ל-.pro-card-h min-width 155.8px — מאופסים */
-html body :is(#MerchantSearchPage, #MultiVendorSearch) .product-card-horizontal { height: auto !important; min-height: 0 !important; margin: 0 !important; border: 0 !important; border-bottom: 1px solid #f0ece8 !important; border-radius: 0 !important; background: transparent !important; box-shadow: none !important; overflow: visible !important; -webkit-tap-highlight-color: transparent !important; }
-html body :is(#MerchantSearchPage, #MultiVendorSearch) .product-card-horizontal:last-child { border-bottom: 0 !important; }
-html body :is(#MerchantSearchPage, #MultiVendorSearch) .product-card-horizontal > .v-card-text { padding: 10px 0 !important; }
-html body :is(#MerchantSearchPage, #MultiVendorSearch) .product-card-horizontal .v-card-text > .tw-grid { display: flex !important; height: auto !important; align-items: center !important; gap: 14px !important; }
-html body :is(#MerchantSearchPage, #MultiVendorSearch) .product-card-horizontal .v-card-text > .tw-grid > :first-child { flex: 1 1 auto !important; min-width: 0 !important; }
-html body :is(#MerchantSearchPage, #MultiVendorSearch) .product-card-horizontal .pro-card-h { flex: 0 0 88px !important; width: 88px !important; min-width: 0 !important; height: auto !important; min-height: 0 !important; align-items: center !important; }   /* Hyperzod: min-width 155.8px */
-html body :is(#MerchantSearchPage, #MultiVendorSearch) .product-card-horizontal .pro-card-h-img { flex: 0 0 88px !important; width: 88px !important; height: 88px !important; min-height: 0 !important; max-height: 88px !important; aspect-ratio: 1 / 1 !important; margin: 0 !important; border: 1px solid #ece8e3 !important; border-radius: 16px !important; background: #fff !important; overflow: visible !important; box-shadow: none !important; box-sizing: border-box !important; }   /* מסגרת לכל אריח: רוב תמונות המוצר הן צילום על לבן ובלי מסגרת הן "צפות" */
-html body :is(#MerchantSearchPage, #MultiVendorSearch) .product-card-horizontal .pro-card-h-img .v-img { border-radius: 15px !important; overflow: hidden !important; }
-html body :is(#MerchantSearchPage, #MultiVendorSearch) .product-card-horizontal .pro-card-h-img .v-responsive__sizer { padding-bottom: 100% !important; }
-html body :is(#MerchantSearchPage, #MultiVendorSearch) .product-card-horizontal .add-product-btn > span { display: none !important; }   /* "שינוי תוספות" כפול מתחת לכפתור */
+html body #MerchantSearchPage .product-card-horizontal { height: auto !important; min-height: 0 !important; margin: 0 !important; border: 0 !important; border-bottom: 1px solid #f0ece8 !important; border-radius: 0 !important; background: transparent !important; box-shadow: none !important; overflow: visible !important; -webkit-tap-highlight-color: transparent !important; }
+html body #MerchantSearchPage .product-card-horizontal:last-child { border-bottom: 0 !important; }
+html body #MerchantSearchPage .product-card-horizontal > .v-card-text { padding: 10px 0 !important; }
+html body #MerchantSearchPage .product-card-horizontal .v-card-text > .tw-grid { display: flex !important; height: auto !important; align-items: center !important; gap: 14px !important; }
+html body #MerchantSearchPage .product-card-horizontal .v-card-text > .tw-grid > :first-child { flex: 1 1 auto !important; min-width: 0 !important; }
+html body #MerchantSearchPage .product-card-horizontal .pro-card-h { flex: 0 0 88px !important; width: 88px !important; min-width: 0 !important; height: auto !important; min-height: 0 !important; align-items: center !important; }   /* Hyperzod: min-width 155.8px */
+html body #MerchantSearchPage .product-card-horizontal .pro-card-h-img { flex: 0 0 88px !important; width: 88px !important; height: 88px !important; min-height: 0 !important; max-height: 88px !important; aspect-ratio: 1 / 1 !important; margin: 0 !important; border: 1px solid #ece8e3 !important; border-radius: 16px !important; background: #fff !important; overflow: visible !important; box-shadow: none !important; box-sizing: border-box !important; }   /* מסגרת לכל אריח: רוב תמונות המוצר הן צילום על לבן ובלי מסגרת הן "צפות" */
+html body #MerchantSearchPage .product-card-horizontal .pro-card-h-img .v-img { border-radius: 15px !important; overflow: hidden !important; }
+html body #MerchantSearchPage .product-card-horizontal .pro-card-h-img .v-responsive__sizer { padding-bottom: 100% !important; }
+html body #MerchantSearchPage .product-card-horizontal .add-product-btn > span { display: none !important; }   /* "שינוי תוספות" כפול מתחת לכפתור */
 /* "+" בפינה התחתונה החיצונית של האריח (במרכז הוא הסתיר את המנה באריח של 88px) */
-html body :is(#MerchantSearchPage, #MultiVendorSearch) .product-card-horizontal .pro-card-h-img > .tw-absolute { top: auto !important; bottom: -8px !important; left: -8px !important; right: auto !important; transform: none !important; z-index: 3 !important; }
-html body :is(#MerchantSearchPage, #MultiVendorSearch) .product-card-horizontal .add-product-btn { margin: 0 !important; padding: 0 !important; }
-html body :is(#MerchantSearchPage, #MultiVendorSearch) .product-card-horizontal .add-product-btn button.add-btn { width: 40px !important; min-width: 40px !important; max-width: 40px !important; height: 40px !important; min-height: 40px !important; max-height: 40px !important; background: #fff !important; -webkit-backdrop-filter: none !important; backdrop-filter: none !important; box-shadow: 0 2px 8px rgba(17, 17, 17, 0.14), 0 0 0 1px rgba(17, 17, 17, 0.06) !important; }   /* עיגול לבן מלא (Vuetify נותן min-height 40 — 36 רוחב יצא אליפסה; הזכוכית השקופה נעלמה על הלבן שמחוץ לאריח, ו-20 blur ברשימה גוללת = עומס גרפי) */
+html body #MerchantSearchPage .product-card-horizontal .pro-card-h-img > .tw-absolute { top: auto !important; bottom: -8px !important; left: -8px !important; right: auto !important; transform: none !important; z-index: 3 !important; }
+html body #MerchantSearchPage .product-card-horizontal .add-product-btn { margin: 0 !important; padding: 0 !important; }
+html body #MerchantSearchPage .product-card-horizontal .add-product-btn button.add-btn { width: 40px !important; min-width: 40px !important; max-width: 40px !important; height: 40px !important; min-height: 40px !important; max-height: 40px !important; background: #fff !important; -webkit-backdrop-filter: none !important; backdrop-filter: none !important; box-shadow: 0 2px 8px rgba(17, 17, 17, 0.14), 0 0 0 1px rgba(17, 17, 17, 0.06) !important; }   /* עיגול לבן מלא (Vuetify נותן min-height 40 — 36 רוחב יצא אליפסה; הזכוכית השקופה נעלמה על הלבן שמחוץ לאריח, ו-20 blur ברשימה גוללת = עומס גרפי) */
 /* טקסט: שם ותיאור ברוחב מלא, מחיר ותג "שינוי תוספות" באותה שורה */
-html body :is(#MerchantSearchPage, #MultiVendorSearch) .product-card-horizontal .v-card-text > .tw-grid > :first-child > div { width: 100% !important; flex-direction: row !important; flex-wrap: wrap !important; align-items: center !important; justify-content: flex-start !important; column-gap: 8px !important; height: auto !important; }
-html body :is(#MerchantSearchPage, #MultiVendorSearch) .product-card-horizontal .rec-item-title { display: contents !important; }
-html body :is(#MerchantSearchPage, #MultiVendorSearch) .product-card-horizontal :is(.product-name, .product-description) { flex: 0 0 100% !important; }
-html body :is(#MerchantSearchPage, #MultiVendorSearch) .product-card-horizontal .price { order: 3 !important; }
+html body #MerchantSearchPage .product-card-horizontal .v-card-text > .tw-grid > :first-child > div { width: 100% !important; flex-direction: row !important; flex-wrap: wrap !important; align-items: center !important; justify-content: flex-start !important; column-gap: 8px !important; height: auto !important; }
+html body #MerchantSearchPage .product-card-horizontal .rec-item-title { display: contents !important; }
+html body #MerchantSearchPage .product-card-horizontal :is(.product-name, .product-description) { flex: 0 0 100% !important; }
+html body #MerchantSearchPage .product-card-horizontal .price { order: 3 !important; }
 /* מוצר בלי תמונה (.tw-col-span-12): Hyperzod שמה את ה-"+" בתוך שורת המחיר — השורה ברוחב מלא, המחיר מימין וה-"+" בקצה
    (23.10: ה-"+" כיסה את סוף המחיר — "₪7" במקום "₪7.90" בחיפוש הכללי) */
-html body :is(#MerchantSearchPage, #MultiVendorSearch) .product-card-horizontal .price.tw-flex { flex: 1 1 100% !important; display: flex !important; justify-content: space-between !important; align-items: center !important; gap: 10px !important; }
-html body :is(#MerchantSearchPage, #MultiVendorSearch) .product-card-horizontal .price.tw-flex > .tw-relative { position: static !important; top: 0 !important; margin-inline-end: -7px !important; }   /* Hyperzod: absolute — עלה על השם/המחיר (כמו בחלק 64). -7 = אותו טור כמו ה-"+" בפינת האריח (נמדד; בחיפוש הכללי -12/-6 — למטה) */
-html body :is(#MerchantSearchPage, #MultiVendorSearch) .product-card-horizontal .tw-grid > .tw-col-span-12 { padding-inline-end: 0 !important; }   /* מוצר בלי תמונה: העמודה היחידה, הריפוד של Hyperzod (12) דחף את ה-"+" פנימה מהטור של שאר השורות */
-html body :is(#MerchantSearchPage, #MultiVendorSearch) .product-card-horizontal .product-discount-badge { top: 6px !important; inset-inline-start: 6px !important; z-index: 2 !important; padding: 2px 7px !important; border-radius: 999px !important; font-size: 11px !important; font-weight: 800 !important; line-height: 16px !important; }
-html body :is(#MerchantSearchPage, #MultiVendorSearch) .product-card-horizontal .product-name { margin: 0 0 3px !important; font-size: 15px !important; font-weight: 700 !important; line-height: 1.35 !important; color: #111 !important; }
-html body :is(#MerchantSearchPage, #MultiVendorSearch) .product-card-horizontal .product-description { margin: 0 0 6px !important; font-size: 13px !important; line-height: 1.4 !important; color: #6b7280 !important; -webkit-line-clamp: 1 !important; line-clamp: 1 !important; }
-html body :is(#MerchantSearchPage, #MultiVendorSearch) .product-card-horizontal .product-customizable-tag { order: 4 !important; display: inline-block !important; margin: 0 !important; padding: 2px 8px !important; border-radius: 999px !important; background: #f3f1ee !important; font-size: 11.5px !important; font-weight: 600 !important; line-height: 16px !important; color: #6b7280 !important; }
-html body :is(#MerchantSearchPage, #MultiVendorSearch) .product-card-horizontal .price .product-price { margin: 0 !important; font-size: 16px !important; font-weight: 800 !important; line-height: 1.25 !important; color: #c8151b !important; }
-html body :is(#MerchantSearchPage, #MultiVendorSearch) .product-card-horizontal .price .product-price small { margin-inline-start: 6px !important; font-size: 13px !important; font-weight: 500 !important; color: #9ca3af !important; }
-html body :is(#MerchantSearchPage, #MultiVendorSearch) .product-card-horizontal:active { background: #faf8f6 !important; }
-/* דף החיפוש הכללי (main#MultiVendorSearch, טאב "מוצרים", 23.10): אותה שורה בדיוק, בתוך כרטיס העסק של חלק 26ב (עד היום: כרטיס
-   בתוך כרטיס, אריח 96×156 מתוח — min-width 155.8px של Hyperzod גבר — ומחיר שחור). כל כרטיס עטוף ב-.tw-py-2 משלו (תמיד :last-child),
-   ולכן הקו בין השורות על העטיפה. במחשב (26ב.7: רשת 2–3 טורים) — כרטיס עם קו דק לכל מוצר במקום קווים בין שורות */
-html body main#MultiVendorSearch .scheme-global-search-product-group .slider-inner-container > .tw-py-2 + .tw-py-2 { border-top: 1px solid #f0ece8 !important; }
-html body main#MultiVendorSearch .product-card-horizontal .product-name.text-truncate { white-space: normal !important; display: -webkit-box !important; -webkit-box-orient: vertical !important; -webkit-line-clamp: 2 !important; line-clamp: 2 !important; overflow: hidden !important; }   /* כאן השם עם text-truncate (שורה אחת) — "3%" / "1%" נחתכו */
-html body main#MultiVendorSearch .product-card-horizontal.product-horizontal-card > .v-card-text { padding-inline-end: 8px !important; }   /* ה-"+" בפינת האריח לא נוגע בקו של כרטיס העסק */
-html body main#MultiVendorSearch .product-card-horizontal .price.tw-flex > .tw-relative { margin-inline-end: -12px !important; }   /* בלי תמונה: הטור של ה-"+" בפינת האריח (כאן האריח בולט 4px מהעמודה) */
-@media (min-width: 768px) {
-    html body main#MultiVendorSearch .scheme-global-search-product-group .slider-inner-container > .tw-py-2 + .tw-py-2 { border-top: 0 !important; }
-    html body main#MultiVendorSearch .product-card-horizontal.product-horizontal-card { border: 1px solid #eceef1 !important; border-radius: 14px !important; }
-    html body main#MultiVendorSearch .product-card-horizontal.product-horizontal-card > .v-card-text { padding: 10px 12px !important; }
-    html body main#MultiVendorSearch .product-card-horizontal.product-horizontal-card .price.tw-flex > .tw-relative { margin-inline-end: -6px !important; }   /* בלי תמונה: ה-"+" בתוך הכרטיס, בקו של ה-"+" שבפינת האריח בכרטיס שלידו */
-}
+html body #MerchantSearchPage .product-card-horizontal .price.tw-flex { flex: 1 1 100% !important; display: flex !important; justify-content: space-between !important; align-items: center !important; gap: 10px !important; }
+html body #MerchantSearchPage .product-card-horizontal .price.tw-flex > .tw-relative { position: static !important; top: 0 !important; margin-inline-end: -7px !important; }   /* Hyperzod: absolute — עלה על השם/המחיר (כמו בחלק 64). -7 = אותו טור כמו ה-"+" בפינת האריח (נמדד) */
+html body #MerchantSearchPage .product-card-horizontal .tw-grid > .tw-col-span-12 { padding-inline-end: 0 !important; }   /* מוצר בלי תמונה: העמודה היחידה, הריפוד של Hyperzod (12) דחף את ה-"+" פנימה מהטור של שאר השורות */
+html body #MerchantSearchPage .product-card-horizontal .product-discount-badge { top: 6px !important; inset-inline-start: 6px !important; z-index: 2 !important; padding: 2px 7px !important; border-radius: 999px !important; font-size: 11px !important; font-weight: 800 !important; line-height: 16px !important; }
+html body #MerchantSearchPage .product-card-horizontal .product-name { margin: 0 0 3px !important; font-size: 15px !important; font-weight: 700 !important; line-height: 1.35 !important; color: #111 !important; }
+html body #MerchantSearchPage .product-card-horizontal .product-description { margin: 0 0 6px !important; font-size: 13px !important; line-height: 1.4 !important; color: #6b7280 !important; -webkit-line-clamp: 1 !important; line-clamp: 1 !important; }
+html body #MerchantSearchPage .product-card-horizontal .product-customizable-tag { order: 4 !important; display: inline-block !important; margin: 0 !important; padding: 2px 8px !important; border-radius: 999px !important; background: #f3f1ee !important; font-size: 11.5px !important; font-weight: 600 !important; line-height: 16px !important; color: #6b7280 !important; }
+html body #MerchantSearchPage .product-card-horizontal .price .product-price { margin: 0 !important; font-size: 16px !important; font-weight: 800 !important; line-height: 1.25 !important; color: #c8151b !important; }
+html body #MerchantSearchPage .product-card-horizontal .price .product-price small { margin-inline-start: 6px !important; font-size: 13px !important; font-weight: 500 !important; color: #9ca3af !important; }
+html body #MerchantSearchPage .product-card-horizontal:active { background: #faf8f6 !important; }
+/* שורת המוצר בטאב "מוצרים" של החיפוש הכללי (23.10–3.11): הוסרה 4.11 — בדף החדש של Hyperzod המנות הן אריחים (.search-dish, חלק 26ב §9). */
 /* "אין תוצאות": הטקסט של Hyperzod (אנגלית) → עברית עם המילה שחיפשו (JS: data-mh-ss-none + data-mh-ss-title) */
 html body #MerchantSearchPage [data-mh-ss-none] { margin: 44px 24px 0 !important; font-size: 0 !important; line-height: 0 !important; text-align: center !important; }
 html body #MerchantSearchPage [data-mh-ss-none]::before { content: attr(data-mh-ss-title) !important; display: block !important; font-size: 17px !important; font-weight: 800 !important; line-height: 1.4 !important; color: #111 !important; overflow-wrap: anywhere !important; }
@@ -8147,7 +8051,7 @@ html body:has(#AppBar) #MerchantSearchPage .scheme-merchant-search-header { top:
     html body #MerchantSearchPage .product-card-horizontal .pro-card-h-img { flex-basis: 112px !important; width: 112px !important; height: 112px !important; max-height: 112px !important; }
 }
 @media (hover: hover) {
-    html body :is(#MerchantSearchPage, #MultiVendorSearch) .product-card-horizontal:hover { background: #faf8f6 !important; }
+    html body #MerchantSearchPage .product-card-horizontal:hover { background: #faf8f6 !important; }
     html body #MerchantSearchPage #mh-ss-empty .mh-ss-chip:hover { background: #f3f1ee !important; }
 }
 /* mh-storesearch-v1 */

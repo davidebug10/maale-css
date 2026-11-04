@@ -2721,14 +2721,14 @@ log('פעיל');
 })();
 
 /* =========================================================================
-   דף תוצאות החיפוש — MH Search  |  v2.0.1 | 2026-10-09  (v1.0.0 6.9: טקסטים בלבד; v2.0.1: זמני משלוח מוסתרים)
+   דף תוצאות החיפוש — MH Search  |  v3.0.0 | 2026-11-04  (v1.0.0 6.9: טקסטים בלבד; v2.0.1: זמני משלוח מוסתרים; v3.0.0: הדף החדש של Hyperzod מ-3.11)
    -------------------------------------------------------------------------
    דוד 9.10: "רטרופיט לדף תוצאות החיפוש" — חנויות קודם, ורלוונטיות חכמה (פלאפל → חנויות פלאפל, הקרובה קודם;
    חביתה → מקומות של ארוחת בוקר; איטלקי → פיצה/פסטה גם בלי המילה בשם), וגם לחנויות ומוצרים עתידיים.
    איך Hyperzod מחפשת (נבדק 9.10, בילד index-jfOdlzWH): getSearch שולח יחד שתי בקשות
      GET /store/v1/search?location[]&q&locale&search_type=merchant|product. חנויות = fuzzy על שם החנות בלבד;
      מוצרים = עד 5 לחנות, 10 חנויות לעמוד, fuzzy מאוד ("פלאפל" → "פלפל מרוקאי", "חביתה" → "חבילת ניוקי הביתה"),
-     והסדר לא מתחשב במרחק. אחר כך: products.length>0 ? tab=0 (מוצרים) : tab=1.
+     והסדר לא מתחשב במרחק. (מ-3.11: דף חדש עם גלולות "הכול / מוצר / חנות" — ראה 2.)
    מה הבלוק עושה:
      1. תופס את שתי התשובות ב-XHR (לפני ש-Hyperzod קוראת אותן) ומחזיר במקומן תוצאות משלו:
         - מועמדים: התשובות של Hyperzod + שאר העמודים + חיפושי מושג ("איטלקי" → גם "פיצה", "פסטה") +
@@ -2743,16 +2743,22 @@ log('פעיל');
           מנה שהיא באמת המנה / 3 מנות של מושג קשור) וציון ≥ 30; אם אין אף אחת — גם חנויות עם מוצר מתאים.
           סדר: קודם מה שאפשר להזמין עכשיו (Wolt: סגורים למטה, לא מוסתרים), ואז הציון.
         - אין שום התאמה → התשובה של Hyperzod כמו שהיא (גיבוי לשגיאות כתיב).
-     2. "חנויות" נפתח קודם: watch סינכרוני על tab מיד אחרי חיפוש (בלי הבהוב); לחיצה של הלקוח — מכובדת.
-     3. מונה בטאבים (data-mh-n) ושורת "למה" בכל כרטיס חנות ("פלאפל בפיתה · פלאפל בבגט · ועוד 3"). עיצוב: חלק 26ב.
-   מיון/סינון שהלקוח בחר בצ'יפים (sort_by/filters) → Hyperzod כמו שהיא. נכשל-פתוח: שגיאה / 4 שניות → המקור.
-   בדיקה: MH_SEARCH.stats() · MH_SEARCH.last() · MH_SEARCH.explain('פלאפל') · capture/search-retrofit/eval.mjs
+     2. "חנויות" קודם — v3: ב-CSS (חלק 26ב §5). מ-3.11 Hyperzod מציגה גלולות "הכול / מוצר / חנות" (resultView, ברירת מחדל "הכול",
+        שני הסקשנים יחד — מוצרים קודם ב-DOM) במקום טאבים; החלקה בין טאבים ו"פתיחה בחנויות" ירדו (אין טאבים).
+     3. מונה בגלולות (data-mh-n) ושורת "למה" בכל כרטיס חנות ("פלאפל בפיתה · פלאפל בבגט · ועוד 3", לפי data-merchant-id).
+        טקסטים: "קילומטר" → ק״מ, "1 תוצאות", "36+ תוצאות" → 36 (עמוד 1 שלנו מכיל הכל), "דֵרוּג", "No results found.";
+        "לא מדורג" מוסתר (mh-unrated); תוויות נגישות בעברית. עיצוב: חלק 26ב.
+     4. ניווט (בלי שינוי בעגלה): "צפה בהכל" גם למוצרים ב"הכול" (Hyperzod מציגה שם 3 קבוצות בלי דרך להמשיך); אחרי לחיצה על
+        גלולה / "צפה בהכל" — הגלולות לא נשארות מתחת לראש הדביק; חיפוש חדש מתחיל מלמעלה.
+   מיון/סינון בצ'יפים (sort_by/filters) → אותה רלוונטיות שלנו, ועליה הסינון והמיון (applyChips). בקשה בלי זוג (פתיחת חלון
+   הסינון, "ניקוי", חיפוש חדש כשסינון פעיל) — מחושבת לבד ולא מחכה לזוג שלא יבוא. נכשל-פתוח: שגיאה / 4 שניות → המקור.
+   בדיקה: MH_SEARCH.stats() · MH_SEARCH.last() · MH_SEARCH.explain('פלאפל') · capture/search-retrofit/eval.mjs · capture/search-4.11/page/snap.mjs
    ========================================================================= */
 (function () {
   'use strict';
   if (window.__MH_SEARCH__) { return; }
   window.__MH_SEARCH__ = true;
-  var VERSION = '2.0.1';
+  var VERSION = '3.0.0';
   /* MH-SEARCH-CORE-START — הליבה של מנוע החיפוש: טהורה (בלי DOM ובלי רשת), כדי שאפשר לבדוק אותה גם ב-node.
      מילון כללי לעברית של אוכל — לא רשימה לפי חנות: חנויות ומוצרים חדשים נכנסים לבד (דוד 9.10). */
   var CORE = (function () {
@@ -3026,11 +3032,11 @@ log('פעיל');
   })();
   /* MH-SEARCH-CORE-END */
 
-  var stats = { version: VERSION, fixes: 0, runs: 0, searches: 0, rewritten: 0, chips: 0, swipes: 0, fallback: 0, timeouts: 0, timesHidden: 0,
-                index: 'none', indexStores: 0, extraCalls: 0, idFetches: 0, tabAuto: 0, why: 0, errors: 0 };
+  var stats = { version: VERSION, fixes: 0, runs: 0, searches: 0, rewritten: 0, chips: 0, fallback: 0, timeouts: 0,
+                index: 'none', indexStores: 0, extraCalls: 0, idFetches: 0, why: 0, solo: 0, errors: 0 };
   var INDEX_URL = 'https://raw.githubusercontent.com/davidebug10/maale-css/search-index/search-index.json';
   var T_JOB = 4000, T_CALL = 2500;      /* תקרת זמן: אחרי זה — התשובה המקורית של Hyperzod */
-  var last = null;                       /* התוצאה האחרונה (לשורת "למה" ולבדיקות) */
+  var last = null, lastBy = {};          /* התוצאה האחרונה (לבדיקות); lastBy — לפי שאילתה: חישוב ישן שמסתיים אחרי החדש לא מוחק את "למה" */
 
   function app() { try { return document.getElementById('app').__vue_app__.config.globalProperties; } catch (e) { return null; } }
   function store() { var a = app(); return a && a.$store; }
@@ -3084,15 +3090,15 @@ log('פעיל');
   }
 
   /* ---------- 3. המנוע ---------- */
-  function compute(s, mRaw, pRaw, headers, depth) {
+  function compute(s, mRaw, pRaw, headers, depth, storesOnly) {   /* storesOnly: תשובת חנויות בלבד — בלי משיכת מוצרים לפי מזהה (נזרקת) */
     var api = s.origin + '/store/v1';
     function retryKeyboard(res) {
       var kb = !depth && !res && (CORE.fromLatinKeyboard(s.q) || CORE.correct(s.q));   /* מקלדת באנגלית, ואז שגיאת כתיב */
       if (!kb) { return res; }
       var s2 = Object.assign({}, s, { q: kb }), b2 = { location: [s.lat, s.lng], locale: s.locale || 'he', q: kb };
       return Promise.all([call(api + '/search', Object.assign({ search_type: 'merchant' }, b2), headers), call(api + '/search', Object.assign({ search_type: 'product' }, b2), headers)])
-        .then(function (r) { return compute(s2, r[0], r[1], headers, 1); })
-        .then(function (r2) { if (r2 && last) { last.q = s.q; last.kb = kb; } return r2; });
+        .then(function (r) { return compute(s2, r[0], r[1], headers, 1, storesOnly); })
+        .then(function (r2) { var o = lastBy[kb]; if (r2 && o) { last = lastBy[s.q] = Object.assign({}, o, { q: s.q, kb: kb }); } return r2; });
     }
     var forms = CORE.understand(s.q);
     var objs = {}, live = {}, prodById = {};
@@ -3146,7 +3152,7 @@ log('פעיל');
       if (!stores.length && !groups.length) { return retryKeyboard(null); }  /* כלום — מקלדת באנגלית? ואם לא: Hyperzod (fuzzy) כגיבוי */
       /* מוצרים מהאינדקס שלא הגיעו בחיפוש של Hyperzod: מושכים אותם חיים לפי מזהה (מחיר ומלאי עדכניים) */
       var need = [];
-      groups.slice(0, 12).forEach(function (g) {
+      if (!storesOnly) groups.slice(0, 12).forEach(function (g) {
         var miss = g.items.slice(0, 6).filter(function (it) { return !prodById[it.id]; }).map(function (it) { return it.id; });
         if (miss.length) { need.push({ id: g.r.id, ids: miss }); }
       });
@@ -3166,7 +3172,7 @@ log('פעיל');
           outGroups.push(o);
         });
         var outStores = stores.map(function (r) { var o = Object.assign({}, r.obj); delete o.products; return o; });
-        last = { q: s.q, at: Date.now(), forms: forms.map(function (f) { return f.s + (f.w < 1 ? '·' + f.w : ''); }),
+        last = lastBy[s.q] = { q: s.q, at: Date.now(), forms: forms.map(function (f) { return f.s + (f.w < 1 ? '·' + f.w : ''); }),
           stores: stores.map(function (r) { return { id: r.id, slug: r.obj.slug, name: r.name, rel: r.rel, final: r.final, avail: r.avail,
             items: r.items.filter(function (it) { return it.lit ? it.s >= 0.6 : it.s >= 0.5; }).slice(0, 12).map(function (it) { return it.name; }) }; }),
           groups: outGroups.map(function (o) { return { slug: o.slug, n: o.products.length }; }) };
@@ -3179,7 +3185,8 @@ log('פעיל');
   }
 
   /* שתי הבקשות (חנויות + מוצרים) יוצאות יחד — עבודה אחת לשתיהן */
-  var jobs = {};
+  var jobs = {}, sends = {};   /* sends: מה יצא לכל חיפוש — זוג אמיתי יוצא באותו רגע (getSearch), הרבה לפני התשובה */
+  var mine = {}, shown = {};     /* מוצרים עמוד 1: האם Hyperzod קיבלה את שלנו (אז עמוד 2+ ריק) — לא "האם החישוב הסתיים". shown — לפי שאילתה */
   function job(s, headers) {
     var k = s.q + '|' + s.lat + '|' + s.lng, j = jobs[k];
     if (j && Date.now() - j.t < 15000) { return j; }
@@ -3243,13 +3250,19 @@ log('פעיל');
   function hook(x, s) {
     var end = x.onloadend;                                   /* axios מגדיר onloadend לפני send */
     if (typeof end !== 'function') { return; }
+    if (s.page === 1) {
+      var gk = s.q + '|' + s.lat + '|' + s.lng, g = sends[gk];
+      if (!g || Date.now() - g.t > 1500) { g = sends[gk] = { t: Date.now() }; }
+      g[s.type + (s.filtered ? 'F' : '')] = 1; x.__mhsG = g;
+    }
     x.onloadend = function () {
-      var self = this, args = arguments, called = false;
+      var self = this, args = arguments, called = false, key = s.q + '|' + s.lat + '|' + s.lng;
       function finish(out) {
         if (called) { return; } called = true;
+        if (s.type === 'product' && s.page === 1) { mine[key] = !!out; shown[s.q] = !!out; }
         if (out) {
-          var txt = JSON.stringify(out);
           try {
+            var txt = JSON.stringify(out);
             Object.defineProperty(x, 'responseText', { configurable: true, get: function () { return txt; } });
             Object.defineProperty(x, 'response', { configurable: true, get: function () { return x.responseType === 'json' ? out : txt; } });
             stats.rewritten++;
@@ -3261,15 +3274,17 @@ log('פעיל');
         var raw = RT.get.call(x), j = null;
         if (x.status !== 200 || !raw) { return finish(null); }
         try { j = JSON.parse(raw); } catch (e) { return finish(null); }
-        if (s.type === 'product' && s.page > 1) {           /* עמוד 1 שלנו כבר מכיל הכל */
-          var k = s.q + '|' + s.lat + '|' + s.lng;
-          return finish(jobs[k] && jobs[k].done ? Object.assign({}, j, { data: [] }) : null);
+        if (s.type === 'product' && s.page > 1) {           /* עמוד 1 שלנו כבר מכיל הכל; אם הוצג המקור (timeout) — גם עמוד 2 שלו */
+          return finish(mine[key] ? Object.assign({}, j, { data: [] }) : null);
         }
-        if (s.filtered) {                                    /* רק בקשת חנויות (searchMerchantsWithFilters) — בלי זוג */
-          if (s.type !== 'merchant') { return finish(null); }
-          stats.chips++;
-          return timeout(loadIndex(), 2500).then(function () { return timeout(compute(s, j, null, x.__mhsH), T_JOB); })
-            .then(function (r) { finish(r ? applyChips(s, r) : null); }, function () { finish(null); });
+        /* בלי זוג: searchMerchantsWithFilters (חלון הסינון, "ניקוי", סינון) שולחת רק חנויות; כשסינון פעיל, חיפוש חדש שולח את
+           המוצרים לבד. עד 4.11 חיכינו 2.5 שנ' לזוג שלא בא, ואז נגמר הזמן → הרשימה הגולמית (5 חנויות → 1) */
+        var g = x.__mhsG, old = jobs[key], fresh = !s.filtered && old && old.done && Date.now() - old.t < 15000;
+        if (s.filtered || !(fresh || (g && g.merchant && g.product))) {
+          if (s.filtered && s.type !== 'merchant') { return finish(null); }
+          if (s.filtered) { stats.chips++; } else { stats.solo++; }
+          return timeout(loadIndex(), 2500).then(function () { return timeout(compute(s, s.type === 'merchant' ? j : null, s.type === 'product' ? j : null, x.__mhsH, 0, s.type === 'merchant'), T_JOB); })
+            .then(function (r) { finish(r ? (s.type === 'merchant' ? applyChips(s, r) : r.products) : null); }, function () { finish(null); });
         }
         var jb = job(s, x.__mhsH);
         if (s.type === 'merchant') { jb.m(j); } else { jb.p(j); }
@@ -3281,43 +3296,37 @@ log('פעיל');
     };
   }
 
-  /* ---------- 5. "חנויות" נפתח קודם (Hyperzod: products.length>0 ? tab=0) ---------- */
+  /* ---------- 5. רכיב הדף של Hyperzod (multi-search-page, מ-3.11): resultView 'all'|'products'|'merchants' במקום tab ----------
+     "חנויות קודם" — ב-CSS (חלק 26ב §5: order), כי בתצוגת "הכול" שני הסקשנים מוצגים יחד. מחפשים את הרכיב בעץ רק כשאין עותק חי. */
+  var comp = null;
   function searchComp() {
-    var el = document.getElementById('app'), found = null;
+    if (comp && comp.$ && !comp.$.isUnmounted) { return comp; }
+    comp = null;
+    var el = document.getElementById('app');
     if (!el || !el._vnode) { return null; }
     (function node(v, d) {
-      if (!v || found || d > 300) { return; }
+      if (!v || comp || d > 300) { return; }
       if (v.component) {
-        try { var p = v.component.proxy; if (p && typeof p.getSearch === 'function' && 'tab' in p && 'merchants' in p) { found = p; return; } } catch (e) {}
+        try { var p = v.component.proxy; if (p && typeof p.setResultView === 'function' && 'resultView' in p && Array.isArray(p.merchants)) { comp = p; return; } } catch (e) {}
         node(v.component.subTree, d + 1);
       }
       if (v.suspense && v.suspense.activeBranch) { node(v.suspense.activeBranch, d + 1); }
-      if (Array.isArray(v.children)) { for (var i = 0; i < v.children.length && !found; i++) { node(v.children[i], d + 1); } }
+      if (Array.isArray(v.children)) { for (var i = 0; i < v.children.length && !comp; i++) { node(v.children[i], d + 1); } }
     })(el._vnode, 0);
-    return found;
-  }
-  var watched = null;
-  function watchTabs() {
-    if (!document.getElementById('MultiVendorSearch')) { return; }
-    var p = searchComp();
-    if (!p || p === watched || typeof p.$watch !== 'function') { return; }
-    watched = p;
-    var auto = false;
-    function storesFirst() { if (auto && p.tab !== 1 && Array.isArray(p.merchants) && p.merchants.length) { p.tab = 1; stats.tabAuto++; } }
-    p.$watch('searchedText', function () { auto = true; }, { flush: 'sync' });
-    p.$watch('merchants', storesFirst, { flush: 'sync' });
-    p.$watch('tab', storesFirst, { flush: 'sync' });
-    p.$watch('loading', function (v) { if (!v) { auto = false; } }, { flush: 'sync' });
+    return comp;
   }
 
-  /* ---------- 6. מונה בטאבים + שורת "למה" בכרטיסי החנויות + טקסטים (v1) ---------- */
+  /* ---------- 6. מונים בגלולות + שורת "למה" בכרטיסי החנויות + טקסטים ---------- */
   var MAP = [
     [/(\d+)\s*mins?\b/g, '$1 דק׳'],
     [/\bmins?\b/g, 'דק׳'],
     [/קילומטר/g, 'ק״מ'],
+    [/^(\s*)1 תוצאות(\s*)$/, '$1תוצאה אחת$2'],          /* Hyperzod: replace(/s$/) ליחיד — בעברית לא עובד */
+    [/^\s*דֵרוּג\s*$/, 'דירוג'],                                /* צ'יפ הדירוג — בניקוד (כמו "כֹּל" בגלולות, שמצוירות ב-CSS) */
     [/No merchants found\.?/g, 'לא נמצאו חנויות'],
     [/No products found\.?/g, 'לא נמצאו מוצרים'],
-    [/No results found\.?/g, 'לא נמצאו תוצאות']
+    [/No results found\.?/g, 'לא מצאנו תוצאות. נסו מילה אחרת'],
+    [/^\s*(Too Many Attempts|HTTP Request not found|Server Error)\.?\s*$/, 'משהו השתבש. נסו שוב בעוד רגע']   /* הודעת שגיאה של ה-API (h6 של Hyperzod) */
   ];
   function fixText(node) {
     var t = node.nodeValue; if (!t) { return; }
@@ -3326,95 +3335,77 @@ log('פעיל');
     if (n !== t) { node.nodeValue = n; stats.fixes++; }
   }
   function walk(root) { var w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT); var n; while ((n = w.nextNode())) { fixText(n); } }
-  function why(it) {
+  function why(it) {                                        /* { names, more } — "ועוד N" ב-::after (data-more), לא נחתך */
     var n = it.items.length;
-    if (!n) { return ''; }
-    return it.items.slice(0, 2).join(' · ') + (n > 2 ? ' · ועוד ' + (n - 2) : '');
+    return { names: it.items.slice(0, 2).join(' · '), more: n > 2 ? ' · ועוד ' + (n - 2) : '' };
   }
-  /* החלקה בין הטאבים (דוד: "שיהיה אפשר להחליק"). RTL: "חנויות" מימין — החלקה ימינה → מוצרים, שמאלה → חנויות.
-     לא מתחילים מתוך שורה שגוללת לרוחב (הצ'יפים) או מקצה המסך (חזרה של האייפון) */
-  function bindSwipe(main) {
-    if (main.__mhSwipe) { return; }
-    main.__mhSwipe = true;
-    var sx = 0, sy = 0, st = 0, on = false;
-    main.addEventListener('touchstart', function (e) {
-      on = false;
-      var t = e.touches && e.touches[0];
-      if (!t || e.touches.length > 1 || !e.target.closest || !e.target.closest('.scheme-global-search-tabs-window')) { return; }
-      if (t.clientX < 24 || t.clientX > window.innerWidth - 24) { return; }
-      for (var el = e.target; el && el !== main; el = el.parentElement) {
-        if (el.scrollWidth > el.clientWidth + 2 && /(auto|scroll)/.test(getComputedStyle(el).overflowX)) { return; }
-      }
-      sx = t.clientX; sy = t.clientY; st = Date.now(); on = true;
-    }, { passive: true });
-    main.addEventListener('touchend', function (e) {
-      if (!on) { return; }
-      on = false;
-      var t = e.changedTouches && e.changedTouches[0], p = watched;
-      if (!t || !p) { return; }
-      var dx = t.clientX - sx, dy = t.clientY - sy;
-      if (Math.abs(dx) < 60 || Math.abs(dy) > Math.abs(dx) * 0.6 || Date.now() - st > 800) { return; }
-      var want = dx > 0 ? 0 : 1;
-      if (p.tab !== want) { p.tab = want; stats.swipes++; }
-    }, { passive: true });
-  }
+  function attr(el, a, v) { if (el && el.getAttribute(a) !== v) { el.setAttribute(a, v); } }
+  var lastQ = null;
   function sync() {
     var main = document.getElementById('MultiVendorSearch');
-    if (!main) { return; }
+    if (!main) { comp = null; lastQ = null; return; }
     stats.runs++;
-    watchTabs();
-    bindSwipe(main);
-    var texts = main.querySelectorAll('#SearchedMerchantAverageTimeAndDistance, #merchantDistance, .tab-item-merchant h6, .tab-item-product h6, .tab-item-merchant .text-h6, .tab-item-product .text-h6');
+    var p = searchComp();
+    /* שורת המידע של קבוצה (הזמן מוסתר ב-CSS; "קילומטר"), המונים, "אין תוצאות", המרחק בכרטיס חנות, צ'יפ הדירוג */
+    var texts = main.querySelectorAll('.search-group__meta, .search-result-count, .scheme-global-search-results h6, #merchantDistance, .scheme-global-search-filter .tw-truncate');
     for (var i = 0; i < texts.length; i++) { walk(texts[i]); }
-    /* זמני משלוח מוסתרים (דוד 9.10): בכותרת קבוצת המוצרים הזמן הוא צומת הטקסט הראשון לפני הנקודה — מרוקנים
-       (השעון והנקודה מוסתרים ב-CSS, חלק 26ב סעיף 13; המרחק נשאר) */
-    var heads = main.querySelectorAll('#SearchedMerchantAverageTimeAndDistance > span');
-    for (var h = 0; h < heads.length; h++) {
-      var f0 = heads[h].firstChild;
-      if (f0 && f0.nodeType === 3 && f0.nodeValue.trim()) { f0.nodeValue = ''; stats.timesHidden++; }
-    }
-    var ratings = main.querySelectorAll('#SearchedMerchantRating');
+    var ratings = main.querySelectorAll('.search-group__rating');
     for (var j = 0; j < ratings.length; j++) {
       var un = /לא מדורג|not rated/i.test(ratings[j].textContent);
       if (ratings[j].classList.contains('mh-unrated') !== un) { ratings[j].classList.toggle('mh-unrated', un); }
     }
-    var p = watched;
-    if (p) {                                                /* מונים: "חנויות 4" / "מוצרים 12" */
+    /* תוויות נגישות (VoiceOver) — אצל Hyperzod באנגלית */
+    attr(main.querySelector('.scheme-global-search-back-btn'), 'aria-label', 'חזרה');
+    attr(main.querySelector('.v-field__append-inner img.search-input-icon:not(.spinning)'), 'alt', 'ניקוי');
+    attr(main.querySelector('.v-field__append-inner img.search-input-icon.spinning'), 'alt', 'טוען');
+    attr(main.querySelector('.tab-item-merchant .search-result-section__header .scheme-global-search-see-all'), 'aria-label', 'צפה בכל החנויות');
+    var rms = main.querySelectorAll('.scheme-global-search-recent-remove');
+    for (var r = 0; r < rms.length; r++) { attr(rms[r], 'aria-label', 'הסרה'); }
+    if (p) {                                                /* מונים: "חנויות 4" / "מוצרים 12" (ב"הכול" — בלי) */
       var nm = Array.isArray(p.merchants) ? p.merchants.length : 0;
       var np = Array.isArray(p.products) ? p.products.reduce(function (a, g) { return a + ((g && g.products) || []).length; }, 0) : 0;
-      /* על ה-span הפנימי: ה-::after של הכפתור תפוס (שכבת הזכוכית) — ה-::before של ה-span הוא התווית (חלק 26ב) */
-      var tm = document.querySelector('#search-merchant-tab .v-btn__content'), tp = document.querySelector('#search-product-tab .v-btn__content');
+      var tm = main.querySelector('#search-merchants-tab'), tp = main.querySelector('#search-products-tab');
       if (tm && tm.getAttribute('data-mh-n') !== String(nm)) { tm.setAttribute('data-mh-n', nm); }
       if (tp && tp.getAttribute('data-mh-n') !== String(np)) { tp.setAttribute('data-mh-n', np); }
     }
-    /* שורת "למה" — הכרטיסים מצוירים בסדר של הרשימה ששלחנו */
-    var L = last, cards = main.querySelectorAll('.tab-item-merchant .merchant-card-title');
-    if (L && p && p.searchedText === L.q && cards.length === L.stores.length) {
-      for (var c = 0; c < cards.length; c++) {
-        var host = cards[c].parentElement, line = host && host.querySelector('.mh-why'), text = why(L.stores[c]);
-        if (!host) { continue; }
-        if (!text) { if (line) { line.remove(); } continue; }
-        if (!line) { line = document.createElement('div'); line.className = 'mh-why'; cards[c].insertAdjacentElement('afterend', line); }
-        if (line.textContent !== text) { line.textContent = text; stats.why++; }
-      }
+    /* שורת "למה" — לפי data-merchant-id (ב"הכול" רק 6 כרטיסים, אז לא לפי הסדר) */
+    var sq = p ? String(p.searchedText || '').trim() : '', L = lastBy[sq] || null, ok = L && p && sq === L.q, byId = {};   /* Hyperzod: רק trimStart (רווח אחרי הצעת מקלדת) */
+    /* חיפוש חדש — מלמעלה (Hyperzod משאירה את הגלילה של החיפוש הקודם; הגלולות נשארו מתחת לראש) */
+    if (p && lastQ !== null && sq && sq !== lastQ) { var ov = main.closest('.home-route-overlay'); if (ov) { ov.scrollTop = 0; } main.scrollTop = 0; }
+    if (p && sq) { lastQ = sq; }
+    /* "36+ תוצאות": Hyperzod מוסיפה + כשיש 10 קבוצות; עמוד 1 שלנו מכיל הכל (עמוד 2 = ריק) — וב-RTL זה נראה "+36" */
+    if (ok && shown[sq]) {
+      var pc = main.querySelector('.tab-item-product .search-result-count'), cn = pc ? pc.childNodes : [];
+      for (var t = 0; t < cn.length; t++) { if (cn[t].nodeType === 3 && /^\s*\d+\+/.test(cn[t].nodeValue)) { cn[t].nodeValue = cn[t].nodeValue.replace(/^(\s*\d+)\+/, '$1'); } }
     }
-    /* הוקלד במקלדת באנגלית: "הצגנו תוצאות עבור: פיצה" */
-    var note = main.querySelector('#mh-search-note'), kbq = L && p && p.searchedText === L.q && L.kb;
-    var tabs = main.querySelector('.scheme-global-search-tabs');
-    if (kbq && tabs) {
-      if (!note) { note = document.createElement('div'); note.id = 'mh-search-note'; tabs.insertAdjacentElement('afterend', note); }
+    /* "צפה בהכל" למוצרים ב"הכול": Hyperzod מציגה שם 3 קבוצות ראשונות בלי המשך (רק דרך הגלולות למעלה) */
+    var ph = main.querySelector('.tab-item-product .search-result-section__header'), more = ph && ph.querySelector('.mh-see-all-products');
+    var showMore = !!(ph && p && p.resultView === 'all' && Array.isArray(p.products) && p.products.length > 3);
+    if (showMore && !more) {
+      more = document.createElement('button'); more.type = 'button'; more.className = 'scheme-global-search-see-all mh-see-all-products';
+      more.setAttribute('aria-label', 'צפה בכל המוצרים');
+      more.innerHTML = 'צפה בהכל<i class="v-icon notranslate" aria-hidden="true" style="font-size:18px;height:18px;width:18px"><svg class="v-icon__svg" viewBox="0 0 24 24"><path d="M8.59,16.58L13.17,12L8.59,7.41L10,6L16,12L10,18L8.59,16.58Z"></path></svg></i>';   /* כמו "צפה בהכל" של החנויות */
+      more.addEventListener('click', function () { var c = searchComp(); if (c) { c.setResultView('products'); } });
+      ph.appendChild(more);
+    } else if (!showMore && more) { more.remove(); }
+    if (ok) { L.stores.forEach(function (s) { byId[s.id] = s; }); }
+    var cards = main.querySelectorAll('.tab-item-merchant [data-merchant-id]');
+    for (var c = 0; c < cards.length; c++) {
+      var title = cards[c].querySelector('.merchant-card-title'), host = title && title.parentElement;
+      if (!host) { continue; }
+      var line = host.querySelector('.mh-why'), it = ok && byId[cards[c].getAttribute('data-merchant-id')], w = it && it.items.length ? why(it) : null;
+      if (!w) { if (line) { line.remove(); } continue; }
+      if (!line) { line = document.createElement('div'); line.className = 'mh-why'; line.appendChild(document.createElement('span')); title.insertAdjacentElement('afterend', line); }
+      if (line.firstChild.textContent !== w.names) { line.firstChild.textContent = w.names; stats.why++; }
+      attr(line, 'data-more', w.more);
+    }
+    /* הוקלד במקלדת באנגלית: "הצגנו תוצאות עבור: פיצה" (מתחת לגלולות; הסדר — חלק 26ב §5) */
+    var note = main.querySelector('#mh-search-note'), kbq = ok && L.kb, pills = main.querySelector('.search-result-pills');
+    if (kbq && pills) {
+      if (!note) { note = document.createElement('div'); note.id = 'mh-search-note'; pills.insertAdjacentElement('afterend', note); }
       var nt = 'הצגנו תוצאות עבור: ' + kbq;
       if (note.textContent !== nt) { note.textContent = nt; }
     } else if (note) { note.remove(); }
-    /* מצב ריק במוצרים: "0 תוצאות" (מ-v1) */
-    var counter = main.querySelector('.tab-item-product > .tw-flex > span');
-    var empty = main.querySelector('#mh-search-empty');
-    var isZero = !!counter && /^0\s/.test(counter.textContent.trim());
-    if (isZero && !empty) {
-      var d = document.createElement('div'); d.id = 'mh-search-empty';
-      d.textContent = 'לא מצאנו מנות שמתאימות לחיפוש. נסו מילה אחרת, או עברו לטאב "חנויות".';
-      counter.parentNode.insertAdjacentElement('afterend', d);
-    } else if (!isZero && empty) { empty.remove(); }
   }
   var pending = false;
   function schedule() {
@@ -3424,6 +3415,18 @@ log('פעיל');
   try {
     new MutationObserver(schedule).observe(document.documentElement, { subtree: true, childList: true, characterData: true });
     schedule();
+    /* גלולה / "צפה בהכל": Hyperzod גוללת לתוצאות רק כשהן מעל המסך (top < 0) — כשהן מתחת לראש הדביק (גלילה קטנה) הגלולות נשארו
+       מוסתרות. scroll-margin-top (26ב §5) מניח אותן מתחת לראש. במחשב אין ראש דביק — לא קורה כלום */
+    document.addEventListener('click', function (e) {
+      var b = e.target && e.target.closest && e.target.closest('#MultiVendorSearch .search-result-section__header .scheme-global-search-see-all, #MultiVendorSearch .search-result-pill');
+      if (!b) { return; }
+      setTimeout(function () {
+        try {
+          var m = document.getElementById('MultiVendorSearch'), res = m && m.querySelector('.scheme-global-search-results'), h = m && m.querySelector('.scheme-global-search-mobile-header');
+          if (res && h && h.offsetHeight && res.getBoundingClientRect().top < h.getBoundingClientRect().bottom - 1) { res.scrollIntoView({ block: 'start' }); }
+        } catch (x) {}
+      }, 80);
+    }, true);
     /* האינדקס (~25KB) נטען בזמן מת, כדי שהחיפוש הראשון לא יחכה לו */
     setTimeout(function () { (window.requestIdleCallback || function (f) { setTimeout(f, 1); })(function () { loadIndex(); }); }, 2500);
   } catch (e) { console.warn('[MH Search] disabled:', e); }
@@ -3442,7 +3445,7 @@ log('פעיל');
       });
     }
   };
-  /* mh-search-v2 */
+  /* mh-search-v3 */
 })();
 
 /* ============================================================
@@ -6407,7 +6410,7 @@ log('פעיל');
 })();
 
 /* =========================================================================
-   "ייפתח שוב ב-" — שעון 24 שעות + תאריך — MH Reopen  |  v1.2.0 | 2026-10-15 (v1.1.0: מוצ״ש; v1.2.0: "היום"/"מחר" בעסק)
+   "ייפתח שוב ב-" — שעון 24 שעות + תאריך — MH Reopen  |  v1.2.1 | 2026-11-04 (v1.1.0: מוצ״ש; v1.2.0: "היום"/"מחר" בעסק; v1.2.1: אריח בחיפוש .search-dish__note)
    -------------------------------------------------------------------------
    מוצר עם לוח זמינות (schedule) שסגור עכשיו: Hyperzod כותבת בכרטיס (.product-availability-message)
    ובכפתור של חלון המוצר "ייפתח שוב ב- שישי, 08:00 AM". השעה עצמה נכונה — next_publish_time_utc
@@ -6433,7 +6436,7 @@ log('פעיל');
   'use strict';
   if (window.__MH_REOPEN__) { return; }
   window.__MH_REOPEN__ = true;
-  var VERSION = '1.2.0';
+  var VERSION = '1.2.1';
   var OLD = 'ddd, hh:mm A', NEW = 'ddd D.M, HH:mm';
   var MOTZASH = 17 * 60;                                  /* שבת מהשעה הזו = "מוצ״ש" — לשנות כאן */
   var MOTZ = 'מוצ״ש';
@@ -6474,7 +6477,7 @@ log('פעיל');
   function to24(h, m, ap) { var H = (+h % 12) + (ap === 'PM' ? 12 : 0); return (H < 10 ? '0' : '') + H + ':' + m; }
   /* תווית בפורמט הישן → "שישי 16.10, 08:00" (התאריך רק אם השעה מהנתונים זהה לשעה שבתווית) */
   function relabel() {
-    var els = document.querySelectorAll('.product-availability-message, .product-popup .v-card-actions .v-btn');
+    var els = document.querySelectorAll('.product-availability-message, .product-popup .v-card-actions .v-btn, .search-dish__note');   /* v1.2.1: אריחי החיפוש (3.11) */
     for (var i = 0; i < els.length; i++) {
       var w = document.createTreeWalker(els[i], NodeFilter.SHOW_TEXT, null), n;
       while ((n = w.nextNode())) {
@@ -6959,9 +6962,10 @@ log('פעיל');
 })();
 
 /* =========================================================
-   תמונות מוצר מ-Google Drive בגודל שבו הן מוצגות — MH DriveImg v1.1.0 | 2026-10-20 (v1.1.0: גם שורות החיפוש — 1000px לתמונה של 96px)
+   תמונות מוצר מ-Google Drive בגודל שבו הן מוצגות — MH DriveImg v1.2.0 | 2026-11-04 (v1.1.0: גם שורות החיפוש — 1000px לתמונה של 96px; v1.2.0: אריחי החיפוש הכללי .search-dish, 132px)
    רקע (QA דף הבית 9.10): תמונות המוצרים באדמין הן קישורי Drive עם &sz=w1000 — 1000px לאריח של ~140px
-   (~0.6–0.8 שנ' כל אחת, אריחים לבנים בזמן הטעינה). כאן: רק תמונה בתוך אריח מוצר (.product-image-frame) או שורת חיפוש (.pro-card-h-img)
+   (~0.6–0.8 שנ' כל אחת, אריחים לבנים בזמן הטעינה). כאן: רק תמונה בתוך אריח מוצר (.product-image-frame), שורת חיפוש בחנות
+   (.pro-card-h-img), אריח בחיפוש הכללי (.search-dish__tap — ×1.35, ריבוע cover) או "חיפוש אחרון" (.scheme-global-search-recent-thumb)
    ברוחב עד 260px → sz לפי הרוחב בפועל × צפיפות המסך (מעוגל ל-40, 240–600). תמונה גדולה (חלון המוצר) — לא נוגעים.
    עובד גם למוצרים חדשים (לפי הכתובת, לא רשימה). נכשל-פתוח. בדיקה: MH_DRIVEIMG.stats()
    ========================================================= */
@@ -6975,11 +6979,12 @@ log('פעיל');
     try {
       var src = img.getAttribute('src') || '', m = RX.exec(src);
       if (!m) { return; }
-      var frame = img.closest('.product-image-frame, .pro-card-h-img');   /* v1.1.0: גם שורות החיפוש (בחנות ובחיפוש הכללי) */
+      var frame = img.closest('.product-image-frame, .pro-card-h-img, .search-dish__tap, .scheme-global-search-recent-thumb');   /* v1.1.0: שורות החיפוש בחנות; v1.2.0: אריחי החיפוש הכללי ו"חיפוש אחרון" */
       if (!frame) { return; }
       var w = frame.getBoundingClientRect().width;
       if (!w || w > 260) { stats.skipped++; return; }
-      var want = Math.min(600, Math.max(240, Math.ceil(w * (window.devicePixelRatio || 1) / 40) * 40));
+      var k = frame.classList.contains('search-dish__tap') ? 1.35 : 1;   /* ריבוע cover: תמונה 4:3 צריכה רוחב ×1.33 כדי שהגובה יספיק */
+      var want = Math.min(600, Math.max(240, Math.ceil(w * k * (window.devicePixelRatio || 1) / 40) * 40));
       if (+m[2] <= want) { return; }
       img.setAttribute('src', src.replace(RX, '$1' + want));
       stats.rewritten++;
@@ -6988,7 +6993,7 @@ log('פעיל');
   function scan(root) {
     if (!root || !root.querySelectorAll) { return; }
     if (root.tagName === 'IMG') { fix(root); return; }
-    var imgs = root.querySelectorAll('.product-image-frame img[src*="drive.google.com/thumbnail"], .pro-card-h-img img[src*="drive.google.com/thumbnail"]');
+    var imgs = root.querySelectorAll('.product-image-frame img[src*="drive.google.com/thumbnail"], .pro-card-h-img img[src*="drive.google.com/thumbnail"], .search-dish__tap img[src*="drive.google.com/thumbnail"], .scheme-global-search-recent-thumb img[src*="drive.google.com/thumbnail"]');
     for (var i = 0; i < imgs.length; i++) { fix(imgs[i]); }
   }
   try {
@@ -7000,7 +7005,7 @@ log('פעיל');
     }).observe(document.documentElement, { subtree: true, childList: true, attributes: true, attributeFilter: ['src'] });
     scan(document);
   } catch (e) { console.warn('[MH DriveImg] disabled:', e); }
-  window.MH_DRIVEIMG = { version: '1.1.0', stats: function () { return JSON.parse(JSON.stringify(stats)); } };
+  window.MH_DRIVEIMG = { version: '1.2.0', stats: function () { return JSON.parse(JSON.stringify(stats)); } };
   /* mh-driveimg-v1 */
 })();
 
