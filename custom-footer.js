@@ -2358,7 +2358,7 @@ log('פעיל | גרסה', CFG.VERSION);
 })();
 
 /* =========================================================================
-   SEO לדפי האתר — MH SEO  |  v1.0.2 | 2026-11-04
+   SEO לדפי האתר — MH SEO  |  v1.0.3 | 2026-11-05
    -------------------------------------------------------------------------
    מה זה עושה (רק head/meta, לא נוגע בעגלה, בתשלום או בהזמנה):
      1. כותרת (<title>) ותיאור (meta description) לכל דף לפי הנתיב:
@@ -2376,6 +2376,10 @@ log('פעיל | גרסה', CFG.VERSION);
    "| מעלה המשלוחים"). ה-H1 הראשון בדף הוא הכותרת הריקה של Hyperzod (.scheme-mobile-page-header) → נפלנו ל-document.title,
    שכבר כלל את הסיומת, ומשקיף ה-head הריץ שוב. עכשיו: SEO_PAGE_TITLES[slug] → H1 הראשון שאינו ריק בתוך התוכן
    (#html-content, ואם אין — בכל הדף) → אין: null (ניסיון חוזר). לעולם לא מ-document.title; סיומת מותג בסוף הבסיס מוסרת.
+
+   v1.0.3 (B-24, מהסשן של maale-seo): בדף עסק הכותרת והתיאור — קודם ה-meta של העסק ב-Hyperzod (meta_title/meta_description
+   שכותב maale-ops; GET /public/v1/url/seo/tags), אחר כך SEO_MERCHANTS, ורק אז ברירת המחדל. עד היום עסק שלא בטבלה (גואה)
+   קיבל תיאור גנרי מעל ה-meta האמיתי. דף מוצר, בית ועמודי תוכן — בלי שינוי.
 
    אבחון: localStorage.setItem('mh_seo_debug','1') → רענן. MH_SEO.apply(), MH_SEO.last()
    ========================================================================= */
@@ -2526,6 +2530,29 @@ function firstH1(root){
   return null;
 }
 
+/* B-24: ה-meta של העסק ב-Hyperzod (maale-ops כותב אותו בהגדרות הכתובת) — endpoint ציבורי, בלי מפתח, פעם אחת לכל עסק.
+   עד שחוזר: null (בטעינה ישירה ב-head כבר ה-meta של השרת). נכשל / 4 שנ' בלי תשובה → {} (טבלה, ואז ברירת מחדל);
+   תשובה מאוחרת עדיין מתקנת. עסק בלי meta: Hyperzod מחזירה כותרת "<שם> - מעלה המשלוחים" ותיאור ריק → לא נחשב.
+   ponytail: הזיהוי של כותרת ברירת המחדל לפי " - מעלה המשלוחים" בסוף — meta_title אמיתי שנגמר כך ייפול לטבלה. */
+var HZ = {};
+function hzMeta(m){
+  if (HZ[m.id]) return HZ[m.id] === 'wait' ? null : HZ[m.id];
+  HZ[m.id] = 'wait';
+  function fin(v, late){ if (HZ[m.id] === 'wait' || late) { HZ[m.id] = v; apply(); } }
+  setTimeout(function(){ fin({}); }, 4000);
+  try {
+    fetch('https://api.hyperzod.app/public/v1/url/seo/tags?tenant_id=6848&url=' + encodeURIComponent(ORIGIN + '/he/m/' + m.slug + '/' + m.id))
+      .then(function(r){ return r.json(); })
+      .then(function(j){
+        var doc = new DOMParser().parseFromString(String((j && j.data) || ''), 'text/html');
+        var t = ((doc.querySelector('title') || {}).textContent || '').replace(/\s+/g, ' ').trim();
+        var de = doc.querySelector('meta[name="description"]');
+        fin({ t: / - מעלה המשלוחים$/.test(t) ? '' : t.replace(BRAND_TAIL, ''), d: ((de && de.getAttribute('content')) || '').replace(/\s+/g, ' ').trim() }, true);
+      })['catch'](function(){ fin({}); });
+  } catch(e){ HZ[m.id] = {}; }
+  return HZ[m.id] === 'wait' ? null : HZ[m.id];
+}
+
 function compute(){
   var st = store();
   var p = location.pathname.replace(/\/+$/, '') || '/';
@@ -2546,10 +2573,11 @@ function compute(){
                desc: cut(pd ? prod.name + ' — ' + pd : prod.name + ' במשלוח מ' + nameCity + '. ' + desc, 155),
                canon: canon, ld: null, ldId: 'mh-ld-merchant' };
     }
+    var hz = hzMeta(m); if (!hz) return null;                  /* ה-meta של Hyperzod עוד בדרך — ננסה שוב */
     return {
       key: 'm:' + m.id,
-      title: (t.t || (nameCity + ' | משלוחים והזמנה אונליין')) + ' | ' + SITE,
-      desc: cut(desc, 155), canon: ORIGIN + '/he/m/' + m.slug + '/' + m.id, ld: merchantJsonLd(m), ldId: 'mh-ld-merchant'
+      title: (hz.t || t.t || (nameCity + ' | משלוחים והזמנה אונליין')) + ' | ' + SITE,
+      desc: cut(hz.d || desc, 155), canon: ORIGIN + '/he/m/' + m.slug + '/' + m.id, ld: merchantJsonLd(m), ldId: 'mh-ld-merchant'
     };
   }
   if (p === '/' || p === '/he' || p === '/he/home') return { key: 'home', title: HOME.title, desc: HOME.desc, canon: ORIGIN + '/he', ld: homeJsonLd(), ldId: 'mh-ld-home' };
@@ -2587,7 +2615,7 @@ new MutationObserver(function(){ clearTimeout(timer); timer = setTimeout(apply, 
 new MutationObserver(function(){ clearTimeout(timer); timer = setTimeout(apply, 400); }).observe(document.body || document.documentElement, { childList: true, subtree: true });
 window.addEventListener('popstate', function(){ setTimeout(apply, 300); });
 setTimeout(apply, 800); setTimeout(apply, 2500);
-window.MH_SEO = { version: '1.0.2', apply: apply, last: function(){ return LAST; }, table: SEO_MERCHANTS };
+window.MH_SEO = { version: '1.0.3', apply: apply, last: function(){ return LAST; }, table: SEO_MERCHANTS, hz: HZ };
 log('פעיל');
 })();
 
