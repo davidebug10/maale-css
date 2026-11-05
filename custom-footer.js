@@ -3498,20 +3498,39 @@ log('פעיל');
 })();
 
 /* ============================================================
-   אופציות בפופאפ המוצר — MH Options  |  v1.0.0 | 2026-09-07
+   אופציות בפופאפ המוצר — MH Options  |  v1.1.0 | 2026-11-05 (v1.0.0: 7.9)
    מסמן mh-opt-on על שורת אופציה (.v-list-item) שהרדיו/צ'קבוקס שלה מסומן. הסיבה: Safari ב-iOS לא
    מרענן :has(input:checked) כש-Vue מחליף את הבחירה — המסגרת האדומה נשארה על אופציה אחת והנקודה
    על אחרת. ה-CSS (חלק 22ט ב-global-cdn.css) נשען על המחלקה הזאת ועל .v-selection-control--dirty.
+   v1.1.0 (כרטיסי אופציה עם תמונה, חלק 68): גם בכרטיסים שבשורה הנגללת (.simple-slider, גם בדף המוצר), ו"שם (מרכיבים)"
+   בכרטיס → השם בצומת הטקסט של Vue + span.mh-opt-sub למרכיבים. Vue מעדכן את צומת הטקסט רק כשהשם משתנה (מפתח לפי אינדקס —
+   כרטיס שמוחזר לאופציה אחרת): אז הטקסט שונה מ-data-mh-name → מוחקים את ה-span ומפצלים מחדש.
    נכשל-פתוח: בלי הבלוק הזה ה-CSS עדיין עובד לפי המחלקה של Vuetify. בדיקה: window.MH_OPTIONS.stats()
    ============================================================ */
 (function () {
   'use strict';
   if (window.__MH_OPTIONS__) { return; }
   window.__MH_OPTIONS__ = true;
-  var VERSION = '1.0.0';
-  var stats = { version: VERSION, syncs: 0, marked: 0 };
+  var VERSION = '1.1.0';
+  var stats = { version: VERSION, syncs: 0, marked: 0, split: 0 };
+  function split() {
+    var ts = document.querySelectorAll('.scheme-product-options-card .simple-slider .v-list-item-title');
+    for (var i = 0; i < ts.length; i++) {
+      var t = ts[i], n = t.firstChild, sub = t.querySelector('.mh-opt-sub');
+      if (!n || n.nodeType !== 3) { continue; }
+      if (sub && n.nodeValue === t.getAttribute('data-mh-name')) { continue; }   /* כבר מפוצל, ו-Vue לא החליף את השם */
+      if (sub) { sub.remove(); }
+      var m = /^\s*([^()]+?)\s*\(([^()]+)\)\s*$/.exec(n.nodeValue);
+      if (!m) { t.removeAttribute('data-mh-name'); continue; }
+      n.nodeValue = m[1];
+      t.setAttribute('data-mh-name', m[1]);
+      sub = document.createElement('span'); sub.className = 'mh-opt-sub'; sub.textContent = m[2];
+      t.appendChild(sub); stats.split++;
+    }
+  }
   function sync() {
-    var rows = document.querySelectorAll('.product-popup .scheme-product-options-card .v-list-item');
+    try { split(); } catch (e) { /* נכשל-פתוח: השם המלא נשאר */ }
+    var rows = document.querySelectorAll('.product-popup .scheme-product-options-card .v-list-item, .scheme-product-options-card .simple-slider .v-list-item');
     var n = 0;
     for (var i = 0; i < rows.length; i++) {
       var r = rows[i];
@@ -3528,7 +3547,7 @@ log('פעיל');
     setTimeout(function () { pending = false; try { sync(); } catch (e) { /* נכשל-פתוח */ } }, 30);
   }
   try {
-    new MutationObserver(schedule).observe(document.documentElement, { subtree: true, childList: true, attributes: true, attributeFilter: ['class', 'checked'] });
+    new MutationObserver(schedule).observe(document.documentElement, { subtree: true, childList: true, characterData: true, attributes: true, attributeFilter: ['class', 'checked'] });   /* characterData — Vue מחליף שם אופציה בכרטיס */
     document.addEventListener('change', schedule, true);
     document.addEventListener('click', schedule, true);
     schedule();

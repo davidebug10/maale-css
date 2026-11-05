@@ -7885,6 +7885,11 @@ html body :is([id="MerchantCollection"], #merchants_by_category) .merchant-card 
 /* כרטיס קטן (פריסת "שתי שורות") */
 html body :is([id="MerchantCollection"], #merchants_by_category) .merchant-card.merchant-card--compact .cover-img { border-radius: 14px !important; aspect-ratio: 4 / 3 !important; }
 html body :is([id="MerchantCollection"], #merchants_by_category) .merchant-card.merchant-card--compact .merchant-card-title { font-size: 14.5px !important; line-height: 20px !important; }
+/* שורת המידע בכרטיס קטן תופסת מקום גם כשהיא ריקה (עסק בלי דירוג וכשרות — וופל באס, העוגיות של חן): אחרת הכרטיס קצר ב-18px,
+   והכרטיס שמתחתיו בעמודה (nm-carousel-column) עולה מול השכן — דוד 5.11: 5 עסקים ב"מתוקים", "אחד זולג קצת למטה". כל מספר עסקים */
+html body :is([id="MerchantCollection"], #merchants_by_category) .merchant-card.merchant-card--compact .merchant-card-body::after {
+    content: attr(data-mh-meta) !important; display: block !important; min-height: 18px !important; overflow: hidden !important; text-overflow: ellipsis !important; white-space: nowrap !important;
+    font-size: 13px !important; font-weight: 600 !important; line-height: 18px !important; color: #6b7280 !important; }
 html body :is([id="MerchantCollection"], #merchants_by_category) .merchant-card.merchant-card--compact .merchant-close-comment { height: 24px !important; line-height: 24px !important; padding: 0 8px 0 7px !important; }
 html body :is([id="MerchantCollection"], #merchants_by_category) .merchant-card.merchant-card--compact .v-responsive__content > div.tw-absolute { top: auto !important; bottom: 8px !important; left: 8px !important; right: 8px !important; }
 /* דף "הכול": אותו כרטיס, רשת נקייה (בלי שורת סיכום — דוד 18.10) */
@@ -8709,3 +8714,202 @@ html.mh-android body .product-popup #add_to_cart_hide_from_mobile_app:not(#mh-a)
 html.mh-android body .product-popup .mhq-card:not(#mh-a):not(#mh-b) { background: #ffffff !important; }
 html.mh-android body .v-bottom-sheet__content .product-popup .v-carousel-item .v-card:not(#mh-a):not(#mh-b) { background: rgba(255, 255, 255, 0.86) !important; }
 /* mh-androidpopup-v1 */
+
+/* =========================================================
+   חלק 68: כרטיסי אופציה עם תמונה (חלון המוצר + דף המוצר) — MH OptCards v1.0.0 | 2026-11-05
+   (דוד, העוגיות של חן: "הווריאנטים מוצגים בתור cards… העיצוב של זה נוראי, חייב לסדר ולתקן ולשפר")
+   Hyperzod: אופציות עם תמונה = שורה נגללת (.simple-slider) של v-card ברוחב 200 (inline) — תמונה 140 + v-list-item (רדיו + שם).
+   עד היום כרטיס השורה של 22ט (מסגרת, ריפוד, מינימום 56) נכנס לתוך הכרטיס — קופסה בתוך קופסה, השם (עם המרכיבים בסוגריים)
+   נשבר ל-4–5 שורות, והשורה נחתכה 12px לפני קצה המסך. כאן הבעלים של הכרטיסים האלה: השורה מקצה לקצה עם הצצה לכרטיס הבא,
+   כרטיס לבן 148, תמונה, שם מודגש + שורת מרכיבים (JS: MH Options מפצל "שם (מרכיבים)" ל-span.mh-opt-sub), סימון עגול על פינת
+   התמונה, נבחר = מסגרת אדומה + גוון. הכול תחת .scheme-product-options-card .simple-slider — רשימת האופציות (22ט) והגלגל (mhq) לא נגעו.
+   הספציפיות: .slider-inner-container .v-card — גוברת על 22ט (.product-popup .scheme-product-options-card …) בתוך החלון.
+   ========================================================= */
+/* 1. המעטפת שקופה (בדף המוצר Hyperzod נותנת לה רקע לבן, פינות וחיתוך) */
+html body .scheme-product-options-card:has(.simple-slider) {
+    background: transparent !important;
+    border-radius: 0 !important;
+    overflow: visible !important;
+    box-shadow: none !important;
+}
+/* 2. השורה מקצה לקצה: הכרטיס הראשון בקו של כותרת הקבוצה (16), הבא מציץ מהקצה */
+html body .scheme-product-options-card .simple-slider { margin-inline: -12px !important; }   /* מבטל את tw-mx-3 של המעטפת */
+html body .scheme-product-options-card .simple-slider .slider-inner-container {
+    display: flex !important;
+    align-items: stretch !important;
+    gap: 10px !important;
+    margin: 0 !important;
+    padding: 4px 16px 8px !important;   /* 4/8 — מקום לטבעת ולצל של כרטיס נבחר */
+    scroll-padding-inline: 16px !important;
+    scroll-snap-type: x proximity !important;
+    overscroll-behavior-x: contain !important;
+    scrollbar-width: none !important;
+}
+html body .scheme-product-options-card .simple-slider .slider-inner-container::-webkit-scrollbar { display: none !important; }
+html body .scheme-product-options-card .simple-slider .slider-inner-container::after { content: "" !important; flex: 0 0 6px !important; }   /* ריפוד הסוף (בגלילה ב-flex ספארי מתעלם מ-padding-inline-end) */
+html body .scheme-product-options-card .simple-slider .slider-inner-container > div {
+    flex: 0 0 auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    scroll-snap-align: start !important;
+}
+/* 3. הכרטיס */
+html body .scheme-product-options-card .simple-slider .slider-inner-container .v-card {
+    position: relative !important;
+    display: flex !important;
+    flex-direction: column !important;
+    width: 148px !important;   /* Hyperzod: width 200 inline */
+    min-width: 0 !important;
+    max-width: none !important;
+    height: 100% !important;
+    margin: 0 !important;
+    background: #ffffff !important;
+    border: 1.5px solid #e6e8ec !important;
+    border-radius: 16px !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04) !important;
+    overflow: hidden !important;
+    cursor: pointer !important;
+    -webkit-tap-highlight-color: transparent !important;
+    transition: border-color 0.18s ease, background-color 0.18s ease, box-shadow 0.18s ease !important;
+}
+html body .scheme-product-options-card .simple-slider .slider-inner-container .v-card :is(.v-card__loader, .v-card__overlay, .v-card__underlay, .v-list-item__underlay, .v-list-item__overlay, .v-list-item__spacer) { display: none !important; }
+@media (hover: hover) {
+    html body .scheme-product-options-card .simple-slider .slider-inner-container .v-card:hover { border-color: #cbd5e1 !important; }
+}
+html body .scheme-product-options-card .simple-slider .slider-inner-container .v-card:focus-visible { outline: 2px solid #e31e24 !important; outline-offset: 2px !important; }
+html body .scheme-product-options-card .simple-slider .slider-inner-container .v-card:has(.mh-opt-on, .v-selection-control--dirty) {
+    border-color: #e31e24 !important;   /* בלי גוון לרקע: התמונות על לבן — גוון היה משאיר מלבן לבן סביב העוגייה */
+    box-shadow: 0 0 0 1px #e31e24, 0 6px 16px rgba(227, 30, 36, 0.12) !important;
+}
+html body .scheme-product-options-card .simple-slider .slider-inner-container .v-card.v-card--disabled { opacity: 0.45 !important; }   /* הקבוצה מלאה (מקסימום) */
+/* 4. התמונה */
+html body .scheme-product-options-card .simple-slider .slider-inner-container .v-card .v-img {
+    flex: 0 0 112px !important;
+    height: 112px !important;   /* Hyperzod: 140 inline / ריבוע ברוחב 200 */
+    background: #ffffff !important;
+}
+html body .scheme-product-options-card .simple-slider .slider-inner-container .v-card .v-img__img--contain { padding: 8px 8px 0 !important; box-sizing: border-box !important; }
+/* 5. השורה שבתוך הכרטיס — בלי הכרטיס של 22ט (מסגרת, ריפוד, מינימום, position) */
+html body .scheme-product-options-card .simple-slider .slider-inner-container .v-card .v-list-item {
+    position: static !important;
+    display: block !important;
+    flex: 1 1 auto !important;
+    height: auto !important;   /* Hyperzod: tw-h-[calc(100%-198px)] בבחירה מרובה */
+    min-height: 0 !important;
+    margin: 0 !important;
+    padding: 8px 10px 12px !important;
+    background: transparent !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    transform: none !important;
+    transition: none !important;
+}
+html body .scheme-product-options-card .simple-slider .slider-inner-container .v-card .v-list-item__prepend {
+    position: absolute !important;
+    top: 8px !important;
+    inset-inline-start: 8px !important;
+    z-index: 2 !important;
+    width: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+html body .scheme-product-options-card .simple-slider .slider-inner-container .v-card .v-list-item-action { margin: 0 !important; }
+html body .scheme-product-options-card .simple-slider .slider-inner-container .v-card .v-list-item__content { padding: 0 !important; overflow: visible !important; }
+html body .scheme-product-options-card .simple-slider .slider-inner-container .v-card .v-list-item-title {
+    display: block !important;
+    font-size: 14px !important;
+    font-weight: 800 !important;
+    color: #111111 !important;
+    line-height: 1.3 !important;
+    text-align: right !important;
+    white-space: normal !important;
+    overflow: visible !important;
+    overflow-wrap: anywhere !important;
+    -webkit-line-clamp: unset !important;
+    max-height: none !important;
+}
+html body .scheme-product-options-card .simple-slider .slider-inner-container .v-card :is(.mh-opt-sub, .v-list-item-subtitle) {
+    display: block !important;
+    margin-top: 3px !important;
+    font-size: 12px !important;
+    font-weight: 500 !important;
+    color: #6b7280 !important;
+    line-height: 1.35 !important;
+    white-space: normal !important;
+    opacity: 1 !important;
+    -webkit-line-clamp: unset !important;
+    overflow: visible !important;
+}
+html body .scheme-product-options-card .simple-slider .slider-inner-container .v-card .v-list-item__content > .tw-font-semibold {   /* "+₪5" */
+    margin-top: 4px !important;
+    font-size: 13px !important;
+    font-weight: 800 !important;
+    color: #6b7280 !important;
+}
+html body .scheme-product-options-card .simple-slider .slider-inner-container .v-card:has(.mh-opt-on, .v-selection-control--dirty) .v-list-item__content > .tw-font-semibold { color: #c8151b !important; }
+/* 6. הסימון על פינת התמונה: עיגול לבן עם צל → אדום עם V (צ'קבוקס — פינות 8) */
+html body .scheme-product-options-card .simple-slider .slider-inner-container .v-card :is(.v-selection-control, .v-selection-control__wrapper, .v-selection-control__input) {
+    width: 26px !important;
+    height: 26px !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    flex: 0 0 26px !important;
+    margin: 0 !important;
+}
+html body .scheme-product-options-card .simple-slider .slider-inner-container .v-card .v-selection-control__input { position: relative !important; overflow: visible !important; }
+html body .scheme-product-options-card .simple-slider .slider-inner-container .v-card .v-selection-control__input > i.v-icon { display: none !important; }
+html body .scheme-product-options-card .simple-slider .slider-inner-container .v-card .v-selection-control__input::before {
+    content: "" !important;
+    position: absolute !important;
+    inset: 0 !important;
+    width: auto !important;
+    height: auto !important;
+    box-sizing: border-box !important;
+    border-radius: 50% !important;
+    border: 2px solid #d1d5db !important;
+    background: #ffffff !important;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.14) !important;
+    opacity: 1 !important;
+    transform: none !important;
+    transition: background-color 0.15s ease, border-color 0.15s ease !important;
+}
+html body .scheme-product-options-card .simple-slider .slider-inner-container .v-card .v-checkbox-btn .v-selection-control__input::before { border-radius: 8px !important; }
+html body .scheme-product-options-card .simple-slider .slider-inner-container .v-card .v-selection-control__input::after {
+    content: "" !important;
+    position: absolute !important;
+    left: 50% !important;
+    top: 50% !important;
+    width: 6px !important;
+    height: 11px !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    border: solid #ffffff !important;
+    border-width: 0 2.5px 2.5px 0 !important;
+    transform: translate(-50%, -60%) rotate(45deg) scale(0) !important;
+    transition: transform 0.15s ease !important;
+}
+html body .scheme-product-options-card .simple-slider .slider-inner-container .v-card:has(.mh-opt-on, .v-selection-control--dirty) .v-selection-control__input::before {
+    background: linear-gradient(135deg, #ff3b41 0%, #c8151b 100%) !important;
+    border-color: #e31e24 !important;
+}
+html body .scheme-product-options-card .simple-slider .slider-inner-container .v-card:has(.mh-opt-on, .v-selection-control--dirty) .v-selection-control__input::after {
+    transform: translate(-50%, -60%) rotate(45deg) scale(1) !important;
+}
+/* 7. החיצים במחשב (Hyperzod: ריבוע אפור 30 באמצע הגובה, 20px מהקצה — ישב על הכרטיס הראשון): עיגול לבן עם צל בגובה
+      אמצע התמונה, צמוד לקצה; לא על הסימון שבפינה העליונה של הכרטיס */
+html body .scheme-product-options-card .simple-slider .simple-slider-controls .v-btn {
+    top: 60px !important;   /* 4 (ריפוד) + 112/2 */
+    transform: translateY(-50%) !important;
+    width: 32px !important;
+    height: 32px !important;
+    min-width: 0 !important;
+    padding: 0 !important;
+    border-radius: 50% !important;
+    background: #ffffff !important;
+    color: #111111 !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.16) !important;
+}
+html body .scheme-product-options-card .simple-slider .simple-slider-controls .v-btn:first-child { left: 2px !important; right: auto !important; }
+html body .scheme-product-options-card .simple-slider .simple-slider-controls .v-btn:last-child { right: 2px !important; left: auto !important; }
+/* mh-optcards-v1 */
