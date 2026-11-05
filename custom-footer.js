@@ -6794,9 +6794,10 @@ log('פעיל');
 })();
 
 /* =========================================================
-   אוספי העסקים בדף הבית + הדף "הכל" — MH Collections v1.3.0 | 2026-10-18 (v1.1.0 סבב 2; v1.1.1 11.10: גם div.merchant-card — באפליקציה הכרטיס אינו <a>;
+   אוספי העסקים בדף הבית + הדף "הכל" — MH Collections v1.4.0 | 2026-11-05 (v1.1.0 סבב 2; v1.1.1 11.10: גם div.merchant-card — באפליקציה הכרטיס אינו <a>;
    v1.2.0 15.10, דוד: בלי מספר המקומות — המספר הכולל מעורפל; "היום"/"מחר" במקום שם היום;
-   v1.3.0 18.10, דוד: בלי שורות "רוב המקומות סגורים" / "כולם סגורים" / "שבת שלום" — לקוח מבין "הכול סגור" ולא מזמין)
+   v1.3.0 18.10, דוד: בלי שורות "רוב המקומות סגורים" / "כולם סגורים" / "שבת שלום" — לקוח מבין "הכול סגור" ולא מזמין;
+   v1.4.0 5.11, דוד: ריקו סלט במקום השני ב"חלבי?" כשהוא פתוח — PINS; באדמין אי אפשר לסדר את העסקים באוסף)
    הבעלים של ההתנהגות של #MerchantCollection (סקשני "Merchant Collection" שדוד בונה באדמין) ושל כותרת הדף
    שנפתח מ"הכל" (#merchants_by_category?collection=true). העיצוב: CSS חלק 59.
    - "View all" (קשיח באנגלית ב-chunk pb-MerchantCollection) → "הכול", בלי מספר (גם לא בקורא מסך ובדף "הכול").
@@ -6806,13 +6807,14 @@ log('פעיל');
    - הכרטיס: "הודעת חלון הראווה" (אלרגנים + כשרות + "התמונות להמחשה בלבד") → רק הכשרות בשורה קטנה
      (data-mh-meta); הודעה בלי "כשרות:" (טוסטראק, דליה) → כמו שהיא. הסטטוס הסגור → נוסח קצר (data-mh-when).
    - סדר: פתוחים קודם, אחריהם לפי שעת הפתיחה הקרובה, "בקרוב נפתח" (מתג ידני) בסוף — CSS order, בלי לגעת ב-DOM של Vue.
+     עסק ב-PINS (ריקו ב"חלבי?") — במקום הקבוע שלו בין הפתוחים; באוסף כזה order = המקום (0,1,2…), בשאר — ה-rank.
    נכשל-פתוח: בלי ה-JS הכרטיסים של Hyperzod כמו שהם (עם העיצוב של חלק 59). בדיקה: MH_COLLECTIONS.stats()
    ========================================================= */
 (function () {
   'use strict';
   if (window.__MH_COLLECTIONS__) { return; }
   window.__MH_COLLECTIONS__ = true;
-  var VERSION = '1.3.0';
+  var VERSION = '1.4.0';
   var stats = { labels: 0, titles: 0, cards: 0, kosher: 0, tags: 0, closed: 0, ordered: 0, errors: 0 };
   var lastTitle = null;   /* הכותרת של הסקשן שממנו לחצו "הכל" */
 
@@ -6924,6 +6926,21 @@ log('פעיל');
     stats.arrows = (stats.arrows || 0) + 1;
   }, true);
 
+  /* מקום קבוע לעסק באוסף (דוד 5.11: ריקו סלט שני ב"חלבי?"). באדמין אי אפשר לסדר — רק לסמן, והרשימה נשמרת בסדר של
+     רשימת הבחירה שם. רק כשהעסק פתוח: סגור נשאר עם הסגורים לפי שעת הפתיחה; פתוח יחיד = ראשון. */
+  var PINS = [{ title: /חלבי/, id: '6ae1df376d9162b3c602a252', pos: 2 }];   /* Ricco salad */
+  function pinFor(title) { for (var i = 0; i < PINS.length; i++) { if (PINS[i].title.test(title || '')) { return PINS[i]; } } return null; }
+  /* items בסדר ה-DOM ({rank, id} או null) → style.order לכל אינדקס: לפי rank ואז ה-DOM, והעסק הקבוע במקומו בין הפתוחים */
+  function pinned(items, pin) {
+    var list = [], out = [], open = 0, k = -1;
+    items.forEach(function (x, i) { if (x) { list.push({ r: Math.min(x.rank, 1e7), id: x.id, i: i }); } });
+    list.sort(function (a, b) { return a.r - b.r || a.i - b.i; });
+    list.forEach(function (o, j) { if (o.r === 0) { open++; if (o.id === pin.id) { k = j; } } });
+    if (k >= 0) { list.splice(Math.min(pin.pos, open) - 1, 0, list.splice(k, 1)[0]); }
+    list.forEach(function (o, j) { out[o.i] = j; });
+    return out;
+  }
+
   /* סקשן: תווית "הכול", אימוג'י התיאור ליד הכותרת, סדר פתוחים-קודם */
   function section(sec) {
     var title = sec.querySelector('h1'), btn = sec.querySelector('.nm-see-all-btn'), desc = title && title.parentElement && title.parentElement.parentElement && title.parentElement.parentElement.querySelector('p');
@@ -6940,8 +6957,9 @@ log('פעיל');
     }
     var states = cards.map(decorate), rows2 = !!sec.querySelector('.nm-carousel--rows-2');
     if (!rows2) {
-      var car = sec.querySelector('.nm-carousel'), moved = false;
-      slides.forEach(function (sl) { var c = sl.querySelector('.merchant-card'); if (!c) { return; } var r = cardState(c).rank; var o = String(Math.min(r, 1e7) | 0); if (sl.style.order !== o) { sl.style.order = o; moved = true; stats.ordered++; } });
+      var car = sec.querySelector('.nm-carousel'), moved = false, pin = pinFor(t);
+      var ord = pin && pinned(slides.map(function (sl) { var c = sl.querySelector('.merchant-card'); return c ? { rank: cardState(c).rank, id: c.getAttribute('data-merchant-id') } : null; }), pin);
+      slides.forEach(function (sl, i) { var c = sl.querySelector('.merchant-card'); if (!c) { return; } var o = ord ? String(ord[i]) : String(Math.min(cardState(c).rank, 1e7) | 0); if (sl.style.order !== o) { sl.style.order = o; moved = true; stats.ordered++; } });
       /* scroll-snap "נצמד" לכרטיס שהיה ראשון ומגלגל אחריו לסוף — חוזרים להתחלה, רק אם הלקוח עוד לא נגע בשורה */
       if (car && moved && !car.__mhTouched) {
         if (!car.__mhWatch) { car.__mhWatch = true; ['pointerdown', 'touchstart', 'wheel'].forEach(function (ev) { car.addEventListener(ev, function () { car.__mhTouched = true; }, { passive: true }); }); }
@@ -6967,9 +6985,11 @@ log('פעיל');
     var want = lastTitle || 'כל המקומות';
     if (h && h.textContent.trim() !== want) { h.textContent = want; stats.titles++; }
     /* אותו סדר כמו בבית (פתוחים, ואז לפי שעת הפתיחה); בלי שורת סיכום (דוד 18.10) */
-    [].forEach.call(page.querySelectorAll('.merchant-card'), function (c) {
-      var st = decorate(c), col = c.closest('[class*="v-col"]');
-      if (col) { var o = String(Math.min(st.rank, 1e7) | 0); if (col.style.order !== o) { col.style.order = o; } }
+    var cards = [].slice.call(page.querySelectorAll('.merchant-card')), sts = cards.map(decorate), pin = pinFor(lastTitle);
+    var ord = pin && pinned(cards.map(function (c, i) { return { rank: sts[i].rank, id: c.getAttribute('data-merchant-id') }; }), pin);
+    cards.forEach(function (c, i) {
+      var col = c.closest('[class*="v-col"]');
+      if (col) { var o = ord ? String(ord[i]) : String(Math.min(sts[i].rank, 1e7) | 0); if (col.style.order !== o) { col.style.order = o; } }
     });
   }
 
