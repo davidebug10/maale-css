@@ -3884,6 +3884,11 @@ html body .product-popup .scheme-product-options-card :is(.v-selection-control--
 html body .product-popup .scheme-product-options-card .mh-opt-on .v-checkbox-btn .v-selection-control__input::after {
     transform: translate(-50%, -60%) rotate(45deg) scale(1) !important;
 }
+/* "הוספה" נחסם בקבוצת חובה → מסגרת אדומה (9.11, דוד: "מאשר"). Hyperzod צובעת את האייקון שהסתרנו למעלה,
+   ולקבוצת צ'קבוקסים אין טקסט "יש לבחור" — בלי זה הלקוח לא רואה למה הכפתור לא עובד. הנבחר גובר (ספציפיות :is). */
+html body .product-popup .scheme-product-options-card .v-selection-control--error .v-selection-control__input::before {
+    border-color: #e31e24 !important;
+}
 
 /* 7. ירושה מ-22ג+ד §4 (ללא שינוי): אופציות שנחסמו אחרי המקסימום נשארות לחיצות — Hyperzod מציגה טוסט */
 html body .product-popup .v-selection-control--disabled,
