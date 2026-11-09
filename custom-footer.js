@@ -8443,5 +8443,40 @@ log('פעיל');
   /* mh-ordertrack-v1 */
 })();
 
+/* =========================================================
+   חלון המוצר טוען שוב את התוספות — MH Refetch v1.0.0 | 2026-11-09
+   רקע: מהבילד של Hyperzod של 9.11 09:35 (index-BJK7dBXt) החלון מבקש את המוצר המלא (getById, עם התוספות) רק כש-item.needs_refetch —
+   וה-API של התפריט לא שולח את השדה. התוצאה: בכל מוצר עם תוספות (456 ב-20 חנויות) החלון נפתח בלי תוספות, ואפשר להוסיף לסל בלי לבחור.
+   עד הבילד הכלל היה: has_excerpt, או has_product_options בלי product_options. כאן: על כל setAddItem — אם הכלל הישן מתקיים ואין needs_refetch,
+   מסמנים needs_refetch=true (לפני שהחלון נוצר: subscribe רץ מיד אחרי ה-commit, הרינדור ב-nextTick). כש-Hyperzod תתקן — השדה כבר מגיע ולא נוגעים.
+   נכשל-פתוח. בדיקה: MH_REFETCH.stats()
+   ========================================================= */
+(function () {
+  'use strict';
+  if (window.__MH_REFETCH__) { return; }
+  window.__MH_REFETCH__ = true;
+  var stats = { hooked: 0, marked: 0, errors: 0 };
+  function store() { try { return document.querySelector('#app').__vue_app__.config.globalProperties.$store; } catch (e) { return null; } }
+  function hook() {
+    var st = store();
+    if (!st || typeof st.subscribe !== 'function') { return false; }
+    if (st.__mhRefetch) { return true; }
+    st.__mhRefetch = true;
+    st.subscribe(function (m) {
+      try {
+        var p = m && /(^|\/)setAddItem$/.test(m.type || '') && m.payload;
+        if (!p || typeof p !== 'object' || p.no_product_data || p.needs_refetch) { return; }
+        if (p.has_excerpt || (p.has_product_options && !(p.product_options && p.product_options.length))) { p.needs_refetch = true; stats.marked++; }
+      } catch (e) { stats.errors++; }
+    });
+    stats.hooked++;
+    return true;
+  }
+  var tries = 0, iv = setInterval(function () { if (hook() || ++tries > 300) { clearInterval(iv); } }, 200);   /* האפליקציה עולה אחרי הקוד — עד דקה */
+  hook();
+  window.MH_REFETCH = { version: '1.0.0', stats: function () { return JSON.parse(JSON.stringify(stats)); } };
+  /* mh-refetch-v1 */
+})();
+
 
 }   /* סוף השומר מטעינה כפולה (window.__MH_FOOTER__) — בראש הקובץ */
