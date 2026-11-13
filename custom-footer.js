@@ -2358,7 +2358,7 @@ log('פעיל | גרסה', CFG.VERSION);
 })();
 
 /* =========================================================================
-   SEO לדפי האתר — MH SEO  |  v1.0.3 | 2026-11-05
+   SEO לדפי האתר — MH SEO  |  v1.0.4 | 2026-11-13
    -------------------------------------------------------------------------
    מה זה עושה (רק head/meta, לא נוגע בעגלה, בתשלום או בהזמנה):
      1. כותרת (<title>) ותיאור (meta description) לכל דף לפי הנתיב:
@@ -2380,6 +2380,10 @@ log('פעיל | גרסה', CFG.VERSION);
    v1.0.3 (B-24, מהסשן של maale-seo): בדף עסק הכותרת והתיאור — קודם ה-meta של העסק ב-Hyperzod (meta_title/meta_description
    שכותב maale-ops; GET /public/v1/url/seo/tags), אחר כך SEO_MERCHANTS, ורק אז ברירת המחדל. עד היום עסק שלא בטבלה (גואה)
    קיבל תיאור גנרי מעל ה-meta האמיתי. דף מוצר, בית ועמודי תוכן — בלי שינוי.
+
+   v1.0.4 (B-35, מהסשן של maale-seo): בין 11.11 ל-12.11 Hyperzod התחילה להגיש מהשרת <link rel="canonical"> משלה
+   (= הכתובת שנפתחה כמו שהיא: /, /m/…, /en/m/…), ו-link() חיפש רק את התגית שלנו → בדף היו שתי canonical סותרות.
+   עכשיו link() מאמץ את התגית הקיימת (מסמן data-mh, מציב את הערך שלנו) ומוחק כל כפולה. הערכים עצמם — בלי שינוי.
 
    אבחון: localStorage.setItem('mh_seo_debug','1') → רענן. MH_SEO.apply(), MH_SEO.last()
    ========================================================================= */
@@ -2454,9 +2458,13 @@ function meta(sel, attrs, content){
   if (!el) { el = document.createElement('meta'); Object.keys(attrs).forEach(function(k){ el.setAttribute(k, attrs[k]); }); document.head.appendChild(el); }
   if (el.getAttribute('content') !== content) el.setAttribute('content', content);
 }
+/* תגית אחת בלבד: מאמצים את הקיימת (מ-12.11 Hyperzod מגישה canonical משלה מהשרת) ומסירים כפולות */
 function link(rel, href){
-  var el = document.head.querySelector('link[rel="' + rel + '"][data-mh]');
-  if (!el) { el = document.createElement('link'); el.setAttribute('rel', rel); el.setAttribute('data-mh', '1'); document.head.appendChild(el); }
+  var all = document.querySelectorAll('link[rel="' + rel + '"]');
+  var el = document.head.querySelector('link[rel="' + rel + '"][data-mh]') || all[0];
+  if (!el) { el = document.createElement('link'); el.setAttribute('rel', rel); document.head.appendChild(el); }
+  if (!el.hasAttribute('data-mh')) el.setAttribute('data-mh', '1');
+  for (var i = 0; i < all.length; i++) { if (all[i] !== el) all[i].remove(); }
   if (el.getAttribute('href') !== href) el.setAttribute('href', href);
 }
 function jsonld(id, obj){
@@ -2615,7 +2623,7 @@ new MutationObserver(function(){ clearTimeout(timer); timer = setTimeout(apply, 
 new MutationObserver(function(){ clearTimeout(timer); timer = setTimeout(apply, 400); }).observe(document.body || document.documentElement, { childList: true, subtree: true });
 window.addEventListener('popstate', function(){ setTimeout(apply, 300); });
 setTimeout(apply, 800); setTimeout(apply, 2500);
-window.MH_SEO = { version: '1.0.3', apply: apply, last: function(){ return LAST; }, table: SEO_MERCHANTS, hz: HZ };
+window.MH_SEO = { version: '1.0.4', apply: apply, last: function(){ return LAST; }, table: SEO_MERCHANTS, hz: HZ };
 log('פעיל');
 })();
 
