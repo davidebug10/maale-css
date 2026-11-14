@@ -341,7 +341,7 @@ if (!window.__MH_FOOTER__) { window.__MH_FOOTER__ = true;
 
 /* =========================================================
    Welcome Page - Terms acceptance sentence + Terms popup
-   Date: 2026-06-27
+   Date: 2026-06-27 (14.11: + מדיניות הפרטיות באותו פופאפ, בלי "שקראת")
    מזריק משפט אישור תקנון מתחת לכפתורים בדף ההתחברות,
    ופותח את דף התקנון החי כפופאפ (iframe).
    מסתיר את .back-btn רק בתוך ה-iframe הזה (לא דולף החוצה).
@@ -358,30 +358,34 @@ if (!window.__MH_FOOTER__) { window.__MH_FOOTER__ = true;
 
     const row = document.createElement('div');
     row.id = 'mh-terms-row';
-    row.innerHTML = 'בלחיצה על "המשך" את/ה מאשר/ת שקראת והסכמת ל<span id="mh-terms-link">תקנון האתר</span>';
+    /* 14.11 (דוד, דרך היועץ העסקי): בלי "שקראת" (חוק החוזים האחידים 4(12)) + קישור למדיניות הפרטיות */
+    row.innerHTML = 'בלחיצה על "המשך" את/ה מסכים/ה ל<span id="mh-terms-link">תקנון האתר</span> ול<span id="mh-privacy-link">מדיניות הפרטיות</span>';
     anchor.parentElement.appendChild(row);
 
-    row.querySelector('#mh-terms-link').addEventListener('click', function(){
-      document.getElementById('mh-terms-modal')?.remove();
-      const m = document.createElement('div');
-      m.id = 'mh-terms-modal';
-      m.innerHTML =
-        '<div id="mh-terms-box">'+
-          '<div id="mh-terms-head"><h3>תקנון השימוש</h3><button id="mh-terms-x" aria-label="close">&times;</button></div>'+
-          '<div id="mh-terms-frame-wrap">'+
-            '<iframe id="mh-terms-frame" src="https://www.maalehamishlohim.co.il/he/page/takanon"></iframe>'+
-            '<div id="mh-terms-cover" aria-hidden="true"></div>'+
-          '</div>'+
-          '<button id="mh-terms-accept">סגור</button>'+
-        '</div>';
-      document.body.appendChild(m);
-      requestAnimationFrame(()=>m.classList.add('show'));
+    row.querySelector('#mh-terms-link').addEventListener('click', function(){ openDoc('תקנון השימוש', 'takanon'); });
+    row.querySelector('#mh-privacy-link').addEventListener('click', function(){ openDoc('מדיניות הפרטיות', 'privacy-policy'); });
+  }
 
-      const close = ()=>{ m.classList.remove('show'); setTimeout(()=>m.remove(),300); };
-      m.querySelector('#mh-terms-x').onclick = close;
-      m.querySelector('#mh-terms-accept').onclick = close;
-      m.onclick = e=>{ if(e.target===m) close(); };
-    });
+  function openDoc(title, slug){
+    document.getElementById('mh-terms-modal')?.remove();
+    const m = document.createElement('div');
+    m.id = 'mh-terms-modal';
+    m.innerHTML =
+      '<div id="mh-terms-box">'+
+        '<div id="mh-terms-head"><h3>'+title+'</h3><button id="mh-terms-x" aria-label="close">&times;</button></div>'+
+        '<div id="mh-terms-frame-wrap">'+
+          '<iframe id="mh-terms-frame" src="https://www.maalehamishlohim.co.il/he/page/'+slug+'"></iframe>'+
+          '<div id="mh-terms-cover" aria-hidden="true"></div>'+
+        '</div>'+
+        '<button id="mh-terms-accept">סגור</button>'+
+      '</div>';
+    document.body.appendChild(m);
+    requestAnimationFrame(()=>m.classList.add('show'));
+
+    const close = ()=>{ m.classList.remove('show'); setTimeout(()=>m.remove(),300); };
+    m.querySelector('#mh-terms-x').onclick = close;
+    m.querySelector('#mh-terms-accept').onclick = close;
+    m.onclick = e=>{ if(e.target===m) close(); };
   }
 
   const mo = new MutationObserver(function(){

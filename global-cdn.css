@@ -2576,11 +2576,15 @@ html body #WelcomePage form#Phone button.v-btn--block:not(.login-btn){
   border-radius:16px !important;box-shadow:none !important;height:48px !important;}
 html body #WelcomePage form#Phone button.v-btn--block:not(.login-btn) .v-btn__content{
   color:#888 !important;font-weight:600 !important;}
-html body #WelcomePage form#Phone #mh-terms-row{
+html body #WelcomePage form#Phone #mh-terms-row,
+html body .v-navigation-drawer #Phone #mh-terms-row{   /* 14.11: + חלונית הכניסה במחשב (מגירה צדדית) — עד היום המשפט שם לא היה מעוצב */
   display:block !important;width:100% !important;text-align:center !important;
   margin:16px 0 2px !important;direction:rtl !important;font-family:'Heebo',sans-serif !important;
   font-size:12px !important;color:#4a5568 !important;line-height:1.6 !important;font-weight:500 !important;}
-html body #WelcomePage form#Phone #mh-terms-link{
+html body #WelcomePage form#Phone #mh-terms-link,
+html body #WelcomePage form#Phone #mh-privacy-link,
+html body .v-navigation-drawer #Phone #mh-terms-link,
+html body .v-navigation-drawer #Phone #mh-privacy-link{
   color:#e31e24 !important;font-weight:800 !important;text-decoration:underline !important;
   cursor:pointer !important;white-space:nowrap !important;}
 #mh-terms-modal{position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;
@@ -2661,7 +2665,8 @@ html body .v-bottom-sheet__content:has(#Phone) #Phone #mh-terms-row{
   display:block !important;width:100% !important;text-align:center !important;
   margin:16px 0 2px !important;direction:rtl !important;font-family:'Heebo',sans-serif !important;
   font-size:12px !important;color:#4a5568 !important;line-height:1.6 !important;font-weight:500 !important;}
-html body .v-bottom-sheet__content:has(#Phone) #Phone #mh-terms-link{
+html body .v-bottom-sheet__content:has(#Phone) #Phone #mh-terms-link,
+html body .v-bottom-sheet__content:has(#Phone) #Phone #mh-privacy-link{
   color:#e31e24 !important;font-weight:800 !important;text-decoration:underline !important;
   cursor:pointer !important;white-space:nowrap !important;}
 /* 23.10 (ליטוש p2): (1) משטח אחד — הכרטיס הפנימי קיבל מהקליפה הכללית (8z) פינות 32 וצל משלו בתוך החלונית (פינות 28):
