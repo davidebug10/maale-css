@@ -5251,10 +5251,11 @@ log('פעיל');
 })();
 
 /* ============================================================
-   חלונית "עוד אחד עם אותן תוספות?" — MH Repeat  |  v1.0.0 | 2026-09-24
+   חלונית "עוד אחד עם אותן תוספות?" — MH Repeat  |  v1.0.1 | 2026-11-15 (v1.0.0: 24.9)
    הרכיב cart-item-addon-confirm של Hyperzod (#AddonsConfirmation) נפתח כשלוחצים + על מוצר עם תוספות
    שכבר בעגלה. חבילת השפה תרגמה "Repeat" ל"חזור" ו-"I'll choose" ל"בחירה" — הלקוח לא מבין מה קורה.
    הבלוק מחליף את הטקסטים (רק בתוך #AddonsConfirmation) ומוריד את הפסיק שאחרי כל תוספת
+   (v1.0.1, דוד 15.11: "בחירה" → "תוספות אחרות" במקום "לבחור מחדש")
    (Hyperzod מרנדרים "שם, " לכל אופציה — העיצוב בחלק 49 הופך כל אחת לגלולה).
    נכשל-פתוח. בדיקה: window.MH_REPEAT.stats()
    ============================================================ */
@@ -5262,11 +5263,11 @@ log('פעיל');
   'use strict';
   if (window.__MH_REPEAT__) { return; }
   window.__MH_REPEAT__ = true;
-  var VERSION = '1.0.0', ROOT = '#AddonsConfirmation';
+  var VERSION = '1.0.1', ROOT = '#AddonsConfirmation';
   var TEXT = [
     { sel: '.v-card-text > .text-subtitle-2', from: ['הבחירות הקודמות שלך', 'Your previous choices'], to: 'להוסיף עוד אחד עם אותן תוספות?' },
     { sel: '.repeat-ntn .v-btn__content', from: ['חזור', 'Repeat'], to: 'כן, אותו דבר' },
-    { sel: '.chose-btn .v-btn__content', from: ['בחירה', "I'll choose", 'Choose'], to: 'לבחור מחדש' },
+    { sel: '.chose-btn .v-btn__content', from: ['בחירה', "I'll choose", 'Choose'], to: 'תוספות אחרות' },
     { sel: '.product-addons > p', from: ['No customizations added'], to: 'בלי תוספות' }
   ];
   var stats = { version: VERSION, applied: 0, trimmed: 0, seen: 0 };
