@@ -7207,7 +7207,7 @@ html body #MultiVendorBottomNav .v-btn.footer-btn.floating-tab-active:hover { ba
 /* mh-navglass-v1 */
 
 /* =========================================================
-   חלק 53: אזהרת כתובת משלוח בצ'ק-אאוט — MH AddrWarn v1.1.0 | 2026-10-01
+   חלק 53: אזהרת כתובת משלוח בצ'ק-אאוט — MH AddrWarn v2.0.0 | 2026-11-15 (v1.1.0: 1.10; v2.0.0 בסוף החלק: ד + ה)
    הכרטיס #mh-addrwarn נוצר ע"י JS "MH AddrWarn" מעל רכיב הכתובת (.address-card) — בפוטר הצף במובייל
    (.place-order) ובעמוד בדסקטופ. שלושה מצבים: --none (אין כתובת), --set (כתובת נבחרה), --default
    (הכתובת = נקודת ברירת המחדל של החנות, "הנחלים 61") = אדום מלא. בעלים יחיד; לא נוגע בשום רכיב אחר.
@@ -7300,6 +7300,106 @@ html body #mh-addrwarn.mh-aw--default strong.mh-aw-line { font-weight: 900 !impo
 html body #mh-addrwarn.mh-aw--default .mh-aw-body { gap: 0 !important; }
 /* הפוטר הצף לא שומר מקום לגובה שלו — מוסיפים לדף בדיוק את גובה הכרטיס */
 html.mh-aw-on body #checkout { padding-bottom: var(--mh-aw-pad, 0px) !important; }
+/* v2.0.0 (דוד 15.11) ד. טופס "הוסף כתובת" כשהסיכה לא זזה והיא על נקודת ברירת המחדל (html.mh-aw-pick, ה-JS):
+   במקום "הנחלים 61 / מעלה אדומים" — הנחיה (הטקסט של Hyperzod מוסתר ב-font-size:0, שלנו ב-::after); שורת החיפוש
+   מודגשת (במחשב, שם אין שורה: "שינוי" #addAddressBtn); "שמור כתובת" מעומעם (הלחיצה עליו נחסמת ב-JS) */
+html.mh-aw-pick body #locationConfirm h2 span.tw-truncate,
+html.mh-aw-pick body #locationConfirm .tw-flex-grow > p.line-clamp-2 {
+    font-size: 0 !important;
+}
+html.mh-aw-pick body #locationConfirm h2 span.tw-truncate::after {
+    content: "חפשו את הרחוב ומספר הבית";
+    font-size: 18px;
+}
+html.mh-aw-pick body #locationConfirm .tw-flex-grow > p.line-clamp-2::after {
+    content: "בשורת החיפוש למעלה, או הזיזו את הסיכה";
+    font-size: 14px;
+    line-height: 1.4;   /* ה-p יורש line-height של 140% מ-font-size 0 = 0px — בלי זה השורה נחתכת ב-line-clamp */
+}
+html.mh-aw-pick body .scheme-address-editor__header .v-field {
+    outline: 2px solid #e31e24 !important;
+    outline-offset: -1px !important;
+    border-radius: 999px !important;
+}
+html.mh-aw-pick body .v-navigation-drawer #locationConfirm .tw-flex-grow > p.line-clamp-2::after {
+    content: "לחצו על „שינוי” כדי לחפש, או הזיזו את הסיכה";
+}
+html.mh-aw-pick body #locationConfirm #addAddressBtn {
+    color: #e31e24 !important;
+    font-weight: 800 !important;
+    text-decoration: underline !important;
+}
+html.mh-aw-pick body .scheme-address-editor__submit,
+html.mh-aw-pick body .scheme-address-editor__footer .v-btn {
+    opacity: 0.45 !important;
+}
+/* ה. חלון "המשלוח יגיע ל:" (#mh-aw-sheet, ה-JS) לפני הזמנה לכתובת על הנקודה — מובייל: גיליון תחתון; מחשב: כרטיס
+   במרכז. "לא, להחליף כתובת" = הפעולה הבולטת (אדום), "כן, לשלוח לכאן" משני */
+html body #mh-aw-sheet {
+    position: fixed !important;
+    inset: 0 !important;
+    z-index: 100000 !important;
+    display: flex !important;
+    align-items: flex-end !important;
+    justify-content: center !important;
+    background: rgba(17, 17, 17, 0.38) !important;
+    -webkit-backdrop-filter: blur(6px) !important;
+    backdrop-filter: blur(6px) !important;
+    direction: rtl !important;
+    font-family: inherit !important;
+}
+html body #mh-aw-sheet .mh-aw-card {
+    width: 100% !important;
+    max-width: 480px !important;
+    box-sizing: border-box !important;
+    padding: 22px 20px calc(20px + env(safe-area-inset-bottom, 0px)) !important;
+    background: rgba(255, 255, 255, 0.97) !important;
+    border-radius: 22px 22px 0 0 !important;
+    box-shadow: 0 -12px 40px -12px rgba(0, 0, 0, 0.35) !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 12px !important;
+    text-align: right !important;
+    animation: mhAwUp 0.22s ease-out;
+}
+@media (min-width: 900px) {
+    html body #mh-aw-sheet { align-items: center !important; }
+    html body #mh-aw-sheet .mh-aw-card { max-width: 420px !important; border-radius: 18px !important; padding-bottom: 20px !important; }
+}
+html body #mh-aw-sheet .mh-aw-sh-t { font-size: 17px !important; font-weight: 800 !important; color: #1a1a1a !important; }
+html body #mh-aw-sheet .mh-aw-sh-addr {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 3px !important;
+    padding: 12px 14px !important;
+    border-radius: 14px !important;
+    background: #fff4f4 !important;
+    border: 1.5px solid rgba(227, 30, 36, 0.38) !important;
+}
+html body #mh-aw-sheet .mh-aw-sh-addr strong { font-size: 16px !important; font-weight: 800 !important; color: #c8151b !important; }
+html body #mh-aw-sheet .mh-aw-sh-addr span { font-size: 13.5px !important; font-weight: 600 !important; color: #4a1416 !important; }
+html body #mh-aw-sheet .mh-aw-sh-q { font-size: 16px !important; font-weight: 700 !important; color: #1a1a1a !important; margin-top: 2px !important; }
+html body #mh-aw-sheet button {
+    height: 50px !important;
+    border-radius: 999px !important;
+    font-family: inherit !important;
+    font-size: 16px !important;
+    font-weight: 800 !important;
+    cursor: pointer !important;
+    -webkit-tap-highlight-color: transparent !important;
+}
+html body #mh-aw-sheet .mh-aw-sh-no {
+    border: 0 !important;
+    background: linear-gradient(135deg, #ff3b41 0%, #c8151b 100%) !important;
+    color: #fff !important;
+    box-shadow: 0 10px 22px -10px rgba(200, 21, 27, 0.7) !important;
+}
+html body #mh-aw-sheet .mh-aw-sh-yes {
+    border: 1.5px solid rgba(0, 0, 0, 0.14) !important;
+    background: #fff !important;
+    color: #1a1a1a !important;
+}
+@keyframes mhAwUp { from { transform: translateY(24px); opacity: 0; } to { transform: none; opacity: 1; } }
 /* mh-addrwarn-v1 */
 
 /* חלק 54 (הירו דף הבית הישן, #mh-home-hero, 4.10) — הוסר 9.10.2026 אחרי שדוד הדביק את home-film.html; הוחלף ע"י "חלק 58: MH HomeFilm". ההיסטוריה ב-git. */

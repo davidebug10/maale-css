@@ -5625,7 +5625,7 @@ log('פעיל');
 })();
 
 /* ============================================================
-   אזהרת כתובת משלוח בצ'ק-אאוט — MH AddrWarn  |  v1.1.0 | 2026-10-01 (v1.0.0 באותו יום)
+   כתובת המשלוח: אזהרה בצ'ק-אאוט + טופס "הוסף כתובת" + אישור לפני הזמנה — MH AddrWarn  |  v2.0.0 | 2026-11-15 (v1.1.0, v1.0.0: 1.10)
    הבעיה (דוד, 1.10): לכל מבקר חדש המיקום הוא נקודת ברירת המחדל של החנות (getDefaultLocation →
    "הנחלים 61, מעלה אדומים"), ומסך "הוספת כתובת" נפתח על הנקודה הזאת — לקוחות שומרים אותה ומזמינים
    לכתובת הלא נכונה. בנוסף Hyperzod בוחרת לבד את הכתובת השמורה הקרובה למיקום הנוכחי.
@@ -5636,24 +5636,37 @@ log('פעיל');
      v1.1.0 (דוד, 1.10): ב-v1.0.0 הכרטיס הגביה את הפוטר הצף והסתיר את אמצעי התשלום (אשראי). עכשיו מצבים
      ב/ג מינימליים, וכשהכרטיס בתוך פוטר fixed — לדף נוסף ריפוד תחתון בגובה הכרטיס (html.mh-aw-on +
      --mh-aw-pad על #checkout), כך ששום דבר לא נשאר מתחת לפוטר.
-   לחיצה על הכרטיס = לחיצה על רכיב הכתובת של Hyperzod (פותח את רשימת הכתובות). טקסט בלבד: לא משנה מה
-   נבחר, לא חוסם הזמנה, לא נוגע במחיר. רק למחובר + סוג הזמנה שדורש כתובת. העיצוב בחלק 53.
-   נכשל-פתוח. בדיקה: window.MH_ADDRWARN.stats()
+   לחיצה על הכרטיס = לחיצה על רכיב הכתובת של Hyperzod (פותח את רשימת הכתובות). רק למחובר + סוג הזמנה שדורש כתובת.
+   v2.0.0 (דוד 15.11 — "זה קורה מלא פעמים"; אישר "ד מאשר" / "ה מאשר"; לקוחה כתבה "הבדולח 2" בשדה מספר הדירה):
+     ד. טופס "הוסף כתובת חדשה" (#locationConfirm + .scheme-address-editor__submit, פאנל address/editAddress): Hyperzod
+        ממלאת אותו מהמיקום הנוכחי (confirm_location → created: getMapLocation בלי address/get_current →
+        getSelectedLocation). כשהסיכה לא זזה והיא על הנקודה (≤60 מ'): html.mh-aw-pick — במקום הכתובת "חפשו את הרחוב
+        ומספר הבית" (CSS, חלק 53), שורת החיפוש מודגשת, "שמור כתובת" מעומעם ולחיצה עליו לא שומרת (טוסט + פוקוס לחיפוש).
+        בחירה מהחיפוש (setMapLocation עם address) / הזזת הסיכה / "אתר אותי" (get_current) → רגיל. גם בעריכת כתובת
+        ששמורה על הנקודה.
+     ה. "בצע הזמנה" (.place-order .v-btn / #OrderPlaceButton) כשכתובת המשלוח ≤60 מ' מהנקודה ולא אושרה במכשיר הזה:
+        חלון #mh-aw-sheet "המשלוח יגיע ל: … זו הכתובת הנכונה?" — "כן, לשלוח לכאן" (נזכר ב-localStorage 'mh-aw-ok'
+        לפי מזהה הכתובת + הנקודה, והלחיצה ממשיכה) / "לא, להחליף כתובת" (בחירת הכתובת של Hyperzod).
+        שכבת ביטחון (כמו MH KafitAddr): POST /store/v1/order שה-delivery_address_id שלו כזה ולא אושר — נחסם לפני
+        שהוא יוצא, והחלון נפתח.
+   לא משנה מה נבחר ולא נוגע במחיר. נכשל-פתוח. בדיקה: window.MH_ADDRWARN.stats()
    ============================================================ */
 (function () {
   'use strict';
   if (window.__MH_ADDRWARN__) { return; }
   window.__MH_ADDRWARN__ = true;
-  var VERSION = '1.1.0', ID = 'mh-addrwarn', RADIUS = 60;
-  var stats = { version: VERSION, syncs: 0, renders: 0, state: 'none', pad: 0, errors: 0 };
+  var VERSION = '2.0.0', ID = 'mh-addrwarn', RADIUS = 60, OKKEY = 'mh-aw-ok', PICK = 'mh-aw-pick';
+  var IS_ORDER = /\/store\/v1\/order(\?|$)/, BTN = '.place-order .v-btn, #OrderPlaceButton';
+  var SAVE = '.scheme-address-editor__submit, .scheme-address-editor__footer .v-btn';   /* "שמור כתובת": נייד (גיליון) / מחשב (מגירה) */
+  var stats = { version: VERSION, syncs: 0, renders: 0, state: 'none', pad: 0, pick: false, picks: 0, saveBlocked: 0, asked: 0, confirmed: 0, changed: 0, netBlocked: 0, errors: 0 };
   var lastKey = '';
   function store() { try { return document.getElementById('app').__vue_app__.config.globalProperties.$store; } catch (e) { return null; } }
   function num(v) { v = parseFloat(v); return isFinite(v) ? v : null; }
-  /* [lat, lng] מכל צורה שהכתובת מגיעה בה */
+  /* [lat, lng] מכל צורה שהכתובת מגיעה בה (v2.0.0: + location_lat_lon — השדה של כתובת שמורה) */
   function coords(a) {
     if (!a || typeof a !== 'object') { return null; }
-    var l = a.location, c = l && l.coordinates;
-    var cand = [[a.latitude, a.longitude], [a.lat, a.lng], l && [l.latitude, l.longitude], l && [l.lat, l.lng], c && c.length === 2 && [c[1], c[0]]];
+    var l = a.location, c = l && l.coordinates, ll = a.location_lat_lon;
+    var cand = [ll && ll.length === 2 && [ll[0], ll[1]], [a.latitude, a.longitude], [a.lat, a.lng], l && [l.latitude, l.longitude], l && [l.lat, l.lng], c && c.length === 2 && [c[1], c[0]]];
     for (var i = 0; i < cand.length; i++) {
       if (!cand[i]) { continue; }
       var la = num(cand[i][0]), ln = num(cand[i][1]);
@@ -5666,6 +5679,8 @@ log('פעיל');
     var h = Math.sin(dLa / 2) * Math.sin(dLa / 2) + Math.cos(p[0] * r) * Math.cos(q[0] * r) * Math.sin(dLn / 2) * Math.sin(dLn / 2);
     return 2 * R * Math.asin(Math.min(1, Math.sqrt(h)));
   }
+  function defPt(def) { var dl = def && def.enabled !== false && def.default_location; return dl ? [num(dl.lat), num(dl.lng)] : null; }
+  function atDefault(S, p) { var d = null; try { d = defPt(S.getters.getDefaultLocation); } catch (e) {} return !!(d && p && d[0] !== null && d[1] !== null && meters(p, d) <= RADIUS); }
   /* רכיב הכתובת של Hyperzod: העוטף .address-card (לא ה-v-card הפנימי #AddressCard) */
   function anchor() {
     var els = document.querySelectorAll('.address-card');
@@ -5676,6 +5691,14 @@ log('פעיל');
     }
     return null;
   }
+  /* פותח את בחירת הכתובת של Hyperzod (כרטיס האזהרה, "לא, להחליף כתובת") */
+  function openPicker() {
+    try {
+      var r = anchor(), t = r && (r.querySelector('.add-address-btn') || r.querySelector('#AddressCard .address'));
+      if (!t) { var c = document.getElementById('AddressCard'); t = c && c.getClientRects().length ? (c.querySelector('.address') || c) : null; }
+      if (t) { t.click(); }
+    } catch (e) { stats.errors++; }
+  }
   function addressRequired(S) {
     try {
       var t = S.getters.getOrderType, list = S.getters.getBootSettings.order_types_tenant || [];
@@ -5685,6 +5708,7 @@ log('פעיל');
     return false;
   }
   function el(tag, cls, txt) { var e = document.createElement(tag); if (cls) { e.className = cls; } if (txt) { e.textContent = txt; } return e; }
+  function toast(msg) { try { var S = store(); if (S) { S.commit('setToast', { message: msg, color: 'red', show: true }); } } catch (e) {} }
   /* הכרטיס בתוך פוטר fixed (מובייל) מגביה אותו — מוסיפים לדף ריפוד תחתון בדיוק בגובה הכרטיס */
   function pad(w) {
     var root = document.documentElement, fixed = false, p = w && w.parentElement;
@@ -5695,12 +5719,7 @@ log('פעיל');
   function remove() { var w = document.getElementById(ID); if (w) { w.remove(); } pad(null); lastKey = ''; stats.state = 'none'; }
   function render(state, addr, a) {
     var w = document.getElementById(ID);
-    if (!w) {
-      w = el('div'); w.id = ID; w.setAttribute('role', 'alert');
-      w.addEventListener('click', function () {   /* פותח את בחירת הכתובת של Hyperzod */
-        try { var r = anchor(); var t = r && (r.querySelector('.add-address-btn') || r.querySelector('#AddressCard .address')); if (t) { t.click(); } } catch (e) {}
-      });
-    }
+    if (!w) { w = el('div'); w.id = ID; w.setAttribute('role', 'alert'); w.addEventListener('click', openPicker); }
     w.className = 'mh-aw mh-aw--' + state;
     w.textContent = '';
     w.appendChild(el('span', 'mh-aw-ico', '!')).setAttribute('aria-hidden', 'true');
@@ -5721,6 +5740,7 @@ log('פעיל');
   function sync() {
     try {
       stats.syncs++;
+      formGuard();
       if (!/\/checkout/.test(location.pathname)) { if (lastKey) { remove(); } return; }
       var S = store(), a = anchor();
       var F = window.MH_ADDRWARN_FAKE || null;   /* בדיקות בלבד (מוק בכרום ללא ראש); באתר לא קיים */
@@ -5731,8 +5751,8 @@ log('פעיל');
       if (d) {
         addr = String(d.address || '').trim() || 'הכתובת שנבחרה';
         state = 'set';
-        var def = G.def, dl = def && def.enabled !== false && def.default_location, p = coords(d);
-        if (dl && p && meters(p, [num(dl.lat), num(dl.lng)]) <= RADIUS) { state = 'default'; }
+        var dl = defPt(G.def), p = coords(d);
+        if (dl && p && meters(p, dl) <= RADIUS) { state = 'default'; }
       }
       var key = state + '|' + addr;
       var w = document.getElementById(ID);
@@ -5740,16 +5760,134 @@ log('פעיל');
       lastKey = key; render(state, addr, a);
     } catch (e) { stats.errors++; }
   }
+
+  /* גלוי = על המסך (מגירות סגורות של Hyperzod יושבות מחוץ למסך עם getClientRects) */
+  function visible(sel) { var l = document.querySelectorAll(sel); for (var i = 0; i < l.length; i++) { var r = l[i].getBoundingClientRect(); if (r.width && r.height && r.right > 0 && r.left < innerWidth && r.bottom > 0 && r.top < innerHeight) { return l[i]; } } return null; }
+  /* ד. טופס "הוסף כתובת": סיכה שלא זזה על נקודת ברירת המחדל → html.mh-aw-pick */
+  function formGuard() {
+    var on = false;
+    try {
+      var S = store(), f = document.getElementById('locationConfirm'), save = visible(SAVE), sp = S && S.getters.sidePanel;
+      if (S && f && save && visible('#locationConfirm') && sp && (sp.address || sp.editAddress)) {
+        var m = S.getters.getMapLocation;
+        on = !!(m && !m.address && !m.get_current && atDefault(S, [num(m.lat), num(m.lng)]));
+      }
+    } catch (e) { stats.errors++; }
+    var h = document.documentElement;
+    if (h.classList.contains(PICK) !== on) { h.classList.toggle(PICK, on); if (on) { stats.picks++; } }
+    stats.pick = on;
+    return on;
+  }
+  document.addEventListener('click', function (e) {
+    try {
+      var t = e.target;
+      if (!t || !t.closest || !document.documentElement.classList.contains(PICK) || !t.closest(SAVE) || !formGuard()) { return; }
+      e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation();
+      stats.saveBlocked++;
+      toast('חפשו קודם את הרחוב ומספר הבית שלכם');
+      /* נייד: שורת החיפוש בראש הגיליון → פוקוס (מקלדת). מחשב: אין שורה — "שינוי" (#addAddressBtn) פותח את החיפוש */
+      var q = visible('.scheme-address-editor__header #search'), ch = q ? null : visible('#locationConfirm #addAddressBtn');
+      if (q) { try { q.focus(); } catch (er) {} } else if (ch) { ch.click(); }
+    } catch (er) { stats.errors++; }
+  }, true);
+
+  /* ה. אישור לפני הזמנה לכתובת על הנקודה — פעם אחת לכל כתובת במכשיר */
+  function okList() { try { var l = JSON.parse(localStorage.getItem(OKKEY) || '[]'); return Array.isArray(l) ? l : []; } catch (e) { return []; } }
+  function okKey(a) { var p = coords(a); return p ? String(a._id || a.id || '') + '@' + p[0].toFixed(5) + ',' + p[1].toFixed(5) : null; }
+  function okRemember(a) {
+    var k = okKey(a), l = okList(); if (!k || l.indexOf(k) !== -1) { return; }
+    l.push(k); try { localStorage.setItem(OKKEY, JSON.stringify(l.slice(-20))); } catch (e) {}
+  }
+  function needsAsk(S, a) { return !!(S && a && addressRequired(S) && atDefault(S, coords(a)) && okList().indexOf(okKey(a)) === -1); }
+  function closeSheet() { var s = document.getElementById('mh-aw-sheet'); if (s) { s.remove(); } }
+  function ask(a, onYes) {
+    closeSheet(); stats.asked++;
+    var parts = [a.address, a.building, a.landmark].map(function (x) { return String(x || '').trim(); }).filter(Boolean);
+    var s = el('div', 'mh-aw-sheet'); s.id = 'mh-aw-sheet';
+    s.setAttribute('role', 'dialog'); s.setAttribute('aria-modal', 'true'); s.setAttribute('aria-labelledby', 'mh-aw-sheet-t');
+    var c = s.appendChild(el('div', 'mh-aw-card'));
+    c.appendChild(el('div', 'mh-aw-sh-t', 'המשלוח יגיע ל:')).id = 'mh-aw-sheet-t';
+    var box = c.appendChild(el('div', 'mh-aw-sh-addr'));
+    box.appendChild(el('strong', null, parts[0] || 'הכתובת שנבחרה'));
+    if (parts.length > 1) { box.appendChild(el('span', null, parts.slice(1).join(' · '))); }
+    c.appendChild(el('div', 'mh-aw-sh-q', 'זו הכתובת הנכונה?'));
+    /* הבטוח בולט (רוב מי שמגיע לכאן לא גר בנקודה): "להחליף" אדום ראשון ומקבל פוקוס, "כן" משני */
+    var no = c.appendChild(el('button', 'mh-aw-sh-no', 'לא, להחליף כתובת')), yes = c.appendChild(el('button', 'mh-aw-sh-yes', 'כן, לשלוח לכאן'));
+    yes.type = 'button'; no.type = 'button';
+    yes.addEventListener('click', function (e) { e.stopPropagation(); okRemember(a); stats.confirmed++; closeSheet(); if (onYes) { setTimeout(onYes, 60); } });
+    no.addEventListener('click', function (e) { e.stopPropagation(); stats.changed++; closeSheet(); setTimeout(openPicker, 60); });
+    s.addEventListener('click', function (e) { if (e.target === s) { closeSheet(); } });
+    s.addEventListener('keydown', function (e) { if (e.key === 'Escape') { closeSheet(); } });
+    document.body.appendChild(s);
+    try { no.focus({ preventScroll: true }); } catch (e) {}
+  }
+  var passing = false;   /* הלחיצה החוזרת שלנו אחרי "כן" */
+  document.addEventListener('click', function (e) {
+    try {
+      var t = e.target, b = !passing && t && t.closest && t.closest(BTN);
+      if (!b || !/\/checkout/.test(location.pathname) || b.closest('.address-card') || b.classList.contains('add-address-btn')) { return; }   /* רק כפתור ההזמנה — לא רכיב הכתובת */
+      var S = store(), a = S && S.getters.isLoggedIn ? S.getters.getDeliveryAddress : null;
+      if (!needsAsk(S, a)) { return; }
+      e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation();
+      ask(a, function () { passing = true; try { b.click(); } finally { passing = false; } });
+    } catch (er) { stats.errors++; }
+  }, true);
+  /* שכבת ביטחון: הבקשה עצמה. true = מותר לשלוח */
+  function guard(body) {
+    if (typeof body !== 'string') { return true; }
+    var o; try { o = JSON.parse(body); } catch (e) { return true; }
+    var id = o && o.delivery_address_id, S = id && store();
+    if (!S) { return true; }
+    var list = [], a = null; try { list = S.getters.getAddresses || []; } catch (e) {}
+    for (var i = 0; i < list.length && !a; i++) { if (list[i] && (list[i]._id === id || list[i].id === id)) { a = list[i]; } }
+    if (!a) { var d = S.getters.getDeliveryAddress; if (d && (d._id === id || d.id === id)) { a = d; } }
+    if (!a || !needsAsk(S, a)) { return true; }
+    stats.netBlocked++;
+    console.warn('[MH AddrWarn] 🛑 הזמנה לכתובת ברירת המחדל בלי אישור נחסמה');
+    setTimeout(function () { try { ask(a, function () { var b = document.querySelector(BTN); if (b) { b.click(); } }); } catch (e) {} }, 150);
+    return false;
+  }
+  try {
+    var XP = XMLHttpRequest.prototype, _o = XP.open, _s = XP.send;
+    XP.open = function (m, url) {
+      try { this.__mhAwOrder = String(m).toUpperCase() === 'POST' && IS_ORDER.test(String(url || '')); } catch (e) {}
+      return _o.apply(this, arguments);
+    };
+    XP.send = function (b) {
+      if (this.__mhAwOrder) {
+        var ok = true;
+        try { ok = guard(b); } catch (e) { stats.errors++; ok = true; }
+        if (!ok) { throw new Error('MH AddrWarn: כתובת ברירת המחדל — ממתין לאישור'); }
+      }
+      return _s.apply(this, arguments);
+    };
+  } catch (e) { stats.errors++; }
+  try {
+    var _f = window.fetch;
+    if (typeof _f === 'function') {
+      window.fetch = function (input, init) {
+        try {
+          var u = typeof input === 'string' ? input : ((input && input.url) || '');
+          var M = String((init && init.method) || (input && input.method) || 'GET').toUpperCase();
+          if (M === 'POST' && IS_ORDER.test(u) && init && typeof init.body === 'string' && !guard(init.body)) {
+            return Promise.reject(new Error('MH AddrWarn: כתובת ברירת המחדל — ממתין לאישור'));
+          }
+        } catch (e) { stats.errors++; }
+        return _f.apply(this, arguments);
+      };
+    }
+  } catch (e) { stats.errors++; }
+
   var pending = null;
   function schedule() { if (pending) { return; } pending = setTimeout(function () { pending = null; sync(); }, 150); }
   try {
     new MutationObserver(function (recs) {
-      for (var i = 0; i < recs.length; i++) { var t = recs[i].target; if (t && t.id !== ID && !(t.closest && t.closest('#' + ID))) { schedule(); return; } }
+      for (var i = 0; i < recs.length; i++) { var t = recs[i].target; if (t && t.id !== ID && !(t.closest && t.closest('#' + ID + ', #mh-aw-sheet'))) { schedule(); return; } }
     }).observe(document.body || document.documentElement, { childList: true, subtree: true });
-    var hook = setInterval(function () {   /* מנוי ל-Vuex כשהוא מוכן: שינוי כתובת/סוג הזמנה/התחברות */
+    var hook = setInterval(function () {   /* מנוי ל-Vuex כשהוא מוכן: שינוי כתובת/סוג הזמנה/התחברות/סיכה/פאנל */
       var S = store(); if (!S || typeof S.subscribe !== 'function') { return; }
       clearInterval(hook);
-      S.subscribe(function (m) { if (/address|ordertype|login|logged|location/i.test(m.type || '')) { schedule(); } });
+      S.subscribe(function (m) { if (/address|ordertype|login|logged|location|sidepanel/i.test(m.type || '')) { schedule(); } });
     }, 500);
     setTimeout(function () { clearInterval(hook); }, 30000);
   } catch (e) { stats.errors++; }
