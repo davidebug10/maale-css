@@ -2265,6 +2265,27 @@ html body #MultiVendorHeader .text-nav_icon_color.tw-text-\[11px\] {
     font-size: 11.5px !important;
     margin-top: 1px !important;
 }
+/* B-44 (15.11, MH Loc): הטקסט הנכון מגיע ב-data-mh-loc — "בחרו כתובת למשלוח" (בלי שורה שנייה), או רחוב ומספר למעלה
+   ועיר מתחת. הטקסט של Hyperzod (splitAddress מוחק את המילה הראשונה) מוסתר ב-font-size:0, ושלנו ב-::after באותו גודל.
+   בלי data-mh-loc (כתובת שמורה שהמיקום עליה בדיוק: "בית" + הכתובת) — של Hyperzod כמו שהוא */
+html body #CurrentLocationBtn span.text[data-mh-loc],
+html body #CurrentLocationBtn > div.tw-whitespace-nowrap[data-mh-loc] {
+    font-size: 0 !important;
+}
+html body #CurrentLocationBtn span.text[data-mh-loc]::after {
+    content: attr(data-mh-loc);
+    font-size: 16px;
+}
+html body #CurrentLocationBtn > div.tw-whitespace-nowrap[data-mh-loc]::after {
+    content: attr(data-mh-loc);
+    font-size: 11.5px;
+}
+html body #CurrentLocationBtn > div.tw-text-\[12px\][data-mh-loc]::after {
+    font-size: 12px;
+}
+html body #CurrentLocationBtn > div.tw-whitespace-nowrap[data-mh-loc=""] {
+    display: none !important;
+}
 
 /* === 6. אייקונים === "גרדיאנט אדום->ורוד" (fill: url(#mh-grad-red-pink) על svg:first-child path) — הוסר 23.10: מעולם לא נראה —
    חלק 36 (אותו סלקטור, !important, מאוחר יותר) צובע את אותו path ב-#e31e24. יחד איתו הוסר ה-JS שהזריק את ה-<defs>. */

@@ -14,6 +14,111 @@
 if (!window.__MH_FOOTER__) { window.__MH_FOOTER__ = true;
 
 /* ============================================================
+   הכתובת של הלקוח בראש האתר + שחזור בכל כניסה — MH Loc  |  v1.0.0 | 2026-11-15
+   הבעיה (B-44, דוד 15.11): ההגדרה Default Client User Location (דלוקה — בשביל רשימת עסקים מלאה ו-SEO) דורסת בכל
+   סשן חדש את המיקום של כל מבקר ל"הנחלים 61". לכן הצ'ק-אאוט כמעט אף פעם לא בוחר לבד את הכתובת השמורה (Hyperzod
+   בוחרת כתובת שמורה עד 100 מ' מהמיקום), וכפתור הכתובת נראה כאילו זו הכתובת של הלקוח. ובנוסף splitAddress של
+   Hyperzod מוחק את המילה הראשונה של כל כתובת בעברית ("הנחלים 61, מעלה אדומים" → "61 מעלה / אדומים").
+   מה עושה (אושר: דוד 15.11 — א: "בחרו כתובת למשלוח", ב: לקוח חדש נשאר על ברירת המחדל, ג: סדר הכתובת):
+     1. זוכר במכשיר (localStorage 'mh-loc', גם לאורח) את המיקום האחרון שהלקוח בחר — בחירה בראש האתר / "אתר אותי"
+        (setLocation שאינו נקודת ברירת המחדל) או כתובת משלוח שנבחרה בצ'ק-אאוט (setDeliveryAddress). האחרון קובע.
+     2. סשן חדש: אם localStorage.location הוא כבר המיקום שזכרנו — מסמנים appInitialized לפני ש-Hyperzod בודקת
+        (הקובץ הזה רץ אחרי הבאנדל ולפני הבדיקה, שמגיעה רק אחרי בקשת ה-boot: נמדד 4/4 בכרום, 3/3 ב-WebKit), ואז היא
+        לא דורסת. אחרת — כשהמיקום נחת על נקודת ברירת המחדל: reverseGeocode לנקודה שזכרנו, אותו מסלול כמו בחירה
+        בראש האתר (מיקום, localStorage, רשימת העסקים). עד 2 ניסיונות לטעינה (מירוץ עם הדריסה של Hyperzod).
+     3. כפתור הכתובת (#CurrentLocationBtn): על נקודת ברירת המחדל או בלי מיקום → "בחרו כתובת למשלוח" (בלי שורה שנייה);
+        אחרת רחוב ומספר למעלה ועיר מתחת. כתובת שמורה שהמיקום עליה בדיוק — כמו של Hyperzod ("בית" + הכתובת).
+        הטקסט ב-data-mh-loc + CSS (חלק 2+3 §5, ::after) — לא נוגעים בטקסט ש-Vue מנהלת.
+   לקוח חדש בלי מיקום שמור: כמו היום (נקודת ברירת המחדל, רשימה מלאה), רק הטקסט בכפתור. גוגל (בלי localStorage): אותו דבר.
+   לא נוגע בצ'ק-אאוט, בתשלום או ברשימת העסקים. נכשל-פתוח. בדיקה: window.MH_LOC.stats()
+   ============================================================ */
+(function () {
+  'use strict';
+  if (window.__MH_LOC__) { return; }
+  window.__MH_LOC__ = true;
+  var VERSION = '1.0.0', KEY = 'mh-loc', RADIUS = 60, PICK = 'בחרו כתובת למשלוח';
+  var stats = { version: VERSION, early: false, remembered: 0, restores: 0, restoreResult: null, pill: '', errors: 0 };
+  var started = Date.now(), lastLocCommit = 0, attempts = 0, hooked = false;
+  function num(v) { v = parseFloat(v); return isFinite(v) ? v : null; }
+  function mem() { try { var m = JSON.parse(localStorage.getItem(KEY)); return m && num(m.lat) !== null && num(m.lng) !== null ? m : null; } catch (e) { return null; } }
+  function meters(p, q) {   /* ponytail: עותק של MH AddrWarn — כל בלוק עומד לבד (נכשל-פתוח) */
+    var R = 6371000, r = Math.PI / 180, dLa = (q[0] - p[0]) * r, dLn = (q[1] - p[1]) * r;
+    var h = Math.sin(dLa / 2) * Math.sin(dLa / 2) + Math.cos(p[0] * r) * Math.cos(q[0] * r) * Math.sin(dLn / 2) * Math.sin(dLn / 2);
+    return 2 * R * Math.asin(Math.min(1, Math.sqrt(h)));
+  }
+  function near(p, q) { return !!(p && q && p[0] !== null && p[1] !== null && q[0] !== null && q[1] !== null && meters(p, q) <= RADIUS); }
+  function pt(loc) { return loc && loc.location ? [num(loc.location.latitude), num(loc.location.longitude)] : null; }
+  /* 2. הסימון המוקדם — מיד, לפני כל דבר אחר בקובץ. המיקום ש-Vuex תעלה איתו: העותק השמור ב-'vuex' (Utils.selectedLocation —
+     הוא גובר על localStorage.location בעליית ה-store; נמדד 15.11), ובלעדיו localStorage.location */
+  try {
+    var m0 = mem(), vx = JSON.parse(localStorage.getItem('vuex') || 'null'), cur = vx && vx.Utils && 'selectedLocation' in vx.Utils ? vx.Utils.selectedLocation : JSON.parse(localStorage.getItem('location') || 'null');
+    if (m0 && !sessionStorage.getItem('appInitialized') && near(pt(cur), [num(m0.lat), num(m0.lng)])) {
+      sessionStorage.setItem('appInitialized', 'true'); stats.early = true;
+    }
+  } catch (e) { stats.errors++; }
+  function store() { try { return document.getElementById('app').__vue_app__.config.globalProperties.$store; } catch (e) { return null; } }
+  function defPt(S) {
+    try { var d = S.getters.getDefaultLocation, l = d && d.enabled !== false && d.default_location; return l ? [num(l.lat), num(l.lng)] : null; } catch (e) { return null; }
+  }
+  function remember(S, p, src) {   /* ponytail: מי שגר באמת עד 60 מ' מהנקודה לא נזכר — מקבל ממילא את ברירת המחדל */
+    if (!p || p[0] === null || p[1] === null || near(p, defPt(S)) || !defPt(S)) { return; }
+    try { localStorage.setItem(KEY, JSON.stringify({ lat: p[0], lng: p[1], src: src, t: Date.now() })); stats.remembered++; } catch (e) {}
+  }
+  function restore(S) {
+    var m = mem(), d = defPt(S), p = pt(S.getters.getSelectedLocation);
+    if (!m || !d || attempts >= 2 || (p && !near(p, d))) { return; }
+    attempts++; stats.restores++;
+    var groups = []; try { groups = JSON.parse(localStorage.getItem('selectedGroups')) || []; } catch (e) {}
+    Promise.resolve(S.dispatch('reverseGeocode', { group_ids: groups, coordinates: [num(m.lat), num(m.lng)], locale: (S.getters.getLocale || {}).locale || 'he' }))
+      .then(function (r) { stats.restoreResult = r; if (r !== 1) { try { localStorage.removeItem(KEY); } catch (e) {} } schedule(); })
+      .catch(function () { stats.errors++; });
+  }
+  /* 3. כפתור הכתובת */
+  function setAttr(el, v) { if (!el) { return; } if (v === null) { if (el.hasAttribute('data-mh-loc')) { el.removeAttribute('data-mh-loc'); } } else if (el.getAttribute('data-mh-loc') !== v) { el.setAttribute('data-mh-loc', v); } }
+  function pill() {
+    var btn = document.getElementById('CurrentLocationBtn'), S = btn && store();
+    if (!S) { return; }
+    var sel = S.getters.getSelectedLocation, a = sel && sel.address ? String(sel.address).trim() : '', p = pt(sel), l1 = null, l2 = null;
+    var saved = null;
+    try { if (p && S.getters.isLoggedIn) { saved = (S.getters.getAddresses || []).find(function (x) { return x.location_lat_lon && x.location_lat_lon[0] === sel.location.latitude && x.location_lat_lon[1] === sel.location.longitude; }); } } catch (e) {}
+    if (!a || near(p, defPt(S))) { l1 = PICK; l2 = ''; }
+    else if (!saved) { var i = a.indexOf(','); l1 = i > 0 ? a.slice(0, i).trim() : a; l2 = i > 0 ? a.slice(i + 1).trim() : ''; }
+    setAttr(btn.querySelector('span.text'), l1);
+    setAttr(btn.querySelector(':scope > div.tw-whitespace-nowrap'), l2);
+    stats.pill = l1 === null ? 'hyperzod' : l1 === PICK ? 'pick' : 'street';
+  }
+  var pend = false;
+  function schedule() { if (!pend) { pend = true; requestAnimationFrame(function () { pend = false; try { pill(); } catch (e) { stats.errors++; } }); } }
+  function hook(S) {
+    if (hooked || typeof S.subscribe !== 'function') { return; }
+    hooked = true;
+    S.subscribe(function (mu) {
+      try {
+        if (mu.type === 'setLocation') { lastLocCommit = Date.now(); remember(S, pt(mu.payload), 'header'); schedule(); }
+        else if (mu.type === 'setDeliveryAddress' && mu.payload && mu.payload.location_lat_lon) { remember(S, [num(mu.payload.location_lat_lon[0]), num(mu.payload.location_lat_lon[1])], 'checkout'); }
+        else if (/address|login|logged/i.test(mu.type || '')) { schedule(); }
+      } catch (e) { stats.errors++; }
+    });
+  }
+  try {
+    var tick = setInterval(function () {
+      try {
+        var S = store();
+        if (!S || !S.getters.getBootSettings || !sessionStorage.getItem('appInitialized')) { return; }
+        hook(S); schedule();
+        /* בלי הסימון המוקדם Hyperzod אולי באמצע הדריסה (reverseGeocode → isServiceableArea, ~1–3 שנ') — מחכים שתנחת */
+        if (Date.now() - lastLocCommit > 1500 && (stats.early || Date.now() - started > 2500)) { restore(S); }
+        if (Date.now() - started > 12000) { clearInterval(tick); }
+      } catch (e) { stats.errors++; }
+    }, 400);
+    new MutationObserver(function () { if (document.getElementById('CurrentLocationBtn')) { schedule(); } })
+      .observe(document.documentElement, { childList: true, subtree: true });
+  } catch (e) { stats.errors++; }
+  window.MH_LOC = { version: VERSION, sync: schedule, remembered: mem, stats: function () { return JSON.parse(JSON.stringify(stats)); } };
+  /* mh-loc-v1 */
+})();
+
+/* ============================================================
    Custom Global Scripts - מעלה המשלוחים
    ============================================================ */
 
