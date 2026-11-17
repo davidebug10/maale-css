@@ -3615,20 +3615,24 @@ log('פעיל');
 })();
 
 /* ============================================================
-   אופציות בפופאפ המוצר — MH Options  |  v1.1.0 | 2026-11-05 (v1.0.0: 7.9)
+   אופציות בפופאפ המוצר — MH Options  |  v1.2.0 | 2026-11-17 (v1.0.0: 7.9; v1.1.0: 5.11)
    מסמן mh-opt-on על שורת אופציה (.v-list-item) שהרדיו/צ'קבוקס שלה מסומן. הסיבה: Safari ב-iOS לא
    מרענן :has(input:checked) כש-Vue מחליף את הבחירה — המסגרת האדומה נשארה על אופציה אחת והנקודה
    על אחרת. ה-CSS (חלק 22ט ב-global-cdn.css) נשען על המחלקה הזאת ועל .v-selection-control--dirty.
    v1.1.0 (כרטיסי אופציה עם תמונה, חלק 68): גם בכרטיסים שבשורה הנגללת (.simple-slider, גם בדף המוצר), ו"שם (מרכיבים)"
    בכרטיס → השם בצומת הטקסט של Vue + span.mh-opt-sub למרכיבים. Vue מעדכן את צומת הטקסט רק כשהשם משתנה (מפתח לפי אינדקס —
    כרטיס שמוחזר לאופציה אחרת): אז הטקסט שונה מ-data-mh-name → מוחקים את ה-span ומפצלים מחדש.
+   v1.2.0 (דוד 17.11: "לפעמים מצליחים ללחוץ על שתיים ביחד"): נבחר = רק המחלקה של Vuetify (v-selection-control--dirty),
+   לא input:checked. Hyperzod שמה @click.prevent על העיגול: Vue מסמן את החדשה בזמן הלחיצה, ואחרי שהלחיצה "בוטלה" הדפדפן
+   מחזיר את ה-checked לאפשרות הקודמת — אחרי נגיעה בעיגול הקודמת נשארה אדומה ליד החדשה (בעגלה — רק החדשה), ובצ'קבוקס
+   תוספת שבוטלה נשארה מסומנת. המחלקה של Vuetify = הבחירה של Hyperzod = מה שנכנס לעגלה (כמו ב-MH OptLimit).
    נכשל-פתוח: בלי הבלוק הזה ה-CSS עדיין עובד לפי המחלקה של Vuetify. בדיקה: window.MH_OPTIONS.stats()
    ============================================================ */
 (function () {
   'use strict';
   if (window.__MH_OPTIONS__) { return; }
   window.__MH_OPTIONS__ = true;
-  var VERSION = '1.1.0';
+  var VERSION = '1.2.0';
   var stats = { version: VERSION, syncs: 0, marked: 0, split: 0 };
   function split() {
     var ts = document.querySelectorAll('.scheme-product-options-card .simple-slider .v-list-item-title');
@@ -3651,7 +3655,7 @@ log('פעיל');
     var n = 0;
     for (var i = 0; i < rows.length; i++) {
       var r = rows[i];
-      var on = !!r.querySelector('.v-selection-control--dirty, input:checked');
+      var on = !!r.querySelector('.v-selection-control--dirty');   /* v1.2.0: לא input:checked — ראו למעלה */
       if (r.classList.contains('mh-opt-on') !== on) r.classList.toggle('mh-opt-on', on);
       if (on) n++;
     }
@@ -3671,6 +3675,7 @@ log('פעיל');
   } catch (e) { console.warn('[MH Options] disabled:', e); }
   window.MH_OPTIONS = { version: VERSION, sync: sync, stats: function () { return Object.assign({}, stats); } };
 })();
+/* mh-options-v1 */
 
 /* ============================================================
    מגבלת בחירה בקבוצת תוספות — MH OptLimit  |  v1.1.0 | 2026-10-05 (v1.0.0: 23.9)
