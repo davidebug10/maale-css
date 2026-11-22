@@ -8750,6 +8750,9 @@ html.mh-android-app body #MultiVendorBottomNav .floating-nav-wrapper #ongoingOrd
   html body .scheme-order-details .mh-ot-hero .mh-ot-help .mh-ot-rt > b { font-size: 14px !important; font-weight: 600 !important; color: #111 !important; }
   html body .scheme-order-details .mh-ot-hero .mh-ot-help .mh-ot-rt > b u { text-decoration: none !important; color: #c8151b !important; font-weight: 800 !important; }
   html body .scheme-order-details .mh-ot-hero .mh-ot-chev { flex: 0 0 16px !important; width: 16px !important; height: 16px !important; color: #9ca3af !important; }
+  /* B6b. מזומן (דוד 22.11, MH OrderTrack v1.2.0): "לתשלום לשליח במזומן" + "סה״כ לתשלום" של Hyperzod בקצה — אדום כהה כמו כל מחיר באתר, מספרים טבלאיים */
+  html body .scheme-order-details .mh-ot-hero .mh-ot-cash .mh-ot-amt { flex: none !important; font-size: 20px !important; line-height: 26px !important; font-weight: 800 !important; color: #c8151b !important; font-variant-numeric: tabular-nums !important; white-space: nowrap !important; }
+  html body .scheme-order-details .mh-ot-hero .mh-ot-cash .mh-ot-amt bdi { unicode-bidi: isolate !important; }
   @media (hover: hover) {
     html body .scheme-order-details .mh-ot-hero a.mh-ot-row:hover { border-color: rgba(227, 30, 36, 0.25) !important; }
     html body .scheme-order-details .mh-ot-hero a.mh-ot-cta:hover { filter: brightness(1.05) !important; }
