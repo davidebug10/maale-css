@@ -8753,6 +8753,8 @@ html.mh-android-app body #MultiVendorBottomNav .floating-nav-wrapper #ongoingOrd
   /* B6b. מזומן (דוד 22.11, MH OrderTrack v1.2.0): "לתשלום לשליח במזומן" + "סה״כ לתשלום" של Hyperzod בקצה — אדום כהה כמו כל מחיר באתר, מספרים טבלאיים */
   html body .scheme-order-details .mh-ot-hero .mh-ot-cash .mh-ot-amt { flex: none !important; font-size: 20px !important; line-height: 26px !important; font-weight: 800 !important; color: #c8151b !important; font-variant-numeric: tabular-nums !important; white-space: nowrap !important; }
   html body .scheme-order-details .mh-ot-hero .mh-ot-cash .mh-ot-amt bdi { unicode-bidi: isolate !important; }
+  /* B6c. תעודת זהות (דוד 23.11, MH OrderTrack v1.3.0): הזמנה עם מוצרי 18+ — "חובה להציג תעודת זהות לשליח" לפני המזומן, תג 18+ ניטרלי בקצה (האדום נשאר לשלב ולסכום) */
+  html body .scheme-order-details .mh-ot-hero .mh-ot-id .mh-ot-age { flex: none !important; padding: 2px 8px !important; border: 1.5px solid #111 !important; border-radius: 999px !important; font-size: 13px !important; line-height: 18px !important; font-weight: 800 !important; color: #111 !important; direction: ltr !important; unicode-bidi: isolate !important; white-space: nowrap !important; }
   @media (hover: hover) {
     html body .scheme-order-details .mh-ot-hero a.mh-ot-row:hover { border-color: rgba(227, 30, 36, 0.25) !important; }
     html body .scheme-order-details .mh-ot-hero a.mh-ot-cta:hover { filter: brightness(1.05) !important; }

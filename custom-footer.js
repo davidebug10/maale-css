@@ -7803,7 +7803,7 @@ log('פעיל');
 })();
 
 /* ============================================================
-   מסך "ההזמנה שלי" + הכפתור "ההזמנה שלי" בדף הבית — MH OrderTrack  |  v1.2.0 | 2026-11-22 (v1.1.0: 29.10 שעון דלוק; v1.0.0: 28.10)
+   מסך "ההזמנה שלי" + הכפתור "ההזמנה שלי" בדף הבית — MH OrderTrack  |  v1.3.0 | 2026-11-23 (v1.2.0: 22.11 מזומן; v1.1.0: 29.10 שעון דלוק; v1.0.0: 28.10)
    העיצוב שאושר (דוד 28.10, "מאשר הכל"): capture/order-screen-27.10/design/r2/final (markup.html = ה-DOM המדויק
    שהבלוק כותב, DECISIONS §7/§11). ה-CSS: חלק 66 ב-global-cdn.css.
    מה הבלוק עושה (tick אחד כל 400ms, רק כשיש .scheme-order-details או #ongoingOrders בדף; אחרת אין טיימר):
@@ -7820,6 +7820,8 @@ log('פעיל');
      - הכפתור בדף הבית: .mh-ot-line בכל כרטיס של Swiper (getOnGoingOrders בלי 5/6, אותו סדר), אותו שלב ואותו מספר כמו המסך.
      - מזומן (v1.2.0, דוד 22.11: "שידע שזה הזמנה במזומן ושהוא צריך לשלם"): בשלבים 1–4, שורה .mh-ot-cash מתחת לשלבים —
        "לתשלום לשליח במזומן" + "סה״כ לתשלום" של Hyperzod מאותו מסך. ראו cashDue().
+     - תעודת זהות (v1.3.0, דוד 23.11: "חובה להציג תעודת זהות לשליח, וללא תעודת זהות, השליח אינו יכול למסור את הפריטים"):
+       בשלבים 1–4, בהזמנה עם מוצרי 18+ — שורה .mh-ot-id לפני שורת המזומן. 18+ = אותו כלל כמו MH AgeDoor בצ'ק-אאוט. ראו ageDue().
    השעון: clockView() — מודל research2/eta-model.mjs + תיקוני הביקורת (28.10): חסד 2 דק' לאיחור Realtime, prev אחד לכל
      הזמנה (מסך+כפתור), תקרת טבעת 0.94 ו"ממש עוד רגע" ב-≤2 דק' בתוך המודל, היסט שעון שרת (HEAD, פעם אחת לטעינה, רק מעל 60 שנ'; עד התשובה — שלבים בלבד).
      ייצוב (QA r2): ההבטחה בדקות שלמות, זזה רק מעל 3′ ולכל היותר פעם ב-2′, תזוזה מאוחרת = "זמן הגעה מעודכן", הטבעת לא חוזרת אחורה.
@@ -7835,7 +7837,7 @@ log('פעיל');
   if (window.__MH_OT__) { return; }
   window.__MH_OT__ = true;
 
-  var VERSION = '1.2.0';
+  var VERSION = '1.3.0';
   var CLOCK_ON = true;             /* דחיפה 2 (29.10, דוד: "להדליק עכשיו" אחרי הזמנה חיה באייפון): שעון דלוק. false = מצב שלבים בלבד */
   var TICK = 400, LIVE_GRACE = 60000, BEAT_FRESH = 120000, TILES_WAIT = 4000;
   var FAILS = 3;                   /* QA r4: כשלים רצופים של ציור המסך עד שמוציאים את הצמתים שלנו (~1.2 שנ'); כשל בודד משאיר את הציור האחרון */
@@ -7846,7 +7848,7 @@ log('פעיל');
   var P = { courier: 10, wait: 5, tA: 7.5, tB: 1.4, maxKm: 8, preLo: 6, preHi: 12, postLo: 6, postHi: 8, adoptLater: 5, adoptEarlier: 3,
     L1: 5, L2: 15, L3: 30, maxPrep: 120, grace: 2, cap: 0.94, soon: 2 };
   var stats = { version: VERSION, clock: false, css: false, has: false, ticks: 0, renders: 0, discs: 0, stripRenders: 0, mode: null, stage: null, level: 0,
-    mapMode: null, map: null, cover: null, seam: false, chat: false, cash: null, fits: 0, redraws: 0, beats: 0, live: null, offsetS: 0, watched: 0, announces: 0, errors: 0, lastError: null };
+    mapMode: null, map: null, cover: null, seam: false, chat: false, cash: null, id18: null, fits: 0, redraws: 0, beats: 0, live: null, offsetS: 0, watched: 0, announces: 0, errors: 0, lastError: null };
 
   function ext(a, b) { var o = {}, k; for (k in a) { o[k] = a[k]; } for (k in b) { o[k] = b[k]; } return o; }
   function err(e) { stats.errors++; stats.lastError = String((e && e.message) || e).slice(0, 140); }
@@ -8111,7 +8113,8 @@ log('פעיל');
     wa: '<path d="M20 12a8 8 0 0 1-11.7 7.1L4 20.2l1.1-4.1A8 8 0 1 1 20 12z"/><path d="M9.2 8.6c.3 2.9 2.5 5.4 5.9 6l1-1.3-1.8-1.1-1 .8a5 5 0 0 1-2.4-2.4l.8-1-1.1-1.8z"/>',
     chat: '<path d="M5 4.5h14a2 2 0 0 1 2 2V15a2 2 0 0 1-2 2h-8.5L6 20.5V17H5a2 2 0 0 1-2-2V6.5a2 2 0 0 1 2-2z"/><path d="M7.5 9h9M7.5 12.5h6"/>',
     chev: '<path d="M14.5 5.5 8 12l6.5 6.5"/>',
-    cash: '<rect x="2.5" y="6" width="19" height="12" rx="2"/><circle cx="12" cy="12" r="2.6"/><path d="M6 9.5v5M18 9.5v5"/>'
+    cash: '<rect x="2.5" y="6" width="19" height="12" rx="2"/><circle cx="12" cy="12" r="2.6"/><path d="M6 9.5v5M18 9.5v5"/>',
+    idcard: '<rect x="2.5" y="5" width="19" height="14" rx="2"/><circle cx="8.5" cy="10.5" r="2.2"/><path d="M5.3 15.8c.6-1.5 1.7-2.3 3.2-2.3s2.6.8 3.2 2.3M14.5 10h4M14.5 13.5h3"/>'
   };
   function ico(n, cls) { return '<svg class="' + (cls || 'mh-ot-g') + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + G[n] + '</svg>'; }
   function r1(x) { return Math.round(x * 10) / 10; }
@@ -8183,6 +8186,10 @@ log('פעיל');
       (d.line ? '<p class="mh-ot-line">' + d.line + '</p>' : '') + (d.sub ? '<p class="mh-ot-sub">' + d.sub + '</p>' : '') + '</div>' +
       (d.cta ? '<a class="mh-ot-cta" href="' + wa + '" target="_blank" rel="noopener">' + ico('wa') + '<span>דברו איתנו בוואטסאפ</span></a>' : '') +
       (d.stage != null ? stepsHTML(d.stage) : '') + '</div>';
+    if (d.id18) {   /* תעודת זהות (דוד 23.11) — מוצרי 18+; לפני המזומן: בלי תעודה אין מסירה בכלל. תג 18+ ניטרלי — האדום נשאר לשלב ולסכום */
+      h += '<div class="mh-ot-row mh-ot-id"><span class="mh-ot-ico" aria-hidden="true">' + ico('idcard') + '</span><span class="mh-ot-rt"><b>חובה להציג תעודת זהות לשליח</b>' +
+        '<span>ללא תעודת זהות, השליח אינו יכול למסור את הפריטים</span></span><b class="mh-ot-age">18+</b></div>';
+    }
     if (d.cash) {   /* מזומן (דוד 22.11) — מתחת לשלבים, לפני השליח. תמיד "לשליח": אצלנו אין איסוף עצמי (pickup = "משלוח עד הבית מורחב" של קפית) */
       h += '<div class="mh-ot-row mh-ot-cash"><span class="mh-ot-ico" aria-hidden="true">' + ico('cash') + '</span><span class="mh-ot-rt"><b>לתשלום לשליח במזומן</b>' +
         '<span>זכרו להכין את הסכום לפני שהשליח מגיע</span></span>' + (d.cash.amt ? '<b class="mh-ot-amt"><bdi dir="ltr">' + esc(d.cash.amt) + '</bdi></b>' : '') + '</div>';
@@ -8218,6 +8225,21 @@ log('פעיל');
     var f = typeof c.total_amount_formatted === 'string' && /\d/.test(c.total_amount_formatted) ? c.total_amount_formatted.trim() : '';
     if (o.order_amount != null && o.order_amount !== '' && !(Math.abs(Number(o.order_amount) - t) < 0.01)) { f = ''; }
     return { amt: f };
+  }
+  /* 18+ (דוד 23.11) — אותו כלל כמו MH AgeDoor בצ'ק-אאוט (ageReason): עסק ברשימת החנויות של MH AgeGate (ageMerchants — גואה)
+     או מוצר שקטגוריה שלו (name או התרגום) ברשימת הקטגוריות שלו (restricted). הרשימות נקראות מ-MH_AGEGATE בכל ציור — מקור אחד.
+     בהזמנה (getViewOrder) לכל מוצר יש product_categories — נבדק 23.11 על הזמנה אמיתית. אין MH_AGEGATE → null (לא מציגים) */
+  function ageDue(o) {   /* ponytail: עותק של ageReason — כל בלוק עומד לבד (נכשל-פתוח) */
+    var A = window.MH_AGEGATE, items = (o.cart && o.cart.cart_items) || [], R = (A && A.restricted) || [];
+    if (!A) { return null; }
+    if ((A.ageMerchants || []).indexOf(o.merchant_id || (items[0] && items[0].merchant_id)) !== -1) { return 'merchant'; }
+    return items.some(function (it) {
+      return (it && it.product_categories || []).some(function (c) {
+        var n = [c && c.name];
+        (c && c.language_translation || []).forEach(function (l) { if (l && l.key === 'name') { n.push(l.value); } });
+        return n.some(function (s) { return typeof s === 'string' && R.indexOf(s.trim()) !== -1; });
+      });
+    }) ? 'category' : null;
   }
   function model(o, v, nw, liveCourier, chat) {
     var st = v.stage, d = { stage: STAGE_NO[st] == null ? null : STAGE_NO[st], level: 0, status: v.label, line: null, sub: null, aria: null, badge: null,
@@ -8269,7 +8291,7 @@ log('פעיל');
     if (ag && ag.name && (st === 'on_the_way' || (chat && d.stage >= 1 && d.stage <= 3))) { d.courier = String(ag.name).trim().split(/\s+/)[0]; d.chat = chat || null; }
     var da = o.delivery_address;
     if (d.stage != null && d.stage < 5 && da && da.address) { d.drop = { addr: da.address, note: da.landmark || '' }; }
-    if (d.stage >= 1 && d.stage <= 4) { d.cash = cashDue(o); }   /* 0 = תשלום אונליין בהמתנה; נמסרה / בוטלה — כבר לא */
+    if (d.stage >= 1 && d.stage <= 4) { d.cash = cashDue(o); d.id18 = ageDue(o); }   /* 0 = תשלום אונליין בהמתנה; נמסרה / בוטלה — כבר לא */
     d.merchant = (o.merchant && o.merchant.name) || '';
     d.wa = waHref(o.order_id);
     return d;
@@ -8600,7 +8622,7 @@ log('פעיל');
        הזו (/profile/order/<id>, /order/success/<id>). QA r5: באפליקציה הכרטיס היוצא נשאר באנימציה אחרי החזרה לרשימה — בלי
        בדיקת הכתובת דרסנו את "Orders - …" שלה */
     if (!card.closest('.v-navigation-drawer, .v-overlay') && new RegExp('/order/(?:success/)?' + o.order_id + '(?!\\d)').test(location.pathname) && document.title !== 'ההזמנה שלי') { document.title = 'ההזמנה שלי'; }
-    stats.mode = v.mode; stats.stage = v.stage; stats.level = d.level; stats.mapMode = mapMode; stats.map = mapState; stats.cover = cover; stats.seam = hero.hasAttribute('data-seam'); stats.chat = !!d.chat; stats.live = lv; stats.cash = d.cash ? d.cash.amt || '?' : null;
+    stats.mode = v.mode; stats.stage = v.stage; stats.level = d.level; stats.mapMode = mapMode; stats.map = mapState; stats.cover = cover; stats.seam = hero.hasAttribute('data-seam'); stats.chat = !!d.chat; stats.live = lv; stats.cash = d.cash ? d.cash.amt || '?' : null; stats.id18 = d.id18 || null;
   }
 
   /* ---------- הכפתור בדף הבית ---------- */
