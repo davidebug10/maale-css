@@ -5208,21 +5208,55 @@ log('פעיל');
 })();
 
 /* ============================================================
-   טלפון בטופס הכתובת: ישראל תמיד — MH ILPhone  |  v1.0.0 | 2026-09-23
+   טלפון: ישראל תמיד — MH ILPhone  |  v1.1.0 | 2026-11-24 (v1.0.0: 23.9)
    בקשת דוד: בשדה הטלפון של הוספת/עריכת כתובת, ישראל (+972) היא ברירת המחדל ותפריט המדינות
    לא נפתח בכלל. Hyperzod פותחת את הבורר על המדינה הראשונה ברשימה (אנדורה, +376) לאורחים.
    איך: מאתרים ברשימת המדינות של הבורר (.country-select-dropdown li) את "Israel" ולוחצים עליה
    דרך המאזין של Vue (li.click()) — כך הקידומת האמיתית של הטופס משתנה, לא רק התצוגה. רץ רק
    כשהדגל הנוכחי אינו ישראל, ורק בתוך #AddressInputContactPhoneNumber. הנעילה של התפריט (בלי
    חץ, בלי לחיצה, הרשימה מוסתרת) היא ב-CSS בחלק 44.
-   נכשל-פתוח: אין רשימה/אין ישראל → כלום. בדיקה: window.MH_ILPHONE.stats()
+   v1.1.0 (24.11, דוד: "למה זה בוחר ארצות הברית? אנשים לא מצליחים לקבל קוד"): כניסה / הרשמה /
+   שכחתי סיסמה — Hyperzod מציעה לאורח את המדינה מ-sessionStorage.geo_country, שממולא בטעינה
+   מ-/public/v1/helpers/geoIp. השירות נופל לפעמים ומחזיר את ברירת המחדל שלו, ארה״ב ("default":true —
+   נתפס 24.11 מכתובת ישראלית), והקוד נשלח ל-+1. כאן: geo_country תמיד IL — גם כשהתשובה מגיעה אחרי
+   שהקובץ רץ (הבקשה יוצאת לפני), לכן גם עטיפה של setItem למפתח הזה בלבד. לקוח מחובר: Hyperzod לוקחת
+   את המדינה שלו — לא נוגעים. הבורר נשאר פתוח: מספר מחו"ל — בוחרים מדינה ידנית.
+   נכשל-פתוח: אין רשימה/אין ישראל/אין sessionStorage → כלום. בדיקה: window.MH_ILPHONE.stats()
    ============================================================ */
 (function () {
   'use strict';
   if (window.__MH_ILPHONE__) { return; }
   window.__MH_ILPHONE__ = true;
-  var VERSION = '1.0.0', ROOT = '#AddressInputContactPhoneNumber', WANT = 'israel';
-  var stats = { version: VERSION, scans: 0, selected: 0, alreadyIL: 0, noList: 0, last: null };
+  var VERSION = '1.1.0', ROOT = '#AddressInputContactPhoneNumber', WANT = 'israel';
+  var stats = { version: VERSION, scans: 0, selected: 0, alreadyIL: 0, noList: 0, last: null, geo: { start: null, fixed: 0, was: null } };
+  try {
+    var GEO = 'geo_country', ss = window.sessionStorage, setItem = Storage.prototype.setItem;
+    Storage.prototype.setItem = function (k, v) {
+      if (k === GEO && this === ss && v !== 'IL') { stats.geo.was = String(v); stats.geo.fixed++; v = 'IL'; }
+      return setItem.call(this, k, v);
+    };
+    stats.geo.start = ss.getItem(GEO);
+    if (stats.geo.start !== 'IL') { ss.setItem(GEO, 'IL'); }
+  } catch (e) {}
+  /* v1.1.0 (24.11, דוד: "Validation Failed" בכניסה, "Invalid phone number." בהרשמה): המילוי האוטומטי של האייפון
+     מכניס "+972 55-553-3212" — עם רווחים ומקפים, ולפעמים עטוף בסימני כיווניות נסתרים (U+202A…U+202C). Hyperzod לא מנקה:
+     בכניסה המספר נראה לה "אימייל" (אין דגל), בהרשמה השרת דוחה אותו. כאן: בשדות הטלפון (כניסה, הרשמה, החלפת מספר, כתובת,
+     פרופיל), כשאחרי ניקוי נשאר מספר — כותבים אותו כמו שמקלידים בארץ: 0555533212. רץ ב-capture על document, לפני
+     ה-v-model, כך ש-Hyperzod רואה רק את המספר הנקי. אימייל / מספר חלקי / קוד האימות (#loginOTP) — לא נוגעים. */
+  stats.cleaned = 0;
+  var JUNK = /[\s‎‏‪-‮⁦-⁩().\-‐-―−]/g;
+  function cleanPhone(raw) {
+    var v = String(raw || '').replace(JUNK, '');
+    if (!/^\+?\d{7,15}$/.test(v)) { return null; }
+    var m = /^(?:\+|00)?972(\d{8,10})$/.exec(v);
+    return m ? (m[1].charAt(0) === '0' ? m[1] : '0' + m[1]) : v;
+  }
+  document.addEventListener('input', function (e) {
+    var el = e.target;
+    if (!el || el.tagName !== 'INPUT' || el.id === 'loginOTP' || !(el.type === 'tel' || el.id === 'loginEmailOrNumber')) { return; }
+    var v = cleanPhone(el.value);
+    if (v !== null && v !== el.value) { el.value = v; stats.cleaned++; }
+  }, true);
   function currentIsIsrael(cs) {
     var img = cs.querySelector('.country-select-toggle img');
     var alt = (img && (img.getAttribute('alt') || '')).toLowerCase();
