@@ -686,11 +686,26 @@ if (!window.__MH_FOOTER__) { window.__MH_FOOTER__ = true;
    - תרגום "Rating:" ל-"הדירוג שלי:" (span.review)
    - "להזמין מחדש" מלא (Hyperzod קוצצת ל-10 תווים: "להזמין מחד..."). 23.10: היה לפי button.track-btn.tw-bg-black —
      מת מאז שהבילד השתנה (היום bg-button_normal); עכשיו לפי הטקסט המקוצר עצמו. העיצוב שתלוי בו — חלק 37.
+   - 26.11 (דוד: "תתרגם יותר הגיוני"): דירוג ההזמנה. מה שבחבילת השפה (review.title / input.feedback / button.submit) — עודכן באדמין
+     (שיחת maale-ops, 26.11 16:45). כאן רק מה שקשיח באנגלית בקוד של Hyperzod (דירוג השליח, רק במשלוח AutoZod) — החלפה מדויקת:
+     הכותרת "Rate your delivery" (#RateOrder [data-rate-section] > label), "Delivery:" (span.review), הטוסט "Review submitted".
    ========================================================= */
 (function () {
     'use strict';
 
     var REORDER_FULL = 'להזמין מחדש';
+    var RATE = { 'Rate your delivery': 'איך היה השליח?' };   // דוד 26.11: על השליח עצמו, לא "המשלוח"
+    var TOAST = { 'Review submitted': 'תודה! הדירוג נשלח' };
+
+    /* nodeValue של צומת הטקסט הקיים (לא textContent) — Vue ממשיך להחזיק את אותו צומת */
+    function swapText(el, map) {
+        for (var c = el.firstChild; c; c = c.nextSibling) {
+            if (c.nodeType === 3) {
+                var k = c.nodeValue.trim();
+                if (Object.prototype.hasOwnProperty.call(map, k)) { c.nodeValue = map[k]; }
+            }
+        }
+    }
 
     function to24(text) {
         return text.replace(
@@ -728,7 +743,20 @@ if (!window.__MH_FOOTER__) { window.__MH_FOOTER__ = true;
                 if (node.nodeType === 3 && /Rating\s*:/i.test(node.textContent)) {
                     node.textContent = node.textContent.replace(/Rating\s*:/i, 'הדירוג שלי:');
                 }
+                if (node.nodeType === 3 && /Delivery\s*:/i.test(node.textContent)) {
+                    node.textContent = node.textContent.replace(/Delivery\s*:/i, 'השליח:');
+                }
             });
+        });
+        document.querySelectorAll('#RateOrder [data-rate-section] > label').forEach(function (el) {
+            swapText(el, RATE);
+        });
+        document.querySelectorAll('.v-snackbar').forEach(function (bar) {
+            var w = document.createTreeWalker(bar, NodeFilter.SHOW_TEXT, null), n;
+            while ((n = w.nextNode())) {
+                var k = n.nodeValue.trim();
+                if (Object.prototype.hasOwnProperty.call(TOAST, k)) { n.nodeValue = TOAST[k]; }
+            }
         });
     }
 

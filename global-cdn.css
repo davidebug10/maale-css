@@ -2832,9 +2832,14 @@ html body button.track-btn:not(.tw-bg-black) > .v-btn__content > svg circle {
     stroke: currentColor !important;
 }
 
-/* חלונית "דרג את ההזמנה שלך" (#RateOrder, טופס .rate-form בחלונית תחתונה) — 23.10 (ליטוש):
-   ה-X ישב צמוד לקצה המסך (right:0 של Hyperzod; ה-ma-2 שלה לא קיים ב-Tailwind עם התחילית) ונראה חתוך בפינה המעוגלת;
-   "שלח" היה מלבן אדום שטוח בפינות 4 — עכשיו כפתור הפעולה של האתר (גרדיאנט, פינות 14, 50). */
+/* חלונית "דרג את ההזמנה שלך" (#RateOrder, טופס .rate-form; בנייד חלונית תחתונה, במחשב פאנל בצד) — 23.10 (ליטוש), 26.11 עיצוב מלא (דוד: "יש לעצב"):
+   כל חלק ([data-rate-section]: העסק, ובמשלוח של AutoZod גם המשלוח) בכרטיס לבן משלו, כותרת ממורכזת 18/800; כוכבים 36px ממורכזים —
+   ריק = קו אפור, מסומן = זהב מלא. Vuetify לא שמה מחלקה על כוכב מלא, רק מחליפה אייקון: mdi-star-outline (path שמתחיל ב-"M12,15.39") / mdi-star;
+   הכפתורים plain (שקיפות 0.62 של Vuetify — הכוכבים נראו דהויים) → 1. שדה המשוב אפור מעוגל בלי הקו, בפוקוס לבן עם מסגרת אדומה עדינה (כמו הערה בצ'ק-אאוט).
+   התוכן מתחיל מתחת ל-X (במחשב ה-X ישב על "דרג"). "שלח" = כפתור הפעולה של האתר (גרדיאנט, פינות 14, 50). הטקסטים — custom-footer.js (דף ההזמנות). */
+html body #RateOrder {
+    padding: 24px 20px max(28px, env(safe-area-inset-bottom)) !important;
+}
 html body #RateOrder > .back-btn {
     right: 16px !important;
     top: 16px !important;
@@ -2848,8 +2853,129 @@ html body #RateOrder > .back-btn::before {
     bottom: -2px !important;
     left: -2px !important;
 }
+html body #RateOrder > .v-card-text {
+    margin: 0 !important;
+    padding: 0 !important;
+}
+html body #RateOrder .rate-form {
+    padding: 44px 0 0 !important;
+}
+html body #RateOrder .rate-form > [data-rate-section] {
+    margin: 0 !important;
+    padding: 16px 14px 14px !important;
+    border: 1px solid rgba(0, 0, 0, 0.06) !important;
+    border-radius: 18px !important;
+    background: #fff !important;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05) !important;
+    text-align: center !important;
+}
+html body #RateOrder .rate-form > [data-rate-section] + [data-rate-section] {
+    margin-top: 12px !important;
+}
+html body #RateOrder [data-rate-section] > label {
+    padding: 0 0 2px !important;
+    font-size: 18px !important;
+    font-weight: 800 !important;
+    line-height: 1.3 !important;
+    letter-spacing: 0 !important;
+    color: #111 !important;
+    text-align: center !important;
+}
+html body #RateOrder [data-rate-section] > .tw-flex {
+    justify-content: center !important;
+}
+html body #RateOrder [data-rate-section] .v-rating {
+    margin: 0 !important;
+    gap: 2px !important;
+}
+html body #RateOrder [data-rate-section] .v-rating .v-btn {
+    width: 48px !important;
+    height: 48px !important;
+    min-width: 0 !important;
+    padding: 0 !important;
+    color: #ffb800 !important;
+    opacity: 1 !important;
+    transition: transform 0.12s ease !important;
+}
+html body #RateOrder [data-rate-section] .v-rating .v-btn:active {
+    transform: scale(0.86) !important;
+}
+html body #RateOrder [data-rate-section] .v-rating .v-icon {
+    font-size: 36px !important;
+    width: 36px !important;
+    height: 36px !important;
+}
+html body #RateOrder [data-rate-section] .v-rating .v-icon__svg path[d^="M12,15.39"] {
+    fill: #c7c7cc !important;
+}
+html body #RateOrder [data-rate-section] .feedback-input {
+    margin-top: 6px !important;
+}
+/* הגובה: Vuetify מחשבת את גובה השדה (auto-grow) מהמשתנים שעל .v-field עצמו, לא מה-padding — 46 במקום 56 */
+html body #RateOrder [data-rate-section] .feedback-input .v-field {
+    --v-input-control-height: 46px !important;
+    --v-input-padding-top: 12px !important;
+    --v-field-padding-top: 0px !important;
+    --v-field-padding-bottom: 12px !important;
+    --v-field-padding-start: 14px !important;
+    --v-field-padding-end: 14px !important;
+    border: 1.5px solid transparent !important;
+    border-radius: 14px !important;
+    background: #f5f5f7 !important;
+    box-shadow: none !important;
+    transition: background 0.2s ease, border-color 0.2s ease !important;
+}
+html body #RateOrder [data-rate-section] .feedback-input .v-field--focused {
+    background: #fff !important;
+    border-color: rgba(227, 30, 36, 0.35) !important;
+}
+html body #RateOrder [data-rate-section] .feedback-input :is(.v-field__outline, .v-field__loader) {
+    display: none !important;
+}
+html body #RateOrder [data-rate-section] .feedback-input textarea.v-field__input {
+    min-height: 46px !important;
+    padding: 12px 14px !important;
+    font-size: 15px !important;
+    font-weight: 600 !important;
+    line-height: 22px !important;
+    color: #111 !important;
+    text-align: right !important;
+    opacity: 1 !important;
+    -webkit-mask-image: none !important;
+    mask-image: none !important;
+}
+html body #RateOrder [data-rate-section] .feedback-input textarea.v-field__input::placeholder {
+    color: #8e8e93 !important;
+    font-weight: 500 !important;
+    opacity: 1 !important;
+}
+html body #RateOrder [data-rate-section] .feedback-input .v-input__details {
+    min-height: 0 !important;
+    padding: 0 4px !important;
+}
+html body #RateOrder [data-rate-section] .feedback-input .v-counter {
+    padding-top: 4px !important;
+    font-size: 11px !important;
+    color: #9ca3af !important;
+    letter-spacing: 0 !important;
+}
+/* חלק שכבר דורג: כוכבים לקריאה בלבד + הטקסט שנכתב (.tw-bg-gray-100) — טקסט אפור ממורכז בלי קופסה, שלא ייראה כמו שדה */
+html body #RateOrder [data-rate-section] > .tw-bg-gray-100 {
+    margin: 2px 0 0 !important;
+    padding: 0 8px !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    text-align: center !important;
+}
+html body #RateOrder [data-rate-section] > .tw-bg-gray-100 p {
+    font-size: 14px !important;
+    font-weight: 500 !important;
+    line-height: 1.45 !important;
+    color: #6b6b70 !important;
+}
 html body #RateOrder .rate-form > .v-btn {
     height: 50px !important;
+    margin: 16px 0 0 !important;
     border-radius: 14px !important;
     background: linear-gradient(135deg, #ff3b41 0%, #c8151b 100%) !important;
     box-shadow: 0 8px 20px rgba(227, 30, 36, 0.28) !important;
